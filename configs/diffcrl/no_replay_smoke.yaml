@@ -1,0 +1,32 @@
+# Cheap BC no-replay pipeline validation; not a performance experiment.
+experiment: diffcrl
+environment:
+  reward_function_version: v2
+bc:
+  epochs: 2
+  batch_size: 256
+  learning_rate: 0.001
+  hidden_sizes:
+  - 256
+  - 256
+  normalization_mode: layer-norm
+  loss: post-tanh-mse
+continual:
+  tasks:
+  - reach-v3
+  - hammer-v3
+  experts:
+    reach-v3: runs/reward_v2/reach-v3/seed_0/final_model.zip
+    hammer-v3: runs/reward_v2/hammer-v3/seed_0/final_model.zip
+  trajectories_per_task: 4
+  replay_mode: none
+evaluation:
+  episodes: 2
+  seed: 10000
+  mode: fixed-tasks
+  task_set_seed: 10000
+runtime:
+  seed: 0
+  device: cpu
+  output: runs/no_replay_smoke
+

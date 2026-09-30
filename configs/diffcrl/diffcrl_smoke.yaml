@@ -1,0 +1,61 @@
+# DiffCRL end-to-end smoke test.
+# Small settings for pipeline validation only.
+
+experiment: diffcrl
+
+environment:
+  reward_function_version: v2
+
+bc:
+  # Only enough to verify BC training actually runs.
+  epochs: 2
+  batch_size: 256
+  learning_rate: 0.001
+  hidden_sizes:
+  - 256
+  - 256
+  normalization_mode: layer-norm
+  loss: post-tanh-mse
+
+diffusion:
+  # Only enough to execute training + sampling.
+  epochs: 2
+  batch_size: 4
+  learning_rate: 0.001
+
+  # Reduce denoising steps for faster generation.
+  steps: 10
+
+  width: 64
+  action_space: raw
+  action_clamp_epsilon: 0.0001
+  generated_action_projection: none
+
+continual:
+  # Need >=2 tasks to exercise generative replay.
+  tasks:
+  - reach-v3
+  - hammer-v3
+
+  experts:
+    reach-v3: runs/reward_v2/reach-v3/seed_0/final_model.zip
+    hammer-v3: runs/reward_v2/hammer-v3/seed_0/final_model.zip
+
+  # Small but enough for train/validation trajectory splitting.
+  trajectories_per_task: 4
+
+  # Critical: must be diffusion, otherwise Stage 1 does not test replay.
+  replay_mode: diffusion
+
+evaluation:
+  # Only testing whether evaluation executes.
+  episodes: 2
+  seed: 10000
+  mode: fixed-tasks
+  task_set_seed: 10000
+runtime:
+  seed: 0
+  device: cpu
+
+  # Keep smoke outputs completely separate from real experiments.
+  output: runs/diffcrl_smoke

@@ -1,0 +1,30 @@
+# Controlled push-v3 stability comparison C: lower LR, larger batch, smaller net.
+experiment: sac
+environment:
+  reward_function_version: v2
+sac:
+  steps: 1000000
+  learning_rate: 0.0003
+  buffer_size: 1000000
+  learning_starts: 10000
+  batch_size: 256
+  gamma: 0.99
+  tau: 0.005
+  train_freq: 1
+  gradient_steps: 1
+  ent_coef: auto
+  net_arch:
+  - 256
+  - 256
+  checkpoint_freq: 50000
+continual:
+  tasks:
+  - push-v3
+evaluation:
+  episodes: 10
+  frequency: 20000
+  seed_offset: 10000
+runtime:
+  seed: 0
+  device: cpu
+  output: runs/controlled/push_sac_stability_c_conservative

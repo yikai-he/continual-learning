@@ -1,0 +1,38 @@
+# Canonical five-task sequential SAC baseline. One policy is retained across
+# tasks; the replay buffer is reset at each task boundary.
+experiment: continual_sac
+environment:
+  reward_function_version: v2
+sac:
+  learning_rate: 0.001
+  buffer_size: 1000000
+  learning_starts: 10000
+  batch_size: 128
+  gamma: 0.99
+  tau: 0.005
+  train_freq: 1
+  gradient_steps: 1
+  ent_coef: auto
+  net_arch:
+  - 256
+  - 256
+  - 256
+  - 256
+continual:
+  tasks:
+  - button-press-v3
+  - faucet-close-v3
+  - hammer-v3
+  - handle-press-side-v3
+  - window-close-v3
+  steps_per_task: 1000000
+  boundary_warmup_steps: 10000
+evaluation:
+  episodes: 50
+  seed: 10000
+  mode: fixed-tasks
+  task_set_seed: 10000
+runtime:
+  seed: 0
+  device: cpu
+  output: runs/formal/continual_sac_5task

@@ -1,0 +1,52 @@
+# Formal five-task, 200-trajectory DiffCRL experiment.
+experiment: diffcrl
+
+environment:
+  reward_function_version: v2
+
+bc:
+  epochs: 100
+  batch_size: 256
+  learning_rate: 0.001
+  hidden_sizes:
+  - 256
+  - 256
+  normalization_mode: layer-norm
+  loss: post-tanh-mse
+
+diffusion:
+  epochs: 300
+  batch_size: 8
+  learning_rate: 0.001
+  steps: 100
+  width: 64
+  action_space: raw
+  action_clamp_epsilon: 0.0001
+  generated_action_projection: none
+
+continual:
+  tasks:
+  - button-press-v3
+  - faucet-close-v3
+  - hammer-v3
+  - handle-press-side-v3
+  - window-close-v3
+  experts:
+    button-press-v3: runs/reward_v2/button-press-v3/seed_0/best_model/best_model.zip
+    faucet-close-v3: runs/reward_v2/faucet-close-v3/seed_0/best_model/best_model.zip
+    hammer-v3: runs/reward_v2/hammer-v3/seed_0/best_model/best_model.zip
+    handle-press-side-v3: runs/reward_v2/handle-press-side-v3/seed_0/best_model/best_model.zip
+    window-close-v3: runs/reward_v2/window-close-v3/seed_0/final_model.zip
+  trajectories_per_task: 200
+  replay_mode: diffusion
+
+evaluation:
+  episodes: 50
+  seed: 10000
+  mode: fixed-tasks
+  task_set_seed: 10000
+
+runtime:
+  seed: 1
+  device: cpu
+  output: runs/formal/diffcrl_5task_200traj
