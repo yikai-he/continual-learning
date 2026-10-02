@@ -15,6 +15,18 @@ python -m pip install -r requirements.txt
 
 The expected package version is `metaworld==3.1.1`.
 
+## Testing
+
+Run the full test suite from the repository root:
+
+```bash
+PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 python -m pytest -q
+```
+
+Plugin autoload is disabled because unrelated system or ROS pytest plugins can
+interfere with the test run. Optional KUKA or hardware-specific integration
+tests may be skipped when their local resources are unavailable.
+
 ## KUKA experiments
 
 KUKA experiments require a separate custom MetaWorld fork, `metaworld-kuka`.
