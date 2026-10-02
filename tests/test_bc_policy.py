@@ -34,7 +34,7 @@ class GeneralPolicyTests(unittest.TestCase):
             load_config(root / name).bc.normalization_mode
             for name in (
                 "configs/diffcrl/diffcrl.yaml",
-                "configs/diffcrl/no_replay.yaml",
+                "configs/diffcrl/diffcrl_no_replay.yaml",
             )
         }
         self.assertEqual(modes, {"layer-norm"})

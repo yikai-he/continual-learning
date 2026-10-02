@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from collections.abc import Mapping
 from dataclasses import dataclass
 
@@ -20,7 +22,7 @@ class TrajectoryGroupPreparation:
 
 @dataclass
 class PreparedGroupedTrajectoryDataset:
-    """Stage (N,200,43) splits with one diffusion task label per episode."""
+    """Stage ``(N,T,43)`` splits with one diffusion task label per episode."""
 
     train: torch.Tensor
     validation: torch.Tensor

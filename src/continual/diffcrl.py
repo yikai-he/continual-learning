@@ -1,7 +1,10 @@
 """Pretrained-expert DiffCRL with goal-conditioned replay and sequential BC."""
 
+from __future__ import annotations
+
 from dataclasses import asdict, dataclass
 from pathlib import Path
+from typing import Dict
 
 import numpy as np
 import torch
@@ -15,7 +18,7 @@ from src.config import (
     save_resolved_config,
     validate_config,
 )
-from src.envs import EPISODE_HORIZON, make_metaworld_env
+from src.envs import horizon_for_backend, make_env
 from src.support.dataset import (
     bc_dataset,
     concatenate_trajectory_groups,
@@ -47,8 +50,8 @@ from .trajectory_diffusion import (
     fit_diffusion,
 )
 
-Metadata = dict[str, object]
-LossReport = dict[str, object]
+Metadata = Dict[str, object]
+LossReport = Dict[str, object]
 
 
 @dataclass(frozen=True)
@@ -201,6 +204,7 @@ class DiffCRLTrainer:
         experts = config.continual.experts
         output = output_directory(config)
         self.sequence, self.config = sequence, config
+        self.horizon = horizon_for_backend(config.environment.backend)
         self.progress = progress
         self.experts = {
             t.task_name: Path(experts[t.task_name]).resolve() for t in sequence.tasks
@@ -216,7 +220,7 @@ class DiffCRLTrainer:
         self.diffusion = (
             TrajectoryDiffusion(
                 DiffusionConfig(
-                    horizon=EPISODE_HORIZON,
+                    horizon=self.horizon,
                     steps=config.diffusion.steps,
                     width=config.diffusion.width,
                     num_tasks=sequence.num_tasks,
@@ -257,6 +261,8 @@ class DiffCRLTrainer:
                 "generated_action_projection": config.diffusion.generated_action_projection,
                 "evaluation_mode": config.evaluation.mode,
                 "tasks": sequence.task_names,
+                "environment_backend": config.environment.backend,
+                "horizon": self.horizon,
                 "task_set_seed": config.evaluation.task_set_seed
                 if config.evaluation.mode == "fixed-tasks"
                 else None,
@@ -320,6 +326,7 @@ class DiffCRLTrainer:
             evaluation_mode=self.config.evaluation.mode,
             task_set_seed=self.config.evaluation.task_set_seed,
             reward_function_version=self.config.environment.reward_function_version,
+            backend=self.config.environment.backend,
             progress=self.progress,
         )
 
@@ -335,6 +342,8 @@ class DiffCRLTrainer:
                 checkpoint=self.previous_diffusion,
                 expected_state_hash=context.diffusion_before_hash,
                 task_names=tuple(self.sequence.task_names),
+                backend=cfg.environment.backend,
+                horizon=self.horizon,
                 runtime_seed=cfg.runtime.seed,
                 device=cfg.runtime.device,
                 reward_function_version=cfg.environment.reward_function_version,
@@ -352,9 +361,9 @@ class DiffCRLTrainer:
         """Collect deterministic current-task episodes from its frozen SAC expert.
 
         The method records task configurations and provenance, initializes the
-        GeneralPolicy at stage zero, and returns packed ``(N, 200, 43)`` data.
+        GeneralPolicy at stage zero, and returns packed ``(N, horizon, 43)`` data.
         All episodes are retained regardless of success, but formal packing
-        requires the full 200-step horizon and rejects shorter episodes.
+        requires the selected backend's full horizon and rejects shorter episodes.
         """
         cfg = self.config
         task = context.task
@@ -366,13 +375,18 @@ class DiffCRLTrainer:
         expert = SB3SACPolicy(
             SAC.load(self.experts[task.task_name], device=cfg.runtime.device)
         )
-        env = make_metaworld_env(
+        env = make_env(
+            cfg.environment.backend,
             task.task_name,
             cfg.runtime.seed,
             reward_function_version=cfg.environment.reward_function_version,
         )
         try:
-            bank = training_bank(task.task_name, cfg.runtime.seed)
+            bank = training_bank(
+                task.task_name,
+                cfg.runtime.seed,
+                backend=cfg.environment.backend,
+            )
             collected_configurations = []
             if (
                 expert.model.observation_space != env.observation_space
@@ -404,7 +418,7 @@ class DiffCRLTrainer:
         del expert
         group = pack_trajectories(
             trajectories,
-            horizon=EPISODE_HORIZON,
+            horizon=self.horizon,
             task_names=self.sequence.task_names,
         )
         real_actions = group[..., PHYSICAL_ACTION_SLICE]
@@ -468,7 +482,9 @@ class DiffCRLTrainer:
         preparations, splits = {}, {}
         for index, values in groups.items():
             name = self.sequence.task(index).task_name
-            validate_trajectory_group(values, count=count)
+            validate_trajectory_group(
+                values, count=count, horizon=self.horizon
+            )
             path = directory / f"data_task_{index}.npy"
             np.save(path, values.numpy(), allow_pickle=False)
             sources[name].update(data_path=str(path), data_sha256=file_hash(path))
@@ -494,8 +510,8 @@ class DiffCRLTrainer:
                 "train_ids": prepared.train_ids,
                 "validation_ids": prepared.validation_ids,
                 "trajectories": count,
-                "train_samples": len(prepared.train_ids) * EPISODE_HORIZON,
-                "validation_samples": len(prepared.validation_ids) * EPISODE_HORIZON,
+                "train_samples": len(prepared.train_ids) * self.horizon,
+                "validation_samples": len(prepared.validation_ids) * self.horizon,
             }
         prepared_data = concatenate_trajectory_groups(groups, preparations)
         return StageData(

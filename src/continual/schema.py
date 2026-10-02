@@ -1,7 +1,8 @@
 """Trajectory contract for collected environment episodes.
 
 Current environment contract (owned by src.envs): observations (T, 39),
-actions (T, 4), rewards (T,), with T <= 200. Each observation is the state
+actions (T, 4), rewards (T,), with T bounded by the effective environment
+horizon. Each observation is the state
 before its corresponding action; each reward follows that action.
 This schema is unpadded: T equals length. Any padded representation requires an
 explicit valid-length mask so padding cannot enter learning.
@@ -32,6 +33,7 @@ class Trajectory:
     task_id: str
     episode_return: float
     success: bool
+    final_success: bool
     length: int
 
 
@@ -73,3 +75,5 @@ def validate_trajectory(trajectory: Trajectory, *, horizon: int) -> None:
         raise ValueError("episode_return must equal the sum of rewards.")
     if not isinstance(trajectory.success, (bool, np.bool_)):
         raise ValueError("success must be boolean.")
+    if not isinstance(trajectory.final_success, (bool, np.bool_)):
+        raise ValueError("final_success must be boolean.")

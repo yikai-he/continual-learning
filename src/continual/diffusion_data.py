@@ -1,6 +1,8 @@
 """Physical BC trajectory packing and goal-conditioned 22D diffusion encoding."""
 
-from collections.abc import Sequence
+from __future__ import annotations
+
+from typing import Sequence
 
 import numpy as np
 import torch

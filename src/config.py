@@ -12,7 +12,7 @@ import re
 import types
 from dataclasses import asdict, dataclass, field, is_dataclass, replace
 from pathlib import Path
-from typing import get_args, get_origin, get_type_hints
+from typing import Dict, List, Optional, Union, get_args, get_origin, get_type_hints
 
 import yaml
 
@@ -21,6 +21,7 @@ import yaml
 class EnvironmentConfig:
     """MetaWorld environment semantics shared by training and evaluation."""
 
+    backend: str = "metaworld-v3"
     reward_function_version: str = "v2"
 
 
@@ -38,7 +39,7 @@ class SACConfig:
     train_freq: int = 1
     gradient_steps: int = 1
     ent_coef: str = "auto"
-    net_arch: list[int] = field(default_factory=lambda: [256, 256, 256, 256])
+    net_arch: List[int] = field(default_factory=lambda: [256, 256, 256, 256])
     checkpoint_freq: int = 10_000
 
 
@@ -49,7 +50,7 @@ class BCConfig:
     epochs: int = 100
     batch_size: int = 256
     learning_rate: float = 0.001
-    hidden_sizes: list[int] = field(default_factory=lambda: [256, 256])
+    hidden_sizes: List[int] = field(default_factory=lambda: [256, 256])
     normalization_mode: str = "layer-norm"  # Network LayerNorm, not data z-scoring.
     loss: str = "post-tanh-mse"  # Physical-action or pre-tanh latent-space MSE.
 
@@ -93,10 +94,10 @@ def _default_experts():
 class ContinualConfig:
     """Ordered curriculum, expert sources, stage budget, and replay behavior."""
 
-    tasks: list[str] = field(
+    tasks: List[str] = field(
         default_factory=lambda: ["reach-v3", "push-v3", "hammer-v3"]
     )
-    experts: dict[str, str] = field(default_factory=_default_experts)
+    experts: Dict[str, str] = field(default_factory=_default_experts)
     trajectories_per_task: int = 200
     replay_mode: str = "diffusion"  # Old-task generation or current-task-only BC.
     steps_per_task: int = 1_000_000
@@ -122,9 +123,9 @@ class RuntimeConfig:
 
     seed: int = 0
     device: str = "cpu"
-    output: str | None = None
-    run_name: str | None = None
-    run_dir: str | None = None  # Filled with the actual directory in saved configs.
+    output: Optional[str] = None
+    run_name: Optional[str] = None
+    run_dir: Optional[str] = None  # Filled with the actual directory in saved configs.
 
 
 @dataclass(frozen=True)
@@ -158,7 +159,7 @@ _RUNTIME_FIELDS = ("seed", "device", "output", "run_name", "run_dir")
 # Per-entry-point allowlist for validation and resolved-config serialization.
 _EXPERIMENT_FIELDS = {
     "sac": {
-        "environment": ("reward_function_version",),
+        "environment": ("backend", "reward_function_version"),
         "sac": ("steps", *_COMMON_SAC_FIELDS, "checkpoint_freq"),
         "continual": ("tasks",),
         "evaluation": ("episodes", "frequency", "seed_offset"),
@@ -172,7 +173,7 @@ _EXPERIMENT_FIELDS = {
         "runtime": _RUNTIME_FIELDS,
     },
     "diffcrl": {
-        "environment": ("reward_function_version",),
+        "environment": ("backend", "reward_function_version"),
         "bc": tuple(BCConfig.__annotations__),
         "diffusion": tuple(DiffusionConfig.__annotations__),
         "continual": ("tasks", "experts", "trajectories_per_task", "replay_mode"),
@@ -263,7 +264,8 @@ _UniqueKeyLoader.add_constructor(
 
 def _typed(value, annotation, path):
     origin, args = get_origin(annotation), get_args(annotation)
-    if origin is types.UnionType:
+    union_type = getattr(types, "UnionType", None)
+    if origin is Union or union_type is not None and origin is union_type:
         if value is None and type(None) in args:
             return None
         return _typed(value, next(t for t in args if t is not type(None)), path)
@@ -313,8 +315,8 @@ def _merge(default, values, path=""):
 def config_from_dict(
     values: dict,
     *,
-    expected_experiment: str | None = None,
-    overrides: dict | None = None,
+    expected_experiment: Optional[str] = None,
+    overrides: Optional[dict] = None,
 ) -> ExperimentConfig:
     if not isinstance(values, dict) or "experiment" not in values:
         raise ValueError("Missing required field: experiment.")
@@ -389,6 +391,7 @@ def validate_config(config: ExperimentConfig) -> None:
     if len(config.bc.hidden_sizes) != 2 or any(n < 1 for n in config.bc.hidden_sizes):
         raise ValueError("bc.hidden_sizes must contain two positive widths.")
     for path, allowed in {
+        "environment.backend": ("metaworld-v3", "kuka-v2"),
         "environment.reward_function_version": ("v1", "v2"),
         "bc.normalization_mode": ("layer-norm",),
         "bc.loss": ("post-tanh-mse", "pre-tanh-mse"),
@@ -415,20 +418,38 @@ def validate_config(config: ExperimentConfig) -> None:
             "continual.trajectories_per_task must be >=2 for a disjoint holdout."
         )
     tasks = config.continual.tasks
-    if (
-        not tasks
-        or len(set(tasks)) != len(tasks)
-        or any(not t.endswith("-v3") for t in tasks)
+    if not tasks or len(set(tasks)) != len(tasks):
+        raise ValueError("continual.tasks must be a nonempty list of unique task names.")
+    if config.environment.backend == "metaworld-v3" and any(
+        not task.endswith("-v3") for task in tasks
     ):
         raise ValueError(
             "continual.tasks must be a nonempty list of unique MetaWorld v3 task names."
         )
+    kuka_v2_tasks = {
+        "kuka-reach-v2",
+        "kuka-push-v2",
+        "kuka-hammer-v2",
+        "kuka-handle-press-side-v2",
+        "kuka-button-press-v2",
+    }
+    if config.environment.backend == "kuka-v2" and any(
+        task not in kuka_v2_tasks for task in tasks
+    ):
+        raise ValueError(
+            "The kuka-v2 backend supports only these tasks: "
+            f"{sorted(kuka_v2_tasks)}."
+        )
+    if config.environment.backend == "kuka-v2" and config.experiment == "continual_sac":
+        raise ValueError("The kuka-v2 backend is not implemented for continual_sac.")
     if config.experiment == "sac" and len(tasks) != 1:
         raise ValueError("continual.tasks must contain exactly one task for sac.")
     if config.experiment == "sac" and config.evaluation.mode != "sampled":
         raise ValueError(
             "evaluation.mode must be sampled for single-task SAC callbacks."
         )
+    if config.environment.backend == "kuka-v2" and config.evaluation.mode != "sampled":
+        raise ValueError("evaluation.mode must be sampled for the kuka-v2 backend.")
     if config.experiment == "continual_sac" and config.continual.replay_mode != "none":
         raise ValueError("continual.replay_mode must be none for continual_sac.")
     if config.evaluation.mode == "fixed-tasks" and config.evaluation.episodes > 50:
@@ -484,7 +505,11 @@ def parse_config(
     if config_required:
         config_argument["required"] = True
     else:
-        config_argument["default"] = Path("configs") / f"{experiment}.yaml"
+        config_argument["default"] = {
+            "sac": Path("configs/sac/sac.yaml"),
+            "diffcrl": Path("configs/diffcrl/diffcrl.yaml"),
+            "continual_sac": Path("configs/continual_sac/continual_sac.yaml"),
+        }[experiment]
         config_argument["help"] = "Experiment YAML (default: %(default)s)."
     parser.add_argument("--config", **config_argument)
     parser.add_argument("--seed", type=int, default=None, help="Override runtime.seed.")

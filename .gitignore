@@ -35,6 +35,7 @@ env/
 runs/
 experiments/
 videos/
+/configs/local/
 
 # Generated or internal documentation artifacts
 /docs/diagnostics/

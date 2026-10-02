@@ -13,12 +13,17 @@ if str(REPOSITORY_ROOT) not in sys.path:
 import numpy as np
 from stable_baselines3 import SAC
 
-from src.envs import make_metaworld_env
+from src.envs import make_env
 
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--task", required=True)
+    parser.add_argument(
+        "--env-backend",
+        choices=("metaworld-v3", "kuka-v2"),
+        default="metaworld-v3",
+    )
     parser.add_argument("--model", type=Path, required=True)
     parser.add_argument("--episodes", type=int, default=50)
     parser.add_argument("--seed", type=int, default=10_000)
@@ -42,7 +47,8 @@ def main() -> None:
     if args.episodes <= 0:
         raise ValueError("--episodes must be greater than zero.")
     model_path = resolve_model_path(args.model)
-    env = make_metaworld_env(
+    env = make_env(
+        args.env_backend,
         args.task,
         args.seed,
         render_mode="human" if args.render else None,

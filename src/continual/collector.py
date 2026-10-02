@@ -1,6 +1,6 @@
 """Single- and repeated-episode collection through the common policy boundary.
 
-Use environments constructed by src.envs.make_metaworld_env. Preserve
+Use environments constructed through src.envs. Preserve
 Gymnasium reset's (observation, info) and step's five returns:
     observation, reward, terminated, truncated, info
 End on terminated or truncated; do not use the old Gym four-return API.
@@ -12,8 +12,7 @@ Success alone does not end an episode. No filtering or padding is performed.
 
 from __future__ import annotations
 
-from collections.abc import Callable
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Callable, Optional
 
 import numpy as np
 from tqdm.auto import tqdm
@@ -27,7 +26,7 @@ if TYPE_CHECKING:
     import gymnasium as gym
 
 
-EpisodeResetCallback = Callable[[object, np.ndarray, int | None, int], None]
+EpisodeResetCallback = Callable[[object, np.ndarray, Optional[int], int], None]
 
 
 def collect_trajectory(
@@ -85,6 +84,7 @@ def collect_trajectory(
                 task_id=task_id,
                 episode_return=sum(rewards),
                 success=episode_success,
+                final_success=bool(info.get("success", False)),
                 length=len(rewards),
             )
             validate_trajectory(trajectory, horizon=horizon)

@@ -79,14 +79,15 @@ class TrainingConfigTests(unittest.TestCase):
             )
             path = Path(tmp) / "input.yaml"
             path.write_text(yaml.safe_dump(config_to_dict(c)))
-            with (
-                patch.object(train_sac, "SAC") as sac,
-                patch.object(train_sac, "make_metaworld_env") as env,
-                patch.object(train_sac, "Monitor", side_effect=lambda e: e),
-                patch.object(train_sac, "CallbackList"),
-                patch.object(train_sac, "EvalCallback") as evaluation,
-                patch.object(train_sac, "CheckpointCallback") as checkpoint,
-            ):
+            with patch.object(train_sac, "SAC") as sac, patch.object(
+                train_sac, "make_env"
+            ) as env, patch.object(
+                train_sac, "Monitor", side_effect=lambda e: e
+            ), patch.object(train_sac, "CallbackList"), patch.object(
+                train_sac, "FixedSeedEvalCallback"
+            ) as evaluation, patch.object(
+                train_sac, "CheckpointCallback"
+            ) as checkpoint:
                 train_sac.main(
                     [
                         "--config",
@@ -112,7 +113,11 @@ class TrainingConfigTests(unittest.TestCase):
                 )
                 self.assertTrue(sac.return_value.learn.call_args.kwargs["progress_bar"])
                 self.assertEqual(
-                    [call.args[1] for call in env.call_args_list], [3, 126]
+                    [call.args[2] for call in env.call_args_list], [3, 126]
+                )
+                self.assertEqual(
+                    [call.args[0] for call in env.call_args_list],
+                    ["metaworld-v3", "metaworld-v3"],
                 )
                 self.assertEqual(
                     [
@@ -122,6 +127,11 @@ class TrainingConfigTests(unittest.TestCase):
                     ["v2", "v2"],
                 )
                 self.assertEqual(evaluation.call_args.kwargs["eval_freq"], 4)
+                self.assertEqual(evaluation.call_args.kwargs["seed"], 126)
+                self.assertEqual(
+                    evaluation.call_args.kwargs["best_success_model_save_path"],
+                    Path(tmp) / "trial/best_success_model",
+                )
                 self.assertEqual(checkpoint.call_args.kwargs["save_freq"], 3)
             resolved = load_config(Path(tmp) / "trial/config.yaml")
             self.assertEqual(
@@ -165,12 +175,15 @@ class TrainingConfigTests(unittest.TestCase):
 
             model.learn.side_effect = learn
             model.save.side_effect = save
-            with (
-                patch.object(sequential_sac, "SAC", return_value=model) as sac,
-                patch.object(sequential_sac, "make_metaworld_env"),
-                patch.object(sequential_sac, "Monitor", side_effect=lambda e: e),
-                patch.object(sequential_sac, "evaluate_stage") as evaluation,
-            ):
+            with patch.object(
+                sequential_sac, "SAC", return_value=model
+            ) as sac, patch.object(
+                sequential_sac, "make_metaworld_env"
+            ), patch.object(
+                sequential_sac, "Monitor", side_effect=lambda e: e
+            ), patch.object(
+                sequential_sac, "evaluate_stage"
+            ) as evaluation:
                 train_continual_sac.run(c)
                 kwargs = sac.call_args.kwargs
                 self.assertEqual(

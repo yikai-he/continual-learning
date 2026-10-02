@@ -142,11 +142,14 @@ def evaluate_task(
     evaluation_mode="sampled",
     task_set_seed=10000,
     reward_function_version="v2",
+    backend="metaworld-v3",
     progress=False,
 ):
     """Fresh task env, reset(seed+i) each episode, deterministic act; any-step success."""
     if evaluation_mode not in ("sampled", "fixed-tasks"):
         raise ValueError("Unknown evaluation mode.")
+    if backend != "metaworld-v3" and evaluation_mode == "fixed-tasks":
+        raise ValueError("fixed-tasks evaluation is specific to MetaWorld-v3.")
     selected, identities = (
         fixed_mt1_tasks(task.task_name, task_set_seed)
         if evaluation_mode == "fixed-tasks"
@@ -164,7 +167,9 @@ def evaluate_task(
     successes = []
     episode_provenance = []
     with TaskSwitcher(
-        sequence, reward_function_version=reward_function_version
+        sequence,
+        backend=backend,
+        reward_function_version=reward_function_version,
     ) as switcher:
         env = switcher.switch(0, seed=seed)
         model = getattr(policy, "model", None)
@@ -223,6 +228,7 @@ def evaluate_task(
         "episode_successes": successes,
         "deterministic": True,
         "evaluation_mode": evaluation_mode,
+        "environment_backend": backend,
         "task_set_seed": task_set_seed if selected is not None else None,
         "task_bank_size": len(selected) if selected is not None else None,
         "episode_provenance": episode_provenance if selected is not None else None,
@@ -243,6 +249,7 @@ def evaluate_stage(
     evaluation_mode="sampled",
     task_set_seed=10000,
     reward_function_version="v2",
+    backend="metaworld-v3",
     progress=False,
 ):
     """Evaluate row ``stage`` on learned tasks, or all tasks when requested.
@@ -276,6 +283,7 @@ def evaluate_stage(
             evaluation_mode=evaluation_mode,
             task_set_seed=task_set_seed,
             reward_function_version=reward_function_version,
+            backend=backend,
             progress=progress,
         )
         for j in indices

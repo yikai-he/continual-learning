@@ -1,8 +1,10 @@
 """Previous-task diffusion replay generation for one DiffCRL stage."""
 
-from collections.abc import Callable
+from __future__ import annotations
+
 from dataclasses import dataclass
 from pathlib import Path
+from typing import Callable, Dict
 
 import numpy as np
 import torch
@@ -10,7 +12,6 @@ from tqdm.auto import tqdm
 
 from src.envs import (
     CURRENT_STATE_SLICE,
-    EPISODE_HORIZON,
     GOAL_SLICE,
     PREVIOUS_STATE_SLICE,
 )
@@ -27,7 +28,7 @@ from .diffusion_data import (
 from .task_bank import reconstruct_goals, sample_training_configurations
 from .trajectory_diffusion import TrajectoryDiffusion
 
-ReplaySource = dict[str, object]
+ReplaySource = Dict[str, object]
 ProgressMessage = Callable[..., None]
 
 
@@ -43,6 +44,8 @@ class ReplayRequest:
     checkpoint: Path
     expected_state_hash: str | None
     task_names: tuple[str, ...]
+    backend: str
+    horizon: int
     runtime_seed: int
     device: str
     reward_function_version: str
@@ -68,7 +71,7 @@ def generate_previous_task_replay(
 ) -> ReplayResult:
     """Reconstruct old training goals and decode sampled 22D dynamics to 43D replay.
 
-    Each prior task receives ``trajectory_count`` physical 200-step trajectories.
+    Each prior task receives ``trajectory_count`` full-horizon physical trajectories.
     """
     old, old_norm, old_goal_norm, old_meta = TrajectoryDiffusion.load(
         request.checkpoint,
@@ -104,6 +107,7 @@ def generate_previous_task_replay(
             reconstruct_goals(
                 source,
                 selected,
+                backend=request.backend,
                 reward_function_version=request.reward_function_version,
             ),
             dtype=torch.float32,
@@ -147,8 +151,10 @@ def generate_previous_task_replay(
         )
         assert torch.equal(
             projected[..., GOAL_SLICE],
-            goals[:, None].expand(-1, EPISODE_HORIZON, -1),
+            goals[:, None].expand(-1, request.horizon, -1),
         )
+        if projected.shape[1] != request.horizon:
+            raise ValueError("Replay checkpoint horizon differs from selected backend.")
         groups[old_index] = projected
         action_diagnostics = generated_action_diagnostics(
             decoded, projected, request.action_projection

@@ -218,10 +218,9 @@ class StageReportTests(unittest.TestCase):
             expected["diffusion_sha256"] = file_hash(artifacts.diffusion_path)
             expected["policy_sha256"] = file_hash(artifacts.policy_path)
 
-            with (
-                patch("src.continual.diffcrl.state_hash", return_value="policy-after"),
-                patch("src.continual.diffcrl.print_stage_report") as printed,
-            ):
+            with patch(
+                "src.continual.diffcrl.state_hash", return_value="policy-after"
+            ), patch("src.continual.diffcrl.print_stage_report") as printed:
                 actual = trainer._finish_stage(
                     context, data, diffusion, policy, artifacts
                 )
@@ -266,10 +265,9 @@ class StageReportTests(unittest.TestCase):
             trainer.previous_diffusion = previous
             trainer.next_stage = 0
 
-            with (
-                patch("src.continual.diffcrl.state_hash", return_value="policy-after"),
-                patch("src.continual.diffcrl.print_stage_report") as printed,
-            ):
+            with patch(
+                "src.continual.diffcrl.state_hash", return_value="policy-after"
+            ), patch("src.continual.diffcrl.print_stage_report") as printed:
                 with self.assertRaisesRegex(
                     RuntimeError, "Source expert changed during experiment"
                 ):

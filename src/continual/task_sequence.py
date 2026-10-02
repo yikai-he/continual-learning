@@ -1,13 +1,15 @@
 """Task metadata and lazy, explicit environment switching; observations stay 39D."""
 
+from __future__ import annotations
+
 from dataclasses import dataclass
 
-from src.envs import make_metaworld_env
+from src.envs import make_env
 
 
 @dataclass(frozen=True)
 class TaskSpec:
-    """Map a stored task ID to its MetaWorld v3 environment name."""
+    """Map a stored task ID to a backend-validated environment name."""
 
     task_id: str
     task_name: str
@@ -17,9 +19,9 @@ class TaskSpec:
             not isinstance(self.task_id, str)
             or not self.task_id.strip()
             or not isinstance(self.task_name, str)
-            or not self.task_name.endswith("-v3")
+            or not self.task_name.strip()
         ):
-            raise ValueError("Require a nonempty task ID and MetaWorld v3 task name.")
+            raise ValueError("Require nonempty task ID and task name strings.")
 
 
 @dataclass(frozen=True)
@@ -70,11 +72,14 @@ class TaskSwitcher:
         self,
         sequence=PILOT_SEQUENCE,
         *,
-        factory=make_metaworld_env,
+        factory=make_env,
+        backend="metaworld-v3",
         reward_function_version="v2",
     ):
         self.sequence = sequence
         self.factory = factory
+        self.factory_uses_backend = factory is make_env
+        self.backend = backend
         self.env = None
         self.index = None
         self.reward_function_version = reward_function_version
@@ -82,8 +87,13 @@ class TaskSwitcher:
     def switch(self, index, *, seed):
         spec = self.sequence.task(index)
         self.close()
+        args = (
+            (self.backend, spec.task_name, seed)
+            if self.factory_uses_backend
+            else (spec.task_name, seed)
+        )
         self.env = self.factory(
-            spec.task_name, seed, reward_function_version=self.reward_function_version
+            *args, reward_function_version=self.reward_function_version
         )
         self.index = index
         return self.env

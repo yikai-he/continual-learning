@@ -90,6 +90,7 @@ class StageDatasetTests(unittest.TestCase):
             action_low=-torch.ones(4), action_high=torch.ones(4)
         )
         trainer.train_configurations = {}
+        trainer.horizon = 200
         raw = StageRawData(
             groups=groups,
             sources={name: {"kind": "fixture"} for name in sequence.task_names},

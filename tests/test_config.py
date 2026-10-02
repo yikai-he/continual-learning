@@ -93,8 +93,8 @@ class ConfigTests(unittest.TestCase):
             "sac_smoke": "configs/sac/sac_smoke.yaml",
             "diffcrl": "configs/diffcrl/diffcrl.yaml",
             "diffcrl_smoke": "configs/diffcrl/diffcrl_smoke.yaml",
-            "no_replay": "configs/diffcrl/no_replay.yaml",
-            "no_replay_smoke": "configs/diffcrl/no_replay_smoke.yaml",
+            "no_replay": "configs/diffcrl/diffcrl_no_replay.yaml",
+            "no_replay_smoke": "configs/diffcrl/diffcrl_no_replay_smoke.yaml",
             "continual_sac": "configs/continual_sac/continual_sac.yaml",
             "continual_sac_smoke": "configs/continual_sac/continual_sac_smoke.yaml",
         }
@@ -128,11 +128,8 @@ class ConfigTests(unittest.TestCase):
                     version,
                 )
         for invalid in ("v3", "", 2, None):
-            with (
-                self.subTest(version=invalid),
-                self.assertRaisesRegex(
-                    ValueError, "environment.reward_function_version"
-                ),
+            with self.subTest(version=invalid), self.assertRaisesRegex(
+                ValueError, "environment.reward_function_version"
             ):
                 self.config(environment={"reward_function_version": invalid})
 
@@ -198,9 +195,8 @@ class ConfigTests(unittest.TestCase):
             ),
         ]
         for values, message in cases:
-            with (
-                self.subTest(values=values),
-                self.assertRaisesRegex(ValueError, message),
+            with self.subTest(values=values), self.assertRaisesRegex(
+                ValueError, message
             ):
                 config_from_dict(values)
 
@@ -218,6 +214,37 @@ class ConfigTests(unittest.TestCase):
             self.config().continual.experts["push-v3"],
             "runs/reward_v2/push-v3/seed_0/final_model.zip",
         )
+
+    def test_kuka_diffcrl_tasks_are_explicitly_validated(self):
+        tasks = [
+            "kuka-reach-v2",
+            "kuka-push-v2",
+            "kuka-hammer-v2",
+            "kuka-handle-press-side-v2",
+            "kuka-button-press-v2",
+        ]
+        experts = {task: f"/tmp/{task}.zip" for task in tasks}
+        config = self.config(
+            environment={"backend": "kuka-v2"},
+            continual={"tasks": tasks, "experts": experts},
+            evaluation={"mode": "sampled"},
+        )
+        self.assertEqual(config.continual.tasks, tasks)
+        self.assertEqual(config.environment.backend, "kuka-v2")
+        with self.assertRaisesRegex(ValueError, "supports only these tasks"):
+            self.config(
+                environment={"backend": "kuka-v2"},
+                continual={
+                    "tasks": ["kuka-invalid-v2"],
+                    "experts": {"kuka-invalid-v2": "/tmp/invalid.zip"},
+                },
+                evaluation={"mode": "sampled"},
+            )
+        with self.assertRaisesRegex(ValueError, "must be sampled"):
+            self.config(
+                environment={"backend": "kuka-v2"},
+                continual={"tasks": tasks, "experts": experts},
+            )
 
     def test_invalid_ranges_and_choices(self):
         cases = [
@@ -299,9 +326,8 @@ class ConfigTests(unittest.TestCase):
         ]
         for values, message in cases:
             values.setdefault("runtime", {"output": "/tmp/run"})
-            with (
-                self.subTest(values=values),
-                self.assertRaisesRegex(ValueError, message),
+            with self.subTest(values=values), self.assertRaisesRegex(
+                ValueError, message
             ):
                 config_from_dict(values)
 
@@ -311,9 +337,8 @@ class ConfigTests(unittest.TestCase):
             self.assertEqual(resolve_device(c).runtime.device, "cpu")
             with self.assertRaisesRegex(ValueError, "unavailable"):
                 resolve_device(replace(c, runtime=replace(c.runtime, device="cuda")))
-        with (
-            patch("torch.cuda.is_available", return_value=True),
-            patch("torch.cuda.device_count", return_value=1),
+        with patch("torch.cuda.is_available", return_value=True), patch(
+            "torch.cuda.device_count", return_value=1
         ):
             self.assertEqual(resolve_device(c).runtime.device, "cuda")
             with self.assertRaisesRegex(ValueError, "unavailable"):

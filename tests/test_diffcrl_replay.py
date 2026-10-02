@@ -46,7 +46,9 @@ def request(**overrides):
         "trajectory_count": 3,
         "checkpoint": Path("/tmp/replay-checkpoint.pt"),
         "expected_state_hash": "expected-state",
-        "task_names": ("reach-v3", "push-v3", "hammer-v3"),
+            "task_names": ("reach-v3", "push-v3", "hammer-v3"),
+            "backend": "metaworld-v3",
+            "horizon": 200,
         "runtime_seed": 23,
         "device": "cpu",
         "reward_function_version": "v2",
@@ -81,25 +83,23 @@ class DiffCRLReplayTests(unittest.TestCase):
         load = Mock(return_value=(model, normalizer, normalizer, metadata()))
         progress = Mock()
 
-        def goals(bank, selected, *, reward_function_version):
+        def goals(bank, selected, *, backend, reward_function_version):
+            self.assertEqual(backend, "metaworld-v3")
             self.assertEqual(reward_function_version, "v2")
             base = 1.0 if bank["task_name"] == "reach-v3" else 2.0
             return [[base, float(index), -base] for index in selected]
 
-        with (
-            patch("src.continual.diffcrl_replay.TrajectoryDiffusion.load", load),
-            patch(
-                "src.continual.diffcrl_replay.reconstruct_goals",
-                side_effect=goals,
-            ),
-            patch(
-                "src.continual.diffcrl_replay.file_hash",
-                return_value="checkpoint-sha",
-            ),
-            patch(
-                "src.continual.diffcrl_replay.state_hash",
-                return_value="expected-state",
-            ),
+        with patch(
+            "src.continual.diffcrl_replay.TrajectoryDiffusion.load", load
+        ), patch(
+            "src.continual.diffcrl_replay.reconstruct_goals",
+            side_effect=goals,
+        ), patch(
+            "src.continual.diffcrl_replay.file_hash",
+            return_value="checkpoint-sha",
+        ), patch(
+            "src.continual.diffcrl_replay.state_hash",
+            return_value="expected-state",
         ):
             result = generate_previous_task_replay(request(), progress_message=progress)
 
@@ -135,22 +135,19 @@ class DiffCRLReplayTests(unittest.TestCase):
         def run_once():
             model = FakeDiffusion()
             normalizer = IdentityNormalizer()
-            with (
-                patch(
-                    "src.continual.diffcrl_replay.TrajectoryDiffusion.load",
-                    return_value=(model, normalizer, normalizer, metadata()),
-                ),
-                patch(
-                    "src.continual.diffcrl_replay.reconstruct_goals",
-                    side_effect=lambda bank, selected, **_: [
-                        [1.0, float(index), -1.0] for index in selected
-                    ],
-                ),
-                patch("src.continual.diffcrl_replay.file_hash", return_value="sha"),
-                patch(
-                    "src.continual.diffcrl_replay.state_hash",
-                    return_value="expected-state",
-                ),
+            with patch(
+                "src.continual.diffcrl_replay.TrajectoryDiffusion.load",
+                return_value=(model, normalizer, normalizer, metadata()),
+            ), patch(
+                "src.continual.diffcrl_replay.reconstruct_goals",
+                side_effect=lambda bank, selected, **_: [
+                    [1.0, float(index), -1.0] for index in selected
+                ],
+            ), patch(
+                "src.continual.diffcrl_replay.file_hash", return_value="sha"
+            ), patch(
+                "src.continual.diffcrl_replay.state_hash",
+                return_value="expected-state",
             ):
                 return generate_previous_task_replay(request())
 
@@ -164,28 +161,21 @@ class DiffCRLReplayTests(unittest.TestCase):
     def test_state_hash_mismatch_fails_before_sampling(self):
         model = FakeDiffusion()
         normalizer = IdentityNormalizer()
-        with (
-            patch(
-                "src.continual.diffcrl_replay.TrajectoryDiffusion.load",
-                return_value=(model, normalizer, normalizer, metadata()),
-            ),
-            patch(
-                "src.continual.diffcrl_replay.state_hash",
-                return_value="different-state",
-            ),
-            self.assertRaisesRegex(RuntimeError, "Previous checkpoint differs"),
-        ):
+        with patch(
+            "src.continual.diffcrl_replay.TrajectoryDiffusion.load",
+            return_value=(model, normalizer, normalizer, metadata()),
+        ), patch(
+            "src.continual.diffcrl_replay.state_hash",
+            return_value="different-state",
+        ), self.assertRaisesRegex(RuntimeError, "Previous checkpoint differs"):
             generate_previous_task_replay(request())
         self.assertEqual(model.calls, [])
 
     def test_checkpoint_validation_failure_propagates(self):
-        with (
-            patch(
-                "src.continual.diffcrl_replay.TrajectoryDiffusion.load",
-                side_effect=ValueError("Diffusion checkpoint configuration differs"),
-            ),
-            self.assertRaisesRegex(ValueError, "configuration differs"),
-        ):
+        with patch(
+            "src.continual.diffcrl_replay.TrajectoryDiffusion.load",
+            side_effect=ValueError("Diffusion checkpoint configuration differs"),
+        ), self.assertRaisesRegex(ValueError, "configuration differs"):
             generate_previous_task_replay(request())
 
 

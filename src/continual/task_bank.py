@@ -4,10 +4,9 @@ import hashlib
 import pickle
 from importlib.metadata import version
 
-import metaworld
 import numpy as np
 
-from src.envs import GOAL_SLICE, make_metaworld_env
+from src.envs import GOAL_SLICE, make_env, make_metaworld_env
 
 
 def bank_hashes(tasks):
@@ -15,13 +14,27 @@ def bank_hashes(tasks):
 
 
 def mt1_tasks(task_name, seed):
+    import metaworld
+
     return metaworld.MT1(task_name, seed=seed).train_tasks
 
 
-def training_bank(task_name, seed):
-    """Record ordered MT1 identities needed to verify and reconstruct replay goals."""
+def training_bank(task_name, seed, *, backend="metaworld-v3"):
+    """Record identities needed to verify and reconstruct replay goals."""
+    if backend == "kuka-v2":
+        return {
+            "backend": backend,
+            "task_name": task_name,
+            "bank_seed": seed,
+            "ordered_task_hashes": [],
+            "reset_seeds": [],
+            "goals": [],
+        }
+    if backend != "metaworld-v3":
+        raise ValueError(f"Unsupported environment backend: {backend!r}.")
     tasks = mt1_tasks(task_name, seed)
     return {
+        "backend": backend,
         "task_name": task_name,
         "bank_seed": seed,
         "ordered_task_hashes": bank_hashes(tasks),
@@ -31,6 +44,25 @@ def training_bank(task_name, seed):
 
 def selected_configuration(env, bank, observation, episode_id):
     """Read the already selected frozen rand_vec; never draw from wrapper RNG."""
+    if bank.get("backend", "metaworld-v3") == "kuka-v2":
+        goal = np.asarray(observation)[GOAL_SLICE].astype(np.float32, copy=True)
+        target = np.asarray(env.unwrapped.raw_env._target_pos, dtype=np.float32)
+        if not np.array_equal(goal, target):
+            raise ValueError("Collection goal disagrees with environment target.")
+        reset_seed = bank["bank_seed"] + episode_id
+        digest = hashlib.sha256(goal.tobytes()).hexdigest()
+        bank["ordered_task_hashes"].append(digest)
+        bank["reset_seeds"].append(reset_seed)
+        bank["goals"].append(goal.tolist())
+        return {
+            "configuration_index": episode_id,
+            "task_data_sha256": digest,
+            "task_name": bank["task_name"],
+            "env_name": bank["task_name"],
+            "bank_seed": bank["bank_seed"],
+            "reset_seed": reset_seed,
+            "episode_id": episode_id,
+        }
     cursor = env
     while cursor is not None and not hasattr(cursor, "tasks"):
         cursor = getattr(cursor, "env", None)
@@ -73,8 +105,36 @@ def sample_training_configurations(bank, train_indices, count, seed):
     )
 
 
-def reconstruct_goals(bank, indices, *, reward_function_version="v2"):
+def reconstruct_goals(
+    bank, indices, *, backend="metaworld-v3", reward_function_version="v2"
+):
     """Only task identities are read; no expert trajectory archive is opened."""
+    if backend == "kuka-v2":
+        if bank.get("backend") != backend:
+            raise ValueError("Replay bank backend differs from requested backend.")
+        env = make_env(
+            backend,
+            bank["task_name"],
+            bank["bank_seed"],
+            reward_function_version=reward_function_version,
+        )
+        try:
+            goals = []
+            for index in indices:
+                if index < 0 or index >= len(bank["reset_seeds"]):
+                    raise ValueError("Invalid replay configuration index.")
+                observation, _ = env.reset(seed=bank["reset_seeds"][index])
+                goal = np.asarray(observation[GOAL_SLICE], dtype=np.float32).copy()
+                if hashlib.sha256(goal.tobytes()).hexdigest() != bank[
+                    "ordered_task_hashes"
+                ][index]:
+                    raise ValueError("Recreated KUKA goal differs from training bank.")
+                goals.append(goal)
+            return np.stack(goals)
+        finally:
+            env.close()
+    if backend != "metaworld-v3" or bank.get("backend", backend) != backend:
+        raise ValueError("Replay bank backend differs from requested backend.")
     if bank["metaworld_version"] != version("metaworld"):
         raise ValueError("MetaWorld version differs from training bank provenance.")
     tasks = mt1_tasks(bank["task_name"], bank["bank_seed"])

@@ -88,9 +88,10 @@ class RewardVersionTests(unittest.TestCase):
             model.replay_buffer.size.return_value = 0
             model._stats_window_size = 100
             model.num_timesteps = 20
-            with (
-                patch.object(sequential_sac, "make_metaworld_env") as make,
-                patch.object(sequential_sac, "Monitor", side_effect=lambda env: env),
+            with patch.object(
+                sequential_sac, "make_metaworld_env"
+            ) as make, patch.object(
+                sequential_sac, "Monitor", side_effect=lambda env: env
             ):
                 sequential_sac.switch_task(
                     model, "push-v3", 4, 10, reward_function_version=reward_version
@@ -113,13 +114,10 @@ class RewardVersionTests(unittest.TestCase):
             env = MagicMock()
             env.reset.return_value = (np.zeros(39, dtype=np.float32), {})
             env.unwrapped._target_pos = np.zeros(3)
-            with (
-                patch("src.continual.task_bank.metaworld.MT1") as mt1,
-                patch(
-                    "src.continual.task_bank.make_metaworld_env", return_value=env
-                ) as make,
-            ):
-                mt1.return_value.train_tasks = [task]
+            with patch("src.continual.task_bank.mt1_tasks") as mt1_tasks, patch(
+                "src.continual.task_bank.make_metaworld_env", return_value=env
+            ) as make:
+                mt1_tasks.return_value = [task]
                 goals = reconstruct_goals(
                     bank, [0], reward_function_version=reward_version
                 )

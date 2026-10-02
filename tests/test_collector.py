@@ -35,10 +35,9 @@ class CollectorBatchTests(unittest.TestCase):
             progress.append(kwargs)
             return iterable
 
-        with (
-            patch.object(collector, "collect_trajectory", side_effect=fake_collect),
-            patch.object(collector, "tqdm", side_effect=fake_tqdm),
-        ):
+        with patch.object(
+            collector, "collect_trajectory", side_effect=fake_collect
+        ), patch.object(collector, "tqdm", side_effect=fake_tqdm):
             trajectories = collector.collect_trajectories(
                 env,
                 policy,
@@ -98,7 +97,9 @@ class TrainerCollectionCleanupTests(unittest.TestCase):
         trainer = object.__new__(DiffCRLTrainer)
         trainer.config = SimpleNamespace(
             runtime=SimpleNamespace(seed=7, device="cpu"),
-            environment=SimpleNamespace(reward_function_version="v2"),
+            environment=SimpleNamespace(
+                backend="metaworld-v3", reward_function_version="v2"
+            ),
             bc=SimpleNamespace(hidden_sizes=[8, 6]),
             diffusion=SimpleNamespace(action_clamp_epsilon=1e-4),
         )
@@ -108,6 +109,7 @@ class TrainerCollectionCleanupTests(unittest.TestCase):
         trainer.policy = None
         trainer.training_banks = {}
         trainer.progress = False
+        trainer.horizon = 200
         context = StageContext(0, sequence.task(0), 2, directory, None, None)
         return trainer, context, model, env
 
@@ -117,15 +119,14 @@ class TrainerCollectionCleanupTests(unittest.TestCase):
 
             with TemporaryDirectory() as tmp:
                 trainer, context, model, env = self.trainer_and_context(Path(tmp))
-                with (
-                    patch("src.continual.diffcrl.SAC.load", return_value=model),
-                    patch("src.continual.diffcrl.make_metaworld_env", return_value=env),
-                    patch(
-                        "src.continual.diffcrl.training_bank",
-                        side_effect=RuntimeError("bank failure"),
-                    ),
-                    self.assertRaisesRegex(RuntimeError, "bank failure"),
-                ):
+                with patch(
+                    "src.continual.diffcrl.SAC.load", return_value=model
+                ), patch(
+                    "src.continual.diffcrl.make_env", return_value=env
+                ), patch(
+                    "src.continual.diffcrl.training_bank",
+                    side_effect=RuntimeError("bank failure"),
+                ), self.assertRaisesRegex(RuntimeError, "bank failure"):
                     trainer._collect_current_task(context)
                 env.close.assert_called_once_with()
 
@@ -134,16 +135,16 @@ class TrainerCollectionCleanupTests(unittest.TestCase):
 
         with TemporaryDirectory() as tmp:
             trainer, context, model, env = self.trainer_and_context(Path(tmp))
-            with (
-                patch("src.continual.diffcrl.SAC.load", return_value=model),
-                patch("src.continual.diffcrl.make_metaworld_env", return_value=env),
-                patch("src.continual.diffcrl.training_bank", return_value={}),
-                patch(
-                    "src.continual.diffcrl.collect_trajectories",
-                    side_effect=RuntimeError("rollout failure"),
-                ),
-                self.assertRaisesRegex(RuntimeError, "rollout failure"),
-            ):
+            with patch(
+                "src.continual.diffcrl.SAC.load", return_value=model
+            ), patch(
+                "src.continual.diffcrl.make_env", return_value=env
+            ), patch(
+                "src.continual.diffcrl.training_bank", return_value={}
+            ), patch(
+                "src.continual.diffcrl.collect_trajectories",
+                side_effect=RuntimeError("rollout failure"),
+            ), self.assertRaisesRegex(RuntimeError, "rollout failure"):
                 trainer._collect_current_task(context)
             env.close.assert_called_once_with()
 

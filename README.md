@@ -1,18 +1,31 @@
 # Diffusion Replay for Continual RL
 
-This project explores continual reinforcement learning for MetaWorld v3. It
-trains a shared behavior-cloning policy from current-task SAC expert
-trajectories and diffusion-generated trajectories from previously learned
-tasks.
+This repository contains the continual-learning and DiffCRL experiments for
+modern MetaWorld v3. Default Sawyer tasks use the `metaworld` Conda
+environment.
 
-## Setup
+## Environment setup
 
-Python 3.10 is recommended. Run all commands from the repository root.
+Run from the repository root:
 
 ```bash
-conda create -n continual-robot python=3.10 -y
-conda activate continual-robot
+conda activate metaworld
 python -m pip install -r requirements.txt
+```
+
+The expected package version is `metaworld==3.1.1`.
+
+## KUKA experiments
+
+KUKA experiments require a separate custom MetaWorld fork, `metaworld-kuka`.
+
+Clone or obtain that repository separately, then install it in the dedicated
+`metaworld-kuka` Conda environment:
+
+```bash
+conda activate metaworld-kuka
+cd metaworld-kuka
+python -m pip install -e .
 ```
 
 ## Experiment types
@@ -26,6 +39,15 @@ python -m pip install -r requirements.txt
   from current expert trajectories and generated trajectories for prior tasks.
 - **DiffCRL without replay** is the corresponding ablation: it retains expert
   supervision and behavioral cloning but disables prior-task diffusion replay.
+
+## Maintained configurations
+
+- `configs/sac/sac.yaml`
+- `configs/diffcrl/diffcrl.yaml`
+- `configs/diffcrl/diffcrl_no_replay.yaml`
+- `configs/continual_sac/continual_sac.yaml`
+
+The corresponding `*_smoke.yaml` files are small developer/testing presets.
 
 ## Single-task experts and DiffCRL
 
@@ -50,6 +72,15 @@ Results and checkpoints are written under `runs/`. Use a new `--run-name` for
 each run because existing run directories are not overwritten.
 
 For a fast pipeline check, use `configs/diffcrl/diffcrl_smoke.yaml`.
+
+Run the no-replay ablation with:
+
+```bash
+python -u train_diffcrl.py \
+  --config configs/diffcrl/diffcrl_no_replay.yaml \
+  --seed 0 \
+  --run-name no-replay-seed0
+```
 
 ## Sequential SAC baseline
 
