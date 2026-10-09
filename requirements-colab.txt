@@ -1,0 +1,11 @@
+# Colab runtime dependencies for DiffCRL.
+#
+# PyTorch is deliberately not pinned here: Colab supplies a CUDA-matched build.
+# The notebook records and checks that build before an experiment starts.
+# The custom KUKA-v3 MetaWorld checkout is installed separately by the notebook.
+-r requirements.txt
+mujoco==3.3.0
+numpy==2.0.2
+scipy==1.14.1
+imageio==2.37.0
+tqdm==4.67.1

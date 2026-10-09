@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import asdict, dataclass
+import json
 from pathlib import Path
 from typing import Dict
 
@@ -50,6 +51,13 @@ from .diffusion_data import (
 from .evaluation import EvaluationMatrix, evaluate_stage
 from .policy_adapter import SB3SACPolicy
 from .reporting import print_final_report, print_stage_report
+from .resume import (
+    completed_stage_markers,
+    load_boundary_state,
+    restore_rng_state,
+    validate_resume_configuration,
+    write_stage_boundary,
+)
 from .task_bank import (
     selected_configuration,
     training_bank,
@@ -77,6 +85,7 @@ class StageContext:
     directory: Path
     policy_before_hash: str | None
     diffusion_before_hash: str | None
+    artifact_suffix: str = ""
 
 
 @dataclass
@@ -202,12 +211,19 @@ class DiffCRLTrainer:
     simulator-generated ``Trajectory`` objects.
     """
 
-    def __init__(self, config: ExperimentConfig, *, progress=True):
+    def __init__(
+        self,
+        config: ExperimentConfig,
+        *,
+        progress=True,
+        resume_from=None,
+        stage_complete_callback=None,
+    ):
         """Validate configuration, initialize persistent state, and reserve output.
 
         Expert checkpoint hashes are captured up front and checked after every
-        stage. The output directory must not exist, preventing accidental resume
-        or overwrite with an incompatible continual state.
+        stage. New runs require a fresh output directory; explicit resumes use
+        only hash-validated completed-stage markers.
         """
         validate_config(config)
         if config.experiment != "diffcrl":
@@ -263,9 +279,15 @@ class DiffCRLTrainer:
             and config.evaluation.mode == "fixed-tasks"
             else {}
         )
-        self.output = Path(output).resolve()
-        if self.output.exists():
+        self.output = (
+            Path(resume_from).resolve()
+            if resume_from is not None
+            else Path(output).resolve()
+        )
+        if resume_from is None and self.output.exists():
             raise FileExistsError(self.output)
+        if resume_from is not None and not self.output.is_dir():
+            raise FileNotFoundError(f"Resume directory not found: {self.output}")
         torch.set_num_threads(1)
         torch.manual_seed(config.runtime.seed)
         self.diffusion = (
@@ -291,20 +313,22 @@ class DiffCRLTrainer:
         self.training_banks = {}
         self.train_configurations = {}
         self.next_stage = 0
-        self.output.mkdir(parents=True, exist_ok=False)
-        save_resolved_config(config, self.output)
-        create_run_manifest(
-            self.output,
-            config,
-            experts={
-                name: identity.to_dict()
-                for name, identity in self.expert_identities.items()
-            },
-            task_banks=self.task_bank_checks,
-        )
-        write_json(
-            self.output / "config.json",
-            {
+        self.stage_complete_callback = stage_complete_callback
+        if resume_from is None:
+            self.output.mkdir(parents=True, exist_ok=False)
+            save_resolved_config(config, self.output)
+            create_run_manifest(
+                self.output,
+                config,
+                experts={
+                    name: identity.to_dict()
+                    for name, identity in self.expert_identities.items()
+                },
+                task_banks=self.task_bank_checks,
+            )
+            write_json(
+                self.output / "config.json",
+                {
                 "trajectories_per_task": config.continual.trajectories_per_task,
                 "diffusion_epochs": config.diffusion.epochs,
                 "bc_epochs": config.bc.epochs,
@@ -353,8 +377,66 @@ class DiffCRLTrainer:
                 "normalization": "stage training split only, feature std floor .001; no normalization clipping",
                 "optimizers": "BC Adam fresh per stage with paired best-epoch restoration; diffusion Adam fresh per fit",
                 "collection": "deterministic; all episodes retained; any-step success recorded",
-            },
+                },
+            )
+        else:
+            self._restore_completed_run_state()
+
+    def _restore_completed_run_state(self):
+        """Restore the latest hash-validated, completed stage boundary."""
+        validate_resume_configuration(self.output, self.config, self.expert_hashes)
+        markers = completed_stage_markers(self.output, self.sequence.task_names)
+        if not markers:
+            raise ValueError(
+                "Resume directory has no stage completion markers; start a new run."
+            )
+        if len(markers) < self.sequence.num_tasks and not (
+            self.output / "RUNNING"
+        ).is_file():
+            raise ValueError("Incomplete resume run is missing its RUNNING marker.")
+        marker = markers[-1]
+        artifacts = marker["artifacts"]
+        self.policy, self.policy_optimizer, policy_metadata = GeneralPolicy.load_training(
+            artifacts["policy"]["resolved_path"]
         )
+        if not isinstance(policy_metadata, dict) or policy_metadata.get(
+            "stage"
+        ) != marker["stage"]:
+            raise ValueError("Policy checkpoint stage differs from completion marker.")
+        self.policy.to(self.config.runtime.device)
+        if self.diffusion is not None:
+            if "diffusion" not in artifacts:
+                raise ValueError("Diffusion resume marker has no diffusion checkpoint.")
+            self.diffusion, _, _, diffusion_metadata = TrajectoryDiffusion.load(
+                artifacts["diffusion"]["resolved_path"],
+                expected_action_space=self.config.diffusion.action_space,
+                expected_clamp_epsilon=self.config.diffusion.action_clamp_epsilon,
+                expected_projection=self.config.diffusion.generated_action_projection,
+                expected_task_order=self.sequence.task_names,
+            )
+            self.diffusion.denoiser.to(self.config.runtime.device)
+            self.previous_diffusion = Path(artifacts["diffusion"]["resolved_path"])
+        else:
+            if "diffusion" in artifacts:
+                raise ValueError("No-Replay resume marker unexpectedly contains diffusion.")
+            diffusion_metadata = {}
+            self.previous_diffusion = None
+        self.matrix = EvaluationMatrix.load(
+            artifacts["evaluation_matrix"]["resolved_path"]
+        )
+        if self.matrix.sequence.task_names != self.sequence.task_names:
+            raise ValueError("Evaluation matrix task sequence differs from configuration.")
+        state = load_boundary_state(marker)
+        self.training_banks = state["training_banks"]
+        self.train_configurations = state["train_configurations"]
+        if diffusion_metadata and (
+            diffusion_metadata.get("training_banks") != self.training_banks
+            or diffusion_metadata.get("train_configurations")
+            != self.train_configurations
+        ):
+            raise ValueError("Diffusion replay metadata differs from boundary state.")
+        self.next_stage = marker["stage"] + 1
+        restore_rng_state(state["rng"])
 
     def _progress_message(self, heading, **details):
         if self.progress:
@@ -721,12 +803,14 @@ class DiffCRLTrainer:
         ):
             raise ValueError("Nonfinite trained state.")
         diffusion_path = (
-            self.output / f"diffusion_after_task_{stage}_{task.task_name}.pt"
+            self.output
+            / f"diffusion_after_task_{stage}_{task.task_name}{context.artifact_suffix}.pt"
             if self.diffusion is not None
             else None
         )
         policy_path = (
-            self.output / f"general_policy_after_task_{stage}_{task.task_name}.pt"
+            self.output
+            / f"general_policy_after_task_{stage}_{task.task_name}{context.artifact_suffix}.pt"
         )
         if self.diffusion is not None:
             self.diffusion.save(
@@ -782,7 +866,7 @@ class DiffCRLTrainer:
 
         The method writes provenance and matrix snapshots, rechecks frozen
         expert hashes, selects the new replay checkpoint, advances the stage
-        counter, and prints the stage report. It is not a transactional commit.
+        counter, writes the completion marker last, and prints the stage report.
         """
         cfg = self.config
         stage = context.index
@@ -818,6 +902,21 @@ class DiffCRLTrainer:
                 raise RuntimeError("Source expert changed during experiment.")
         self.previous_diffusion = diffusion_path
         self.next_stage += 1
+        write_stage_boundary(
+            self.output,
+            stage=stage,
+            task=task.task_name,
+            policy_path=policy_path,
+            diffusion_path=diffusion_path,
+            report_path=directory / "report.json",
+            matrix_path=directory / "evaluation_matrix.json",
+            training_banks=self.training_banks,
+            train_configurations=self.train_configurations,
+            artifact_suffix=context.artifact_suffix,
+        )
+        callback = getattr(self, "stage_complete_callback", None)
+        if callback is not None:
+            callback(self.output, stage, self.sequence.task_names)
         print_stage_report(
             self.matrix,
             stage,
@@ -841,8 +940,25 @@ class DiffCRLTrainer:
                 f"\nStage {stage + 1}/{self.sequence.num_tasks}: {task.task_name}"
             )
         count = self.config.continual.trajectories_per_task
-        directory = self.output / f"stage_{stage}_{task.task_name}"
+        base_name = f"stage_{stage}_{task.task_name}"
+        attempt = 0
+        while True:
+            suffix = "" if attempt == 0 else f".resume_{attempt}"
+            directory = self.output / f"{base_name}{suffix}"
+            collisions = (
+                directory,
+                self.output
+                / f"general_policy_after_task_{stage}_{task.task_name}{suffix}.pt",
+                self.output
+                / f"diffusion_after_task_{stage}_{task.task_name}{suffix}.pt",
+                self.output
+                / f"stage_state_after_task_{stage}_{task.task_name}{suffix}.pt",
+            )
+            if not any(path.exists() for path in collisions):
+                break
+            attempt += 1
         directory.mkdir()
+        artifact_suffix = "" if attempt == 0 else f".resume_{attempt}"
         policy_before = None if self.policy is None else state_hash(self.policy)
         diffusion_before = (
             state_hash(self.diffusion) if self.diffusion is not None else None
@@ -855,6 +971,7 @@ class DiffCRLTrainer:
             directory=directory,
             policy_before_hash=policy_before,
             diffusion_before_hash=diffusion_before,
+            artifact_suffix=artifact_suffix,
         )
         replay = self._generate_replay(context)
         current_task = self._collect_current_task(context)
@@ -879,9 +996,16 @@ class DiffCRLTrainer:
 
     def run(self):
         """Train all configured tasks sequentially and return the final matrix."""
-        for stage in range(self.sequence.num_tasks):
+        for stage in range(self.next_stage, self.sequence.num_tasks):
             self.train_task(stage)
-        write_json(self.output / "evaluation_matrix.json", self.matrix.to_dict())
+        final_matrix = self.output / "evaluation_matrix.json"
+        if final_matrix.exists():
+            existing = json.loads(final_matrix.read_text(encoding="utf-8"))
+            if existing != self.matrix.to_dict():
+                raise ValueError("Existing final evaluation matrix differs from resumed state.")
+        else:
+            write_json(final_matrix, self.matrix.to_dict())
         print_final_report(self.matrix)
-        complete_run(self.output)
+        if not (self.output / "RUN_COMPLETE").exists():
+            complete_run(self.output)
         return self.matrix

@@ -214,6 +214,9 @@ class StageReportTests(unittest.TestCase):
             trainer.expert_hashes = {"reach-v3": file_hash(expert_path)}
             trainer.previous_diffusion = directory / "previous.pt"
             trainer.next_stage = 0
+            trainer.output = directory
+            trainer.training_banks = {}
+            trainer.train_configurations = {}
             expected = expected_report(directory)
             expected["diffusion_sha256"] = file_hash(artifacts.diffusion_path)
             expected["policy_sha256"] = file_hash(artifacts.policy_path)

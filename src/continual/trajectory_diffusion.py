@@ -12,6 +12,7 @@ from torch import nn
 from tqdm.auto import tqdm
 
 from src.config import DiffusionModelConfig as DiffusionConfig
+from src.support.io import atomic_torch_save
 
 from .diffusion_data import DIFFUSION_FEATURES
 
@@ -240,20 +241,19 @@ class TrajectoryDiffusion(nn.Module):
 
     def save(self, path, dynamic_normalizer, goal_normalizer, metadata):
         """Persist model, both normalizers, and replay provenance without overwrite."""
-        with Path(path).open("xb") as stream:
-            torch.save(
-                {
-                    "kind": "trajectory_diffusion_22_v1",
-                    "config": asdict(self.config),
-                    "state_dict": self.state_dict(),
-                    "dynamic_mean": dynamic_normalizer.mean,
-                    "dynamic_scale": dynamic_normalizer.scale,
-                    "goal_mean": goal_normalizer.mean,
-                    "goal_scale": goal_normalizer.scale,
-                    "metadata": metadata,
-                },
-                stream,
-            )
+        atomic_torch_save(
+            path,
+            {
+                "kind": "trajectory_diffusion_22_v1",
+                "config": asdict(self.config),
+                "state_dict": self.state_dict(),
+                "dynamic_mean": dynamic_normalizer.mean,
+                "dynamic_scale": dynamic_normalizer.scale,
+                "goal_mean": goal_normalizer.mean,
+                "goal_scale": goal_normalizer.scale,
+                "metadata": metadata,
+            },
+        )
 
     @classmethod
     def load(

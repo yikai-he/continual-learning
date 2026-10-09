@@ -16,6 +16,7 @@ from torch.utils.data import DataLoader, TensorDataset
 from tqdm.auto import tqdm
 
 from src.envs import ACTION_SHAPE, OBSERVATION_SHAPE
+from src.support.io import atomic_torch_save
 
 BC_CLAMP_EPSILON = 1e-4
 BC_LOSSES = ("post-tanh-mse", "pre-tanh-mse")
@@ -99,16 +100,15 @@ class GeneralPolicy(nn.Module):
                     for group in optimizer.param_groups
                 ],
             )
-        with Path(path).open("xb") as stream:
-            torch.save(
-                {
-                    "kind": "general_policy_layer_norm_v1",
-                    "hidden_sizes": self.hidden_sizes,
-                    "state_dict": self.state_dict(),
-                    **extra,
-                },
-                stream,
-            )
+        atomic_torch_save(
+            path,
+            {
+                "kind": "general_policy_layer_norm_v1",
+                "hidden_sizes": self.hidden_sizes,
+                "state_dict": self.state_dict(),
+                **extra,
+            },
+        )
 
     @classmethod
     def load(cls, path: str | Path) -> GeneralPolicy:

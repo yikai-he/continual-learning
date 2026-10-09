@@ -145,6 +145,93 @@ python -u train_diffcrl.py \
 Results and checkpoints are written under `runs/`. Use a new `--run-name` for
 each run because existing run directories are not overwritten.
 
+### Resuming DiffCRL at a completed stage
+
+New DiffCRL runs write `stage_<index>_COMPLETE.json` after each fully finalized
+stage. The marker contains hashes for the policy checkpoint, diffusion
+checkpoint (when replay is enabled), boundary state, stage report, and stage
+evaluation matrix. It is written last, so files from an interrupted stage are
+never interpreted as a completed stage.
+
+Resume an interrupted run with the same scientific configuration and the run's
+current location:
+
+```bash
+python -u train_diffcrl.py \
+  --config configs/diffcrl/diffcrl.yaml \
+  --resume-from /path/to/existing/run
+```
+
+Completed stages are hash-validated and skipped. The policy, diffusion model,
+normalizers, replay/task-bank metadata, evaluation matrix, completed-stage
+index, and Python/NumPy/PyTorch RNG states are restored from the latest marker.
+BC and diffusion optimizers remain fresh at the next stage, matching normal
+uninterrupted execution. If an interrupted stage already left files behind,
+the retry uses a `.resume_N` directory and checkpoint suffix; existing files
+are not changed.
+
+Task order, environment/reward contract, seeds, data budget, model/training
+settings, replay mode, and evaluation protocol must match. Expert and stage
+artifacts must have the recorded SHA-256 hashes. Run directories and expert
+files may be relocated, and execution output/device paths may differ. Exact
+numeric equivalence across a CPU/GPU or GPU-model change is not guaranteed,
+even though RNG state is restored. Runs created before stage completion markers
+cannot be resumed safely by this interface.
+
+### Colab storage and stage backups
+
+Direct-to-Drive output remains supported: set `runtime.output` to a mounted
+Drive directory and resume that directory with `--resume-from`. For faster
+local I/O, the recommended Colab mode keeps `runtime.output` under
+`/content/experiments` and synchronizes every completed stage automatically:
+
+```bash
+python -u train_diffcrl.py \
+  --config /content/configs/formal.yaml \
+  --stage-sync-to /content/drive/MyDrive/Thesis/continual-learning/experiments/run-name
+```
+
+Synchronization reads the local marker, validates every referenced artifact,
+copies only required checkpoint/report/matrix/boundary files plus run metadata,
+verifies destination SHA-256 hashes, and publishes the Drive completion marker
+last. Existing identical files are reused; different files are reported as
+conflicts and are never silently replaced. A failure stops training before the
+next stage while preserving the completed local stage and leaving no remote
+completion marker for a partial copy.
+
+Retry a failed backup without repeating training, or inspect it, with:
+
+```bash
+python manage_diffcrl_sync.py sync \
+  --source /content/experiments/run-name \
+  --destination /content/drive/MyDrive/Thesis/continual-learning/experiments/run-name
+python manage_diffcrl_sync.py status \
+  --source /content/drive/MyDrive/Thesis/continual-learning/experiments/run-name
+python manage_diffcrl_sync.py validate \
+  --source /content/drive/MyDrive/Thesis/continual-learning/experiments/run-name
+```
+
+After loss of the Colab runtime, restore the latest contiguous validated prefix
+to a fresh local directory and resume it. Restoration refuses non-empty targets
+and verifies all copied hashes:
+
+```bash
+python manage_diffcrl_sync.py restore \
+  --source /content/drive/MyDrive/Thesis/continual-learning/experiments/run-name \
+  --destination /content/experiments/run-name
+python -u train_diffcrl.py \
+  --config /content/configs/formal.yaml \
+  --resume-from /content/experiments/run-name \
+  --stage-sync-to /content/drive/MyDrive/Thesis/continual-learning/experiments/run-name
+```
+
+Only marker-referenced files are restored; disposable generated trajectories,
+caches, and TensorBoard events are not copied. Scientific configuration and
+expert checkpoint hashes must still match. Filesystem relocation is allowed,
+but bitwise equivalence is not promised across different CPU/GPU backends or
+CUDA topologies. The Colab notebook exposes both storage modes and the same
+validate, restore, retry, status, and resume operations.
+
 The canonical trained KUKA v3 experts are stored under
 `runs/experts/kuka-v3/<task>/expert_model.zip`. Model provenance, reward
 configuration, hashes, and retained evaluation evidence live beside each
