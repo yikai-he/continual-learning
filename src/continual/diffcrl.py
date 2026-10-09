@@ -49,6 +49,7 @@ from .diffusion_data import (
     validate_stage_trajectory_group,
 )
 from .evaluation import EvaluationMatrix, evaluate_stage
+from .expert_space import validate_expert_spaces
 from .policy_adapter import SB3SACPolicy
 from .reporting import print_final_report, print_stage_report
 from .resume import (
@@ -518,8 +519,8 @@ class DiffCRLTrainer:
         self._progress_message(
             "Collecting expert trajectories", Task=task.task_name, Trajectories=count
         )
-        expert = SB3SACPolicy(
-            SAC.load(self.experts[task.task_name], device=cfg.runtime.device)
+        expert_model = SAC.load(
+            self.experts[task.task_name], device=cfg.runtime.device
         )
         settings = getattr(
             self,
@@ -533,17 +534,16 @@ class DiffCRLTrainer:
             **settings.kwargs(),
         )
         try:
+            validate_expert_spaces(
+                expert_model, env, self.expert_identities[task.task_name]
+            )
+            expert = SB3SACPolicy(expert_model)
             bank = training_bank(
                 task.task_name,
                 cfg.runtime.seed,
                 backend=cfg.environment.backend,
             )
             collected_configurations = []
-            if (
-                expert.model.observation_space != env.observation_space
-                or expert.model.action_space != env.action_space
-            ):
-                raise ValueError("Expert/environment spaces differ.")
             trajectories = collect_trajectories(
                 env,
                 expert,

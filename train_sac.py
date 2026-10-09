@@ -1024,6 +1024,17 @@ def main(argv=None) -> None:
                     training_config_sha256=file_hash(config_path),
                     observation_shape=OBSERVATION_SHAPE,
                     action_shape=ACTION_SHAPE,
+                    horizon=horizon_for_backend(config.environment.backend),
+                    hammer_reward_variant=(
+                        config.environment.hammer_reward_variant
+                        if config.continual.tasks[0] == HAMMER_TASK
+                        else None
+                    ),
+                    hammer_nail_progress_weight=(
+                        config.environment.hammer_nail_progress_weight
+                        if config.continual.tasks[0] == HAMMER_TASK
+                        else None
+                    ),
                     qualification=qualification(index),
                 )
         try:
