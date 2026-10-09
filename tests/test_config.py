@@ -117,7 +117,7 @@ class ConfigTests(unittest.TestCase):
 
     def test_reward_version_default_validation_and_persistence(self):
         self.assertEqual(self.config().environment.reward_function_version, "v2")
-        for version in ("v1", "v2"):
+        for version in ("v1", "v2", "v3"):
             config = self.config(environment={"reward_function_version": version})
             with tempfile.TemporaryDirectory() as tmp:
                 save_resolved_config(config, Path(tmp))
@@ -127,7 +127,7 @@ class ConfigTests(unittest.TestCase):
                     ).environment.reward_function_version,
                     version,
                 )
-        for invalid in ("v3", "", 2, None):
+        for invalid in ("v4", "", 2, None):
             with self.subTest(version=invalid), self.assertRaisesRegex(
                 ValueError, "environment.reward_function_version"
             ):
@@ -320,8 +320,8 @@ class ConfigTests(unittest.TestCase):
             ),
             ({"experiment": "sac", "diffusion": {"epochs": 1}}, "section diffusion"),
             (
-                {"experiment": "sac", "evaluation": {"mode": "sampled"}},
-                "evaluation.mode",
+                {"experiment": "sac", "evaluation": {"seed": 10000}},
+                "evaluation.seed",
             ),
         ]
         for values, message in cases:

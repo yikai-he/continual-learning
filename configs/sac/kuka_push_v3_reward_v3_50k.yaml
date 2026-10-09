@@ -1,0 +1,37 @@
+# Controlled reward-only probe derived from kuka_push_v3_short_50k.yaml.
+# The sole experimental change is reward_function_version: v2 -> v3.
+experiment: sac
+environment:
+  backend: kuka-v3
+  reward_function_version: v3
+sac:
+  steps: 50000
+  learning_rate: 0.001
+  buffer_size: 1000000
+  learning_starts: 10000
+  batch_size: 128
+  gamma: 0.99
+  tau: 0.005
+  train_freq: 1
+  gradient_steps: 1
+  ent_coef: auto
+  net_arch:
+  - 256
+  - 256
+  - 256
+  - 256
+  checkpoint_freq: 10000
+continual:
+  tasks:
+  - kuka-push-v3
+evaluation:
+  episodes: 20
+  frequency: 5000
+  seed_offset: 10000
+  mode: sampled
+  task_set_seed: 10000
+runtime:
+  seed: 0
+  device: auto
+  output: runs/reward_v3/kuka-push-v3
+  run_name: seed_0_50k_probe

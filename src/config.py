@@ -23,6 +23,18 @@ class EnvironmentConfig:
 
     backend: str = "metaworld-v3"
     reward_function_version: str = "v2"
+    hammer_reward_variant: str = "original"
+    hammer_nail_progress_weight: float = 0.0
+
+
+@dataclass(frozen=True)
+class EarlyStoppingConfig:
+    """Optional development-only success-based stopping criterion."""
+
+    enabled: bool = False
+    min_steps: int = 100_000
+    success_threshold: float = 0.95
+    patience: int = 3
 
 
 @dataclass(frozen=True)
@@ -41,6 +53,7 @@ class SACConfig:
     ent_coef: str = "auto"
     net_arch: List[int] = field(default_factory=lambda: [256, 256, 256, 256])
     checkpoint_freq: int = 10_000
+    early_stopping: EarlyStoppingConfig = field(default_factory=EarlyStoppingConfig)
 
 
 @dataclass(frozen=True)
@@ -159,10 +172,21 @@ _RUNTIME_FIELDS = ("seed", "device", "output", "run_name", "run_dir")
 # Per-entry-point allowlist for validation and resolved-config serialization.
 _EXPERIMENT_FIELDS = {
     "sac": {
-        "environment": ("backend", "reward_function_version"),
-        "sac": ("steps", *_COMMON_SAC_FIELDS, "checkpoint_freq"),
+        "environment": (
+            "backend",
+            "reward_function_version",
+            "hammer_reward_variant",
+            "hammer_nail_progress_weight",
+        ),
+        "sac": ("steps", *_COMMON_SAC_FIELDS, "checkpoint_freq", "early_stopping"),
         "continual": ("tasks",),
-        "evaluation": ("episodes", "frequency", "seed_offset"),
+        "evaluation": (
+            "episodes",
+            "frequency",
+            "seed_offset",
+            "mode",
+            "task_set_seed",
+        ),
         "runtime": _RUNTIME_FIELDS,
     },
     "continual_sac": {
@@ -173,7 +197,12 @@ _EXPERIMENT_FIELDS = {
         "runtime": _RUNTIME_FIELDS,
     },
     "diffcrl": {
-        "environment": ("backend", "reward_function_version"),
+        "environment": (
+            "backend",
+            "reward_function_version",
+            "hammer_reward_variant",
+            "hammer_nail_progress_weight",
+        ),
         "bc": tuple(BCConfig.__annotations__),
         "diffusion": tuple(DiffusionConfig.__annotations__),
         "continual": ("tasks", "experts", "trajectories_per_task", "replay_mode"),
@@ -386,13 +415,22 @@ def validate_config(config: ExperimentConfig) -> None:
         raise ValueError(
             "sac.ent_coef must be auto (the existing entropy-state contract)."
         )
+    if config.sac.early_stopping.min_steps < 0:
+        raise ValueError("sac.early_stopping.min_steps must be nonnegative.")
+    if config.sac.early_stopping.patience <= 0:
+        raise ValueError("sac.early_stopping.patience must be positive.")
+    if not 0 <= config.sac.early_stopping.success_threshold <= 1:
+        raise ValueError(
+            "sac.early_stopping.success_threshold must be in [0, 1]."
+        )
     if not config.sac.net_arch or any(n < 1 for n in config.sac.net_arch):
         raise ValueError("sac.net_arch must contain positive widths.")
     if len(config.bc.hidden_sizes) != 2 or any(n < 1 for n in config.bc.hidden_sizes):
         raise ValueError("bc.hidden_sizes must contain two positive widths.")
     for path, allowed in {
-        "environment.backend": ("metaworld-v3", "kuka-v2"),
-        "environment.reward_function_version": ("v1", "v2"),
+        "environment.backend": ("metaworld-v3", "kuka-v2", "kuka-v3"),
+        "environment.reward_function_version": ("v1", "v2", "v3", "v3_1"),
+        "environment.hammer_reward_variant": ("original", "nail_progress"),
         "bc.normalization_mode": ("layer-norm",),
         "bc.loss": ("post-tanh-mse", "pre-tanh-mse"),
         "diffusion.action_space": ("raw", "pre-tanh"),
@@ -403,6 +441,8 @@ def validate_config(config: ExperimentConfig) -> None:
         section, name = path.split(".")
         if getattr(getattr(config, section), name) not in allowed:
             raise ValueError(f"{path} must be one of {allowed}.")
+    if config.environment.hammer_nail_progress_weight < 0:
+        raise ValueError("environment.hammer_nail_progress_weight must be nonnegative.")
     if (
         config.diffusion.steps < 2
         or config.diffusion.width < 4
@@ -440,16 +480,62 @@ def validate_config(config: ExperimentConfig) -> None:
             "The kuka-v2 backend supports only these tasks: "
             f"{sorted(kuka_v2_tasks)}."
         )
+    kuka_v3_tasks = {
+        "kuka-reach-v3",
+        "kuka-push-v3",
+        "kuka-handle-press-side-v3",
+        "kuka-button-press-v3",
+        "kuka-hammer-v3",
+        "kuka-drawer-close-v3",
+        "kuka-faucet-open-v3",
+        "kuka-faucet-close-v3",
+        "kuka-window-open-v3",
+        "kuka-window-close-v3",
+        "kuka-door-open-v3",
+        "kuka-pick-place-v3",
+    }
+    if config.environment.backend == "kuka-v3" and any(
+        task not in kuka_v3_tasks for task in tasks
+    ):
+        raise ValueError(
+            "The kuka-v3 backend supports only these tasks: "
+            f"{sorted(kuka_v3_tasks)}."
+        )
     if config.environment.backend == "kuka-v2" and config.experiment == "continual_sac":
         raise ValueError("The kuka-v2 backend is not implemented for continual_sac.")
+    if config.environment.backend == "kuka-v3" and config.experiment not in (
+        "sac",
+        "diffcrl",
+    ):
+        raise ValueError("The kuka-v3 backend is implemented only for sac and diffcrl.")
     if config.experiment == "sac" and len(tasks) != 1:
         raise ValueError("continual.tasks must contain exactly one task for sac.")
-    if config.experiment == "sac" and config.evaluation.mode != "sampled":
-        raise ValueError(
-            "evaluation.mode must be sampled for single-task SAC callbacks."
-        )
     if config.environment.backend == "kuka-v2" and config.evaluation.mode != "sampled":
-        raise ValueError("evaluation.mode must be sampled for the kuka-v2 backend.")
+        raise ValueError(
+            f"evaluation.mode must be sampled for the {config.environment.backend} backend."
+        )
+    hammer_options_active = (
+        config.environment.hammer_reward_variant != "original"
+        or config.environment.hammer_nail_progress_weight != 0
+    )
+    hammer_scope_valid = config.environment.backend == "kuka-v3" and (
+        (config.experiment == "sac" and tasks == ["kuka-hammer-v3"])
+        or config.experiment == "diffcrl"
+    )
+    if hammer_options_active and not hammer_scope_valid:
+        raise ValueError(
+            "Hammer reward options require KUKA-v3 Hammer SAC or KUKA-v3 DiffCRL."
+        )
+    if (
+        config.environment.hammer_reward_variant == "original"
+        and config.environment.hammer_nail_progress_weight != 0
+    ):
+        raise ValueError("The original Hammer reward requires zero progress weight.")
+    if (
+        config.environment.hammer_reward_variant == "nail_progress"
+        and config.environment.hammer_nail_progress_weight <= 0
+    ):
+        raise ValueError("The nail_progress Hammer reward requires a positive weight.")
     if config.experiment == "continual_sac" and config.continual.replay_mode != "none":
         raise ValueError("continual.replay_mode must be none for continual_sac.")
     if config.evaluation.mode == "fixed-tasks" and config.evaluation.episodes > 50:
@@ -498,7 +584,13 @@ def resolve_device(config: ExperimentConfig) -> ExperimentConfig:
 
 
 def parse_config(
-    experiment: str, description: str, argv=None, *, config_required: bool = False
+    experiment: str,
+    description: str,
+    argv=None,
+    *,
+    config_required: bool = False,
+    configure_parser=None,
+    return_args: bool = False,
 ) -> ExperimentConfig:
     parser = argparse.ArgumentParser(description=description)
     config_argument = {"type": Path, "help": "Experiment YAML."}
@@ -519,6 +611,8 @@ def parse_config(
         help="Override runtime.device: cpu, auto, cuda, cuda:N.",
     )
     parser.add_argument("--run-name", default=None, help="Override runtime.run_name.")
+    if configure_parser is not None:
+        configure_parser(parser)
     args = parser.parse_args(argv)
     overrides = {
         name: getattr(args, name)
@@ -526,11 +620,12 @@ def parse_config(
         if getattr(args, name) is not None
     }
     try:
-        return resolve_device(
+        config = resolve_device(
             load_config(
                 args.config, expected_experiment=experiment, overrides=overrides
             )
         )
+        return (config, args) if return_args else config
     except ValueError as error:
         parser.error(str(error))
 

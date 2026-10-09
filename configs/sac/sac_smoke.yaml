@@ -24,8 +24,9 @@ evaluation:
   episodes: 2
   frequency: 250
   seed_offset: 10000
+  mode: fixed-tasks
+  task_set_seed: 10000
 runtime:
   seed: 0
   device: auto
   output: runs/sac_smoke
-

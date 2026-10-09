@@ -1,0 +1,42 @@
+experiment: diffcrl
+environment:
+  backend: kuka-v3
+  reward_function_version: v2
+  hammer_reward_variant: nail_progress
+  hammer_nail_progress_weight: 4.0
+bc:
+  epochs: 2
+  batch_size: 256
+  learning_rate: 0.001
+  hidden_sizes: [256, 256]
+  normalization_mode: layer-norm
+  loss: post-tanh-mse
+diffusion:
+  epochs: 2
+  batch_size: 4
+  learning_rate: 0.001
+  steps: 10
+  width: 64
+  action_space: raw
+  action_clamp_epsilon: 0.0001
+  generated_action_projection: none
+continual:
+  tasks:
+  - kuka-reach-v3
+  - kuka-handle-press-side-v3
+  - kuka-hammer-v3
+  experts:
+    kuka-reach-v3: runs/experts/kuka-v3/reach-v3/expert_model.zip
+    kuka-handle-press-side-v3: runs/experts/kuka-v3/handle-press-side-v3/expert_model.zip
+    kuka-hammer-v3: runs/experts/kuka-v3/hammer-v3/expert_model.zip
+  trajectories_per_task: 4
+  replay_mode: diffusion
+evaluation:
+  episodes: 2
+  seed: 10000
+  mode: fixed-tasks
+  task_set_seed: 10000
+runtime:
+  seed: 0
+  device: cpu
+  output: runs/kuka_diffcrl_hammer_smoke

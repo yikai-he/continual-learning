@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "backend": "kuka-v3",
+  "task_name": "kuka-door-open-v3",
+  "algorithm": "SAC",
+  "observation_shape": [39],
+  "action_shape": [4],
+  "horizon": 200,
+  "reward_function_version": "v2",
+  "training_seed": 0,
+  "checkpoint_sha256": "73d6f429931446bf8be36d2fa6671e22819ba1b7e8a7ee8b9ca560864e4a9016"
+}

@@ -14,13 +14,27 @@ from torch.utils.data import TensorDataset
 import train_continual_sac
 import train_diffcrl
 import train_sac
-from src.config import config_to_dict, default_config, load_config
+from src.config import config_from_dict, config_to_dict, default_config, load_config
 from src.continual import sequential_sac
 from src.continual.bc_policy import GeneralPolicy, fit_bc
 from src.continual.trajectory_diffusion import DiffusionConfig, TrajectoryDiffusion
 
 
 class TrainingConfigTests(unittest.TestCase):
+    def test_sac_early_stopping_defaults_disabled_and_parses_optional_block(self):
+        default = default_config("sac")
+        self.assertFalse(default.sac.early_stopping.enabled)
+        values = config_to_dict(default)
+        values["sac"]["early_stopping"] = {
+            "enabled": True,
+            "min_steps": 100_000,
+            "success_threshold": 0.95,
+            "patience": 3,
+        }
+        parsed = config_from_dict(values, expected_experiment="sac")
+        self.assertTrue(parsed.sac.early_stopping.enabled)
+        self.assertEqual(parsed.sac.early_stopping.min_steps, 100_000)
+
     def test_continual_sac_requires_explicit_config(self):
         with self.assertRaises(SystemExit) as error:
             train_continual_sac.parse_args([])
@@ -86,8 +100,9 @@ class TrainingConfigTests(unittest.TestCase):
             ), patch.object(train_sac, "CallbackList"), patch.object(
                 train_sac, "FixedSeedEvalCallback"
             ) as evaluation, patch.object(
-                train_sac, "CheckpointCallback"
+                train_sac, "GlobalCheckpointCallback"
             ) as checkpoint:
+                sac.return_value.num_timesteps = 7
                 train_sac.main(
                     [
                         "--config",
@@ -133,6 +148,12 @@ class TrainingConfigTests(unittest.TestCase):
                     Path(tmp) / "trial/best_success_model",
                 )
                 self.assertEqual(checkpoint.call_args.kwargs["save_freq"], 3)
+                self.assertTrue(
+                    checkpoint.call_args.kwargs["save_replay_buffer"]
+                )
+                self.assertTrue(
+                    sac.return_value.learn.call_args.kwargs["reset_num_timesteps"]
+                )
             resolved = load_config(Path(tmp) / "trial/config.yaml")
             self.assertEqual(
                 (

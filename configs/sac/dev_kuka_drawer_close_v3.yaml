@@ -1,0 +1,20 @@
+# Development SAC expert; early stopping is not intended for formal experiments.
+experiment: sac
+environment: {backend: kuka-v3, reward_function_version: v2}
+sac:
+  steps: 500000
+  learning_rate: 0.001
+  buffer_size: 1000000
+  learning_starts: 10000
+  batch_size: 128
+  gamma: 0.99
+  tau: 0.005
+  train_freq: 1
+  gradient_steps: 1
+  ent_coef: auto
+  net_arch: [256, 256, 256, 256]
+  checkpoint_freq: 50000
+  early_stopping: {enabled: true, min_steps: 100000, success_threshold: 0.95, patience: 3}
+continual: {tasks: [kuka-drawer-close-v3]}
+evaluation: {episodes: 20, frequency: 20000, seed_offset: 10000}
+runtime: {seed: 0, device: auto, output: runs/dev}

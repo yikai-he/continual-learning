@@ -14,8 +14,13 @@ from tqdm.auto import tqdm
 from src.continual.collector import collect_trajectory
 from src.continual.metrics import average_performance, forgetting, forward_transfer
 from src.continual.reporting import format_evaluation_result
-from src.continual.task_bank import bank_hashes, mt1_tasks
+from src.continual.task_bank import (
+    _task_rand_vec,
+    backend_tasks,
+    task_identities,
+)
 from src.continual.task_sequence import PILOT_SEQUENCE, TaskSequence, TaskSwitcher
+from src.envs import task_configuration
 
 
 class EvaluationMatrix:
@@ -95,22 +100,10 @@ class EvaluationMatrix:
         return result
 
 
-def fixed_mt1_tasks(task_name, task_set_seed):
-    """Return the ordered, seeded MT1 configuration bank and stable identities."""
-    tasks = mt1_tasks(task_name, task_set_seed)
-    hashes = bank_hashes(tasks)
-    identities = [
-        {
-            "task_index": i,
-            "task_env_name": item.env_name,
-            "task_data_sha256": digest,
-        }
-        for i, (item, digest) in enumerate(zip(tasks, hashes))
-    ]
-    if any(item["task_env_name"] != task_name for item in identities):
-        raise ValueError("MT1 task bank contains a different environment.")
-    if len({item["task_data_sha256"] for item in identities}) != len(tasks):
-        raise ValueError("MT1 task bank contains duplicate configurations.")
+def fixed_mt1_tasks(task_name, task_set_seed, backend="metaworld-v3"):
+    """Return an ordered backend task bank and its stable identities."""
+    tasks = backend_tasks(task_name, task_set_seed, backend=backend)
+    identities = task_identities(tasks, task_name)
     return tasks, identities
 
 
@@ -124,6 +117,14 @@ def disable_task_sampling(env):
             return
         current = getattr(current, "env", None)
     raise ValueError("Expected MetaWorld task-selection wrapper.")
+
+
+def validate_active_task(env, task, backend):
+    """Prove reset preserved the explicitly selected serialized configuration."""
+    actual = task_configuration(env, backend)
+    expected = _task_rand_vec(task)
+    if not np.array_equal(actual, expected):
+        raise ValueError("Fixed evaluation reset changed the selected task identity.")
 
 
 def running_evaluation_statistics(returns, successes):
@@ -142,16 +143,19 @@ def evaluate_task(
     evaluation_mode="sampled",
     task_set_seed=10000,
     reward_function_version="v2",
+    hammer_reward_variant="original",
+    hammer_nail_progress_weight=0.0,
     backend="metaworld-v3",
     progress=False,
+    render_mode=None,
 ):
     """Fresh task env, reset(seed+i) each episode, deterministic act; any-step success."""
     if evaluation_mode not in ("sampled", "fixed-tasks"):
         raise ValueError("Unknown evaluation mode.")
-    if backend != "metaworld-v3" and evaluation_mode == "fixed-tasks":
-        raise ValueError("fixed-tasks evaluation is specific to MetaWorld-v3.")
+    if backend not in ("metaworld-v3", "kuka-v3") and evaluation_mode == "fixed-tasks":
+        raise ValueError("fixed-tasks evaluation requires a deterministic task bank.")
     selected, identities = (
-        fixed_mt1_tasks(task.task_name, task_set_seed)
+        fixed_mt1_tasks(task.task_name, task_set_seed, backend=backend)
         if evaluation_mode == "fixed-tasks"
         else (None, None)
     )
@@ -170,6 +174,9 @@ def evaluate_task(
         sequence,
         backend=backend,
         reward_function_version=reward_function_version,
+        hammer_reward_variant=hammer_reward_variant,
+        hammer_nail_progress_weight=hammer_nail_progress_weight,
+        render_mode=render_mode,
     ) as switcher:
         env = switcher.switch(0, seed=seed)
         model = getattr(policy, "model", None)
@@ -193,6 +200,8 @@ def evaluate_task(
                 trajectory = collect_trajectory(
                     env, policy, task.task_id, seed=seed + i, deterministic=True
                 )
+                if selected is not None:
+                    validate_active_task(env, selected[i], backend)
                 returns.append(trajectory.episode_return)
                 lengths.append(trajectory.length)
                 successes.append(trajectory.success)
@@ -231,6 +240,11 @@ def evaluate_task(
         "environment_backend": backend,
         "task_set_seed": task_set_seed if selected is not None else None,
         "task_bank_size": len(selected) if selected is not None else None,
+        "ordered_task_hashes": (
+            [identity["task_hash"] for identity in identities]
+            if selected is not None
+            else None
+        ),
         "episode_provenance": episode_provenance if selected is not None else None,
     }
     if progress:
@@ -249,6 +263,8 @@ def evaluate_stage(
     evaluation_mode="sampled",
     task_set_seed=10000,
     reward_function_version="v2",
+    hammer_reward_variant="original",
+    hammer_nail_progress_weight=0.0,
     backend="metaworld-v3",
     progress=False,
 ):
@@ -283,6 +299,8 @@ def evaluate_stage(
             evaluation_mode=evaluation_mode,
             task_set_seed=task_set_seed,
             reward_function_version=reward_function_version,
+            hammer_reward_variant=hammer_reward_variant,
+            hammer_nail_progress_weight=hammer_nail_progress_weight,
             backend=backend,
             progress=progress,
         )

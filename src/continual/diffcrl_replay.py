@@ -54,6 +54,8 @@ class ReplayRequest:
     action_projection: str
     bc_clamp_epsilon: float
     progress: bool
+    hammer_reward_variant: str = "original"
+    hammer_nail_progress_weight: float = 0.0
 
 
 @dataclass
@@ -103,13 +105,17 @@ def generate_previous_task_replay(
             request.trajectory_count,
             seed,
         )
+        environment_kwargs = {
+            "backend": request.backend,
+            "reward_function_version": request.reward_function_version,
+        }
+        if request.backend == "kuka-v3":
+            environment_kwargs.update(
+                hammer_reward_variant=request.hammer_reward_variant,
+                hammer_nail_progress_weight=request.hammer_nail_progress_weight,
+            )
         goals = torch.as_tensor(
-            reconstruct_goals(
-                source,
-                selected,
-                backend=request.backend,
-                reward_function_version=request.reward_function_version,
-            ),
+            reconstruct_goals(source, selected, **environment_kwargs),
             dtype=torch.float32,
         )
         with tqdm(

@@ -18,7 +18,13 @@ from src.config import (
     save_resolved_config,
     validate_config,
 )
-from src.envs import horizon_for_backend, make_env
+from src.envs import (
+    ACTION_SHAPE,
+    OBSERVATION_SHAPE,
+    EnvironmentSettings,
+    horizon_for_backend,
+    make_env,
+)
 from src.support.dataset import (
     bc_dataset,
     concatenate_trajectory_groups,
@@ -26,7 +32,9 @@ from src.support.dataset import (
     validate_trajectory_group,
 )
 from src.support.io import write_json
+from src.support.expert_manifest import validate_expert_checkpoint
 from src.support.reproducibility import file_hash, state_hash
+from src.support.run_manifest import complete_run, create_run_manifest
 
 from .bc_policy import BC_CLAMP_EPSILON, GeneralPolicy, fit_bc
 from .collector import collect_trajectories
@@ -37,11 +45,16 @@ from .diffusion_data import (
     encode_trajectory,
     pack_trajectories,
     transform_actions,
+    validate_stage_trajectory_group,
 )
 from .evaluation import EvaluationMatrix, evaluate_stage
 from .policy_adapter import SB3SACPolicy
 from .reporting import print_final_report, print_stage_report
-from .task_bank import selected_configuration, training_bank
+from .task_bank import (
+    selected_configuration,
+    training_bank,
+    verify_disjoint_task_banks,
+)
 from .task_sequence import TaskSequence, TaskSpec
 from .trajectory_diffusion import (
     DiffusionConfig,
@@ -205,6 +218,7 @@ class DiffCRLTrainer:
         output = output_directory(config)
         self.sequence, self.config = sequence, config
         self.horizon = horizon_for_backend(config.environment.backend)
+        self.environment_settings = EnvironmentSettings.from_config(config.environment)
         self.progress = progress
         self.experts = {
             t.task_name: Path(experts[t.task_name]).resolve() for t in sequence.tasks
@@ -212,6 +226,43 @@ class DiffCRLTrainer:
         self.expert_hashes = {
             name: file_hash(path) for name, path in self.experts.items()
         }
+        self.expert_identities = {
+            name: validate_expert_checkpoint(
+                path,
+                expected_task=name,
+                expected_backend=config.environment.backend,
+                expected_reward_function_version=config.environment.reward_function_version,
+                expected_observation_shape=OBSERVATION_SHAPE,
+                expected_action_shape=ACTION_SHAPE,
+                expected_horizon=self.horizon,
+                expected_hammer_reward_variant=(
+                    config.environment.hammer_reward_variant
+                    if name == "kuka-hammer-v3"
+                    else None
+                ),
+                expected_hammer_nail_progress_weight=(
+                    config.environment.hammer_nail_progress_weight
+                    if name == "kuka-hammer-v3"
+                    else None
+                ),
+                allow_legacy=config.environment.backend != "kuka-v3",
+            )
+            for name, path in self.experts.items()
+        }
+        self.task_bank_checks = (
+            {
+                task.task_name: verify_disjoint_task_banks(
+                    task.task_name,
+                    config.runtime.seed,
+                    config.evaluation.task_set_seed,
+                    backend=config.environment.backend,
+                )
+                for task in sequence.tasks
+            }
+            if config.environment.backend in ("metaworld-v3", "kuka-v3")
+            and config.evaluation.mode == "fixed-tasks"
+            else {}
+        )
         self.output = Path(output).resolve()
         if self.output.exists():
             raise FileExistsError(self.output)
@@ -242,6 +293,15 @@ class DiffCRLTrainer:
         self.next_stage = 0
         self.output.mkdir(parents=True, exist_ok=False)
         save_resolved_config(config, self.output)
+        create_run_manifest(
+            self.output,
+            config,
+            experts={
+                name: identity.to_dict()
+                for name, identity in self.expert_identities.items()
+            },
+            task_banks=self.task_bank_checks,
+        )
         write_json(
             self.output / "config.json",
             {
@@ -326,6 +386,8 @@ class DiffCRLTrainer:
             evaluation_mode=self.config.evaluation.mode,
             task_set_seed=self.config.evaluation.task_set_seed,
             reward_function_version=self.config.environment.reward_function_version,
+            hammer_reward_variant=self.config.environment.hammer_reward_variant,
+            hammer_nail_progress_weight=self.config.environment.hammer_nail_progress_weight,
             backend=self.config.environment.backend,
             progress=self.progress,
         )
@@ -347,6 +409,8 @@ class DiffCRLTrainer:
                 runtime_seed=cfg.runtime.seed,
                 device=cfg.runtime.device,
                 reward_function_version=cfg.environment.reward_function_version,
+                hammer_reward_variant=cfg.environment.hammer_reward_variant,
+                hammer_nail_progress_weight=cfg.environment.hammer_nail_progress_weight,
                 action_space=cfg.diffusion.action_space,
                 action_clamp_epsilon=cfg.diffusion.action_clamp_epsilon,
                 action_projection=cfg.diffusion.generated_action_projection,
@@ -375,11 +439,16 @@ class DiffCRLTrainer:
         expert = SB3SACPolicy(
             SAC.load(self.experts[task.task_name], device=cfg.runtime.device)
         )
+        settings = getattr(
+            self,
+            "environment_settings",
+            EnvironmentSettings.from_config(cfg.environment),
+        )
         env = make_env(
-            cfg.environment.backend,
+            settings.backend,
             task.task_name,
             cfg.runtime.seed,
-            reward_function_version=cfg.environment.reward_function_version,
+            **settings.kwargs(),
         )
         try:
             bank = training_bank(
@@ -484,6 +553,12 @@ class DiffCRLTrainer:
             name = self.sequence.task(index).task_name
             validate_trajectory_group(
                 values, count=count, horizon=self.horizon
+            )
+            validate_stage_trajectory_group(
+                values,
+                stage=stage,
+                task=name,
+                source=sources[name],
             )
             path = directory / f"data_task_{index}.npy"
             np.save(path, values.numpy(), allow_pickle=False)
@@ -808,4 +883,5 @@ class DiffCRLTrainer:
             self.train_task(stage)
         write_json(self.output / "evaluation_matrix.json", self.matrix.to_dict())
         print_final_report(self.matrix)
+        complete_run(self.output)
         return self.matrix

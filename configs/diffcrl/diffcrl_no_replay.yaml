@@ -36,4 +36,3 @@ runtime:
   seed: 0
   device: cpu
   output: runs/formal/no_replay_5task
-

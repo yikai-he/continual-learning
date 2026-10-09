@@ -30,6 +30,11 @@ def fixture_groups():
         0: torch.randn((5, 200, 43), generator=generator),
         1: torch.randn((5, 200, 43), generator=generator),
     }
+    for values in groups.values():
+        values[..., 18:36] = torch.cat(
+            (values[:, :1, :18], values[:, :-1, :18]), dim=1
+        )
+        values[..., 36:39] = values[:, :1, 36:39]
     groups[0][..., 39:] = torch.tensor([-1.0, -0.9998, 0.25, 1.0])
     groups[1][..., 39:] = torch.tensor([-1.2, -0.5, 0.99995, 1.1])
     return groups

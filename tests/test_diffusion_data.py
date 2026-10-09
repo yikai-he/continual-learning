@@ -9,6 +9,7 @@ from src.continual.diffusion_data import (
     encode_trajectory,
     project_actions,
     transform_actions,
+    validate_stage_trajectory_group,
 )
 
 
@@ -62,6 +63,33 @@ class StructuredTrajectoryTests(unittest.TestCase):
         self.assertTrue(
             torch.equal(projected[..., 18:], generated[..., 18:].clamp(-1, 1))
         )
+
+    def test_stage_preflight_rejects_any_goal_drift_with_context(self):
+        observations, actions = valid_batch()
+        packed = torch.cat((observations, actions), dim=-1)
+        source = {
+            "kind": "real_expert",
+            "collection_configurations": [
+                {"task_bank_index": 7, "task_hash": "abc", "reset_seed": 4},
+                {"task_bank_index": 8, "task_hash": "def", "reset_seed": 5},
+            ],
+        }
+        validate_stage_trajectory_group(
+            packed, stage=3, task="kuka-faucet-close-v3", source=source
+        )
+        for drift in (1e-8, 1e-2):
+            invalid = packed.clone()
+            invalid[0, 1, 36] += drift
+            with self.assertRaisesRegex(
+                ValueError,
+                "stage=3.*trajectory=0.*source=current.*task_bank_index=7.*first_conflicting_timestep=1",
+            ):
+                validate_stage_trajectory_group(
+                    invalid,
+                    stage=3,
+                    task="kuka-faucet-close-v3",
+                    source=source,
+                )
 
 
 if __name__ == "__main__":

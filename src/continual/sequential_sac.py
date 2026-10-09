@@ -29,6 +29,8 @@ from src.continual.task_sequence import TaskSequence
 from src.envs import make_metaworld_env
 from src.support.io import write_json
 from src.support.reproducibility import file_hash
+from src.support.run_manifest import complete_run, create_run_manifest
+from src.continual.task_bank import verify_disjoint_task_banks
 
 
 class FiniteTransitions(BaseCallback):
@@ -73,8 +75,21 @@ def run(config: ExperimentConfig, *, observer=None):
     config = resolve_device(config)
     sequence = TaskSequence.from_names(config.continual.tasks)
     output = output_directory(config)
+    task_bank_checks = (
+        {
+            task.task_name: verify_disjoint_task_banks(
+                task.task_name,
+                config.runtime.seed + stage,
+                config.evaluation.task_set_seed,
+            )
+            for stage, task in enumerate(sequence.tasks)
+        }
+        if config.evaluation.mode == "fixed-tasks"
+        else {}
+    )
     output.mkdir(parents=True, exist_ok=False)
     save_resolved_config(config, output)
+    create_run_manifest(output, config, task_banks=task_bank_checks)
     write_json(
         output / "config.json",
         {
@@ -224,6 +239,7 @@ def run(config: ExperimentConfig, *, observer=None):
         write_json(output / "evaluation_matrix.json", matrix.to_dict())
         write_json(output / "stages.json", stages)
         print_final_report(matrix)
+        complete_run(output)
         return model
     finally:
         if model is not None:

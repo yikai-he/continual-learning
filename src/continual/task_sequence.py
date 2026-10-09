@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-from src.envs import make_env
+from src.envs import EnvironmentSettings, make_env
 
 
 @dataclass(frozen=True)
@@ -75,14 +75,24 @@ class TaskSwitcher:
         factory=make_env,
         backend="metaworld-v3",
         reward_function_version="v2",
+        hammer_reward_variant="original",
+        hammer_nail_progress_weight=0.0,
+        render_mode=None,
     ):
         self.sequence = sequence
         self.factory = factory
         self.factory_uses_backend = factory is make_env
+        self.settings = EnvironmentSettings(
+            backend=backend,
+            reward_function_version=reward_function_version,
+            hammer_reward_variant=hammer_reward_variant,
+            hammer_nail_progress_weight=hammer_nail_progress_weight,
+        )
         self.backend = backend
         self.env = None
         self.index = None
         self.reward_function_version = reward_function_version
+        self.render_mode = render_mode
 
     def switch(self, index, *, seed):
         spec = self.sequence.task(index)
@@ -92,9 +102,14 @@ class TaskSwitcher:
             if self.factory_uses_backend
             else (spec.task_name, seed)
         )
-        self.env = self.factory(
-            *args, reward_function_version=self.reward_function_version
+        kwargs = (
+            self.settings.kwargs()
+            if self.factory_uses_backend
+            else {"reward_function_version": self.reward_function_version}
         )
+        if self.render_mode is not None:
+            kwargs["render_mode"] = self.render_mode
+        self.env = self.factory(*args, **kwargs)
         self.index = index
         return self.env
 

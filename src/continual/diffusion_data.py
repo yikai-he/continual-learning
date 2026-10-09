@@ -24,6 +24,68 @@ DIFFUSION_FEATURES = CURRENT_STATE_SLICE.stop + ACTION_SHAPE[0]
 DIFFUSION_ACTION_SLICE = slice(CURRENT_STATE_SLICE.stop, DIFFUSION_FEATURES)
 
 
+def validate_stage_trajectory_group(values, *, stage, task, source):
+    """Validate physical episode structure with actionable stage provenance."""
+    source_type = {
+        "real_expert": "current",
+        "generated": "replay",
+    }.get(source.get("kind"), source.get("kind", "unknown"))
+    if values.ndim != 3 or values.shape[-1] != PHYSICAL_TRAJECTORY_FEATURES:
+        raise ValueError(
+            f"Invalid trajectory group shape at stage={stage}, task={task}: "
+            f"{tuple(values.shape)}."
+        )
+    observations = values[..., PHYSICAL_OBSERVATION_SLICE]
+    actions = values[..., PHYSICAL_ACTION_SLICE]
+    if not torch.isfinite(observations).all() or not torch.isfinite(actions).all():
+        raise ValueError(
+            f"Nonfinite trajectory data at stage={stage}, task={task}, "
+            f"source={source_type}."
+        )
+    for trajectory_index, episode in enumerate(observations):
+        current = episode[..., CURRENT_STATE_SLICE]
+        previous = episode[..., PREVIOUS_STATE_SLICE]
+        goals = episode[..., GOAL_SLICE]
+        if not torch.equal(previous[0], current[0]) or not torch.equal(
+            previous[1:], current[:-1]
+        ):
+            raise ValueError(
+                f"Previous-state contract failed at stage={stage}, task={task}, "
+                f"trajectory={trajectory_index}, source={source_type}."
+            )
+        conflicts = torch.nonzero(
+            torch.any(goals != goals[0], dim=1), as_tuple=False
+        ).flatten()
+        if len(conflicts):
+            metadata = source.get("collection_configurations", [])
+            record = (
+                metadata[trajectory_index]
+                if trajectory_index < len(metadata)
+                else {}
+            )
+            if not record:
+                indices = source.get("training_configuration_indices", [])
+                hashes = source.get("training_configuration_hashes", [])
+                record = {
+                    "task_bank_index": indices[trajectory_index]
+                    if trajectory_index < len(indices)
+                    else None,
+                    "task_hash": hashes[trajectory_index]
+                    if trajectory_index < len(hashes)
+                    else None,
+                }
+            drift = float(torch.max(torch.abs(goals - goals[0])))
+            raise ValueError(
+                "Goal must be exactly constant within each episode: "
+                f"stage={stage}, task={task}, trajectory={trajectory_index}, "
+                f"source={source_type}, length={len(episode)}, "
+                f"task_bank_index={record.get('task_bank_index', record.get('configuration_index'))}, "
+                f"task_hash={record.get('task_hash', record.get('task_data_sha256'))}, "
+                f"reset_seed={record.get('reset_seed')}, max_goal_drift={drift}, "
+                f"first_conflicting_timestep={int(conflicts[0])}."
+            )
+
+
 def pack_trajectories(
     trajectories: Sequence[Trajectory],
     *,

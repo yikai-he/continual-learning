@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "backend": "kuka-v3",
+  "task_name": "kuka-drawer-close-v3",
+  "algorithm": "SAC",
+  "observation_shape": [39],
+  "action_shape": [4],
+  "horizon": 200,
+  "reward_function_version": "v2",
+  "training_seed": 0,
+  "checkpoint_sha256": "135c3c070025b15ebdce2f60b71b654fc50ab608acacc4936ed47e762871240d"
+}
