@@ -32,13 +32,7 @@ env/
 # --------------------
 # Experiment outputs
 # --------------------
-runs/*
-!runs/experts/
-runs/experts/*
-!runs/experts/kuka-v3/
-runs/experts/kuka-v3/README.md
-runs/experts/kuka-v3/*/*
-!runs/experts/kuka-v3/*/expert_manifest.json
+runs/
 experiments/
 videos/
 /configs/local/
