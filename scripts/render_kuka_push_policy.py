@@ -132,36 +132,10 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     )
     parser.add_argument(
         "--reward-version",
-        choices=(
-            "v1",
-            "v2",
-            "v3",
-            "v3_1",
-            "v3_2_retention",
-            "v3_3_contact_push_progress",
-            "v4_simple_approach_progress",
-            "v5_contact_start_progress",
-            "v6_rear_contact_push_progress",
-            "v1_initial_to_contact",
-            "v1_1_initial_to_contact_aperture",
-            "sawyer_push_v2_adapted",
-        ),
+        choices=("v1", "v2"),
         default="v2",
         help="environment reward version (default: v2)",
     )
-    parser.add_argument(
-        "--cube-push-curriculum-level",
-        type=int,
-        choices=(1, 2, 3),
-        default=3,
-        help="optional kuka-push-cube-v3 initialization curriculum (default: 3)",
-    )
-    parser.add_argument(
-        "--cube-push-initialization",
-        choices=("default", "contact", "near_contact"), default="default"
-    )
-    parser.add_argument("--cube-y-min", type=float, default=0.490)
-    parser.add_argument("--near-contact-gap-m", type=float, default=0.005)
     parser.add_argument("--audit-case", choices=tuple(AUDIT_CASES))
     parser.add_argument("--seeds", nargs="+", type=int, default=[10_000])
     parser.add_argument("--task-index", type=int, choices=range(50))
@@ -220,52 +194,6 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         parser.error("--audit-case cannot be combined with --model or --task-index")
     if args.audit_case and args.env_name != "kuka-push-v3":
         parser.error("--audit-case is only available with --env-name kuka-push-v3")
-    if args.cube_push_curriculum_level != 3 and args.env_name != "kuka-push-cube-v3":
-        parser.error(
-            "--cube-push-curriculum-level 1 or 2 requires "
-            "--env-name kuka-push-cube-v3"
-        )
-    if args.cube_push_initialization != "default" and args.env_name != "kuka-push-cube-v3":
-        parser.error("--cube-push-initialization is specific to kuka-push-cube-v3")
-    if not 0.484 <= args.cube_y_min <= 0.55:
-        parser.error("--cube-y-min must be in [0.484, 0.55]")
-    if not np.isfinite(args.near_contact_gap_m) or args.near_contact_gap_m <= 0:
-        parser.error("--near-contact-gap-m must be positive and finite")
-    if (
-        args.reward_version == "v3_3_contact_push_progress"
-        and args.env_name != "kuka-push-cube-v3"
-    ):
-        parser.error(
-            "--reward-version v3_3_contact_push_progress requires "
-            "--env-name kuka-push-cube-v3"
-        )
-    if (
-        args.reward_version == "v4_simple_approach_progress"
-        and args.env_name != "kuka-push-cube-v3"
-    ):
-        parser.error(
-            "--reward-version v4_simple_approach_progress requires "
-            "--env-name kuka-push-cube-v3"
-        )
-    if args.reward_version == "v5_contact_start_progress" and args.env_name != "kuka-push-cube-v3":
-        parser.error("--reward-version v5_contact_start_progress requires --env-name kuka-push-cube-v3")
-    if args.reward_version == "v6_rear_contact_push_progress" and args.env_name != "kuka-push-cube-v3":
-        parser.error("--reward-version v6_rear_contact_push_progress requires --env-name kuka-push-cube-v3")
-    if args.reward_version in (
-        "v1_initial_to_contact", "v1_1_initial_to_contact_aperture"
-    ):
-        if args.env_name != "kuka-push-cube-v3":
-            parser.error(f"--reward-version {args.reward_version} requires --env-name kuka-push-cube-v3")
-        if args.cube_push_curriculum_level != 2 or args.cube_push_initialization != "default":
-            parser.error(f"{args.reward_version} requires curriculum level 2 and default initialization")
-    if (
-        args.reward_version == "sawyer_push_v2_adapted"
-        and args.env_name != "kuka-push-cube-v3"
-    ):
-        parser.error(
-            "--reward-version sawyer_push_v2_adapted requires "
-            "--env-name kuka-push-cube-v3"
-        )
     if args.controller == "scripted":
         if args.checkpoint is not None or args.model is not None or args.audit_case:
             parser.error("--controller scripted cannot load a SAC checkpoint or audit case")
@@ -745,12 +673,6 @@ def run(args: argparse.Namespace) -> None:
         peg_unplug_progress_gamma=getattr(
             args, "peg_unplug_progress_gamma", 0.99
         ),
-        cube_push_curriculum_level=getattr(
-            args, "cube_push_curriculum_level", 3
-        ),
-        cube_push_initialization=getattr(args, "cube_push_initialization", "default"),
-        cube_y_min=getattr(args, "cube_y_min", 0.490),
-        near_contact_gap_m=getattr(args, "near_contact_gap_m", 0.005),
     )
     if model is not None:
         validate_spaces(model, env)

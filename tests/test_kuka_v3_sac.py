@@ -1,5 +1,6 @@
 """Focused coverage for isolated KUKA-v3 single-task SAC support."""
 
+from dataclasses import replace
 from pathlib import Path
 
 import numpy as np
@@ -147,57 +148,15 @@ def test_peg_unplug_progress_options_are_task_scoped() -> None:
         config_from_dict(values, expected_experiment="sac")
 
 
-def test_kuka_push_reward_v3_probe_matches_v2_sac_settings() -> None:
-    v2 = load_config(
-        Path("configs/sac/archive/short_probes/kuka_push_v3_short_50k.yaml"),
-        expected_experiment="sac",
-    )
-    v3 = load_config(
-        Path("configs/sac/archive/reward_ablations/kuka_push_v3_reward_v3_50k.yaml"),
-        expected_experiment="sac",
-    )
-    assert v3.environment.backend == v2.environment.backend == "kuka-v3"
-    assert v3.environment.reward_function_version == "v3"
-    assert v2.environment.reward_function_version == "v2"
-    assert v3.sac == v2.sac
-    assert v3.continual == v2.continual
-    assert v3.evaluation == v2.evaluation
-    assert v3.runtime.seed == v2.runtime.seed == 0
-    assert v3.runtime.device == v2.runtime.device == "auto"
-    assert v3.runtime.output == "runs/reward_v3/kuka-push-v3"
-    assert v3.runtime.run_name == "seed_0_50k_probe"
-
-
-def test_kuka_push_reward_v3_1_probe_only_changes_reward_identity() -> None:
-    v3 = load_config(
-        Path("configs/sac/archive/reward_ablations/kuka_push_v3_reward_v3_50k.yaml"),
-        expected_experiment="sac",
-    )
-    v3_1 = load_config(
-        Path("configs/sac/archive/reward_ablations/kuka_push_v3_reward_v3_1_50k.yaml"),
-        expected_experiment="sac",
-    )
-    assert v3_1.environment.backend == v3.environment.backend == "kuka-v3"
-    assert v3_1.environment.reward_function_version == "v3_1"
-    assert v3.environment.reward_function_version == "v3"
-    assert v3_1.sac == v3.sac
-    assert v3_1.continual == v3.continual
-    assert v3_1.evaluation == v3.evaluation
-    assert v3_1.runtime.seed == v3.runtime.seed == 0
-    assert v3_1.runtime.device == v3.runtime.device == "auto"
-    assert v3_1.runtime.output == "runs/reward_v3_1/kuka-push-v3"
-    assert v3_1.runtime.run_name == "seed_0_50k_probe"
-
-
-def test_kuka_push_reward_v3_1_200k_experiment_contract() -> None:
+def test_kuka_push_sawyer_v2_1m_experiment_contract() -> None:
     config = load_config(
-        Path("configs/sac/kuka_push_v3_reward_v3_1_200k.yaml"),
+        Path("configs/sac/kuka_push_v3_sawyer_v2_1m.yaml"),
         expected_experiment="sac",
     )
     assert config.environment.backend == "kuka-v3"
-    assert config.environment.reward_function_version == "v3_1"
+    assert config.environment.reward_function_version == "v2"
     assert config.continual.tasks == ["kuka-push-v3"]
-    assert config.sac.steps == 200_000
+    assert config.sac.steps == 1_000_000
     assert config.sac.learning_rate == 0.001
     assert config.sac.buffer_size == 1_000_000
     assert config.sac.learning_starts == 10_000
@@ -205,7 +164,7 @@ def test_kuka_push_reward_v3_1_200k_experiment_contract() -> None:
     assert config.sac.net_arch == [256, 256, 256, 256]
     assert config.sac.train_freq == config.sac.gradient_steps == 1
     assert config.sac.checkpoint_freq == 50_000
-    assert config.sac.early_stopping.enabled
+    assert not config.sac.early_stopping.enabled
     assert config.sac.early_stopping.min_steps == 100_000
     assert config.sac.early_stopping.success_threshold == 0.95
     assert config.sac.early_stopping.patience == 3
@@ -214,60 +173,37 @@ def test_kuka_push_reward_v3_1_200k_experiment_contract() -> None:
     assert config.evaluation.frequency == 20_000
     assert config.evaluation.task_set_seed == 10_000
     assert config.runtime.seed == 0
-    assert config.runtime.output == (
-        "runs/reward_ablations/kuka-push-v3/reward_v3_1"
-    )
-    assert config.runtime.run_name == "seed_0_200k"
+    assert config.runtime.output == "runs/training_baselines/kuka-push-v3/sawyer-v2-1m"
+    assert config.runtime.run_name == "seed_0_fresh_1m"
 
 
-def test_kuka_push_lr3e4_ablation_changes_only_lr_checkpoint_and_output() -> None:
+def test_kuka_push_200k_pilot_differs_only_in_budget_and_output_identity() -> None:
     baseline = load_config(
-        Path("configs/sac/kuka_push_v3_reward_v3_1_200k.yaml"),
+        Path("configs/sac/kuka_push_v3_sawyer_v2_1m.yaml"),
         expected_experiment="sac",
     )
-    ablation = load_config(
-        Path("configs/sac/kuka_push_v3_reward_v3_1_lr3e4_200k.yaml"),
+    pilot = load_config(
+        Path("configs/sac/kuka_push_v3_sawyer_v2_pilot_200k.yaml"),
         expected_experiment="sac",
     )
-    assert ablation.environment == baseline.environment
-    assert ablation.continual == baseline.continual
-    assert ablation.evaluation == baseline.evaluation
-    assert ablation.runtime.seed == baseline.runtime.seed == 0
-    assert ablation.runtime.device == baseline.runtime.device
-    assert ablation.runtime.run_name == baseline.runtime.run_name == "seed_0_200k"
-    assert ablation.runtime.output.endswith("reward_v3_1_lr3e4")
-    assert ablation.runtime.output != baseline.runtime.output
-    assert ablation.sac.learning_rate == 0.0003
-    assert baseline.sac.learning_rate == 0.001
-    assert ablation.sac.checkpoint_freq == 20_000
-    assert baseline.sac.checkpoint_freq == 50_000
-    for field in (
-        "steps", "buffer_size", "learning_starts", "batch_size", "gamma", "tau",
-        "train_freq", "gradient_steps", "ent_coef", "net_arch", "early_stopping",
-    ):
-        assert getattr(ablation.sac, field) == getattr(baseline.sac, field)
+    assert pilot.environment == baseline.environment
+    assert pilot.continual == baseline.continual
+    assert pilot.evaluation == baseline.evaluation
+    assert pilot.runtime.seed == baseline.runtime.seed == 0
+    assert pilot.runtime.device == baseline.runtime.device
+    assert pilot.sac == replace(baseline.sac, steps=200_000)
+    assert pilot.runtime.output == "runs/training_pilots/kuka-push-v3/sawyer-v2-200k"
+    assert pilot.runtime.run_name == "seed_0_fresh_200k_pilot"
 
 
-def test_kuka_push_v3_2_retention_experiment_is_reward_only_ablation() -> None:
-    baseline = load_config(
-        Path("configs/sac/kuka_push_v3_reward_v3_1_lr3e4_200k.yaml"),
-        expected_experiment="sac",
-    )
-    retention = load_config(
-        Path("configs/sac/kuka_push_v3_reward_v3_2_retention_200k.yaml"),
-        expected_experiment="sac",
-    )
-    assert retention.environment.backend == baseline.environment.backend == "kuka-v3"
-    assert retention.environment.reward_function_version == "v3_2_retention"
-    assert baseline.environment.reward_function_version == "v3_1"
-    assert retention.sac == baseline.sac
-    assert retention.continual == baseline.continual
-    assert retention.evaluation == baseline.evaluation
-    assert retention.runtime.seed == baseline.runtime.seed == 0
-    assert retention.runtime.device == baseline.runtime.device == "auto"
-    assert retention.runtime.run_name == baseline.runtime.run_name == "seed_0_200k"
-    assert retention.runtime.output.endswith("reward_v3_2_retention")
-    assert retention.runtime.output != baseline.runtime.output
+def test_obsolete_push_reward_is_rejected_for_all_push_tasks() -> None:
+    values = _sac_config("kuka-push-v3")
+    values["environment"]["reward_function_version"] = "v3_1"
+    with pytest.raises(ValueError, match="reward_function_version"):
+        config_from_dict(values, expected_experiment="sac")
+    values["continual"]["tasks"] = ["kuka-push-cube-v3"]
+    with pytest.raises(ValueError, match="reward_function_version"):
+        config_from_dict(values, expected_experiment="sac")
 
 
 def test_hammer_reward_ablation_configs_are_controlled() -> None:

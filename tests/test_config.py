@@ -121,7 +121,7 @@ class ConfigTests(unittest.TestCase):
 
     def test_reward_version_default_validation_and_persistence(self):
         self.assertEqual(self.config().environment.reward_function_version, "v2")
-        for version in ("v1", "v2", "v3", "v3_1", "v3_2_retention"):
+        for version in ("v1", "v2"):
             config = self.config(environment={"reward_function_version": version})
             with tempfile.TemporaryDirectory() as tmp:
                 save_resolved_config(config, Path(tmp))

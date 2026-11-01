@@ -43,10 +43,6 @@ class EnvironmentSettings:
     peg_unplug_reward_variant: str = "original"
     peg_unplug_progress_weight: float = 0.0
     peg_unplug_progress_gamma: float = 0.99
-    cube_push_curriculum_level: int = 3
-    cube_push_initialization: str = "default"
-    cube_y_min: float = 0.490
-    near_contact_gap_m: float = 0.005
 
     @classmethod
     def from_config(cls, config) -> "EnvironmentSettings":
@@ -66,12 +62,6 @@ class EnvironmentSettings:
             peg_unplug_progress_gamma=getattr(
                 config, "peg_unplug_progress_gamma", 0.99
             ),
-            cube_push_curriculum_level=getattr(
-                config, "cube_push_curriculum_level", 3
-            ),
-            cube_push_initialization=getattr(config, "cube_push_initialization", "default"),
-            cube_y_min=getattr(config, "cube_y_min", 0.490),
-            near_contact_gap_m=getattr(config, "near_contact_gap_m", 0.005),
         )
 
     def kwargs(self) -> dict:
@@ -82,10 +72,6 @@ class EnvironmentSettings:
             "peg_unplug_reward_variant": self.peg_unplug_reward_variant,
             "peg_unplug_progress_weight": self.peg_unplug_progress_weight,
             "peg_unplug_progress_gamma": self.peg_unplug_progress_gamma,
-            "cube_push_curriculum_level": self.cube_push_curriculum_level,
-            "cube_push_initialization": self.cube_push_initialization,
-            "cube_y_min": self.cube_y_min,
-            "near_contact_gap_m": self.near_contact_gap_m,
         }
 
     def make(self, task: str, seed: int, render_mode: str | None = None) -> gym.Env:
@@ -120,10 +106,6 @@ def make_env(
     peg_unplug_reward_variant: str = "original",
     peg_unplug_progress_weight: float = 0.0,
     peg_unplug_progress_gamma: float = 0.99,
-    cube_push_curriculum_level: int = 3,
-    cube_push_initialization: str = "default",
-    cube_y_min: float = 0.490,
-    near_contact_gap_m: float = 0.005,
 ) -> gym.Env:
     """Create an environment through the selected backend adapter."""
     if backend == "metaworld-v3":
@@ -146,10 +128,6 @@ def make_env(
             peg_unplug_reward_variant=peg_unplug_reward_variant,
             peg_unplug_progress_weight=peg_unplug_progress_weight,
             peg_unplug_progress_gamma=peg_unplug_progress_gamma,
-            cube_push_curriculum_level=cube_push_curriculum_level,
-            cube_push_initialization=cube_push_initialization,
-            cube_y_min=cube_y_min,
-            near_contact_gap_m=near_contact_gap_m,
         )
     raise ValueError(f"Unsupported environment backend: {backend!r}.")
 

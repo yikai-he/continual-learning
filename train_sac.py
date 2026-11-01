@@ -775,10 +775,6 @@ def main(argv=None) -> None:
         "peg_unplug_reward_variant": config.environment.peg_unplug_reward_variant,
         "peg_unplug_progress_weight": config.environment.peg_unplug_progress_weight,
         "peg_unplug_progress_gamma": config.environment.peg_unplug_progress_gamma,
-        "cube_push_curriculum_level": config.environment.cube_push_curriculum_level,
-        "cube_push_initialization": config.environment.cube_push_initialization,
-        "cube_y_min": config.environment.cube_y_min,
-        "near_contact_gap_m": config.environment.near_contact_gap_m,
         "policy": "MlpPolicy",
         "resumed": resume_from is not None,
         "resume_checkpoint": str(resume_from.expanduser().resolve())
@@ -817,10 +813,6 @@ def main(argv=None) -> None:
             peg_unplug_reward_variant=config.environment.peg_unplug_reward_variant,
             peg_unplug_progress_weight=config.environment.peg_unplug_progress_weight,
             peg_unplug_progress_gamma=config.environment.peg_unplug_progress_gamma,
-            cube_push_curriculum_level=config.environment.cube_push_curriculum_level,
-            cube_push_initialization=config.environment.cube_push_initialization,
-            cube_y_min=config.environment.cube_y_min,
-            near_contact_gap_m=config.environment.near_contact_gap_m,
         )
     )
     eval_env = Monitor(
@@ -838,10 +830,6 @@ def main(argv=None) -> None:
             peg_unplug_reward_variant=config.environment.peg_unplug_reward_variant,
             peg_unplug_progress_weight=config.environment.peg_unplug_progress_weight,
             peg_unplug_progress_gamma=config.environment.peg_unplug_progress_gamma,
-            cube_push_curriculum_level=config.environment.cube_push_curriculum_level,
-            cube_push_initialization=config.environment.cube_push_initialization,
-            cube_y_min=config.environment.cube_y_min,
-            near_contact_gap_m=config.environment.near_contact_gap_m,
         )
     )
     evaluation_callback = FixedSeedEvalCallback(

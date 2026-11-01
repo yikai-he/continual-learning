@@ -28,10 +28,6 @@ class EnvironmentConfig:
     peg_unplug_reward_variant: str = "original"
     peg_unplug_progress_weight: float = 0.0
     peg_unplug_progress_gamma: float = 0.99
-    cube_push_curriculum_level: int = 3
-    cube_push_initialization: str = "default"
-    cube_y_min: float = 0.490
-    near_contact_gap_m: float = 0.005
 
 
 @dataclass(frozen=True)
@@ -217,10 +213,6 @@ _EXPERIMENT_FIELDS = {
             "peg_unplug_reward_variant",
             "peg_unplug_progress_weight",
             "peg_unplug_progress_gamma",
-            "cube_push_curriculum_level",
-            "cube_push_initialization",
-            "cube_y_min",
-            "near_contact_gap_m",
         ),
         "sac": ("steps", *_COMMON_SAC_FIELDS, "checkpoint_freq", "early_stopping"),
         "continual": ("tasks",),
@@ -532,22 +524,12 @@ def validate_config(config: ExperimentConfig) -> None:
         )
     for path, allowed in {
         "environment.backend": ("metaworld-v3", "kuka-v2", "kuka-v3"),
-        "environment.reward_function_version": (
-                "v1", "v2", "v3", "v3_1", "v3_2_retention",
-                "v3_3_contact_push_progress",
-                "v4_simple_approach_progress",
-                "v5_contact_start_progress",
-                "v6_rear_contact_push_progress",
-                "v1_initial_to_contact",
-                "v1_1_initial_to_contact_aperture",
-                "sawyer_push_v2_adapted",
-        ),
+        "environment.reward_function_version": ("v1", "v2"),
         "environment.hammer_reward_variant": ("original", "nail_progress"),
         "environment.peg_unplug_reward_variant": (
             "original",
             "peg_unplug_progress_v1",
         ),
-        "environment.cube_push_initialization": ("default", "contact", "near_contact"),
         "bc.normalization_mode": ("layer-norm",),
         "bc.loss": ("post-tanh-mse", "pre-tanh-mse"),
         "diffusion.action_space": ("raw", "pre-tanh"),
@@ -564,12 +546,6 @@ def validate_config(config: ExperimentConfig) -> None:
         raise ValueError("environment.peg_unplug_progress_weight must be nonnegative.")
     if not 0 < config.environment.peg_unplug_progress_gamma <= 1:
         raise ValueError("environment.peg_unplug_progress_gamma must be in (0, 1].")
-    if config.environment.cube_push_curriculum_level not in (1, 2, 3):
-        raise ValueError("environment.cube_push_curriculum_level must be 1, 2, or 3.")
-    if not math.isfinite(config.environment.cube_y_min) or not 0.484 <= config.environment.cube_y_min <= 0.55:
-        raise ValueError("environment.cube_y_min must be in [0.484, 0.55].")
-    if not math.isfinite(config.environment.near_contact_gap_m) or config.environment.near_contact_gap_m <= 0:
-        raise ValueError("environment.near_contact_gap_m must be positive and finite.")
     if (
         config.diffusion.steps < 2
         or config.diffusion.width < 4
@@ -672,92 +648,6 @@ def validate_config(config: ExperimentConfig) -> None:
         raise ValueError("The kuka-v3 backend is implemented only for sac and diffcrl.")
     if config.experiment == "sac" and len(tasks) != 1:
         raise ValueError("continual.tasks must contain exactly one task for sac.")
-    if config.environment.cube_push_curriculum_level != 3 and not (
-        config.environment.backend == "kuka-v3"
-        and config.experiment == "sac"
-        and tasks == ["kuka-push-cube-v3"]
-    ):
-        raise ValueError(
-            "Cube Push curriculum levels 1 and 2 require single-task KUKA-v3 SAC "
-            "on kuka-push-cube-v3."
-        )
-    if config.environment.cube_push_initialization in ("contact", "near_contact") and not (
-        config.environment.backend == "kuka-v3"
-        and config.experiment == "sac"
-        and config.environment.cube_push_curriculum_level == 2
-        and tasks == ["kuka-push-cube-v3"]
-    ):
-        raise ValueError(
-            "Contact initializations require Level 2 single-task KUKA-v3 Cube Push SAC."
-        )
-    if config.environment.reward_function_version == "v3_3_contact_push_progress":
-        if not (
-            config.environment.backend == "kuka-v3"
-            and config.experiment == "sac"
-            and tasks == ["kuka-push-cube-v3"]
-        ):
-            raise ValueError(
-                "v3_3_contact_push_progress is supported only for single-task "
-                "KUKA-v3 SAC on kuka-push-cube-v3."
-            )
-    if config.environment.reward_function_version == "v4_simple_approach_progress":
-        if not (
-            config.environment.backend == "kuka-v3"
-            and config.experiment == "sac"
-            and tasks == ["kuka-push-cube-v3"]
-        ):
-            raise ValueError(
-                "v4_simple_approach_progress is supported only for single-task "
-                "KUKA-v3 SAC on kuka-push-cube-v3."
-            )
-    if config.environment.reward_function_version == "v5_contact_start_progress":
-        if not (
-            config.environment.backend == "kuka-v3"
-            and config.experiment == "sac"
-            and tasks == ["kuka-push-cube-v3"]
-        ):
-            raise ValueError(
-                "v5_contact_start_progress is supported only for single-task "
-                "KUKA-v3 SAC on kuka-push-cube-v3."
-            )
-    if config.environment.reward_function_version == "v6_rear_contact_push_progress":
-        if not (
-            config.environment.backend == "kuka-v3"
-            and config.experiment == "sac"
-            and tasks == ["kuka-push-cube-v3"]
-        ):
-            raise ValueError(
-                "v6_rear_contact_push_progress is supported only for single-task "
-                "KUKA-v3 SAC on kuka-push-cube-v3."
-            )
-    if config.environment.reward_function_version in (
-        "v1_initial_to_contact", "v1_1_initial_to_contact_aperture"
-    ):
-        reward_version = config.environment.reward_function_version
-        if config.continual.tasks != ["kuka-push-cube-v3"]:
-            raise ValueError(
-                f"{reward_version} is supported only for single-task "
-                "kuka-push-cube-v3"
-            )
-        if (
-            config.environment.backend != "kuka-v3"
-            or config.environment.cube_push_curriculum_level != 2
-            or config.environment.cube_push_initialization != "default"
-        ):
-            raise ValueError(
-                f"{reward_version} requires kuka-v3, curriculum level 2, "
-                "and default initialization"
-            )
-    if config.environment.reward_function_version == "sawyer_push_v2_adapted":
-        if not (
-            config.environment.backend == "kuka-v3"
-            and config.experiment == "sac"
-            and tasks == ["kuka-push-cube-v3"]
-        ):
-            raise ValueError(
-                "sawyer_push_v2_adapted is supported only for single-task "
-                "KUKA-v3 SAC on kuka-push-cube-v3."
-            )
     if config.environment.backend == "kuka-v2" and config.evaluation.mode != "sampled":
         raise ValueError(
             f"evaluation.mode must be sampled for the {config.environment.backend} backend."
