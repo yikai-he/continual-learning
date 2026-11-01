@@ -6,7 +6,7 @@ import importlib.util
 import pickle
 from pathlib import Path
 from types import SimpleNamespace
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, patch
 
 import pytest
 
@@ -28,6 +28,115 @@ def test_checkpoint_aliases_and_seed_list() -> None:
     assert args.episodes == 1
     assert args.window_size == (1280, 900)
     assert args.env_name == "kuka-push-v3"
+    assert args.reward_version == "v2"
+
+
+@pytest.mark.parametrize(
+    "reward_version", ("v1", "v2", "v3", "v3_1", "v3_2_retention")
+)
+def test_reward_version_argument_accepts_supported_values(reward_version) -> None:
+    args = replay.parse_args(["--reward-version", reward_version])
+    assert args.reward_version == reward_version
+
+
+def test_reward_version_argument_rejects_unknown_value() -> None:
+    with pytest.raises(SystemExit):
+        replay.parse_args(["--reward-version", "unknown"])
+
+
+def test_v3_3_reward_argument_is_cube_only() -> None:
+    args = replay.parse_args(
+        [
+            "--env-name",
+            "kuka-push-cube-v3",
+            "--reward-version",
+            "v3_3_contact_push_progress",
+        ]
+    )
+    assert args.reward_version == "v3_3_contact_push_progress"
+    with pytest.raises(SystemExit):
+        replay.parse_args(["--reward-version", "v3_3_contact_push_progress"])
+
+
+def test_v4_reward_argument_is_cube_only() -> None:
+    args = replay.parse_args(
+        [
+            "--env-name",
+            "kuka-push-cube-v3",
+            "--reward-version",
+            "v4_simple_approach_progress",
+        ]
+    )
+    assert args.reward_version == "v4_simple_approach_progress"
+    with pytest.raises(SystemExit):
+        replay.parse_args(["--reward-version", "v4_simple_approach_progress"])
+
+
+def test_v5_contact_start_arguments_are_cube_only() -> None:
+    args = replay.parse_args([
+        "--env-name", "kuka-push-cube-v3",
+        "--reward-version", "v5_contact_start_progress",
+        "--cube-push-curriculum-level", "2",
+        "--cube-push-initialization", "contact",
+    ])
+    assert args.reward_version == "v5_contact_start_progress"
+    assert args.cube_push_initialization == "contact"
+    with pytest.raises(SystemExit):
+        replay.parse_args(["--cube-push-initialization", "contact"])
+
+
+def test_near_contact_common_distribution_arguments() -> None:
+    args = replay.parse_args([
+        "--env-name", "kuka-push-cube-v3",
+        "--reward-version", "v6_rear_contact_push_progress",
+        "--cube-push-curriculum-level", "2",
+        "--cube-push-initialization", "near_contact",
+        "--cube-y-min", "0.502",
+        "--near-contact-gap-m", "0.005",
+    ])
+    assert args.cube_push_initialization == "near_contact"
+    assert args.cube_y_min == pytest.approx(0.502)
+    assert args.near_contact_gap_m == pytest.approx(0.005)
+
+
+def test_stage1_reward_requires_level2_default_cube_environment() -> None:
+    args = replay.parse_args([
+        "--env-name", "kuka-push-cube-v3",
+        "--reward-version", "v1_initial_to_contact",
+        "--cube-push-curriculum-level", "2",
+        "--cube-push-initialization", "default",
+    ])
+    assert args.reward_version == "v1_initial_to_contact"
+    with pytest.raises(SystemExit):
+        replay.parse_args([
+            "--env-name", "kuka-push-cube-v3",
+            "--reward-version", "v1_initial_to_contact",
+            "--cube-push-curriculum-level", "3",
+        ])
+
+
+def test_stage1_v1_1_reward_requires_level2_default_cube_environment() -> None:
+    args = replay.parse_args([
+        "--env-name", "kuka-push-cube-v3",
+        "--reward-version", "v1_1_initial_to_contact_aperture",
+        "--cube-push-curriculum-level", "2",
+        "--cube-push-initialization", "default",
+    ])
+    assert args.reward_version == "v1_1_initial_to_contact_aperture"
+    with pytest.raises(SystemExit):
+        replay.parse_args([
+            "--env-name", "kuka-push-cube-v3",
+            "--reward-version", "v1_1_initial_to_contact_aperture",
+            "--cube-push-initialization", "contact",
+        ])
+
+
+def test_sawyer_adapted_reward_argument_is_cube_only() -> None:
+    args = replay.parse_args(["--env-name", "kuka-push-cube-v3",
+        "--reward-version", "sawyer_push_v2_adapted"])
+    assert args.reward_version == "sawyer_push_v2_adapted"
+    with pytest.raises(SystemExit):
+        replay.parse_args(["--reward-version", "sawyer_push_v2_adapted"])
 
 
 def test_environment_name_can_select_handle_press_side() -> None:
@@ -121,7 +230,202 @@ def test_source_loads_only_policy_parameters_and_predicts_deterministically() ->
     assert "model.learn" not in source
     assert "deterministic=True" in source
     assert "except KeyboardInterrupt" in source
-    assert "finally:\n        env.close()" in source
+
+
+def _run_args(**updates):
+    values = {
+        "device": "cpu",
+        "env_name": "kuka-push-v3",
+        "reward_version": "v2",
+        "task_set_seed": 10_000,
+        "smoke_test": 1,
+        "output_video": None,
+        "window_size": (8, 6),
+        "control_hz": 20.0,
+        "overwrite_video": False,
+        "no_loop": True,
+        "print_every": 20,
+    }
+    values.update(updates)
+    return SimpleNamespace(**values)
+
+
+def _run_dependencies(env, model):
+    return (
+        patch.object(replay, "resolve_model", return_value=(Path("model.zip"), "test")),
+        patch.object(replay.SAC, "load", return_value=model),
+        patch.object(replay, "make_env", return_value=env),
+        patch.object(replay, "validate_spaces"),
+        patch.object(replay, "find_task_wrapper", return_value=MagicMock()),
+        patch.object(
+            replay,
+            "resolve_requests",
+            return_value=[replay.TaskRequest(10_000, 0, "hash", "test")],
+        ),
+        patch.object(
+            replay,
+            "reset_exact_task",
+            return_value=(replay.np.zeros(39), replay.np.zeros(3), replay.np.ones(3)),
+        ),
+    )
+
+
+def test_environment_is_closed_after_normal_completion() -> None:
+    env = MagicMock()
+    env.step.return_value = (replay.np.zeros(39), 0.0, False, False, {})
+    model = MagicMock()
+    model.predict.return_value = (replay.np.zeros(4), None)
+    dependencies = _run_dependencies(env, model)
+    with dependencies[0], dependencies[1], dependencies[2], dependencies[3], \
+        dependencies[4], dependencies[5], dependencies[6]:
+        replay.run(_run_args())
+    env.close.assert_called_once_with()
+
+
+def test_selected_reward_version_reaches_environment_factory() -> None:
+    env = MagicMock()
+    env.step.return_value = (replay.np.zeros(39), 0.0, False, True, {})
+    model = MagicMock()
+    model.predict.return_value = (replay.np.zeros(4), None)
+    dependencies = _run_dependencies(env, model)
+    with dependencies[0], dependencies[1], dependencies[2] as make_env, \
+        dependencies[3], dependencies[4], dependencies[5], dependencies[6]:
+        replay.run(_run_args(reward_version="v3_1"))
+    assert make_env.call_args.kwargs["reward_function_version"] == "v3_1"
+
+
+def test_retention_reward_version_reaches_environment_factory() -> None:
+    env = MagicMock()
+    env.step.return_value = (replay.np.zeros(39), 0.0, False, True, {})
+    model = MagicMock()
+    model.predict.return_value = (replay.np.zeros(4), None)
+    dependencies = _run_dependencies(env, model)
+    with dependencies[0], dependencies[1], dependencies[2] as make_env, \
+        dependencies[3], dependencies[4], dependencies[5], dependencies[6]:
+        replay.run(_run_args(reward_version="v3_2_retention"))
+    assert (
+        make_env.call_args.kwargs["reward_function_version"]
+        == "v3_2_retention"
+    )
+
+
+def test_v3_3_cube_reward_version_reaches_environment_factory() -> None:
+    env = MagicMock()
+    env.step.return_value = (replay.np.zeros(39), 0.0, False, True, {})
+    model = MagicMock()
+    model.predict.return_value = (replay.np.zeros(4), None)
+    dependencies = _run_dependencies(env, model)
+    with dependencies[0], dependencies[1], dependencies[2] as make_env, \
+        dependencies[3], dependencies[4], dependencies[5], dependencies[6]:
+        replay.run(
+            _run_args(
+                env_name="kuka-push-cube-v3",
+                reward_version="v3_3_contact_push_progress",
+            )
+        )
+    assert make_env.call_args.args[1] == "kuka-push-cube-v3"
+    assert (
+        make_env.call_args.kwargs["reward_function_version"]
+        == "v3_3_contact_push_progress"
+    )
+
+
+def test_sawyer_adapted_reward_reaches_cube_environment_factory() -> None:
+    env = MagicMock(); env.step.return_value=(replay.np.zeros(39),0.0,False,True,{})
+    model = MagicMock(); model.predict.return_value=(replay.np.zeros(4),None)
+    dependencies = _run_dependencies(env, model)
+    with dependencies[0], dependencies[1], dependencies[2] as make_env, \
+        dependencies[3], dependencies[4], dependencies[5], dependencies[6]:
+        replay.run(_run_args(env_name="kuka-push-cube-v3",
+            reward_version="sawyer_push_v2_adapted"))
+    assert make_env.call_args.args[1] == "kuka-push-cube-v3"
+    assert make_env.call_args.kwargs["reward_function_version"] == "sawyer_push_v2_adapted"
+
+
+def test_contact_display_prefers_v3_3_physical_contact_diagnostic() -> None:
+    base = MagicMock()
+    assert replay.object_contact(
+        base,
+        {"physical_robot_object_contact": True, "named_pad_contact": False},
+        replay.np.zeros(39),
+    )
+    base.pad_contacting_object.assert_not_called()
+
+
+def test_environment_is_closed_when_rendering_fails() -> None:
+    env = MagicMock()
+    env.render.side_effect = RuntimeError("render failure")
+    model = MagicMock()
+    dependencies = _run_dependencies(env, model)
+    with dependencies[0], dependencies[1], dependencies[2], dependencies[3], \
+        dependencies[4], dependencies[5], dependencies[6], pytest.raises(
+            RuntimeError, match="render failure"
+        ):
+        replay.run(_run_args(smoke_test=None))
+    env.close.assert_called_once_with()
+
+
+def _video_environment():
+    camera = SimpleNamespace(
+        type=0,
+        fixedcamid=-1,
+        trackbodyid=-1,
+        lookat=replay.np.zeros(3),
+        distance=1.0,
+        azimuth=0.0,
+        elevation=0.0,
+    )
+    viewer = SimpleNamespace(cam=camera, window=None)
+    renderer = SimpleNamespace(width=0, height=0, viewer=viewer)
+    base = SimpleNamespace(
+        mujoco_renderer=renderer,
+        model=SimpleNamespace(vis=SimpleNamespace(global_=SimpleNamespace())),
+    )
+    env = MagicMock()
+    env.unwrapped = base
+    frame = replay.np.zeros((6, 8, 3), dtype=replay.np.uint8)
+    env.render.return_value = frame
+    observation = replay.np.zeros(39)
+    observation[36:39] = 1.0
+    env.step.return_value = (observation, 0.0, False, True, {})
+    return env
+
+
+def _run_video(env, model, writer) -> None:
+    dependencies = _run_dependencies(env, model)
+    with dependencies[0], dependencies[1], dependencies[2], dependencies[3], \
+        dependencies[4], dependencies[5], dependencies[6], patch.object(
+            replay, "configure_camera", return_value="test"
+        ), patch.object(replay, "workspace_would_clip", return_value=False), \
+        patch.object(replay, "object_contact", return_value=False), patch.object(
+            replay, "add_object_marker"
+        ), patch.object(replay, "Mp4Writer", return_value=writer):
+        replay.run(
+            _run_args(smoke_test=None, output_video=Path("output.mp4"))
+        )
+
+
+def test_environment_is_closed_when_video_writing_fails() -> None:
+    env = _video_environment()
+    model = MagicMock()
+    model.predict.return_value = (replay.np.zeros(4), None)
+    writer = MagicMock()
+    writer.write.side_effect = RuntimeError("write failure")
+    with pytest.raises(RuntimeError, match="write failure"):
+        _run_video(env, model, writer)
+    writer.close.assert_called_once_with()
+    env.close.assert_called_once_with()
+
+
+def test_environment_is_closed_when_video_writer_close_fails() -> None:
+    env = _video_environment()
+    model = MagicMock()
+    model.predict.return_value = (replay.np.zeros(4), None)
+    writer = MagicMock()
+    writer.close.side_effect = RuntimeError("close failure")
+    with pytest.raises(RuntimeError, match="close failure"):
+        _run_video(env, model, writer)
+    env.close.assert_called_once_with()
 
 
 def test_loop_restart_next_and_freeze_state_logic() -> None:

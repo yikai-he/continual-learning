@@ -6,7 +6,6 @@ import hashlib
 import json
 import os
 import platform
-import subprocess
 from datetime import datetime, timezone
 from importlib import metadata
 from pathlib import Path
@@ -14,6 +13,7 @@ from pathlib import Path
 import torch
 
 from src.config import config_to_dict
+from src.support.reproducibility import git_output
 
 
 def _now() -> str:
@@ -21,22 +21,12 @@ def _now() -> str:
 
 
 def _git(path: Path) -> dict:
-    def command(*args):
-        try:
-            return subprocess.check_output(
-                ("git", "-C", str(path), *args),
-                text=True,
-                stderr=subprocess.DEVNULL,
-            ).strip()
-        except (OSError, subprocess.CalledProcessError):
-            return None
-
-    changed = command("status", "--short")
-    diff = command("diff", "--binary", "HEAD")
+    changed = git_output(path, "status", "--short")
+    diff = git_output(path, "diff", "--binary", "HEAD")
     return {
         "path": str(path.resolve()),
-        "commit": command("rev-parse", "HEAD"),
-        "branch": command("branch", "--show-current"),
+        "commit": git_output(path, "rev-parse", "HEAD"),
+        "branch": git_output(path, "branch", "--show-current"),
         "dirty": bool(changed) if changed is not None else None,
         "changed_files": changed.splitlines() if changed else [],
         "diff_sha256": hashlib.sha256(diff.encode()).hexdigest()
@@ -119,6 +109,8 @@ def create_run_manifest(
             "task_set_seed": config.evaluation.task_set_seed,
             "replay_mode": config.continual.replay_mode,
             "trajectory_count": config.continual.trajectories_per_task,
+            "historical_replay_budget": config.continual.replay_budget,
+            "replay_priority_strategy": config.continual.replay_priority_strategy,
             "bc": resolved.get("bc"),
             "diffusion": resolved.get("diffusion"),
             "normalization": getattr(config.bc, "normalization_mode", None),

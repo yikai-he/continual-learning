@@ -22,11 +22,11 @@ continual:
   - kuka-faucet-close-v3
   - kuka-hammer-v3
   experts:
-    kuka-reach-v3: runs/experts/kuka-v3/reach-v3/expert_model.zip
-    kuka-handle-press-side-v3: runs/experts/kuka-v3/handle-press-side-v3/expert_model.zip
-    kuka-drawer-close-v3: runs/experts/kuka-v3/drawer-close-v3/expert_model.zip
-    kuka-faucet-close-v3: runs/experts/kuka-v3/faucet-close-v3/expert_model.zip
-    kuka-hammer-v3: runs/experts/kuka-v3/hammer-v3/expert_model.zip
+    kuka-reach-v3: runs/experts/kuka-v3/reach-v3/policy.zip
+    kuka-handle-press-side-v3: runs/experts/kuka-v3/handle-press-side-v3/policy.zip
+    kuka-drawer-close-v3: runs/experts/kuka-v3/drawer-close-v3/policy.zip
+    kuka-faucet-close-v3: runs/experts/kuka-v3/faucet-close-v3/policy.zip
+    kuka-hammer-v3: runs/experts/kuka-v3/hammer-v3/policy.zip
   trajectories_per_task: 200
   replay_mode: none
 evaluation:

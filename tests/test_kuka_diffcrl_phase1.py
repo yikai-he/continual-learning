@@ -238,7 +238,7 @@ def test_hammer_manifest_settings_must_match(tmp_path, variant, weight, match) -
 
 def test_canonical_kuka_manifests_match_checkpoints() -> None:
     root = Path("runs/experts/kuka-v3")
-    for checkpoint in root.glob("*/expert_model.zip"):
+    for checkpoint in root.glob("*/policy.zip"):
         data = json.loads((checkpoint.parent / "expert_manifest.json").read_text())
         assert hashlib.sha256(checkpoint.read_bytes()).hexdigest() == data["checkpoint_sha256"]
         assert data["backend"] == "kuka-v3"

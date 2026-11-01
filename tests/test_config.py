@@ -18,6 +18,10 @@ from src.config import (
     save_resolved_config,
     validate_config,
 )
+from src.continual.resume import _scientific_config
+from src.continual.trajectory_flow_matching import (
+    FlowMatchingConfig as FlowMatchingModelConfig,
+)
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -117,7 +121,7 @@ class ConfigTests(unittest.TestCase):
 
     def test_reward_version_default_validation_and_persistence(self):
         self.assertEqual(self.config().environment.reward_function_version, "v2")
-        for version in ("v1", "v2", "v3"):
+        for version in ("v1", "v2", "v3", "v3_1", "v3_2_retention"):
             config = self.config(environment={"reward_function_version": version})
             with tempfile.TemporaryDirectory() as tmp:
                 save_resolved_config(config, Path(tmp))
@@ -201,8 +205,8 @@ class ConfigTests(unittest.TestCase):
                 config_from_dict(values)
 
     def test_required_expert_mapping_and_no_default_path_replacement(self):
-        with self.assertRaisesRegex(ValueError, "continual.experts.button-press-v3"):
-            self.config(continual={"tasks": ["button-press-v3"]})
+        with self.assertRaisesRegex(ValueError, "continual.experts.window-open-v3"):
+            self.config(continual={"tasks": ["window-open-v3"]})
         c = self.config(
             continual={
                 "tasks": ["button-press-v3"],
@@ -211,8 +215,8 @@ class ConfigTests(unittest.TestCase):
         )
         self.assertEqual(c.continual.experts, {"button-press-v3": "expert.zip"})
         self.assertEqual(
-            self.config().continual.experts["push-v3"],
-            "runs/reward_v2/push-v3/seed_0/final_model.zip",
+            self.config().continual.experts["button-press-v3"],
+            "runs/experts/metaworld-v3/button-press-v3/policy.zip",
         )
 
     def test_kuka_diffcrl_tasks_are_explicitly_validated(self):
@@ -249,7 +253,8 @@ class ConfigTests(unittest.TestCase):
     def test_invalid_ranges_and_choices(self):
         cases = [
             ("bc", "epochs", 0),
-            ("bc", "hidden_sizes", [8]),
+            ("bc", "hidden_sizes", []),
+            ("bc", "hidden_sizes", [256, True]),
             ("bc", "loss", "unknown"),
             ("diffusion", "width", 5),
             ("diffusion", "steps", 1),
@@ -268,6 +273,15 @@ class ConfigTests(unittest.TestCase):
             values[section][name] = value
             with self.subTest(field=f"{section}.{name}"), self.assertRaises(ValueError):
                 config_from_dict(values)
+
+    def test_general_policy_hidden_architecture_is_configurable(self):
+        for hidden_sizes in ([256, 256], [256, 256, 256, 256], [8]):
+            with self.subTest(hidden_sizes=hidden_sizes):
+                values = config_to_dict(self.config())
+                values["bc"]["hidden_sizes"] = hidden_sizes
+                self.assertEqual(
+                    config_from_dict(values).bc.hidden_sizes, hidden_sizes
+                )
         for name, value in [
             ("gamma", 1.1),
             ("batch_size", -1),
@@ -379,6 +393,143 @@ class ConfigTests(unittest.TestCase):
         c = self.config()
         with self.assertRaisesRegex(ValueError, "bc.epochs"):
             validate_config(replace(c, bc=replace(c.bc, epochs="one")))
+
+    def test_flow_matching_configuration_is_typed_serialized_and_model_compatible(self):
+        config = self.config(
+            continual={"replay_mode": "flow-matching"},
+            flow_matching={
+                "epochs": 12,
+                "batch_size": 4,
+                "learning_rate": 0.0005,
+                "width": 32,
+                "residual_blocks": 6,
+                "time_embedding": "sinusoidal",
+                "time_embedding_scale": 50.0,
+                "integration_steps": 20,
+                "gradient_clip_norm": 1.0,
+                "validation_samples": 4,
+                "checkpoint_selection": "validation-loss",
+                "probability_path": "linear",
+                "source_distribution": "standard-normal",
+                "ode_solver": "euler",
+            },
+        )
+        serialized = config_to_dict(config)
+        self.assertEqual(serialized["continual"]["replay_mode"], "flow-matching")
+        self.assertEqual(serialized["flow_matching"]["integration_steps"], 20)
+        self.assertEqual(config_from_dict(serialized), config)
+
+        model_config = FlowMatchingModelConfig(
+            width=config.flow_matching.width,
+            integration_steps=config.flow_matching.integration_steps,
+            time_embedding_scale=config.flow_matching.time_embedding_scale,
+        )
+        self.assertEqual(
+            (
+                model_config.width,
+                model_config.integration_steps,
+                model_config.time_embedding_scale,
+            ),
+            (32, 20, 50.0),
+        )
+
+    def test_invalid_flow_matching_hyperparameters_and_unknown_fields(self):
+        invalid = {
+            "epochs": 0,
+            "batch_size": 0,
+            "learning_rate": 0.0,
+            "width": 5,
+            "residual_blocks": 5,
+            "time_embedding": "learned",
+            "time_embedding_scale": 0.0,
+            "integration_steps": 0,
+            "gradient_clip_norm": 0.5,
+            "validation_samples": 3,
+            "checkpoint_selection": "last",
+            "probability_path": "ot",
+            "source_distribution": "uniform",
+            "ode_solver": "rk4",
+        }
+        for name, value in invalid.items():
+            with self.subTest(field=name), self.assertRaisesRegex(
+                ValueError, f"flow_matching.{name}"
+            ):
+                self.config(
+                    continual={"replay_mode": "flow-matching"},
+                    flow_matching={name: value},
+                )
+        with self.assertRaisesRegex(ValueError, "flow_matching.typo"):
+            self.config(
+                continual={"replay_mode": "flow-matching"},
+                flow_matching={"typo": 1},
+            )
+
+    def test_flow_section_and_replay_mode_are_strict(self):
+        with self.assertRaisesRegex(ValueError, "flow_matching requires"):
+            self.config(flow_matching={"epochs": 1})
+        with self.assertRaisesRegex(ValueError, "continual.replay_mode"):
+            self.config(continual={"replay_mode": "flow_matching"})
+        fixed_ddpm = self.config(
+            continual={
+                "replay_mode": "diffusion",
+                "replay_allocation": "fixed-total",
+                "replay_budget": 10,
+            }
+        )
+        self.assertEqual(fixed_ddpm.continual.replay_budget, 10)
+        with self.assertRaisesRegex(ValueError, "generative replay mode"):
+            config_from_dict(
+                {
+                    "experiment": "diffcrl",
+                    "continual": {
+                        "replay_mode": "none",
+                        "replay_budget": 10,
+                    },
+                }
+            )
+
+    def test_existing_diffusion_and_no_replay_serialization_is_exactly_preserved(self):
+        expected_sections = {
+            "experiment",
+            "environment",
+            "bc",
+            "diffusion",
+            "continual",
+            "evaluation",
+            "runtime",
+        }
+        for path in (
+            ROOT / "configs/diffcrl/diffcrl.yaml",
+            ROOT / "configs/diffcrl/diffcrl_no_replay.yaml",
+        ):
+            with self.subTest(path=path):
+                original = yaml.safe_load(path.read_text())
+                resolved = config_to_dict(load_config(path))
+                self.assertEqual(set(resolved), expected_sections)
+                self.assertNotIn("flow_matching", resolved)
+                # Existing explicit YAML values must survive resolution unchanged.
+                for section, values in original.items():
+                    if section == "experiment":
+                        self.assertEqual(resolved[section], values)
+                    else:
+                        for name, value in values.items():
+                            self.assertEqual(resolved[section][name], value)
+
+    def test_flow_settings_participate_only_in_flow_scientific_identity(self):
+        flow = self.config(continual={"replay_mode": "flow-matching"})
+        changed = replace(
+            flow,
+            flow_matching=replace(flow.flow_matching, integration_steps=25),
+        )
+        self.assertNotEqual(_scientific_config(flow), _scientific_config(changed))
+        diffusion = self.config()
+        changed_unused = replace(
+            diffusion,
+            flow_matching=replace(diffusion.flow_matching, integration_steps=25),
+        )
+        self.assertEqual(
+            _scientific_config(diffusion), _scientific_config(changed_unused)
+        )
 
 
 if __name__ == "__main__":

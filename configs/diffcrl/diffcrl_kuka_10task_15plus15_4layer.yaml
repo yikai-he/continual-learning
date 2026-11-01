@@ -1,0 +1,63 @@
+# Formal ten-task KUKA-v3 DDPM replay experiment with a fixed 15-trajectory budget.
+experiment: diffcrl
+environment:
+  backend: kuka-v3
+  reward_function_version: v2
+  hammer_reward_variant: nail_progress
+  hammer_nail_progress_weight: 4.0
+  peg_unplug_reward_variant: peg_unplug_progress_v1
+  peg_unplug_progress_weight: 2.0
+  peg_unplug_progress_gamma: 0.99
+bc:
+  epochs: 100
+  batch_size: 256
+  learning_rate: 0.001
+  hidden_sizes: [256, 256, 256, 256]
+  normalization_mode: layer-norm
+  loss: post-tanh-mse
+diffusion:
+  epochs: 300
+  batch_size: 8
+  learning_rate: 0.001
+  steps: 100
+  width: 64
+  action_space: raw
+  action_clamp_epsilon: 0.0001
+  generated_action_projection: none
+continual:
+  tasks:
+    - kuka-hammer-v3
+    - kuka-window-close-v3
+    - kuka-button-press-v3
+    - kuka-peg-unplug-side-v3
+    - kuka-faucet-open-v3
+    - kuka-handle-press-side-v3
+    - kuka-drawer-close-v3
+    - kuka-button-press-topdown-v3
+    - kuka-door-open-v3
+    - kuka-reach-v3
+  experts:
+    kuka-hammer-v3: runs/experts/kuka-v3/hammer-v3/policy.zip
+    kuka-window-close-v3: runs/experts/kuka-v3/window-close-v3/policy.zip
+    kuka-button-press-v3: runs/experts/kuka-v3/button-press-v3/policy.zip
+    kuka-peg-unplug-side-v3: runs/experts/kuka-v3/peg-unplug-side-v3/policy.zip
+    kuka-faucet-open-v3: runs/experts/kuka-v3/faucet-open-v3/policy.zip
+    kuka-handle-press-side-v3: runs/experts/kuka-v3/handle-press-side-v3/policy.zip
+    kuka-drawer-close-v3: runs/experts/kuka-v3/drawer-close-v3/policy.zip
+    kuka-button-press-topdown-v3: runs/experts/kuka-v3/button-press-topdown-v3/policy.zip
+    kuka-door-open-v3: runs/experts/kuka-v3/door-open-v3/policy.zip
+    kuka-reach-v3: runs/experts/kuka-v3/reach-v3/policy.zip
+  trajectories_per_task: 15
+  replay_mode: diffusion
+  replay_allocation: fixed-total
+  replay_budget: 15
+  replay_priority_strategy: uniform
+evaluation:
+  episodes: 50
+  seed: 10000
+  mode: fixed-tasks
+  task_set_seed: 10000
+runtime:
+  seed: 0
+  device: cpu
+  output: runs/formal/kuka_10task_15plus15_4layer/

@@ -2,11 +2,11 @@
 
 from __future__ import annotations
 
-from typing import Sequence
+from collections.abc import Sequence
+from dataclasses import dataclass
 
 import numpy as np
 import torch
-
 from src.envs import (
     ACTION_SHAPE,
     CURRENT_STATE_SLICE,
@@ -15,6 +15,7 @@ from src.envs import (
     PREVIOUS_STATE_SLICE,
 )
 
+from .generator_normalization import FeatureNormalizer
 from .schema import Trajectory, validate_trajectory
 
 PHYSICAL_TRAJECTORY_FEATURES = OBSERVATION_SHAPE[0] + ACTION_SHAPE[0]
@@ -22,6 +23,28 @@ PHYSICAL_OBSERVATION_SLICE = slice(0, OBSERVATION_SHAPE[0])
 PHYSICAL_ACTION_SLICE = slice(OBSERVATION_SHAPE[0], PHYSICAL_TRAJECTORY_FEATURES)
 DIFFUSION_FEATURES = CURRENT_STATE_SLICE.stop + ACTION_SHAPE[0]
 DIFFUSION_ACTION_SLICE = slice(CURRENT_STATE_SLICE.stop, DIFFUSION_FEATURES)
+
+
+@dataclass(frozen=True)
+class PreparedGeneratorData:
+    """Encoded inputs and fitted statistics awaiting timed normalization."""
+
+    train: torch.Tensor
+    validation: torch.Tensor
+    train_goals: torch.Tensor
+    validation_goals: torch.Tensor
+    normalizer: FeatureNormalizer
+    goal_normalizer: FeatureNormalizer
+
+
+@dataclass(frozen=True)
+class NormalizedGeneratorData:
+    """Normalized dynamic and goal conditions passed to a generator fit."""
+
+    train: torch.Tensor
+    validation: torch.Tensor
+    train_goals: torch.Tensor
+    validation_goals: torch.Tensor
 
 
 def validate_stage_trajectory_group(values, *, stage, task, source):
@@ -59,9 +82,7 @@ def validate_stage_trajectory_group(values, *, stage, task, source):
         if len(conflicts):
             metadata = source.get("collection_configurations", [])
             record = (
-                metadata[trajectory_index]
-                if trajectory_index < len(metadata)
-                else {}
+                metadata[trajectory_index] if trajectory_index < len(metadata) else {}
             )
             if not record:
                 indices = source.get("training_configuration_indices", [])
@@ -84,6 +105,38 @@ def validate_stage_trajectory_group(values, *, stage, task, source):
                 f"reset_seed={record.get('reset_seed')}, max_goal_drift={drift}, "
                 f"first_conflicting_timestep={int(conflicts[0])}."
             )
+
+
+def generated_action_diagnostics(before, after, projection):
+    """Describe decoded replay before and after optional action projection."""
+    if before.shape != after.shape or not torch.equal(
+        before[..., PHYSICAL_OBSERVATION_SLICE],
+        after[..., PHYSICAL_OBSERVATION_SLICE],
+    ):
+        raise ValueError("Projection changed replay shape or observations.")
+    prior = before[..., PHYSICAL_ACTION_SLICE]
+    result = after[..., PHYSICAL_ACTION_SLICE]
+    pre_oob = prior.abs() > 1
+    post_oob = result.abs() > 1
+    return {
+        "generated_action_projection": projection,
+        "pre_projection_oob_component_fraction": float(pre_oob.float().mean()),
+        "pre_projection_oob_timestep_fraction": float(
+            pre_oob.any(dim=-1).float().mean()
+        ),
+        "post_projection_oob_component_fraction": float(post_oob.float().mean()),
+        "clipped_component_fraction": float((prior != result).float().mean()),
+        "post_projection_abs_eq_1_fraction": float((result.abs() == 1).float().mean()),
+        "post_projection_abs_gt_0_99_fraction": float(
+            (result.abs() > 0.99).float().mean()
+        ),
+        "post_projection_abs_eq_1_fraction_by_action_coordinate": (
+            (result.abs() == 1).float().mean(dim=(0, 1)).tolist()
+        ),
+        "post_projection_abs_gt_0_99_fraction_by_action_coordinate": (
+            (result.abs() > 0.99).float().mean(dim=(0, 1)).tolist()
+        ),
+    }
 
 
 def pack_trajectories(
@@ -192,6 +245,58 @@ def encode_trajectory(observations, actions):
     if not torch.equal(goals, goals[:, :1].expand_as(goals)):
         raise ValueError("Goal must be exactly constant within each episode.")
     return torch.cat((current, actions), dim=-1), goals[:, 0].clone()
+
+
+def prepare_generator_data(
+    train: torch.Tensor,
+    validation: torch.Tensor,
+    *,
+    action_space: str,
+    action_clamp_epsilon: float,
+) -> PreparedGeneratorData:
+    """Encode physical splits and fit statistics without consuming RNG state."""
+    train_dynamic, train_goals = encode_trajectory(
+        train[..., PHYSICAL_OBSERVATION_SLICE],
+        train[..., PHYSICAL_ACTION_SLICE],
+    )
+    validation_dynamic, validation_goals = encode_trajectory(
+        validation[..., PHYSICAL_OBSERVATION_SLICE],
+        validation[..., PHYSICAL_ACTION_SLICE],
+    )
+    transformed_train = transform_actions(
+        train_dynamic,
+        action_space,
+        action_clamp_epsilon,
+    )
+    transformed_validation = transform_actions(
+        validation_dynamic,
+        action_space,
+        action_clamp_epsilon,
+    )
+    goal_normalizer = FeatureNormalizer.fit(train_goals[:, None, :])
+    normalizer = FeatureNormalizer.fit(transformed_train)
+    return PreparedGeneratorData(
+        train=transformed_train,
+        validation=transformed_validation,
+        train_goals=train_goals,
+        validation_goals=validation_goals,
+        normalizer=normalizer,
+        goal_normalizer=goal_normalizer,
+    )
+
+
+def normalize_generator_data(prepared: PreparedGeneratorData) -> NormalizedGeneratorData:
+    """Normalize prepared inputs in the historical timed argument order."""
+    return NormalizedGeneratorData(
+        train=prepared.normalizer.normalize(prepared.train),
+        validation=prepared.normalizer.normalize(prepared.validation),
+        train_goals=prepared.goal_normalizer.normalize(
+            prepared.train_goals[:, None, :]
+        )[:, 0],
+        validation_goals=prepared.goal_normalizer.normalize(
+            prepared.validation_goals[:, None, :]
+        )[:, 0],
+    )
 
 
 def decode_trajectory(dynamic, goals):

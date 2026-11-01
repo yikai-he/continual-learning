@@ -28,6 +28,55 @@ def dataset(offset=0.0):
 
 
 class GeneralPolicyTests(unittest.TestCase):
+    def test_two_layer_architecture_preserves_module_order_and_state_keys(self):
+        model = GeneralPolicy(
+            -np.ones(4), np.ones(4), hidden_sizes=(256, 256)
+        )
+        self.assertEqual(
+            [type(module) for module in model.network],
+            [nn.Linear, nn.LayerNorm, nn.ReLU, nn.Linear, nn.ReLU, nn.Linear, nn.Tanh],
+        )
+        self.assertEqual(
+            list(model.state_dict()),
+            [
+                "action_low",
+                "action_high",
+                "network.0.weight",
+                "network.0.bias",
+                "network.1.weight",
+                "network.1.bias",
+                "network.3.weight",
+                "network.3.bias",
+                "network.5.weight",
+                "network.5.bias",
+            ],
+        )
+
+    def test_four_layer_architecture_forward_shape_and_bounds(self):
+        model = GeneralPolicy(
+            -np.ones(4), np.ones(4), hidden_sizes=(256, 256, 256, 256)
+        )
+        self.assertEqual(
+            [type(module) for module in model.network],
+            [
+                nn.Linear,
+                nn.LayerNorm,
+                nn.ReLU,
+                nn.Linear,
+                nn.ReLU,
+                nn.Linear,
+                nn.ReLU,
+                nn.Linear,
+                nn.ReLU,
+                nn.Linear,
+                nn.Tanh,
+            ],
+        )
+        actions = model(torch.randn(7, 39))
+        self.assertEqual(actions.shape, (7, 4))
+        self.assertTrue(torch.all(actions >= model.action_low))
+        self.assertTrue(torch.all(actions <= model.action_high))
+
     def test_diffusion_and_no_replay_select_same_policy_preprocessing(self):
         root = Path(__file__).resolve().parents[1]
         modes = {
@@ -106,6 +155,38 @@ class GeneralPolicyTests(unittest.TestCase):
             torch.save({"hidden_sizes": (8, 6), "state_dict": model.state_dict()}, old)
             with self.assertRaisesRegex(ValueError, "incompatible"):
                 GeneralPolicy.load(old)
+
+    def test_four_layer_save_reload_and_training_resume_equivalence(self):
+        torch.manual_seed(13)
+        model = GeneralPolicy(
+            -np.ones(4), np.ones(4), hidden_sizes=(8, 7, 6, 5)
+        ).eval()
+        optimizer = torch.optim.Adam(model.parameters(), lr=3e-4)
+        raw = torch.randn(3, 39)
+        expected = model(raw).detach()
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "policy.pt"
+            model.save(path, optimizer=optimizer, metadata={"stage": 1})
+            restored, restored_optimizer, metadata = GeneralPolicy.load_training(path)
+            self.assertEqual(restored.hidden_sizes, (8, 7, 6, 5))
+            self.assertEqual(metadata, {"stage": 1})
+            self.assertIsInstance(restored_optimizer, torch.optim.Adam)
+            torch.testing.assert_close(restored(raw), expected)
+            self.assertEqual(
+                restored_optimizer.state_dict()["param_groups"],
+                optimizer.state_dict()["param_groups"],
+            )
+
+    def test_corrupt_stored_architecture_has_clear_error(self):
+        model = policy()
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "policy.pt"
+            model.save(path)
+            data = torch.load(path, map_location="cpu", weights_only=True)
+            data["hidden_sizes"] = (8, 6, 5)
+            torch.save(data, path)
+            with self.assertRaisesRegex(ValueError, "stored GeneralPolicy architecture"):
+                GeneralPolicy.load(path)
 
     def test_diffusion_feature_normalizer_is_unchanged(self):
         trajectories = torch.arange(2 * 3 * 43, dtype=torch.float32).reshape(2, 3, 43)

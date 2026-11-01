@@ -27,6 +27,7 @@ evaluation:
   episodes: 2
   frequency: 1000
   seed_offset: 10000
+  mode: fixed-tasks
 runtime:
   seed: 0
   device: auto

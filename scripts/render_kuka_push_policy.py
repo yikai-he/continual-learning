@@ -1,11 +1,13 @@
 #!/usr/bin/env python3
-"""Interactively replay deterministic reward-v2 KUKA push SAC checkpoints."""
+"""Interactively replay KUKA policies or calibrated scripted Push control."""
 
 from __future__ import annotations
 
 import argparse
 import hashlib
+import os
 import pickle
+import subprocess
 import sys
 import time
 from pathlib import Path
@@ -15,15 +17,17 @@ REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
 if str(REPOSITORY_ROOT) not in sys.path:
     sys.path.insert(0, str(REPOSITORY_ROOT))
 
+if "--output-video" in sys.argv:
+    os.environ.setdefault("MUJOCO_GL", "egl")
+
 import glfw
 import mujoco
 import numpy as np
-from stable_baselines3 import SAC
 from metaworld.wrappers import RandomTaskSelectWrapper
-
-from src.envs import make_env
 from src.env_adapters.kuka_v3 import KUKA_V3_TASKS
-
+from src.envs import make_env
+from stable_baselines3 import SAC
+from scripts.kuka_push_scripted_controller import CalibratedPushController
 
 RUN = Path("runs/reward_v2/kuka-push-v3/seed_0_150k_probe")
 CHECKPOINTS = {
@@ -115,11 +119,49 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     source.add_argument("--checkpoint", choices=tuple(CHECKPOINTS))
     source.add_argument("--model", type=Path, help="arbitrary SAC .zip checkpoint")
     parser.add_argument(
+        "--controller",
+        choices=("sac", "scripted"),
+        default="sac",
+        help="action source; scripted uses the calibrated physics-diagnostic controller",
+    )
+    parser.add_argument(
         "--env-name",
         choices=KUKA_V3_TASKS,
         default="kuka-push-v3",
         help="KUKA-v3 environment to replay (default: kuka-push-v3)",
     )
+    parser.add_argument(
+        "--reward-version",
+        choices=(
+            "v1",
+            "v2",
+            "v3",
+            "v3_1",
+            "v3_2_retention",
+            "v3_3_contact_push_progress",
+            "v4_simple_approach_progress",
+            "v5_contact_start_progress",
+            "v6_rear_contact_push_progress",
+            "v1_initial_to_contact",
+            "v1_1_initial_to_contact_aperture",
+            "sawyer_push_v2_adapted",
+        ),
+        default="v2",
+        help="environment reward version (default: v2)",
+    )
+    parser.add_argument(
+        "--cube-push-curriculum-level",
+        type=int,
+        choices=(1, 2, 3),
+        default=3,
+        help="optional kuka-push-cube-v3 initialization curriculum (default: 3)",
+    )
+    parser.add_argument(
+        "--cube-push-initialization",
+        choices=("default", "contact", "near_contact"), default="default"
+    )
+    parser.add_argument("--cube-y-min", type=float, default=0.490)
+    parser.add_argument("--near-contact-gap-m", type=float, default=0.005)
     parser.add_argument("--audit-case", choices=tuple(AUDIT_CASES))
     parser.add_argument("--seeds", nargs="+", type=int, default=[10_000])
     parser.add_argument("--task-index", type=int, choices=range(50))
@@ -130,6 +172,24 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--device", default="cpu")
     parser.add_argument("--camera-name", default="corner")
     parser.add_argument(
+        "--peg-unplug-reward-variant",
+        choices=("original", "peg_unplug_progress_v1"),
+        default="original",
+        help="Peg Unplug reward variant passed through to the KUKA-v3 adapter",
+    )
+    parser.add_argument("--peg-unplug-progress-weight", type=float, default=0.0)
+    parser.add_argument("--peg-unplug-progress-gamma", type=float, default=0.99)
+    parser.add_argument(
+        "--output-video",
+        type=Path,
+        help="save the existing GLFW viewer frames as an MP4 and exit after one rollout",
+    )
+    parser.add_argument(
+        "--overwrite-video",
+        action="store_true",
+        help="replace --output-video when intentionally regenerating this batch output",
+    )
+    parser.add_argument(
         "--window-size",
         nargs=2,
         type=int,
@@ -137,7 +197,9 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         default=(1280, 900),
         help="fallback GLFW window size if maximizing is unavailable",
     )
-    parser.add_argument("--no-loop", action="store_true", help="freeze after an episode")
+    parser.add_argument(
+        "--no-loop", action="store_true", help="freeze after an episode"
+    )
     parser.add_argument("--loop-delay", type=float, default=1.0)
     parser.add_argument(
         "--smoke-test",
@@ -158,12 +220,125 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         parser.error("--audit-case cannot be combined with --model or --task-index")
     if args.audit_case and args.env_name != "kuka-push-v3":
         parser.error("--audit-case is only available with --env-name kuka-push-v3")
+    if args.cube_push_curriculum_level != 3 and args.env_name != "kuka-push-cube-v3":
+        parser.error(
+            "--cube-push-curriculum-level 1 or 2 requires "
+            "--env-name kuka-push-cube-v3"
+        )
+    if args.cube_push_initialization != "default" and args.env_name != "kuka-push-cube-v3":
+        parser.error("--cube-push-initialization is specific to kuka-push-cube-v3")
+    if not 0.484 <= args.cube_y_min <= 0.55:
+        parser.error("--cube-y-min must be in [0.484, 0.55]")
+    if not np.isfinite(args.near_contact_gap_m) or args.near_contact_gap_m <= 0:
+        parser.error("--near-contact-gap-m must be positive and finite")
+    if (
+        args.reward_version == "v3_3_contact_push_progress"
+        and args.env_name != "kuka-push-cube-v3"
+    ):
+        parser.error(
+            "--reward-version v3_3_contact_push_progress requires "
+            "--env-name kuka-push-cube-v3"
+        )
+    if (
+        args.reward_version == "v4_simple_approach_progress"
+        and args.env_name != "kuka-push-cube-v3"
+    ):
+        parser.error(
+            "--reward-version v4_simple_approach_progress requires "
+            "--env-name kuka-push-cube-v3"
+        )
+    if args.reward_version == "v5_contact_start_progress" and args.env_name != "kuka-push-cube-v3":
+        parser.error("--reward-version v5_contact_start_progress requires --env-name kuka-push-cube-v3")
+    if args.reward_version == "v6_rear_contact_push_progress" and args.env_name != "kuka-push-cube-v3":
+        parser.error("--reward-version v6_rear_contact_push_progress requires --env-name kuka-push-cube-v3")
+    if args.reward_version in (
+        "v1_initial_to_contact", "v1_1_initial_to_contact_aperture"
+    ):
+        if args.env_name != "kuka-push-cube-v3":
+            parser.error(f"--reward-version {args.reward_version} requires --env-name kuka-push-cube-v3")
+        if args.cube_push_curriculum_level != 2 or args.cube_push_initialization != "default":
+            parser.error(f"{args.reward_version} requires curriculum level 2 and default initialization")
+    if (
+        args.reward_version == "sawyer_push_v2_adapted"
+        and args.env_name != "kuka-push-cube-v3"
+    ):
+        parser.error(
+            "--reward-version sawyer_push_v2_adapted requires "
+            "--env-name kuka-push-cube-v3"
+        )
+    if args.controller == "scripted":
+        if args.checkpoint is not None or args.model is not None or args.audit_case:
+            parser.error("--controller scripted cannot load a SAC checkpoint or audit case")
+        if args.env_name not in ("kuka-push-v3", "kuka-push-cube-v3"):
+            parser.error("--controller scripted supports only KUKA Push environments")
     if args.smoke_test is not None and not 1 <= args.smoke_test <= 200:
         parser.error("--smoke-test must be in [1, 200]")
     if any(dimension < 1 for dimension in args.window_size):
         parser.error("--window-size dimensions must be positive")
+    if args.output_video is not None and (args.episodes != 1 or len(args.seeds) != 1):
+        parser.error("--output-video requires exactly one episode and one seed")
+    if args.output_video is not None and args.smoke_test is not None:
+        parser.error("--output-video cannot be combined with --smoke-test")
+    if args.overwrite_video and args.output_video is None:
+        parser.error("--overwrite-video requires --output-video")
     args.window_size = tuple(args.window_size)
     return args
+
+
+class Mp4Writer:
+    """Stream the pixels already drawn by the interactive viewer to ffmpeg."""
+
+    def __init__(
+        self, path: Path, width: int, height: int, fps: float, overwrite: bool
+    ) -> None:
+        self.path = path.expanduser().resolve()
+        if self.path.exists() and not overwrite:
+            raise FileExistsError(f"refusing to overwrite existing video: {self.path}")
+        self.path.parent.mkdir(parents=True, exist_ok=True)
+        self.width = width
+        self.height = height
+        self.fps = fps
+        self.process = subprocess.Popen(
+            [
+                "ffmpeg", "-loglevel", "error", "-y",
+                "-f", "rawvideo", "-pix_fmt", "rgb24",
+                "-s", f"{width}x{height}", "-r", str(fps), "-i", "-",
+                "-an", "-c:v", "libx264", "-pix_fmt", "yuv420p",
+                "-movflags", "+faststart", str(self.path),
+            ],
+            stdin=subprocess.PIPE,
+        )
+        self.frames = 0
+
+    def capture(self, viewer: Any) -> None:
+        rgb = np.empty((self.height, self.width, 3), dtype=np.uint8)
+        mujoco.mjr_readPixels(rgb, None, viewer.viewport, viewer.con)
+        if self.process.stdin is None:
+            raise RuntimeError("ffmpeg stdin is unavailable")
+        self.process.stdin.write(np.flipud(rgb).tobytes())
+        self.frames += 1
+
+    def write(self, rgb: np.ndarray) -> None:
+        if rgb.shape != (self.height, self.width, 3):
+            raise ValueError(
+                f"rendered frame shape {rgb.shape} != {(self.height, self.width, 3)}"
+            )
+        if self.process.stdin is None:
+            raise RuntimeError("ffmpeg stdin is unavailable")
+        self.process.stdin.write(np.asarray(rgb, dtype=np.uint8).tobytes())
+        self.frames += 1
+
+    def close(self) -> None:
+        if self.process.stdin is not None:
+            self.process.stdin.close()
+        return_code = self.process.wait()
+        if return_code != 0:
+            raise RuntimeError(f"ffmpeg exited with status {return_code}")
+        print(
+            f"VIDEO SAVED | path={self.path} | frames={self.frames} | "
+            f"fps={self.fps:g} | duration={self.frames / self.fps:.3f}s",
+            flush=True,
+        )
 
 
 def configure_viewer_window(
@@ -179,8 +354,10 @@ def configure_viewer_window(
         maximized = bool(glfw.get_window_attrib(window, glfw.MAXIMIZED))
     except (glfw.GLFWError, AttributeError):
         actual = before
-    if not maximized and actual == before and (
-        actual[0] < requested[0] or actual[1] < requested[1]
+    if (
+        not maximized
+        and actual == before
+        and (actual[0] < requested[0] or actual[1] < requested[1])
     ):
         glfw.set_window_size(window, *requested)
         glfw.poll_events()
@@ -224,8 +401,19 @@ def validate_spaces(model: SAC, env: Any) -> None:
         expected = expected_obs if "observation" in name else expected_action
         if shape != expected:
             raise ValueError(f"{name} shape must be {expected}, got {shape}")
-    if model.observation_space != env.observation_space:
-        raise ValueError("model and environment observation spaces differ")
+    # These checkpoints serialized the historical KUKA goal bounds as [0, 0]
+    # even though the final three observation values contained the real goal.
+    # Require identical dtype and non-goal bounds while tolerating that metadata
+    # correction in the current environment.
+    if model.observation_space.dtype != env.observation_space.dtype:
+        raise ValueError("model and environment observation dtypes differ")
+    for bound in ("low", "high"):
+        model_bound = getattr(model.observation_space, bound)
+        env_bound = getattr(env.observation_space, bound)
+        if not np.array_equal(model_bound[:-3], env_bound[:-3]):
+            raise ValueError(
+                f"model and environment non-goal observation {bound} bounds differ"
+            )
     if model.action_space != env.action_space:
         raise ValueError("model and environment action spaces differ")
 
@@ -243,7 +431,9 @@ def task_hash(task: Any) -> str:
     return hashlib.sha256(task.data).hexdigest()
 
 
-def resolve_requests(args: argparse.Namespace, wrapper: RandomTaskSelectWrapper) -> list[TaskRequest]:
+def resolve_requests(
+    args: argparse.Namespace, wrapper: RandomTaskSelectWrapper
+) -> list[TaskRequest]:
     if args.audit_case:
         case = AUDIT_CASES[args.audit_case]
         requests = [
@@ -380,6 +570,8 @@ def workspace_would_clip(base: Any, action: np.ndarray) -> bool:
 
 def object_contact(base: Any, info: dict[str, Any], observation: np.ndarray) -> bool:
     """Return task contact telemetry without assuming an ``objGeom`` exists."""
+    if "physical_robot_object_contact" in info:
+        return bool(info["physical_robot_object_contact"])
     try:
         return bool(
             base.pad_contacting_object(base._get_id_main_object())
@@ -391,14 +583,73 @@ def object_contact(base: Any, info: dict[str, Any], observation: np.ndarray) -> 
         return bool(info.get("near_object", False))
 
 
+def cube_contact_diagnostics(base: Any) -> dict[str, Any]:
+    """Describe current physical cube contacts and nearest-face tilt."""
+    try:
+        object_geom = base._get_id_main_object()
+        object_xmat = np.asarray(base.data.geom("objGeom").xmat).reshape(3, 3)
+    except (AttributeError, KeyError):
+        return {"physical": False, "labels": (), "tilt_deg": 0.0}
+    pad_ids = {base.model.geom(name).id for name in base.ROBOTIQ_PAD_GEOMS}
+    follower_ids = {
+        side: {
+            geom_id
+            for geom_id in range(base.model.ngeom)
+            if base.model.geom_bodyid[geom_id] == base.model.body(f"{side}_follower").id
+            and base.model.geom_contype[geom_id] != 0
+        }
+        for side in ("left", "right")
+    }
+    labels = []
+    for contact in base.data.contact:
+        pair = {contact.geom1, contact.geom2}
+        if object_geom not in pair:
+            continue
+        other = contact.geom2 if contact.geom1 == object_geom else contact.geom1
+        if other in pad_ids:
+            label = "pad"
+        elif other in follower_ids["left"]:
+            label = "left_follower"
+        elif other in follower_ids["right"]:
+            label = "right_follower"
+        elif base.model.body(base.model.geom_bodyid[other]).name == "world":
+            continue
+        else:
+            name = base.model.geom(other).name
+            label = name or base.model.body(base.model.geom_bodyid[other]).name
+        if label not in labels:
+            labels.append(label)
+    vertical = np.abs(object_xmat[2, :])
+    tilt = np.degrees(np.arccos(np.clip(np.max(vertical), 0.0, 1.0)))
+    return {"physical": bool(labels), "labels": tuple(labels), "tilt_deg": float(tilt)}
+
+
+def controller_action(
+    controller: str,
+    policy: SAC | None,
+    scripted: CalibratedPushController | None,
+    observation: np.ndarray,
+    base: Any,
+) -> np.ndarray:
+    if controller == "scripted":
+        if scripted is None or policy is not None:
+            raise RuntimeError("invalid scripted-controller state")
+        action, _ = scripted.predict(observation, base)
+    else:
+        if policy is None or scripted is not None:
+            raise RuntimeError("invalid SAC-controller state")
+        action, _ = policy.predict(observation, deterministic=True)
+    return np.asarray(action, dtype=np.float32)
+
+
 def add_object_marker(viewer: Any, base: Any) -> None:
-    """Highlight objGeom when the selected task provides that named geometry."""
+    """Highlight objGeom using its actual loaded primitive shape and dimensions."""
     try:
         obj_geom = base.data.geom("objGeom")
     except KeyError:
         return
     viewer.add_marker(
-        type=mujoco.mjtGeom.mjGEOM_CYLINDER,
+        type=int(base.model.geom_type[obj_geom.id]),
         size=base.model.geom_size[obj_geom.id].copy(),
         pos=obj_geom.xpos.copy(),
         mat=obj_geom.xmat.copy(),
@@ -430,7 +681,9 @@ def episode_summary(
     )
 
 
-def configure_camera(viewer: Any, base: Any, preset: int, default: dict[str, Any]) -> str:
+def configure_camera(
+    viewer: Any, base: Any, preset: int, default: dict[str, Any]
+) -> str:
     if preset == 1:
         for key, value in default.items():
             if key == "lookat":
@@ -454,19 +707,59 @@ def configure_camera(viewer: Any, base: Any, preset: int, default: dict[str, Any
     return CAMERA_NAMES[preset]
 
 
+def configure_named_camera(viewer: Any, base: Any, name: str) -> str:
+    """Select an MJCF fixed camera by name for the initial viewer pose."""
+    camera_id = base.model.camera(name).id
+    viewer.cam.type = mujoco.mjtCamera.mjCAMERA_FIXED
+    viewer.cam.fixedcamid = camera_id
+    viewer.cam.trackbodyid = -1
+    return name
+
+
 def run(args: argparse.Namespace) -> None:
-    model_path, label = resolve_model(args)
-    print(f"Loading {label}: {model_path}")
-    model = SAC.load(model_path, device=args.device)
+    controller = getattr(args, "controller", "sac")
+    model: SAC | None = None
+    scripted: CalibratedPushController | None = None
+    if controller == "scripted":
+        label = "scripted rho=0.060 z=0.042"
+        scripted = CalibratedPushController()
+        print("Using calibrated scripted controller; no SAC checkpoint will be loaded")
+    else:
+        model_path, label = resolve_model(args)
+        print(f"Loading {label}: {model_path}")
+        model = SAC.load(model_path, device=args.device)
     env = make_env(
         "kuka-v3",
         args.env_name,
         args.task_set_seed,
-        render_mode=None if args.smoke_test else "human",
-        reward_function_version="v2",
+        render_mode=(
+            None if args.smoke_test else "rgb_array" if args.output_video else "human"
+        ),
+        reward_function_version=args.reward_version,
+        peg_unplug_reward_variant=getattr(
+            args, "peg_unplug_reward_variant", "original"
+        ),
+        peg_unplug_progress_weight=getattr(
+            args, "peg_unplug_progress_weight", 0.0
+        ),
+        peg_unplug_progress_gamma=getattr(
+            args, "peg_unplug_progress_gamma", 0.99
+        ),
+        cube_push_curriculum_level=getattr(
+            args, "cube_push_curriculum_level", 3
+        ),
+        cube_push_initialization=getattr(args, "cube_push_initialization", "default"),
+        cube_y_min=getattr(args, "cube_y_min", 0.490),
+        near_contact_gap_m=getattr(args, "near_contact_gap_m", 0.005),
     )
-    validate_spaces(model, env)
-    print("Spaces verified: model/env observation=(39,), action=(4,)")
+    if model is not None:
+        validate_spaces(model, env)
+        print("Spaces verified: model/env observation=(39,), action=(4,)")
+    else:
+        if env.observation_space.shape != (39,) or env.action_space.shape != (4,):
+            raise ValueError("scripted controller requires observation=(39,), action=(4,)")
+        print("Spaces verified: scripted environment observation=(39,), action=(4,)")
+    video_writer: Mp4Writer | None = None
     try:
         wrapper = find_task_wrapper(env)
         requested = resolve_requests(args, wrapper)
@@ -474,10 +767,31 @@ def run(args: argparse.Namespace) -> None:
             observation, initial_obj, goal = reset_exact_task(
                 env, wrapper, requested[0]
             )
+            if scripted is not None:
+                scripted.reset(initial_obj, goal)
+            success = False
+            maximum_action_norm = 0.0
+            maximum_tcp_displacement = 0.0
+            initial_tcp = np.asarray(observation[:3], dtype=float).copy()
             for _ in range(args.smoke_test):
-                action, _ = model.predict(observation, deterministic=True)
-                observation, *_ = env.step(action)
-            print(f"SMOKE TEST PASSED: deterministic steps={args.smoke_test}")
+                action = controller_action(
+                    controller, model, scripted, observation, env.unwrapped
+                )
+                observation, _, _, _, info = env.step(action)
+                success = success or bool(info.get("success", False))
+                maximum_action_norm = max(
+                    maximum_action_norm, float(np.linalg.norm(action))
+                )
+                maximum_tcp_displacement = max(
+                    maximum_tcp_displacement,
+                    float(np.linalg.norm(observation[:3] - initial_tcp)),
+                )
+            print(
+                f"SMOKE TEST PASSED: deterministic steps={args.smoke_test} | "
+                f"success={int(success)} | max_action_norm={maximum_action_norm:.6f} | "
+                f"max_tcp_displacement={maximum_tcp_displacement:.6f}",
+                flush=True,
+            )
             return
 
         command = ReplayCommand()
@@ -488,18 +802,26 @@ def run(args: argparse.Namespace) -> None:
         while request_index < len(requested) and not command.quit:
             request = requested[request_index]
             seed = request.seed
-            observation, initial_obj, goal = reset_exact_task(
-                env, wrapper, request
-            )
+            observation, initial_obj, goal = reset_exact_task(env, wrapper, request)
+            if scripted is not None:
+                scripted.reset(initial_obj, goal)
             initial_distance = float(np.linalg.norm(initial_obj - goal))
-            env.render()
+            if args.output_video is not None:
+                env.unwrapped.mujoco_renderer.width = args.window_size[0]
+                env.unwrapped.mujoco_renderer.height = args.window_size[1]
+                env.unwrapped.model.vis.global_.offwidth = args.window_size[0]
+                env.unwrapped.model.vis.global_.offheight = args.window_size[1]
+            first_frame = env.render()
             viewer = env.unwrapped.mujoco_renderer.viewer
-            if viewer is None or viewer.window is None:
-                raise RuntimeError("MuJoCo human viewer did not expose a GLFW window")
-            window = viewer.window
-            if not window_configured:
-                configure_viewer_window(window, args.window_size)
-                window_configured = True
+            if viewer is None:
+                raise RuntimeError("MuJoCo renderer did not expose a viewer")
+            window = None if args.output_video is not None else viewer.window
+            if args.output_video is None:
+                if window is None:
+                    raise RuntimeError("MuJoCo human viewer did not expose a GLFW window")
+                if not window_configured:
+                    configure_viewer_window(window, args.window_size)
+                    window_configured = True
             default_camera = {
                 "type": viewer.cam.type,
                 "fixedcamid": viewer.cam.fixedcamid,
@@ -509,9 +831,23 @@ def run(args: argparse.Namespace) -> None:
                 "azimuth": float(viewer.cam.azimuth),
                 "elevation": float(viewer.cam.elevation),
             }
-            camera = configure_camera(viewer, env.unwrapped, 5, default_camera)
+            if controller == "scripted":
+                camera = configure_named_camera(
+                    viewer, env.unwrapped, getattr(args, "camera_name", "corner")
+                )
+            else:
+                camera = configure_camera(viewer, env.unwrapped, 5, default_camera)
             paused = False
-            viewer_callback = viewer._key_callback
+            if args.output_video is not None:
+                video_writer = Mp4Writer(
+                    args.output_video,
+                    args.window_size[0],
+                    args.window_size[1],
+                    args.control_hz,
+                    args.overwrite_video,
+                )
+            else:
+                viewer_callback = viewer._key_callback
 
             def key_callback(win, key, scancode, action, mods):
                 nonlocal paused, camera, auto_loop
@@ -526,7 +862,9 @@ def run(args: argparse.Namespace) -> None:
                         auto_loop = not auto_loop
                         print(f"Auto-loop: {'ON' if auto_loop else 'OFF'}")
                     elif key == glfw.KEY_H:
-                        presentation.show_builtin_menu = not presentation.show_builtin_menu
+                        presentation.show_builtin_menu = (
+                            not presentation.show_builtin_menu
+                        )
                     elif key == glfw.KEY_I:
                         presentation.cycle_hud()
                     elif key in (glfw.KEY_F1, glfw.KEY_SLASH):
@@ -540,9 +878,10 @@ def run(args: argparse.Namespace) -> None:
                     return
                 viewer_callback(win, key, scancode, action, mods)
 
-            glfw.set_key_callback(window, key_callback)
-            viewer._hide_menu = False
-            original_overlay = viewer._create_overlay
+            if window is not None:
+                glfw.set_key_callback(window, key_callback)
+                viewer._hide_menu = False
+                original_overlay = viewer._create_overlay
             state: dict[str, Any] = {
                 "step": 0,
                 "reward": 0.0,
@@ -557,6 +896,12 @@ def run(args: argparse.Namespace) -> None:
                 "clip": False,
                 "min_distance": initial_distance,
                 "max_displacement": 0.0,
+                "first_physical_contact": None,
+                "contact_labels": (),
+                "tilt_deg": 0.0,
+                "tcp": np.asarray(observation[:3], dtype=float).copy(),
+                "obj": np.asarray(initial_obj, dtype=float).copy(),
+                "phase": scripted.phase if scripted is not None else "policy",
             }
 
             def overlay() -> None:
@@ -573,7 +918,12 @@ def run(args: argparse.Namespace) -> None:
                         verbose=presentation.hud_mode == "verbose",
                         task_specific_lines=get_task_specific_debug_info(
                             args.env_name, env.unwrapped
-                        ),
+                        ) + ((
+                            f"Phase {state['phase']} | Tilt {state['tilt_deg']:.1f} deg",
+                            f"Physical {','.join(state['contact_labels']) or 'none'} | First {state['first_physical_contact'] or '-'}",
+                            f"TCP {np.array2string(state['tcp'], precision=3)}",
+                            f"Cube {np.array2string(state['obj'], precision=3)}",
+                        ) if args.env_name == "kuka-push-cube-v3" else ()),
                     )
                     viewer.add_overlay(
                         mujoco.mjtGridPos.mjGRID_TOPLEFT, "\n".join(diagnostics), ""
@@ -585,7 +935,8 @@ def run(args: argparse.Namespace) -> None:
                         "",
                     )
 
-            viewer._create_overlay = overlay
+            if window is not None:
+                viewer._create_overlay = overlay
             timestep = contact_steps = 0
             episode_return = 0.0
             first_success = first_contact = None
@@ -593,8 +944,13 @@ def run(args: argparse.Namespace) -> None:
             maximum_progress = maximum_displacement = 0.0
             previous_distance = initial_distance
             next_step_at = time.monotonic()
-            while timestep < 200 and not command.quit and not command.restart and not command.next_seed:
-                if glfw.window_should_close(window):
+            while (
+                timestep < 200
+                and not command.quit
+                and not command.restart
+                and not command.next_seed
+            ):
+                if window is not None and glfw.window_should_close(window):
                     command.quit = True
                     break
                 if paused:
@@ -602,8 +958,10 @@ def run(args: argparse.Namespace) -> None:
                     env.render()
                     time.sleep(0.02)
                     continue
-                action, _ = model.predict(observation, deterministic=True)
-                action = np.asarray(action, dtype=np.float32)
+                phase = scripted.phase if scripted is not None else "policy"
+                action = controller_action(
+                    controller, model, scripted, observation, env.unwrapped
+                )
                 clipping = workspace_would_clip(env.unwrapped, action)
                 observation, reward, terminated, truncated, info = env.step(action)
                 timestep += 1
@@ -611,11 +969,14 @@ def run(args: argparse.Namespace) -> None:
                 distance = float(np.linalg.norm(obj - goal))
                 signed = previous_distance - distance
                 contact = object_contact(env.unwrapped, info, observation)
+                physical = cube_contact_diagnostics(env.unwrapped)
                 episode_return += float(reward)
                 contact_steps += int(contact)
                 success = bool(info.get("success", False))
                 if contact and first_contact is None:
                     first_contact = timestep
+                if physical["physical"] and state["first_physical_contact"] is None:
+                    state["first_physical_contact"] = timestep
                 if success and first_success is None:
                     first_success = timestep
                 minimum_distance = min(minimum_distance, distance)
@@ -638,17 +999,24 @@ def run(args: argparse.Namespace) -> None:
                         "clip": clipping,
                         "min_distance": minimum_distance,
                         "max_displacement": maximum_displacement,
+                        "contact_labels": physical["labels"],
+                        "tilt_deg": physical["tilt_deg"],
+                        "tcp": np.asarray(observation[:3], dtype=float).copy(),
+                        "obj": obj.copy(),
+                        "phase": phase,
                     }
                 )
                 if timestep % args.print_every == 0 or success:
                     print(
                         f"t={timestep:03d} reward={reward:+.3f} return={episode_return:.3f} "
                         f"success={int(success)} contact={int(contact)} distance={distance:.6f} "
-                        f"signed_progress={signed:+.6f} displacement={np.linalg.norm(obj-initial_obj):.6f}",
+                        f"signed_progress={signed:+.6f} displacement={np.linalg.norm(obj - initial_obj):.6f}",
                         flush=True,
                     )
                 add_object_marker(viewer, env.unwrapped)
-                env.render()
+                frame = env.render()
+                if video_writer is not None:
+                    video_writer.write(frame)
                 previous_distance = distance
                 if terminated or truncated:
                     break
@@ -671,9 +1039,11 @@ def run(args: argparse.Namespace) -> None:
                     minimum_distance=minimum_distance,
                     final_distance=previous_distance,
                 )
-            disposition = advance_after_episode(
-                auto_loop=auto_loop, command=command
-            )
+            if video_writer is not None:
+                video_writer.close()
+                video_writer = None
+                break
+            disposition = advance_after_episode(auto_loop=auto_loop, command=command)
             if disposition == "quit":
                 break
             if disposition == "next":
@@ -706,9 +1076,7 @@ def run(args: argparse.Namespace) -> None:
                     break
                 env.render()
                 time.sleep(0.02)
-            disposition = advance_after_episode(
-                auto_loop=auto_loop, command=command
-            )
+            disposition = advance_after_episode(auto_loop=auto_loop, command=command)
             if disposition == "next":
                 request_index += 1
             elif disposition == "quit":
@@ -717,7 +1085,11 @@ def run(args: argparse.Namespace) -> None:
     except KeyboardInterrupt:
         print("\nInterrupted once; closing viewer cleanly.", flush=True)
     finally:
-        env.close()
+        try:
+            if video_writer is not None:
+                video_writer.close()
+        finally:
+            env.close()
 
 
 def main(argv: list[str] | None = None) -> None:

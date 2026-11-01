@@ -14,7 +14,6 @@ from dataclasses import dataclass
 
 import numpy as np
 from numpy.typing import NDArray
-
 from src.envs import ACTION_SHAPE, OBSERVATION_SHAPE
 
 

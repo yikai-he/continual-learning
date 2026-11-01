@@ -30,7 +30,7 @@ case "$group" in
 esac
 
 for name in "${configs[@]}"; do
-  config="configs/sac/${name}.yaml"
+  config="configs/sac/dev/${name}.yaml"
   echo "[$(date '+%Y-%m-%d %H:%M:%S')] START ${name} (seed ${seed})"
   python -u train_sac.py --config "$config" --seed "$seed"
   echo "[$(date '+%Y-%m-%d %H:%M:%S')] FINISH ${name} (seed ${seed})"

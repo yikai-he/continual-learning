@@ -6,7 +6,6 @@ from copy import deepcopy
 
 import gymnasium as gym
 import numpy as np
-
 from src.env_adapters import GOAL_SLICE
 from src.support.expert_manifest import ExpertIdentity
 

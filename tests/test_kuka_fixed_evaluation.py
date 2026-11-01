@@ -6,7 +6,9 @@ import numpy as np
 import pytest
 
 from src.config import load_config
+from src.continual.diffcrl import DiffCRLTrainer
 from src.continual.evaluation import evaluate_task, fixed_mt1_tasks
+from src.continual.evaluation import EvaluationMatrix
 from src.continual.task_bank import (
     bank_hashes,
     reconstruct_goals,
@@ -146,8 +148,74 @@ def test_hammer_fixed_evaluation_forwards_environment_settings() -> None:
         reward_function_version="v2",
         hammer_reward_variant="nail_progress",
         hammer_nail_progress_weight=4.0,
+        peg_unplug_reward_variant="original",
+        peg_unplug_progress_weight=0.0,
+        peg_unplug_progress_gamma=0.99,
         render_mode=None,
     )
+
+
+def test_peg_fixed_evaluation_forwards_environment_settings() -> None:
+    task = TaskSequence.from_names(["kuka-peg-unplug-side-v3"]).task(0)
+    env = make_env(
+        "kuka-v3",
+        "kuka-peg-unplug-side-v3",
+        20_000,
+        reward_function_version="v2",
+        peg_unplug_reward_variant="peg_unplug_progress_v1",
+        peg_unplug_progress_weight=2.0,
+        peg_unplug_progress_gamma=0.99,
+    )
+    switcher = MagicMock()
+    switcher.__enter__.return_value = switcher
+    switcher.switch.return_value = env
+    with patch(
+        "src.continual.evaluation.TaskSwitcher", return_value=switcher
+    ) as switcher_type:
+        evaluate_task(
+            _ZeroPolicy(),
+            task,
+            episodes=1,
+            seed=20_000,
+            evaluation_mode="fixed-tasks",
+            task_set_seed=10_000,
+            backend="kuka-v3",
+            reward_function_version="v2",
+            peg_unplug_reward_variant="peg_unplug_progress_v1",
+            peg_unplug_progress_weight=2.0,
+            peg_unplug_progress_gamma=0.99,
+        )
+    env.close()
+    assert env.unwrapped.peg_unplug_reward_variant == "peg_unplug_progress_v1"
+    assert env.unwrapped.peg_unplug_progress_weight == 2.0
+    assert env.unwrapped.peg_unplug_progress_gamma == 0.99
+    switcher_type.assert_called_once_with(
+        TaskSequence((task,)),
+        backend="kuka-v3",
+        reward_function_version="v2",
+        hammer_reward_variant="original",
+        hammer_nail_progress_weight=0.0,
+        peg_unplug_reward_variant="peg_unplug_progress_v1",
+        peg_unplug_progress_weight=2.0,
+        peg_unplug_progress_gamma=0.99,
+        render_mode=None,
+    )
+
+
+def test_diffcrl_stage_evaluation_forwards_peg_environment_settings() -> None:
+    config = _config("diffcrl_kuka_10task_15plus15_2layer.yaml")
+    trainer = DiffCRLTrainer.__new__(DiffCRLTrainer)
+    trainer.config = config
+    trainer.policy = MagicMock()
+    trainer.matrix = EvaluationMatrix(TaskSequence.from_names(config.continual.tasks))
+    trainer.progress = False
+    with patch("src.continual.diffcrl.evaluate_stage") as evaluate:
+        trainer._evaluate_stage(0)
+    assert evaluate.call_args.kwargs["peg_unplug_reward_variant"] == (
+        "peg_unplug_progress_v1"
+    )
+    assert evaluate.call_args.kwargs["peg_unplug_progress_weight"] == 2.0
+    assert evaluate.call_args.kwargs["peg_unplug_progress_gamma"] == 0.99
 
 
 def test_replay_reconstruction_remains_on_training_bank() -> None:

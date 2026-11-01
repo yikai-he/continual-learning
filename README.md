@@ -4,6 +4,9 @@ This repository contains the continual-learning and DiffCRL experiments for
 modern MetaWorld v3. Default Sawyer tasks use the `metaworld` Conda
 environment.
 
+For the implemented system design, data contracts, replay methods, checkpoint
+formats, and developer guide, see [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
+
 ## Environment setup
 
 Run from the repository root:
@@ -27,18 +30,35 @@ Plugin autoload is disabled because unrelated system or ROS pytest plugins can
 interfere with the test run. Optional KUKA or hardware-specific integration
 tests may be skipped when their local resources are unavailable.
 
+## Repository and experiment inventory
+
+Active artifacts are limited to canonical experts and formal continual-learning
+results; see [docs/RUNS_INVENTORY.md](docs/RUNS_INVENTORY.md). Historical
+lightweight reports are indexed in
+[docs/archive/experiments/README.md](docs/archive/experiments/README.md); their
+large checkpoints and datasets were deleted. Cleanup scope and storage figures
+are recorded in
+[docs/ARTIFACT_CLEANUP_REPORT.md](docs/ARTIFACT_CLEANUP_REPORT.md).
+The maintained, experimental, and historical command/configuration boundaries
+are summarized in [docs/WORKFLOW_INDEX.md](docs/WORKFLOW_INDEX.md).
+
 ## KUKA experiments
 
-KUKA experiments require a separate custom MetaWorld fork, `metaworld-kuka`.
+KUKA experiments require the workspace-local MetaWorld-KUKA v3 fork.
 
-Clone or obtain that repository separately, then install it in the dedicated
-`metaworld-kuka` Conda environment:
+With `continual-learning/` and `metaworld-kuka-v3/` as sibling directories,
+install the fork editably into the intended `metaworld` Conda environment:
 
 ```bash
-conda activate metaworld-kuka
-cd metaworld-kuka
-python -m pip install -e .
+conda run -n metaworld python -m pip install \
+  -e ../metaworld-kuka-v3 \
+  --no-deps \
+  --no-build-isolation
 ```
+
+The local distribution provides both `metaworld` and `metaworld_kuka`.
+Editable installation is required because merely placing the checkout beside
+this repository does not add it to the Conda interpreter's import path.
 
 ### KUKA Hammer working reward
 
@@ -78,8 +98,15 @@ the Hammer expert primarily by shaped return.
   diffusion replay.
 - **DiffCRL with diffusion replay** trains the shared behavior-cloning policy
   from current expert trajectories and generated trajectories for prior tasks.
+- **DiffCRL with Flow Matching replay** uses conditional ODE-generated
+  trajectories for prior tasks.
+- **DiffCRL with real replay** resamples archived original training trajectories
+  for prior tasks without using a generative model.
 - **DiffCRL without replay** is the corresponding ablation: it retains expert
-  supervision and behavioral cloning but disables prior-task diffusion replay.
+  supervision and behavioral cloning but disables all prior-task replay.
+
+The corresponding `continual.replay_mode` values are `diffusion`,
+`flow-matching`, `real`, and `none`.
 
 ## Maintained configurations
 
@@ -89,6 +116,20 @@ the Hammer expert primarily by shaped return.
 - `configs/continual_sac/continual_sac.yaml`
 
 The corresponding `*_smoke.yaml` files are small developer/testing presets.
+
+Single-task SAC configurations are organized as follows:
+
+- Formal 1M-step presets, `sac.yaml`, and smoke-test presets remain directly in
+  `configs/sac/`.
+- Development and batch-training presets live in `configs/sac/dev/`.
+- Historical short probes live in `configs/sac/archive/short_probes/`.
+- Historical reward comparisons and ablations live in
+  `configs/sac/archive/reward_ablations/`.
+- Other historical controls live in
+  `configs/sac/archive/historical_controls/`.
+
+Archived configurations are preserved for reproducibility and normally should
+not be used as starting points for new experiments.
 
 ## Single-task experts and DiffCRL
 
@@ -107,7 +148,7 @@ target in the YAML's `sac.steps` field and run:
 python -u train_sac.py \
   --config path/to/expert-config.yaml \
   --seed 0 \
-  --resume-from runs/reward_v2/hammer-v3/seed_0/checkpoints/sac_500000_steps.zip
+  --resume-from runs/path/to/checkpoints/sac_500000_steps.zip
 ```
 
 For example, with `sac.steps: 1000000`, a 500,000-step checkpoint trains only
@@ -145,6 +186,26 @@ python -u train_diffcrl.py \
 Results and checkpoints are written under `runs/`. Use a new `--run-name` for
 each run because existing run directories are not overwritten.
 
+### Fixed-budget Flow Matching replay
+
+Flow Matching uses fresh generative replay from the previous completed Flow
+checkpoint. Its historical replay quantity is a fixed stage-level budget, not
+a per-task quantity:
+
+```yaml
+continual:
+  trajectories_per_task: 200  # current-task expert trajectories
+  replay_mode: flow-matching
+  replay_budget: 200           # all historical synthetic trajectories
+  replay_priority_strategy: uniform
+```
+
+At stage zero there is no historical replay. At later stages, uniform
+allocation divides `replay_budget` across all previous tasks, with remainder
+samples assigned in curriculum order. The current expert data is additional to
+that budget. See [docs/FLOW_REPLAY_ARCHITECTURE.md](docs/FLOW_REPLAY_ARCHITECTURE.md)
+for the execution, provenance, resume, and scientific-comparison contracts.
+
 ### Resuming DiffCRL at a completed stage
 
 New DiffCRL runs write `stage_<index>_COMPLETE.json` after each fully finalized
@@ -162,7 +223,7 @@ python -u train_diffcrl.py \
   --resume-from /path/to/existing/run
 ```
 
-Completed stages are hash-validated and skipped. The policy, diffusion model,
+Completed stages are hash-validated and skipped. The policy, selected generative model,
 normalizers, replay/task-bank metadata, evaluation matrix, completed-stage
 index, and Python/NumPy/PyTorch RNG states are restored from the latest marker.
 BC and diffusion optimizers remain fresh at the next stage, matching normal
@@ -233,7 +294,7 @@ CUDA topologies. The Colab notebook exposes both storage modes and the same
 validate, restore, retry, status, and resume operations.
 
 The canonical trained KUKA v3 experts are stored under
-`runs/experts/kuka-v3/<task>/expert_model.zip`. Model provenance, reward
+`runs/experts/kuka-v3/<task>/policy.zip`. Model provenance, reward
 configuration, hashes, and retained evaluation evidence live beside each
 checkpoint. Hammer's canonical expert uses reward v2 with `nail_progress`
 weight `4.0`.

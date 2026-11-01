@@ -10,6 +10,7 @@ import numpy as np
 from src.continual import collector
 from src.continual.diffcrl import DiffCRLTrainer, StageContext
 from src.continual.task_sequence import TaskSequence
+from src.support.expert_manifest import ExpertIdentity
 
 
 class CollectorBatchTests(unittest.TestCase):
@@ -106,6 +107,27 @@ class TrainerCollectionCleanupTests(unittest.TestCase):
         trainer.sequence = sequence
         trainer.experts = {"hammer-v3": Path("/tmp/expert.zip")}
         trainer.expert_hashes = {"hammer-v3": "sha"}
+        trainer.expert_identities = {
+            "hammer-v3": ExpertIdentity(
+                task_name="hammer-v3",
+                checkpoint_path="/tmp/expert.zip",
+                checkpoint_sha256="sha",
+                backend="metaworld-v3",
+                algorithm="SAC",
+                reward_function_version="v2",
+                training_seed=0,
+                training_config_reference=None,
+                training_config_sha256=None,
+                observation_shape=(39,),
+                action_shape=(4,),
+                horizon=200,
+                hammer_reward_variant=None,
+                hammer_nail_progress_weight=None,
+                qualification=None,
+                manifest_path=None,
+                legacy=True,
+            )
+        }
         trainer.policy = None
         trainer.training_banks = {}
         trainer.progress = False

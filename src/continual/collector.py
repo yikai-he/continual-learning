@@ -12,12 +12,12 @@ Success alone does not end an episode. No filtering or padding is performed.
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Callable, Optional
+from collections.abc import Callable
+from typing import TYPE_CHECKING
 
 import numpy as np
-from tqdm.auto import tqdm
-
 from src.envs import ACTION_SHAPE, OBSERVATION_SHAPE
+from tqdm.auto import tqdm
 
 from .policy_adapter import Policy
 from .schema import Trajectory, validate_trajectory
@@ -26,7 +26,7 @@ if TYPE_CHECKING:
     import gymnasium as gym
 
 
-EpisodeResetCallback = Callable[[object, np.ndarray, Optional[int], int], None]
+EpisodeResetCallback = Callable[[object, np.ndarray, int | None, int], None]
 
 
 def collect_trajectory(

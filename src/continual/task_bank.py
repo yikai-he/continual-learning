@@ -5,7 +5,7 @@ import pickle
 from importlib.metadata import version
 
 import numpy as np
-
+from src.env_adapters.kuka_v3 import kuka_v3_tasks
 from src.envs import (
     GOAL_SLICE,
     make_env,
@@ -13,7 +13,6 @@ from src.envs import (
     target_position,
     task_configuration,
 )
-from src.env_adapters.kuka_v3 import kuka_v3_tasks
 
 
 def bank_hashes(tasks):
@@ -59,9 +58,7 @@ def _task_wrapper(env):
     """Locate the MetaWorld task-selection wrapper in an adapter stack."""
     cursor = env
     while cursor is not None:
-        if hasattr(cursor, "tasks") and hasattr(
-            cursor, "toggle_sample_tasks_on_reset"
-        ):
+        if hasattr(cursor, "tasks") and hasattr(cursor, "toggle_sample_tasks_on_reset"):
             return cursor
         cursor = getattr(cursor, "env", None)
     raise ValueError("MetaWorld task-selection wrapper is missing.")
@@ -170,7 +167,9 @@ def selected_configuration(env, bank, observation, episode_id):
         wrapper = _task_wrapper(env)
         hashes = bank_hashes(wrapper.tasks)
         if hashes != bank["ordered_task_hashes"]:
-            raise ValueError("Collection wrapper task bank differs from recorded KUKA bank.")
+            raise ValueError(
+                "Collection wrapper task bank differs from recorded KUKA bank."
+            )
         configuration = task_configuration(env, "kuka-v3")
         matches = [
             index
@@ -178,7 +177,9 @@ def selected_configuration(env, bank, observation, episode_id):
             if np.array_equal(_task_rand_vec(task), configuration)
         ]
         if len(matches) != 1:
-            raise ValueError("Selected KUKA configuration is not uniquely identifiable.")
+            raise ValueError(
+                "Selected KUKA configuration is not uniquely identifiable."
+            )
         index = matches[0]
         goal = np.asarray(observation)[GOAL_SLICE].astype(np.float32, copy=True)
         target = target_position(env, "kuka-v3")
@@ -289,9 +290,10 @@ def reconstruct_goals(
                     raise ValueError("Recreated KUKA goal disagrees with target.")
                 configuration = task_configuration(env, backend)
                 identity = goal if configuration is None else configuration
-                if hashlib.sha256(identity.tobytes()).hexdigest() != bank[
-                    "ordered_task_hashes"
-                ][index]:
+                if (
+                    hashlib.sha256(identity.tobytes()).hexdigest()
+                    != bank["ordered_task_hashes"][index]
+                ):
                     raise ValueError("Recreated KUKA goal differs from training bank.")
                 goals.append(goal)
             return np.stack(goals)
@@ -306,7 +308,9 @@ def reconstruct_goals(
                 "KUKA replay bank lacks exact task identity; recollect Stage 1."
             )
         if bank["metaworld_version"] != version("metaworld"):
-            raise ValueError("MetaWorld version differs from KUKA training bank provenance.")
+            raise ValueError(
+                "MetaWorld version differs from KUKA training bank provenance."
+            )
         tasks = kuka_v3_tasks(bank["task_name"], bank["bank_seed"])
         hashes = bank_hashes(tasks)
         if hashes != bank["ordered_task_hashes"]:
@@ -337,16 +341,20 @@ def reconstruct_goals(
                 actual_configuration = task_configuration(env, backend)
                 expected_configuration = _task_rand_vec(tasks[index])
                 if not np.array_equal(actual_configuration, expected_configuration):
-                    raise ValueError("Recreated KUKA rand_vec differs from selected task.")
+                    raise ValueError(
+                        "Recreated KUKA rand_vec differs from selected task."
+                    )
                 actual_hash = hashlib.sha256(tasks[index].data).hexdigest()
                 if actual_hash != bank["ordered_task_hashes"][index]:
-                    raise ValueError("Recreated KUKA task identity differs from training bank.")
+                    raise ValueError(
+                        "Recreated KUKA task identity differs from training bank."
+                    )
                 record = bank.get("configuration_records", {}).get(str(index))
                 if record is not None:
-                    recorded_goal = np.asarray(record["recorded_goal"], dtype=np.float32)
-                    if not np.allclose(
-                        goal, recorded_goal, rtol=1e-6, atol=1e-7
-                    ):
+                    recorded_goal = np.asarray(
+                        record["recorded_goal"], dtype=np.float32
+                    )
+                    if not np.allclose(goal, recorded_goal, rtol=1e-6, atol=1e-7):
                         raise ValueError(
                             "Recreated KUKA goal differs from training bank: "
                             f"recorded={recorded_goal.tolist()}, "

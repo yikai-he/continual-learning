@@ -11,7 +11,6 @@ from typing import TYPE_CHECKING, Protocol
 
 import numpy as np
 from numpy.typing import NDArray
-
 from src.envs import ACTION_SHAPE, OBSERVATION_SHAPE
 
 if TYPE_CHECKING:

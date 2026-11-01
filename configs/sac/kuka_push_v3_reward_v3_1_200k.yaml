@@ -1,0 +1,32 @@
+# Controlled KUKA Push reward-v3.1 SAC experiment. Starts from scratch.
+experiment: sac
+environment:
+  backend: kuka-v3
+  reward_function_version: v3_1
+sac:
+  steps: 200000
+  learning_rate: 0.001
+  buffer_size: 1000000
+  learning_starts: 10000
+  batch_size: 128
+  gamma: 0.99
+  tau: 0.005
+  train_freq: 1
+  gradient_steps: 1
+  ent_coef: auto
+  net_arch: [256, 256, 256, 256]
+  checkpoint_freq: 50000
+  early_stopping: {enabled: true, min_steps: 100000, success_threshold: 0.95, patience: 3}
+continual:
+  tasks: [kuka-push-v3]
+evaluation:
+  episodes: 50
+  frequency: 20000
+  seed_offset: 10000
+  mode: fixed-tasks
+  task_set_seed: 10000
+runtime:
+  seed: 0
+  device: auto
+  output: runs/reward_ablations/kuka-push-v3/reward_v3_1
+  run_name: seed_0_200k

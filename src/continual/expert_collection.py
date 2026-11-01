@@ -9,13 +9,12 @@ from typing import Any
 
 import numpy as np
 import yaml
-from stable_baselines3 import SAC
-from tqdm.auto import tqdm
-
 from src.continual.collector import collect_trajectories, collect_trajectory
 from src.continual.diffusion_data import pack_trajectories, unpack_trajectories
 from src.continual.policy_adapter import SB3SACPolicy
 from src.envs import GOAL_SLICE, horizon_for_backend, make_env
+from stable_baselines3 import SAC
+from tqdm.auto import tqdm
 
 
 @dataclass(frozen=True)
@@ -74,9 +73,15 @@ def load_collection_config(path: str | Path) -> CollectionConfig:
         raise ValueError("environment.reward_function_version must be v1 or v2.")
     if not config.expert.is_file():
         raise FileNotFoundError(f"Expert model not found: {config.expert}")
-    if isinstance(config.trajectories, bool) or not isinstance(config.trajectories, int) or config.trajectories < 1:
+    if (
+        isinstance(config.trajectories, bool)
+        or not isinstance(config.trajectories, int)
+        or config.trajectories < 1
+    ):
         raise ValueError("continual.trajectories_per_task must be positive.")
-    if isinstance(config.initial_seed, bool) or not isinstance(config.initial_seed, int):
+    if isinstance(config.initial_seed, bool) or not isinstance(
+        config.initial_seed, int
+    ):
         raise ValueError("runtime.seed must be an integer.")
     if config.horizon != horizon_for_backend(config.backend):
         raise ValueError("collection.horizon must match the selected backend.")
@@ -149,7 +154,10 @@ def collect_expert_dataset(config: CollectionConfig) -> dict[str, Any]:
     try:
         if env.spec.max_episode_steps != config.horizon:
             raise ValueError("Environment horizon differs from collection config.")
-        if model.observation_space != env.observation_space or model.action_space != env.action_space:
+        if (
+            model.observation_space != env.observation_space
+            or model.action_space != env.action_space
+        ):
             raise ValueError("Expert/environment spaces differ.")
         if config.successful_only:
             trajectories, attempts = collect_successful_trajectories(
@@ -207,7 +215,8 @@ def collect_expert_dataset(config: CollectionConfig) -> dict[str, Any]:
             "observations_finite": bool(np.isfinite(item.observations).all()),
             "actions_finite": bool(np.isfinite(item.actions).all()),
             "actions_within_bounds": bool(
-                np.all(item.actions >= action_low) and np.all(item.actions <= action_high)
+                np.all(item.actions >= action_low)
+                and np.all(item.actions <= action_high)
             ),
             "action_bound_violation": bool(
                 np.any(item.actions < action_low) or np.any(item.actions > action_high)
@@ -254,13 +263,19 @@ def collect_expert_dataset(config: CollectionConfig) -> dict[str, Any]:
             "previous_frame": "obs[18:36]",
             "goal": "obs[36:39]",
             "previous_frame_aligned": bool(
-                np.array_equal(observation_values[:, 0, 18:36], observation_values[:, 0, 0:18])
-                and np.array_equal(observation_values[:, 1:, 18:36], observation_values[:, :-1, 0:18])
+                np.array_equal(
+                    observation_values[:, 0, 18:36], observation_values[:, 0, 0:18]
+                )
+                and np.array_equal(
+                    observation_values[:, 1:, 18:36], observation_values[:, :-1, 0:18]
+                )
             ),
             "goal_constant_per_trajectory": bool(
                 np.array_equal(
                     observation_values[:, :, GOAL_SLICE],
-                    np.broadcast_to(goals[:, None], observation_values[:, :, GOAL_SLICE].shape),
+                    np.broadcast_to(
+                        goals[:, None], observation_values[:, :, GOAL_SLICE].shape
+                    ),
                 )
             ),
         },

@@ -25,6 +25,9 @@ Trainable policies, generative trajectory memory, and replay support.
 - `bc_policy.py` — Implements and trains the persistent behavior-cloning policy.
 - `trajectory_diffusion.py` — Implements trajectory diffusion training, sampling, and persistence.
 - `diffcrl_replay.py` — Generates previous-task replay from the prior diffusion checkpoint.
+- `trajectory_flow_matching.py` — Implements Flow Matching training and sampling.
+- `replay_allocation.py` — Allocates a fixed historical budget across prior tasks.
+- `flow_matching_replay.py` — Generates fresh allocated replay from the prior Flow checkpoint.
 - `diagnostics.py` — Reports action-bound and projection diagnostics for generated replay.
 
 ## Evaluation
@@ -39,5 +42,5 @@ Stage evaluation, continual-learning metrics, and human-readable output.
 
 Top-level workflows that compose the lower layers into complete experiments.
 
-- `diffcrl.py` — Coordinates expert collection, diffusion replay, BC, and evaluation across stages.
+- `diffcrl.py` — Coordinates expert collection, generative replay, model fitting, BC, and evaluation across stages.
 - `sequential_sac.py` — Runs the persistent-SAC continual baseline without cross-task replay.

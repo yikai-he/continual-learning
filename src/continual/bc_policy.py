@@ -11,12 +11,11 @@ from pathlib import Path
 
 import numpy as np
 import torch
+from src.envs import ACTION_SHAPE, OBSERVATION_SHAPE
+from src.support.io import atomic_torch_save
 from torch import nn
 from torch.utils.data import DataLoader, TensorDataset
 from tqdm.auto import tqdm
-
-from src.envs import ACTION_SHAPE, OBSERVATION_SHAPE
-from src.support.io import atomic_torch_save
 
 BC_CLAMP_EPSILON = 1e-4
 BC_LOSSES = ("post-tanh-mse", "pre-tanh-mse")
@@ -35,7 +34,7 @@ class GeneralPolicy(nn.Module):
         action_low: np.ndarray,
         action_high: np.ndarray,
         *,
-        hidden_sizes: tuple[int, int] = (256, 256),
+        hidden_sizes: tuple[int, ...] = (256, 256),
     ) -> None:
         super().__init__()
         low, high = np.asarray(action_low), np.asarray(action_high)
@@ -47,20 +46,23 @@ class GeneralPolicy(nn.Module):
             or not (low < high).all()
         ):
             raise ValueError("Expected finite, ordered MetaWorld action bounds.")
-        if len(hidden_sizes) != 2 or any(h <= 0 for h in hidden_sizes):
-            raise ValueError("Provide two positive hidden sizes.")
+        if not hidden_sizes or any(
+            isinstance(h, bool) or not isinstance(h, int) or h <= 0
+            for h in hidden_sizes
+        ):
+            raise ValueError("Provide one or more positive integer hidden sizes.")
         self.hidden_sizes = tuple(hidden_sizes)
         self.register_buffer("action_low", torch.tensor(low, dtype=torch.float32))
         self.register_buffer("action_high", torch.tensor(high, dtype=torch.float32))
-        self.network = nn.Sequential(
+        layers: list[nn.Module] = [
             nn.Linear(OBSERVATION_SHAPE[0], hidden_sizes[0]),
             nn.LayerNorm(hidden_sizes[0]),
             nn.ReLU(),
-            nn.Linear(hidden_sizes[0], hidden_sizes[1]),
-            nn.ReLU(),
-            nn.Linear(hidden_sizes[1], ACTION_SHAPE[0]),
-            nn.Tanh(),
-        )
+        ]
+        for input_size, output_size in zip(hidden_sizes, hidden_sizes[1:]):
+            layers.extend((nn.Linear(input_size, output_size), nn.ReLU()))
+        layers.extend((nn.Linear(hidden_sizes[-1], ACTION_SHAPE[0]), nn.Tanh()))
+        self.network = nn.Sequential(*layers)
 
     def forward(self, observations: torch.Tensor) -> torch.Tensor:
         """Map raw 39D observations to bounded physical 4D actions."""
@@ -124,7 +126,13 @@ class GeneralPolicy(nn.Module):
             state["action_high"].numpy(),
             hidden_sizes=tuple(data["hidden_sizes"]),
         )
-        policy.load_state_dict(state)
+        try:
+            policy.load_state_dict(state)
+        except RuntimeError as exc:
+            raise ValueError(
+                "Checkpoint state_dict is incompatible with its stored "
+                f"GeneralPolicy architecture {policy.hidden_sizes}."
+            ) from exc
         policy.eval()
         return policy
 
@@ -267,45 +275,58 @@ def fit_bc(
     initial = metrics()
     history, best_loss, best_epoch, best_state = [], float("inf"), 0, None
     best_optimizer_state = None
-    for epoch in tqdm(
+    with tqdm(
         range(1, epochs + 1),
         desc="BC training",
         unit="epoch",
         disable=not progress,
-    ):
-        policy.train()
-        for observations, actions in loader:
-            optimizer.zero_grad()
-            z, predicted_action = predictions(observations)
-            if bc_loss == "pre-tanh-mse":
-                scaled = (
-                    2
-                    * (actions - policy.action_low)
-                    / (policy.action_high - policy.action_low)
-                    - 1
-                )
-                target = torch.atanh(
-                    scaled.clamp(-1 + BC_CLAMP_EPSILON, 1 - BC_CLAMP_EPSILON)
-                )
-                objective = criterion(z, target)
-            else:
-                objective = criterion(predicted_action, actions)
-            if not torch.isfinite(objective):
-                raise ValueError("BC loss became non-finite.")
-            objective.backward()
-            optimizer.step()
-        policy.eval()
-        record = {"epoch": epoch, **metrics()}
-        history.append(record)
-        if record["validation_action_mse"] < best_loss:
-            best_loss, best_epoch = record["validation_action_mse"], epoch
-            best_state = deepcopy(policy.state_dict())
-            best_optimizer_state = deepcopy(optimizer.state_dict())
+    ) as epoch_progress:
+        for epoch in epoch_progress:
+            policy.train()
+            for observations, actions in loader:
+                optimizer.zero_grad()
+                z, predicted_action = predictions(observations)
+                if bc_loss == "pre-tanh-mse":
+                    scaled = (
+                        2
+                        * (actions - policy.action_low)
+                        / (policy.action_high - policy.action_low)
+                        - 1
+                    )
+                    target = torch.atanh(
+                        scaled.clamp(-1 + BC_CLAMP_EPSILON, 1 - BC_CLAMP_EPSILON)
+                    )
+                    objective = criterion(z, target)
+                else:
+                    objective = criterion(predicted_action, actions)
+                if not torch.isfinite(objective):
+                    raise ValueError("BC loss became non-finite.")
+                objective.backward()
+                optimizer.step()
+            policy.eval()
+            record = {"epoch": epoch, **metrics()}
+            history.append(record)
+            if record["validation_action_mse"] < best_loss:
+                best_loss, best_epoch = record["validation_action_mse"], epoch
+                best_state = deepcopy(policy.state_dict())
+                best_optimizer_state = deepcopy(optimizer.state_dict())
+            epoch_progress.set_postfix(
+                train=f"{record['train_action_mse']:.5f}",
+                validation=f"{record['validation_action_mse']:.5f}",
+                best=f"{best_loss:.5f}@{best_epoch}",
+            )
     policy.load_state_dict(best_state)
     optimizer.load_state_dict(best_optimizer_state)
-    return {
+    result = {
         "initial": initial,
         "best_epoch": best_epoch,
         **metrics(),
         "history": history,
     }
+    if progress:
+        tqdm.write(
+            f"BC selected epoch {best_epoch}/{epochs}: "
+            f"validation_action_mse={result['validation_action_mse']:.6f}, "
+            f"train_action_mse={result['train_action_mse']:.6f}"
+        )
+    return result

@@ -3,62 +3,23 @@
 from __future__ import annotations
 
 import math
-from copy import deepcopy
-from dataclasses import asdict, dataclass
-from pathlib import Path
 
 import torch
-from torch import nn
-from tqdm.auto import tqdm
-
 from src.config import DiffusionModelConfig as DiffusionConfig
 from src.support.io import atomic_torch_save
+from torch import nn
 
 from .diffusion_data import DIFFUSION_FEATURES
+from .generator_normalization import FeatureNormalizer, validate_cpu_feature_batch
+from .generator_training import (
+    fit_generator,
+    generator_checkpoint_payload,
+    run_cpu_inputs_on_module_device,
+)
 
 
 def _finite_batch(x: torch.Tensor) -> None:
-    if (
-        x.ndim != 3
-        or min(x.shape) < 1
-        or not x.is_floating_point()
-        or x.device.type != "cpu"
-        or not torch.isfinite(x).all()
-    ):
-        raise ValueError("Expected a nonempty finite floating CPU tensor (N,T,F).")
-
-
-@dataclass
-class FeatureNormalizer:
-    """Per-feature z-score fitted only on supplied training episodes; no clipping."""
-
-    mean: torch.Tensor
-    scale: torch.Tensor
-
-    @classmethod
-    def fit(
-        cls, train: torch.Tensor, *, minimum_scale: float = 1e-3
-    ) -> FeatureNormalizer:
-        """Fit per-feature moments over batch and time with a scale floor."""
-        _finite_batch(train)
-        if not math.isfinite(minimum_scale) or minimum_scale <= 0:
-            raise ValueError("minimum_scale must be positive and finite.")
-        return cls(
-            train.mean(dim=(0, 1)),
-            train.std(dim=(0, 1), unbiased=False).clamp_min(minimum_scale),
-        )
-
-    def normalize(self, x: torch.Tensor) -> torch.Tensor:
-        _finite_batch(x)
-        if x.shape[-1] != self.mean.numel():
-            raise ValueError("Feature count differs from fitted normalization.")
-        return (x - self.mean) / self.scale
-
-    def denormalize(self, x: torch.Tensor) -> torch.Tensor:
-        _finite_batch(x)
-        if x.shape[-1] != self.mean.numel():
-            raise ValueError("Feature count differs from fitted normalization.")
-        return x * self.scale + self.mean
+    validate_cpu_feature_batch(x)
 
 
 class TemporalDenoiser(nn.Module):
@@ -191,15 +152,11 @@ class TrajectoryDiffusion(nn.Module):
             or (timestep >= self.config.steps).any()
         ):
             raise ValueError("Invalid diffusion timesteps.")
-        # Keep normalization, schedules and seeded noise on CPU. Only the
-        # denoiser executes on the selected device; transfers preserve gradients.
-        device = next(self.denoiser.parameters()).device
-        return self.denoiser(
-            noisy.to(device),
-            timestep.to(device),
-            task_ids.to(device) if task_ids is not None else None,
-            goals.to(device),
-        ).cpu()
+        # Normalization, schedules, and seeded noise intentionally remain on CPU.
+        # This boundary moves only the neural computation and preserves gradients.
+        return run_cpu_inputs_on_module_device(
+            self.denoiser, noisy, timestep, task_ids, goals
+        )
 
     def loss(self, clean, *, generator, task_ids=None, goals=None):
         """Train x0 prediction at one randomly sampled timestep per trajectory."""
@@ -219,11 +176,24 @@ class TrajectoryDiffusion(nn.Module):
         )
 
     @torch.no_grad()
-    def sample(self, count, *, seed=0, task_ids=None, goals=None):
-        """Sample normalized (N,horizon,22) dynamics under task and goal conditions."""
+    def sample(
+        self,
+        count,
+        *,
+        seed=0,
+        task_ids=None,
+        goals=None,
+        execution_mode="legacy",
+    ):
+        """Sample normalized trajectories with legacy or device-native execution."""
         self._goals(goals, count)
         self.validate_tasks(task_ids, count)
+        if execution_mode not in ("legacy", "device-native"):
+            raise ValueError("execution_mode must be legacy or device-native.")
         self.eval()
+        if execution_mode == "device-native":
+            return self._sample_device_native(count, seed, task_ids, goals)
+
         generator = torch.Generator().manual_seed(seed)
         x = torch.randn(
             (count, self.config.horizon, DIFFUSION_FEATURES), generator=generator
@@ -239,20 +209,44 @@ class TrajectoryDiffusion(nn.Module):
         self._validate(x)
         return x
 
+    def _sample_device_native(self, count, seed, task_ids, goals):
+        """Run the full reverse process on the denoiser device, returning CPU data."""
+        device = next(self.denoiser.parameters()).device
+        generator = torch.Generator(device=device).manual_seed(seed)
+        device_tasks = task_ids.to(device) if task_ids is not None else None
+        device_goals = goals.to(device)
+        posterior_x0 = self.posterior_x0.to(device)
+        posterior_xt = self.posterior_xt.to(device)
+        posterior_variance = self.posterior_variance.to(device)
+        x = torch.randn(
+            (count, self.config.horizon, DIFFUSION_FEATURES),
+            generator=generator,
+            device=device,
+        )
+        for step in reversed(range(self.config.steps)):
+            timestep = torch.full((count,), step, dtype=torch.long, device=device)
+            x0 = self.denoiser(x, timestep, device_tasks, device_goals)
+            x = posterior_x0[step] * x0 + posterior_xt[step] * x
+            if step:
+                x += posterior_variance[step].sqrt() * torch.randn(
+                    x.shape, generator=generator, device=device
+                )
+        result = x.cpu()
+        self._validate(result)
+        return result
+
     def save(self, path, dynamic_normalizer, goal_normalizer, metadata):
         """Persist model, both normalizers, and replay provenance without overwrite."""
         atomic_torch_save(
             path,
-            {
-                "kind": "trajectory_diffusion_22_v1",
-                "config": asdict(self.config),
-                "state_dict": self.state_dict(),
-                "dynamic_mean": dynamic_normalizer.mean,
-                "dynamic_scale": dynamic_normalizer.scale,
-                "goal_mean": goal_normalizer.mean,
-                "goal_scale": goal_normalizer.scale,
-                "metadata": metadata,
-            },
+            generator_checkpoint_payload(
+                kind="trajectory_diffusion_22_v1",
+                config=self.config,
+                state_dict=self.state_dict(),
+                dynamic_normalizer=dynamic_normalizer,
+                goal_normalizer=goal_normalizer,
+                metadata=metadata,
+            ),
         )
 
     @classmethod
@@ -264,6 +258,7 @@ class TrajectoryDiffusion(nn.Module):
         expected_clamp_epsilon=None,
         expected_projection=None,
         expected_task_order=None,
+        expected_config=None,
     ):
         """Restore a CPU replay checkpoint after validating its run contract."""
         data = torch.load(path, map_location="cpu", weights_only=True)
@@ -271,6 +266,8 @@ class TrajectoryDiffusion(nn.Module):
             raise ValueError("Checkpoint is not trajectory_diffusion_22_v1.")
         config = DiffusionConfig(**data["config"])
         metadata = data["metadata"]
+        if expected_config is not None and config != expected_config:
+            raise ValueError("Diffusion checkpoint model configuration differs from run.")
         if (
             expected_action_space is not None
             and config.diffusion_action_space != expected_action_space
@@ -283,12 +280,44 @@ class TrajectoryDiffusion(nn.Module):
         ):
             raise ValueError("Diffusion checkpoint configuration differs from run.")
         model = cls(config)
-        model.load_state_dict(data["state_dict"])
+        dynamic = FeatureNormalizer(data["dynamic_mean"], data["dynamic_scale"])
+        goal = FeatureNormalizer(data["goal_mean"], data["goal_scale"])
+        for name, normalizer, features in (
+            ("dynamic", dynamic, config.features),
+            ("goal", goal, 3),
+        ):
+            if (
+                normalizer.mean.shape != (features,)
+                or normalizer.scale.shape != (features,)
+                or not torch.isfinite(normalizer.mean).all()
+                or not torch.isfinite(normalizer.scale).all()
+                or (normalizer.scale <= 0).any()
+            ):
+                raise ValueError(f"Diffusion checkpoint {name} normalization is invalid.")
+
+        state_dict = data["state_dict"]
+        expected_state = model.state_dict()
+        schedule_names = (
+            "abar",
+            "posterior_variance",
+            "posterior_x0",
+            "posterior_xt",
+        )
+        if any(
+            name not in state_dict
+            or not torch.equal(state_dict[name], expected_state[name])
+            for name in schedule_names
+        ):
+            raise ValueError("Diffusion checkpoint schedule differs from its configuration.")
+        try:
+            model.load_state_dict(state_dict, strict=True)
+        except RuntimeError as error:
+            raise ValueError("Diffusion checkpoint model state is incompatible.") from error
         model.eval()
         return (
             model,
-            FeatureNormalizer(data["dynamic_mean"], data["dynamic_scale"]),
-            FeatureNormalizer(data["goal_mean"], data["goal_scale"]),
+            dynamic,
+            goal,
             metadata,
         )
 
@@ -315,66 +344,20 @@ def fit_diffusion(
     model._goals(validation_goals, len(validation))
     model.validate_tasks(train_task_ids, len(train))
     model.validate_tasks(validation_task_ids, len(validation))
-    if epochs < 1 or batch_size < 1 or learning_rate <= 0:
-        raise ValueError("Invalid fit settings.")
-    optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
-    rng = torch.Generator().manual_seed(seed)
-
-    @torch.no_grad()
-    def assess(data, goals, ids, noise_seed):
-        local = torch.Generator().manual_seed(noise_seed)
-        return (
-            sum(
-                model.loss(data, generator=local, task_ids=ids, goals=goals).item()
-                for _ in range(4)
-            )
-            / 4
-        )
-
-    def metrics():
-        return {
-            "train_loss": assess(train, train_goals, train_task_ids, seed + 1000),
-            "validation_loss": assess(
-                validation, validation_goals, validation_task_ids, seed + 2000
-            ),
-        }
-
-    initial = metrics()
-    history = []
-    best = float("inf")
-    best_state = None
-    best_epoch = 0
-    for epoch in tqdm(
-        range(1, epochs + 1),
-        desc="Diffusion training",
-        unit="epoch",
-        disable=not progress,
-    ):
-        model.train()
-        for batch in torch.randperm(len(train), generator=rng).split(batch_size):
-            optimizer.zero_grad()
-            loss = model.loss(
-                train[batch],
-                generator=rng,
-                task_ids=train_task_ids[batch],
-                goals=train_goals[batch],
-            )
-            if not torch.isfinite(loss):
-                raise ValueError("Nonfinite diffusion loss.")
-            loss.backward()
-            nn.utils.clip_grad_norm_(model.parameters(), 1.0)
-            optimizer.step()
-        model.eval()
-        record = {"epoch": epoch, **metrics()}
-        history.append(record)
-        if record["validation_loss"] < best:
-            best = record["validation_loss"]
-            best_epoch = epoch
-            best_state = deepcopy(model.state_dict())
-    model.load_state_dict(best_state)
-    return {
-        "initial": initial,
-        "best_epoch": best_epoch,
-        "history": history,
-        **metrics(),
-    }
+    # The shared progress iterator retains the explicit disable=not progress policy.
+    return fit_generator(
+        model,
+        train,
+        validation,
+        train_goals,
+        validation_goals,
+        train_task_ids,
+        validation_task_ids,
+        epochs=epochs,
+        batch_size=batch_size,
+        learning_rate=learning_rate,
+        seed=seed,
+        progress=progress,
+        progress_label="Diffusion training",
+        nonfinite_error="Nonfinite diffusion loss.",
+    )

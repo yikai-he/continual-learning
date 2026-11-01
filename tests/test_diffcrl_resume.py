@@ -16,6 +16,7 @@ from src.continual.resume import (
     completed_stage_markers,
     load_boundary_state,
     restore_rng_state,
+    resolve_stage_attempt_paths,
     validate_resume_configuration,
     write_stage_boundary,
 )
@@ -119,6 +120,42 @@ def test_incomplete_stage_is_ignored_and_never_overwritten(tmp_path):
         add_boundary(run, 0)
 
 
+@pytest.mark.parametrize(
+    "collision_name",
+    [
+        "stage_1_push-v3",
+        "general_policy_after_task_1_push-v3.pt",
+        "diffusion_after_task_1_push-v3.pt",
+        "flow_matching_after_task_1_push-v3.pt",
+        "stage_state_after_task_1_push-v3.pt",
+    ],
+)
+def test_stage_attempt_resolution_checks_every_legacy_collision(tmp_path, collision_name):
+    (tmp_path / collision_name).touch()
+    directory, suffix = resolve_stage_attempt_paths(tmp_path, 1, "push-v3")
+    assert directory == tmp_path / "stage_1_push-v3.resume_1"
+    assert suffix == ".resume_1"
+
+
+def test_stage_attempt_resolution_skips_complete_attempts_without_rng_use(tmp_path):
+    (tmp_path / "stage_1_push-v3").mkdir()
+    (tmp_path / "flow_matching_after_task_1_push-v3.resume_1.pt").touch()
+    np.random.seed(41)
+    torch.manual_seed(43)
+    numpy_rng = np.random.get_state()
+    torch_rng = torch.get_rng_state().clone()
+
+    directory, suffix = resolve_stage_attempt_paths(tmp_path, 1, "push-v3")
+
+    assert directory == tmp_path / "stage_1_push-v3.resume_2"
+    assert suffix == ".resume_2"
+    numpy_after = np.random.get_state()
+    assert numpy_after[0] == numpy_rng[0]
+    np.testing.assert_array_equal(numpy_after[1], numpy_rng[1])
+    assert numpy_after[2:] == numpy_rng[2:]
+    torch.testing.assert_close(torch.get_rng_state(), torch_rng, rtol=0, atol=0)
+
+
 @pytest.mark.parametrize("mode", ["missing", "corrupt"])
 def test_missing_or_corrupted_completed_checkpoint_is_rejected(tmp_path, mode):
     run, _, _ = make_run(tmp_path)
@@ -146,6 +183,14 @@ def test_configuration_and_replay_mismatches_are_rejected(tmp_path):
     )
     with pytest.raises(ValueError, match="scientific configuration"):
         validate_resume_configuration(run, changed_replay, hashes)
+
+
+def test_legacy_diffusion_resume_identity_omits_new_flow_defaults(tmp_path):
+    run, experts, config = make_run(tmp_path)
+    saved = (run / "config.yaml").read_text(encoding="utf-8")
+    assert "flow_matching:" not in saved
+    hashes = {task: file_hash(path) for task, path in experts.items()}
+    validate_resume_configuration(run, config, hashes)
 
 
 def test_expert_hashes_allow_relocation_but_reject_different_bytes(tmp_path):

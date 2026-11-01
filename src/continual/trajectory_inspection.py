@@ -8,7 +8,6 @@ from dataclasses import dataclass
 from pathlib import Path
 
 import numpy as np
-
 from src.continual.diffusion_data import (
     PHYSICAL_ACTION_SLICE,
     PHYSICAL_TRAJECTORY_FEATURES,
@@ -127,7 +126,6 @@ def _norm_rows(values: np.ndarray) -> np.ndarray:
     return np.linalg.norm(values, axis=1)
 
 
-
 def distribution_statistics(values: np.ndarray) -> dict[str, float | int | None]:
     """Return JSON-safe statistics for finite scalar values."""
     finite = np.asarray(values)[np.isfinite(values)]
@@ -135,15 +133,20 @@ def distribution_statistics(values: np.ndarray) -> dict[str, float | int | None]
     if not finite.size:
         return {"count": 0, **{key: None for key in keys}}
     return {
-        "count": int(finite.size), "mean": float(np.mean(finite)),
-        "std": float(np.std(finite)), "median": float(np.median(finite)),
+        "count": int(finite.size),
+        "mean": float(np.mean(finite)),
+        "std": float(np.std(finite)),
+        "median": float(np.median(finite)),
         "p90": float(np.percentile(finite, 90)),
         "p95": float(np.percentile(finite, 95)),
-        "p99": float(np.percentile(finite, 99)), "max": float(np.max(finite)),
+        "p99": float(np.percentile(finite, 99)),
+        "max": float(np.max(finite)),
     }
 
 
-def _dimension_statistics(values: np.ndarray, prefix: str) -> dict[str, dict[str, object]]:
+def _dimension_statistics(
+    values: np.ndarray, prefix: str
+) -> dict[str, dict[str, object]]:
     result = {}
     for dimension in range(values.shape[1]):
         finite = values[:, dimension][np.isfinite(values[:, dimension])]
@@ -154,8 +157,10 @@ def _dimension_statistics(values: np.ndarray, prefix: str) -> dict[str, dict[str
             continue
         percentiles = np.percentile(finite, PERCENTILES)
         result[name] = {
-            "count": int(finite.size), "mean": float(np.mean(finite)),
-            "std": float(np.std(finite)), "min": float(np.min(finite)),
+            "count": int(finite.size),
+            "mean": float(np.mean(finite)),
+            "std": float(np.std(finite)),
+            "min": float(np.min(finite)),
             "max": float(np.max(finite)),
             **{f"p{q:02d}": float(value) for q, value in zip(PERCENTILES, percentiles)},
         }
@@ -166,8 +171,13 @@ def action_saturation_statistics(actions: np.ndarray) -> dict[str, dict[str, flo
     """Report component and timestep fractions beyond absolute thresholds."""
     absolute = np.abs(actions)
     return {
-        "component_fraction": {f">{q:.2f}": float(np.mean(absolute > q)) for q in ACTION_THRESHOLDS},
-        "timestep_fraction": {f">{q:.2f}": float(np.mean(np.any(absolute > q, axis=1))) for q in ACTION_THRESHOLDS},
+        "component_fraction": {
+            f">{q:.2f}": float(np.mean(absolute > q)) for q in ACTION_THRESHOLDS
+        },
+        "timestep_fraction": {
+            f">{q:.2f}": float(np.mean(np.any(absolute > q, axis=1)))
+            for q in ACTION_THRESHOLDS
+        },
     }
 
 
@@ -175,14 +185,27 @@ def action_overshoot_statistics(trajectories, *, top_k: int = 5) -> dict[str, ob
     offenders = []
     for trajectory_index, trajectory in enumerate(trajectories):
         actions = split_fields(trajectory)["action"]
-        for timestep, dimension in np.argwhere(np.isfinite(actions) & (np.abs(actions) > 1)):
+        for timestep, dimension in np.argwhere(
+            np.isfinite(actions) & (np.abs(actions) > 1)
+        ):
             value = float(actions[timestep, dimension])
-            offenders.append({"trajectory_index": trajectory_index, "timestep": int(timestep),
-                "action_dimension": int(dimension), "action_value": value,
-                "overshoot": abs(value) - 1})
+            offenders.append(
+                {
+                    "trajectory_index": trajectory_index,
+                    "timestep": int(timestep),
+                    "action_dimension": int(dimension),
+                    "action_value": value,
+                    "overshoot": abs(value) - 1,
+                }
+            )
     offenders.sort(key=lambda item: item["overshoot"], reverse=True)
-    stats = distribution_statistics(np.asarray([item["overshoot"] for item in offenders]))
-    return {key: stats[key] for key in ("count", "mean", "median", "p90", "p95", "p99", "max")} | {"top_components": offenders[:top_k]}
+    stats = distribution_statistics(
+        np.asarray([item["overshoot"] for item in offenders])
+    )
+    return {
+        key: stats[key]
+        for key in ("count", "mean", "median", "p90", "p95", "p99", "max")
+    } | {"top_components": offenders[:top_k]}
 
 
 def diagnose_trajectory(
@@ -328,18 +351,29 @@ def export_txt(trajectory: np.ndarray, path: str | Path, **kwargs) -> None:
 def scan_trajectories(
     trajectories: tuple[np.ndarray, ...], *, tolerance=DEFAULT_TOLERANCE, top_k=5
 ) -> dict[str, list[tuple[int, float]] | list[int]]:
-    reports = [diagnose_trajectory(item, tolerance=tolerance, top_k=top_k) for item in trajectories]
+    reports = [
+        diagnose_trajectory(item, tolerance=tolerance, top_k=top_k)
+        for item in trajectories
+    ]
 
     def ranking(metric):
-        return sorted(enumerate(metric(report) for report in reports), key=lambda x: x[1], reverse=True)[:top_k]
+        return sorted(
+            enumerate(metric(report) for report in reports),
+            key=lambda x: x[1],
+            reverse=True,
+        )[:top_k]
 
     return {
-        "largest_previous_state_mismatch": ranking(lambda r: r["previous_alignment"]["max"]),
+        "largest_previous_state_mismatch": ranking(
+            lambda r: r["previous_alignment"]["max"]
+        ),
         "largest_state_jump": ranking(lambda r: r["state_continuity"]["max"]),
         "highest_action_oob_fraction": ranking(lambda r: r["action_oob_fraction"]),
         "largest_goal_drift": ranking(lambda r: r["goal_drift"]["max"]),
         "nan_or_inf_trajectories": [
-            index for index, report in enumerate(reports) if report["nan_count"] or report["inf_count"]
+            index
+            for index, report in enumerate(reports)
+            if report["nan_count"] or report["inf_count"]
         ],
     }
 
@@ -360,15 +394,27 @@ def aggregate_diagnostics(trajectories: tuple[np.ndarray, ...]) -> dict[str, obj
         "nan_count": int(sum(np.isnan(item).sum() for item in trajectories)),
         "inf_count": int(sum(np.isinf(item).sum() for item in trajectories)),
         "state_delta": distribution_statistics(deltas),
-        "state_mean": [item["mean"] for item in _dimension_statistics(state, "state").values()],
-        "state_std": [item["std"] for item in _dimension_statistics(state, "state").values()],
-        "action_mean": [item["mean"] for item in _dimension_statistics(action, "action").values()],
-        "action_std": [item["std"] for item in _dimension_statistics(action, "action").values()],
+        "state_mean": [
+            item["mean"] for item in _dimension_statistics(state, "state").values()
+        ],
+        "state_std": [
+            item["std"] for item in _dimension_statistics(state, "state").values()
+        ],
+        "action_mean": [
+            item["mean"] for item in _dimension_statistics(action, "action").values()
+        ],
+        "action_std": [
+            item["std"] for item in _dimension_statistics(action, "action").values()
+        ],
         "action_saturation": saturation,
         "action_oob_fraction": saturation["component_fraction"][">1.00"],
         "action_oob_timestep_fraction": saturation["timestep_fraction"][">1.00"],
-        "previous_alignment_mean": float(np.mean([r["previous_alignment"]["mean"] for r in reports])),
-        "previous_alignment_max": float(np.max([r["previous_alignment"]["max"] for r in reports])),
+        "previous_alignment_mean": float(
+            np.mean([r["previous_alignment"]["mean"] for r in reports])
+        ),
+        "previous_alignment_max": float(
+            np.max([r["previous_alignment"]["max"] for r in reports])
+        ),
         "goal_drift_mean": float(np.mean([r["goal_drift"]["mean"] for r in reports])),
         "goal_drift_max": float(np.max([r["goal_drift"]["max"] for r in reports])),
         "state_dimensions": _dimension_statistics(state, "state"),
@@ -390,17 +436,23 @@ def action_oob_by_timestep(trajectories, *, top_k: int = 5) -> dict[str, object]
         component_count = int(oob.sum())
         trajectory_count = int(np.any(oob, axis=1).sum())
         valid_count = len(available)
-        per_timestep.append({
-            "timestep": timestep,
-            "valid_trajectory_count": valid_count,
-            "component_count": component_count,
-            "component_fraction": float(component_count / (valid_count * ACTION_SHAPE[0])),
-            "trajectory_count": trajectory_count,
-            "trajectory_fraction": float(trajectory_count / valid_count),
-        })
+        per_timestep.append(
+            {
+                "timestep": timestep,
+                "valid_trajectory_count": valid_count,
+                "component_count": component_count,
+                "component_fraction": float(
+                    component_count / (valid_count * ACTION_SHAPE[0])
+                ),
+                "trajectory_count": trajectory_count,
+                "trajectory_fraction": float(trajectory_count / valid_count),
+            }
+        )
 
     def highest(key):
-        return sorted(per_timestep, key=lambda item: (-item[key], item["timestep"]))[:top_k]
+        return sorted(per_timestep, key=lambda item: (-item[key], item["timestep"]))[
+            :top_k
+        ]
 
     return {
         "per_timestep": per_timestep,
@@ -436,16 +488,20 @@ def state_reference_diagnostics(
                 "real_reference_value": reference,
                 "real_std": real_std,
                 "generated_abs_deviation": {
-                    key: stats[key] for key in ("count", "mean", "median", "p90", "p95", "p99", "max")
+                    key: stats[key]
+                    for key in ("count", "mean", "median", "p90", "p95", "p99", "max")
                 },
-                "fraction_above_tolerance": float(np.mean(deviations > absolute_tolerance)),
+                "fraction_above_tolerance": float(
+                    np.mean(deviations > absolute_tolerance)
+                ),
                 "tolerance": float(absolute_tolerance),
             }
             continue
         low, high = np.percentile(rv, (1, 99))
         percentile[name] = {
             "constant_reference": False,
-            "real_p01": float(low), "real_p99": float(high),
+            "real_p01": float(low),
+            "real_p99": float(high),
             "below_real_p01": float(np.mean(gv < low)),
             "above_real_p99": float(np.mean(gv > high)),
             "largest_below_real_min": float(max(np.min(rv) - np.min(gv), 0)),
@@ -463,21 +519,35 @@ def compare_datasets(
     constant_state_abs_tolerance: float = CONSTANT_STATE_ABS_TOL,
 ) -> dict[str, object]:
     """Compare provided datasets against real distribution references."""
-    real_stats, generated_stats = aggregate_diagnostics(real), aggregate_diagnostics(generated)
+    real_stats, generated_stats = (
+        aggregate_diagnostics(real),
+        aggregate_diagnostics(generated),
+    )
     real_fields = [split_fields(item) for item in real]
     generated_fields = [split_fields(item) for item in generated]
     real_state = np.concatenate([item["current_state"] for item in real_fields])
-    generated_state = np.concatenate([item["current_state"] for item in generated_fields])
+    generated_state = np.concatenate(
+        [item["current_state"] for item in generated_fields]
+    )
     real_action = np.concatenate([item["action"] for item in real_fields])
     generated_action = np.concatenate([item["action"] for item in generated_fields])
-    generated_deltas = np.concatenate([diagnose_trajectory(item)["state_continuity"]["deltas"] for item in generated])
+    generated_deltas = np.concatenate(
+        [diagnose_trajectory(item)["state_continuity"]["deltas"] for item in generated]
+    )
     generated_deltas = generated_deltas[np.isfinite(generated_deltas)]
-    references = {name: real_stats["state_delta"][name] for name in ("p90", "p95", "p99")}
+    references = {
+        name: real_stats["state_delta"][name] for name in ("p90", "p95", "p99")
+    }
     tail = {}
     for name, reference in references.items():
         count = int(np.sum(generated_deltas > reference))
-        tail[f">real_{name}"] = {"count": count, "total": int(generated_deltas.size),
-            "fraction": float(count / generated_deltas.size) if generated_deltas.size else 0.0}
+        tail[f">real_{name}"] = {
+            "count": count,
+            "total": int(generated_deltas.size),
+            "fraction": float(count / generated_deltas.size)
+            if generated_deltas.size
+            else 0.0,
+        }
     constant_state, state_support = state_reference_diagnostics(
         real_state,
         generated_state,
@@ -486,20 +556,35 @@ def compare_datasets(
     )
     action_support = {}
     for dimension in range(ACTION_SHAPE[0]):
-        rv = real_action[:, dimension]; rv = rv[np.isfinite(rv)]
-        gv = generated_action[:, dimension]; gv = gv[np.isfinite(gv)]
+        rv = real_action[:, dimension]
+        rv = rv[np.isfinite(rv)]
+        gv = generated_action[:, dimension]
+        gv = gv[np.isfinite(gv)]
         low, high = np.percentile(rv, (1, 99))
-        action_support[f"action_{dimension:02d}"] = {"real_p01": float(low), "real_p99": float(high),
-            "generated_outside_real_p01_p99_fraction": float(np.mean((gv < low) | (gv > high)))}
+        action_support[f"action_{dimension:02d}"] = {
+            "real_p01": float(low),
+            "real_p99": float(high),
+            "generated_outside_real_p01_p99_fraction": float(
+                np.mean((gv < low) | (gv > high))
+            ),
+        }
     return {
-        "metadata": {"real_label": "provided real reference", "generated_label": "provided generated dataset",
-            "interpretation": "Descriptive distribution diagnostics only; these metrics do not prove simulator or physical validity."},
-        "real": real_stats, "generated": generated_stats,
-        "state_delta_reference": {f"real_{key}": value for key, value in references.items()},
+        "metadata": {
+            "real_label": "provided real reference",
+            "generated_label": "provided generated dataset",
+            "interpretation": "Descriptive distribution diagnostics only; these metrics do not prove simulator or physical validity.",
+        },
+        "real": real_stats,
+        "generated": generated_stats,
+        "state_delta_reference": {
+            f"real_{key}": value for key, value in references.items()
+        },
         "generated_tail_exceedance": tail,
         "constant_state_diagnostics": constant_state,
         "state_support_exceedance": state_support,
         "action_support_exceedance": action_support,
         "generated_oob_by_timestep": action_oob_by_timestep(generated, top_k=top_k),
-        "generated_action_overshoot": action_overshoot_statistics(generated, top_k=top_k),
+        "generated_action_overshoot": action_overshoot_statistics(
+            generated, top_k=top_k
+        ),
     }

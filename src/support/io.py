@@ -1,6 +1,7 @@
 import json
 import errno
 import os
+import tempfile
 from pathlib import Path
 
 import torch
@@ -42,6 +43,29 @@ def atomic_write_json(path, value):
             stream.flush()
             os.fsync(stream.fileno())
         _publish_exclusive(temporary, path)
+    finally:
+        temporary.unlink(missing_ok=True)
+
+
+def atomic_replace_json(path, value, *, sort_keys=False, allow_nan=True):
+    """Atomically write JSON, replacing an existing destination."""
+    path = Path(path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    handle, temporary_name = tempfile.mkstemp(
+        prefix=path.name, suffix=".tmp", dir=path.parent
+    )
+    temporary = Path(temporary_name)
+    try:
+        with os.fdopen(handle, "w", encoding="utf-8") as stream:
+            json.dump(
+                value,
+                stream,
+                indent=2,
+                sort_keys=sort_keys,
+                allow_nan=allow_nan,
+            )
+            stream.write("\n")
+        os.replace(temporary, path)
     finally:
         temporary.unlink(missing_ok=True)
 

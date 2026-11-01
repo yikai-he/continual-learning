@@ -17,14 +17,14 @@ run_experiment() {
 
 run_experiment \
   "Hammer reward ablation: original" \
-  "configs/sac/kuka_hammer_v3_ablation_original_250k.yaml"
+  "configs/sac/archive/reward_ablations/kuka_hammer_v3_ablation_original_250k.yaml"
 
 run_experiment \
   "Hammer reward ablation: nail-progress weight 2" \
-  "configs/sac/kuka_hammer_v3_ablation_progress_w2_250k.yaml"
+  "configs/sac/archive/reward_ablations/kuka_hammer_v3_ablation_progress_w2_250k.yaml"
 
 run_experiment \
   "Hammer reward ablation: nail-progress weight 4" \
-  "configs/sac/kuka_hammer_v3_ablation_progress_w4_250k.yaml"
+  "configs/sac/archive/reward_ablations/kuka_hammer_v3_ablation_progress_w4_250k.yaml"
 
 echo "[$(date '+%Y-%m-%d %H:%M:%S %Z')] All Hammer 250k screening runs finished."

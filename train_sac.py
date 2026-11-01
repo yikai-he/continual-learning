@@ -6,21 +6,12 @@ import csv
 import hashlib
 import json
 import re
-import subprocess
 from collections import deque
 from datetime import datetime
 from importlib import metadata as package_metadata
 from pathlib import Path
 
 import numpy as np
-from stable_baselines3 import SAC
-from stable_baselines3.common.callbacks import (
-    BaseCallback,
-    CallbackList,
-    CheckpointCallback,
-)
-from stable_baselines3.common.monitor import Monitor
-
 from src.config import (
     EarlyStoppingConfig,
     ExperimentConfig,
@@ -28,17 +19,31 @@ from src.config import (
     parse_config,
     save_resolved_config,
 )
-from src.envs import ACTION_SHAPE, OBSERVATION_SHAPE, horizon_for_backend, make_env
 from src.continual.evaluation import disable_task_sampling, fixed_mt1_tasks
 from src.continual.task_bank import verify_disjoint_task_banks
-from src.support.run_manifest import complete_run, create_run_manifest
-from src.support.expert_manifest import qualification_record, write_expert_manifest
-from src.support.reproducibility import file_hash
+from src.envs import ACTION_SHAPE, OBSERVATION_SHAPE, horizon_for_backend, make_env
+from src.support.reproducibility import git_output
 from src.hammer_diagnostics import (
     HAMMER_TASK,
     HammerEpisodeTracker,
     summarize_hammer_episodes,
 )
+from src.sac.checkpoint_ranking import (
+    best_return_index,
+    best_success_index,
+    success_score,
+)
+from src.sac.kuka_diagnostics import KukaEpisodeDiagnostics
+from src.support.expert_manifest import qualification_record, write_expert_manifest
+from src.support.reproducibility import file_hash
+from src.support.run_manifest import complete_run, create_run_manifest
+from stable_baselines3 import SAC
+from stable_baselines3.common.callbacks import (
+    BaseCallback,
+    CallbackList,
+    CheckpointCallback,
+)
+from stable_baselines3.common.monitor import Monitor
 
 
 def export_run_summaries(run_dir: Path) -> None:
@@ -56,7 +61,11 @@ def export_run_summaries(run_dir: Path) -> None:
             else np.std(returns, axis=1)
         )
 
-    if not len(steps) or returns.shape[0] != len(steps) or successes.shape[0] != len(steps):
+    if (
+        not len(steps)
+        or returns.shape[0] != len(steps)
+        or successes.shape[0] != len(steps)
+    ):
         raise ValueError("Evaluation archive is empty or has inconsistent row counts.")
     mean_returns = np.mean(returns, axis=1)
     success_rates = np.mean(successes, axis=1)
@@ -69,10 +78,8 @@ def export_run_summaries(run_dir: Path) -> None:
         }
         for i in range(len(steps))
     ]
-    best_return_index = int(np.argmax(mean_returns))
-    best_success_index = max(
-        range(len(rows)), key=lambda i: (success_rates[i], mean_returns[i])
-    )
+    return_index = best_return_index(mean_returns)
+    success_index = best_success_index(success_rates, mean_returns)
 
     with (run_dir / "evaluation_history.csv").open(
         "w", encoding="utf-8", newline=""
@@ -94,9 +101,9 @@ def export_run_summaries(run_dir: Path) -> None:
         "initial": {key: rows[0][key] for key in rows[0] if key != "step"},
         "final": rows[-1],
         "best_success": checkpoint(
-            best_success_index, "best_success_model/best_success_model.zip"
+            success_index, "best_success_model/best_success_model.zip"
         ),
-        "best_return": checkpoint(best_return_index, "best_model/best_model.zip"),
+        "best_return": checkpoint(return_index, "best_model/best_model.zip"),
         "artifacts": {
             "final_model": "final_model.zip",
             "evaluations_npz": "evaluations/evaluations.npz",
@@ -132,11 +139,11 @@ def export_run_summaries(run_dir: Path) -> None:
         "",
         "## Best Checkpoints",
         "",
-        f"- Best success: step {rows[best_success_index]['step']} "
-        f"({rows[best_success_index]['success_rate']:.1%}), "
+        f"- Best success: step {rows[success_index]['step']} "
+        f"({rows[success_index]['success_rate']:.1%}), "
         "`best_success_model/best_success_model.zip`",
-        f"- Best return: step {rows[best_return_index]['step']} "
-        f"({rows[best_return_index]['mean_return']:.4f}), `best_model/best_model.zip`",
+        f"- Best return: step {rows[return_index]['step']} "
+        f"({rows[return_index]['mean_return']:.4f}), `best_model/best_model.zip`",
         "- Final model: `final_model.zip`",
         "",
     ]
@@ -162,6 +169,33 @@ class TrainingSuccessCallback(BaseCallback):
                     "rollout/success_rate", float(np.mean(self._successes))
                 )
         return True
+
+
+def summarize_success_trace(successes, *, sustained_steps: int = 10) -> dict:
+    """Summarize observational success retention without changing success semantics."""
+    trace = [bool(value) for value in successes]
+    if not trace:
+        raise ValueError("Success trace must contain at least one environment step.")
+    if sustained_steps <= 0:
+        raise ValueError("sustained_steps must be positive.")
+    longest_run = run = 0
+    for success in trace:
+        run = run + 1 if success else 0
+        longest_run = max(longest_run, run)
+    first_success = next((i for i, success in enumerate(trace) if success), None)
+    retained_steps = sum(trace[first_success:]) if first_success is not None else 0
+    post_success_steps = len(trace) - first_success if first_success is not None else 0
+    return {
+        "any_step_success": any(trace),
+        "final_step_success": trace[-1],
+        "sustained_success": longest_run >= sustained_steps,
+        "longest_success_run": longest_run,
+        "first_success_step": first_success,
+        "success_retention_steps": retained_steps,
+        "success_retention_fraction": (
+            retained_steps / post_success_steps if post_success_steps else 0.0
+        ),
+    }
 
 
 class FixedSeedEvalCallback(BaseCallback):
@@ -218,9 +252,7 @@ class FixedSeedEvalCallback(BaseCallback):
                     for task in self.fixed_tasks
                 ]
             else:
-                self.fixed_tasks, identities = fixed_mt1_tasks(
-                    task_name, task_set_seed
-                )
+                self.fixed_tasks, identities = fixed_mt1_tasks(task_name, task_set_seed)
             if n_eval_episodes > len(self.fixed_tasks):
                 raise ValueError("Evaluation episodes exceed the fixed MT1 task bank.")
             self.task_hashes = tuple(
@@ -240,43 +272,30 @@ class FixedSeedEvalCallback(BaseCallback):
         self.successes: list[list[bool]] = []
         self.return_stddevs: list[float] = []
         self.behavior_metrics: list[list[dict]] = []
+        self.success_diagnostics: list[list[dict]] = []
         self.hammer_metrics: list[list[dict]] = []
+        self.handoff_metrics: list[list[dict]] = []
 
     def _evaluate(self) -> tuple[list[float], list[int], list[bool]]:
         returns, lengths, successes = [], [], []
         evaluation_behavior = []
+        evaluation_success_diagnostics = []
         evaluation_hammer = []
+        evaluation_handoff = []
         for index, seed in enumerate(self.seeds):
             if self.fixed_tasks is not None:
                 self.eval_env.unwrapped.set_task(self.fixed_tasks[index])
             observation, _ = self.eval_env.reset(seed=seed)
+            diagnostics = KukaEpisodeDiagnostics(
+                self.task_name,
+                self.eval_env,
+                observation,
+                HammerEpisodeTracker,
+            )
             episode_return = 0.0
             episode_length = 0
             episode_success = False
-            hammer_tracker = (
-                HammerEpisodeTracker(self.eval_env)
-                if self.task_name == HAMMER_TASK
-                else None
-            )
-            if hammer_tracker is not None:
-                hammer_tracker.sample(0)
-            track_push = self.task_name == "kuka-push-v3" and observation.shape == (39,)
-            if track_push:
-                initial_object = np.asarray(observation[4:7], dtype=float).copy()
-                goal = np.asarray(observation[36:39], dtype=float).copy()
-                initial_distance = float(np.linalg.norm(initial_object - goal))
-                minimum_distance = initial_distance
-                maximum_displacement = 0.0
-                contact_steps = stationary_contact_steps = 0
-                clipped_contact_without_progress_steps = 0
-                positive_progress_steps = negative_progress_steps = 0
-                progress_contribution = baseline_contribution = 0.0
-                pre_contact_caging_contribution = 0.0
-                contact_baseline_contribution = 0.0
-                first_success_count = 0
-                ever_near_object = False
-                had_contact = False
-                contact_lost = False
+            episode_success_trace = []
             while True:
                 action, _ = self.model.predict(observation, deterministic=True)
                 observation, reward, terminated, truncated, info = self.eval_env.step(
@@ -284,158 +303,37 @@ class FixedSeedEvalCallback(BaseCallback):
                 )
                 episode_return += float(reward)
                 episode_length += 1
-                episode_success |= bool(
-                    info.get("success", info.get("is_success", False))
+                step_success = bool(info.get("success", info.get("is_success", False)))
+                episode_success |= step_success
+                episode_success_trace.append(step_success)
+                diagnostics.observe_step(
+                    action, observation, reward, info, episode_length
                 )
-                if hammer_tracker is not None:
-                    hammer_tracker.sample(episode_length)
-                if track_push:
-                    reward_prefix = (
-                        "reward_v3_1"
-                        if "reward_v3_1_total" in info
-                        else "reward_v3"
-                    )
-                    obj = np.asarray(observation[4:7], dtype=float)
-                    current_distance = float(np.linalg.norm(obj - goal))
-                    signed_progress = float(
-                        info.get(
-                            f"{reward_prefix}_signed_progress",
-                            initial_distance - current_distance
-                            if episode_length == 1
-                            else previous_distance - current_distance,
-                        )
-                    )
-                    raw_env = self.eval_env.unwrapped
-                    physical_contact = (
-                        raw_env.pad_contacting_object(raw_env._get_id_main_object())
-                        and float(observation[3]) > 0
-                    )
-                    contact = bool(
-                        info.get(f"{reward_prefix}_contact", physical_contact)
-                    )
-                    at_workspace_boundary = bool(
-                        np.any(
-                            np.isclose(
-                                np.asarray(raw_env.data.mocap_pos[0], dtype=float),
-                                np.asarray(raw_env.mocap_low, dtype=float),
-                                atol=1e-9,
-                            )
-                            | np.isclose(
-                                np.asarray(raw_env.data.mocap_pos[0], dtype=float),
-                                np.asarray(raw_env.mocap_high, dtype=float),
-                                atol=1e-9,
-                            )
-                        )
-                    )
-                    if had_contact and not contact:
-                        contact_lost = True
-                    had_contact |= contact
-                    contact_steps += int(contact)
-                    stationary_contact_steps += int(
-                        contact and abs(signed_progress) <= 1e-5
-                    )
-                    clipped_contact_without_progress_steps += int(
-                        contact
-                        and at_workspace_boundary
-                        and abs(signed_progress) <= 1e-5
-                    )
-                    positive_progress_steps += int(contact and signed_progress > 1e-5)
-                    negative_progress_steps += int(contact and signed_progress < -1e-5)
-                    progress_contribution += 1000.0 * float(contact) * float(
-                        info.get(
-                            f"{reward_prefix}_clipped_progress",
-                            np.clip(signed_progress, -0.005, 0.005),
-                        )
-                    )
-                    caging = float(
-                        info.get(
-                            f"{reward_prefix}_caging",
-                            info.get("grasp_reward", 0.0),
-                        )
-                    )
-                    if reward_prefix == "reward_v3_1":
-                        pre_contact_caging_contribution += caging * float(not contact)
-                        contact_baseline_contribution += 0.05 * float(contact)
-                        baseline_contribution += (
-                            caging * float(not contact) + 0.05 * float(contact)
-                        )
-                    else:
-                        pre_contact_caging_contribution += 0.1 * caging
-                        contact_baseline_contribution += 0.05 * float(contact)
-                        baseline_contribution += 0.1 * caging + 0.05 * float(contact)
-                    first_success_count += int(
-                        info.get(f"{reward_prefix}_first_success", False)
-                    )
-                    ever_near_object |= bool(info.get("near_object", False))
-                    minimum_distance = min(minimum_distance, current_distance)
-                    maximum_displacement = max(
-                        maximum_displacement,
-                        float(np.linalg.norm(obj - initial_object)),
-                    )
-                    previous_distance = current_distance
                 if terminated or truncated:
                     break
             returns.append(episode_return)
             lengths.append(episode_length)
             successes.append(episode_success)
-            if hammer_tracker is not None:
-                evaluation_hammer.append(
-                    hammer_tracker.finish(episode_success).to_dict()
-                )
-            if track_push:
-                final_progress = initial_distance - previous_distance
-                maximum_progress = initial_distance - minimum_distance
-                if episode_success and previous_distance > 0.05:
-                    category = "overshoot"
-                elif episode_success:
-                    category = "success"
-                elif not ever_near_object:
-                    category = "no_meaningful_approach"
-                elif not had_contact:
-                    category = "approach_no_contact"
-                elif maximum_displacement <= 0.001:
-                    category = "stationary_contact"
-                elif final_progress < -0.005:
-                    category = "wrong_direction"
-                elif minimum_distance <= 0.075:
-                    category = "near_threshold_miss"
-                elif maximum_progress >= 0.03:
-                    category = "useful_progress_insufficient"
-                elif contact_lost:
-                    category = "contact_loss"
-                else:
-                    category = "contact_low_progress"
-                evaluation_behavior.append(
-                    {
-                        "seed": seed,
-                        "success": episode_success,
-                        "category": category,
-                        "initial_goal_distance": initial_distance,
-                        "maximum_goal_progress": maximum_progress,
-                        "minimum_goal_distance": minimum_distance,
-                        "final_goal_distance": previous_distance,
-                        "maximum_puck_displacement": maximum_displacement,
-                        "contact_rate": contact_steps / episode_length,
-                        "stationary_contact_rate": stationary_contact_steps
-                        / episode_length,
-                        "workspace_clipped_contact_without_progress_rate": (
-                            clipped_contact_without_progress_steps / episode_length
-                        ),
-                        "wrong_direction_step_rate": negative_progress_steps
-                        / episode_length,
-                        "correct_direction_step_rate": positive_progress_steps
-                        / episode_length,
-                        "signed_progress_contribution": progress_contribution,
-                        "caging_contact_baseline_contribution": baseline_contribution,
-                        "pre_contact_caging_contribution": (
-                            pre_contact_caging_contribution
-                        ),
-                        "contact_baseline_contribution": contact_baseline_contribution,
-                        "success_bonus_occurrences": first_success_count,
-                    }
-                )
+            success_diagnostic = summarize_success_trace(episode_success_trace)
+            evaluation_success_diagnostics.append({"seed": seed, **success_diagnostic})
+            behavior, hammer, handoff = diagnostics.finish(
+                seed=seed,
+                episode_return=episode_return,
+                episode_length=episode_length,
+                episode_success=episode_success,
+                success_diagnostic=success_diagnostic,
+                final_info=info,
+            )
+            if behavior is not None:
+                evaluation_behavior.append(behavior)
+            if hammer is not None:
+                evaluation_hammer.append(hammer)
+            if handoff is not None:
+                evaluation_handoff.append(handoff)
         self._last_behavior_metrics = evaluation_behavior
+        self._last_success_diagnostics = evaluation_success_diagnostics
         self._last_hammer_metrics = evaluation_hammer
+        self._last_handoff_metrics = evaluation_handoff
         return returns, lengths, successes
 
     def _save_evaluations(self) -> None:
@@ -458,8 +356,20 @@ class FixedSeedEvalCallback(BaseCallback):
                 json.dumps(
                     [
                         {"step": step, "episodes": episodes}
+                        for step, episodes in zip(self.timesteps, self.behavior_metrics)
+                    ],
+                    indent=2,
+                )
+                + "\n",
+                encoding="utf-8",
+            )
+        if self.success_diagnostics:
+            (self.log_path / "success_diagnostics.json").write_text(
+                json.dumps(
+                    [
+                        {"step": step, "episodes": episodes}
                         for step, episodes in zip(
-                            self.timesteps, self.behavior_metrics
+                            self.timesteps, self.success_diagnostics
                         )
                     ],
                     indent=2,
@@ -479,6 +389,18 @@ class FixedSeedEvalCallback(BaseCallback):
                 + "\n",
                 encoding="utf-8",
             )
+        if self.handoff_metrics:
+            (self.log_path / "handoff_metrics.json").write_text(
+                json.dumps(
+                    [
+                        {"step": step, "episodes": episodes}
+                        for step, episodes in zip(self.timesteps, self.handoff_metrics)
+                    ],
+                    indent=2,
+                )
+                + "\n",
+                encoding="utf-8",
+            )
 
     def _record_evaluation(self, *, allow_early_stop: bool = True) -> bool:
         returns, lengths, successes = self._evaluate()
@@ -492,9 +414,14 @@ class FixedSeedEvalCallback(BaseCallback):
         self.return_stddevs.append(return_stddev)
         if getattr(self, "_last_behavior_metrics", None):
             self.behavior_metrics.append(self._last_behavior_metrics)
+        if getattr(self, "_last_success_diagnostics", None):
+            self.success_diagnostics.append(self._last_success_diagnostics)
         hammer_metrics = getattr(self, "_last_hammer_metrics", None)
         if hammer_metrics:
             self.hammer_metrics.append(hammer_metrics)
+        handoff_metrics = getattr(self, "_last_handoff_metrics", None)
+        if handoff_metrics:
+            self.handoff_metrics.append(handoff_metrics)
         self._save_evaluations()
         self.logger.record("eval/mean_reward", mean_return)
         self.logger.record("eval/std_reward", return_stddev)
@@ -502,21 +429,49 @@ class FixedSeedEvalCallback(BaseCallback):
         if hammer_metrics:
             for name, value in summarize_hammer_episodes(hammer_metrics).items():
                 self.logger.record(f"eval/{name}", value)
+        if handoff_metrics:
+            self.logger.record(
+                "eval/handoff_instantaneous_success_rate",
+                float(
+                    np.mean([item["instantaneous_success"] for item in handoff_metrics])
+                ),
+            )
+            self.logger.record("eval/handoff_sustained_success_rate", success_rate)
+            for metric in (
+                "valid_rear_contact_episode",
+                "first_valid_rear_contact_step",
+                "initial_tcp_target_distance",
+                "minimum_tcp_target_distance",
+                "final_tcp_target_distance",
+                "mean_physical_aperture",
+                "final_physical_aperture",
+                "mean_aperture_error",
+                "maximum_cube_displacement",
+                "maximum_cube_tilt",
+                "reward_tcp_shaping_total",
+                "reward_aperture_shaping_total",
+                "reward_handoff_total",
+                "final_tcp_potential",
+                "final_aperture_potential",
+                "final_total_potential",
+                "discounted_episode_return_gamma_0_99",
+            ):
+                values = [
+                    float(item[metric])
+                    for item in handoff_metrics
+                    if item.get(metric) is not None
+                ]
+                if values:
+                    self.logger.record(f"eval/handoff_{metric}", float(np.mean(values)))
 
         if mean_return > self.best_mean_return:
             self.best_mean_return = mean_return
             self.model.save(self.best_model_save_path / "best_model")
-        score = (success_rate, mean_return)
+        score = success_score(success_rate, mean_return)
         if score > self.best_success_score:
             self.best_success_score = score
-            self.model.save(
-                self.best_success_model_save_path / "best_success_model"
-            )
-        return (
-            self._update_early_stopping(success_rate)
-            if allow_early_stop
-            else True
-        )
+            self.model.save(self.best_success_model_save_path / "best_success_model")
+        return self._update_early_stopping(success_rate) if allow_early_stop else True
 
     def _update_early_stopping(self, success_rate: float) -> bool:
         """Return False when the configured global success criterion is met."""
@@ -528,8 +483,7 @@ class FixedSeedEvalCallback(BaseCallback):
             self.consecutive_successful_evaluations = 0
         if (
             self.num_timesteps >= self.early_stopping.min_steps
-            and self.consecutive_successful_evaluations
-            >= self.early_stopping.patience
+            and self.consecutive_successful_evaluations >= self.early_stopping.patience
         ):
             self.early_stopped = True
             self.stop_timestep = self.num_timesteps
@@ -540,9 +494,7 @@ class FixedSeedEvalCallback(BaseCallback):
     def _on_training_start(self) -> None:
         """Initialize the global schedule and optionally evaluate a fresh policy."""
         current = self.model.num_timesteps
-        self._next_evaluation_timestep = next_global_boundary(
-            current, self.eval_freq
-        )
+        self._next_evaluation_timestep = next_global_boundary(current, self.eval_freq)
         if self.evaluate_on_training_start:
             self.num_timesteps = current
             self._record_evaluation(allow_early_stop=False)
@@ -586,9 +538,7 @@ class GlobalCheckpointCallback(CheckpointCallback):
             and hasattr(self.model, "replay_buffer")
             and self.model.replay_buffer is not None
         ):
-            replay_path = self._checkpoint_path(
-                "replay_buffer_", extension="pkl"
-            )
+            replay_path = self._checkpoint_path("replay_buffer_", extension="pkl")
             self.model.save_replay_buffer(replay_path)
         self._next_checkpoint_timestep = next_global_boundary(
             self.num_timesteps, self.save_freq
@@ -598,18 +548,10 @@ class GlobalCheckpointCallback(CheckpointCallback):
 
 def _git_identity(path: Path) -> dict[str, str | None]:
     """Read local Git provenance without changing repository state."""
-    result: dict[str, str | None] = {"branch": None, "commit": None}
-    for key, args in (
-        ("branch", ("branch", "--show-current")),
-        ("commit", ("rev-parse", "HEAD")),
-    ):
-        try:
-            result[key] = subprocess.check_output(
-                ("git", "-C", str(path), *args), text=True, stderr=subprocess.DEVNULL
-            ).strip()
-        except (OSError, subprocess.CalledProcessError):
-            pass
-    return result
+    return {
+        "branch": git_output(path, "branch", "--show-current"),
+        "commit": git_output(path, "rev-parse", "HEAD"),
+    }
 
 
 def _runtime_provenance(backend: str) -> dict:
@@ -661,7 +603,9 @@ def replay_buffer_path(checkpoint_path: Path) -> Path:
     checkpoint_path = Path(checkpoint_path).expanduser().resolve()
     if checkpoint_path.suffix != ".zip":
         raise ValueError("Resume checkpoint must be an SB3 .zip model checkpoint.")
-    match = re.fullmatch(r"(?P<prefix>.+)_(?P<step>\d+)_steps\.zip", checkpoint_path.name)
+    match = re.fullmatch(
+        r"(?P<prefix>.+)_(?P<step>\d+)_steps\.zip", checkpoint_path.name
+    )
     if match is None:
         raise ValueError(
             "Resume checkpoint name must match '<prefix>_<step>_steps.zip' so "
@@ -714,9 +658,7 @@ def early_stopping_metadata(
             observed.trigger_success_rate if observed is not None else None
         ),
         "consecutive_success_count": (
-            observed.consecutive_successful_evaluations
-            if observed is not None
-            else 0
+            observed.consecutive_successful_evaluations if observed is not None else 0
         ),
     }
 
@@ -829,9 +771,14 @@ def main(argv=None) -> None:
         "effective_horizon": horizon_for_backend(config.environment.backend),
         "reward_function_version": config.environment.reward_function_version,
         "hammer_reward_variant": config.environment.hammer_reward_variant,
-        "hammer_nail_progress_weight": (
-            config.environment.hammer_nail_progress_weight
-        ),
+        "hammer_nail_progress_weight": (config.environment.hammer_nail_progress_weight),
+        "peg_unplug_reward_variant": config.environment.peg_unplug_reward_variant,
+        "peg_unplug_progress_weight": config.environment.peg_unplug_progress_weight,
+        "peg_unplug_progress_gamma": config.environment.peg_unplug_progress_gamma,
+        "cube_push_curriculum_level": config.environment.cube_push_curriculum_level,
+        "cube_push_initialization": config.environment.cube_push_initialization,
+        "cube_y_min": config.environment.cube_y_min,
+        "near_contact_gap_m": config.environment.near_contact_gap_m,
         "policy": "MlpPolicy",
         "resumed": resume_from is not None,
         "resume_checkpoint": str(resume_from.expanduser().resolve())
@@ -867,6 +814,13 @@ def main(argv=None) -> None:
             hammer_nail_progress_weight=(
                 config.environment.hammer_nail_progress_weight
             ),
+            peg_unplug_reward_variant=config.environment.peg_unplug_reward_variant,
+            peg_unplug_progress_weight=config.environment.peg_unplug_progress_weight,
+            peg_unplug_progress_gamma=config.environment.peg_unplug_progress_gamma,
+            cube_push_curriculum_level=config.environment.cube_push_curriculum_level,
+            cube_push_initialization=config.environment.cube_push_initialization,
+            cube_y_min=config.environment.cube_y_min,
+            near_contact_gap_m=config.environment.near_contact_gap_m,
         )
     )
     eval_env = Monitor(
@@ -881,6 +835,13 @@ def main(argv=None) -> None:
             hammer_nail_progress_weight=(
                 config.environment.hammer_nail_progress_weight
             ),
+            peg_unplug_reward_variant=config.environment.peg_unplug_reward_variant,
+            peg_unplug_progress_weight=config.environment.peg_unplug_progress_weight,
+            peg_unplug_progress_gamma=config.environment.peg_unplug_progress_gamma,
+            cube_push_curriculum_level=config.environment.cube_push_curriculum_level,
+            cube_push_initialization=config.environment.cube_push_initialization,
+            cube_y_min=config.environment.cube_y_min,
+            near_contact_gap_m=config.environment.near_contact_gap_m,
         )
     )
     evaluation_callback = FixedSeedEvalCallback(
@@ -949,9 +910,7 @@ def main(argv=None) -> None:
             "target_timesteps": config.sac.steps,
             "remaining_timesteps": training_timesteps,
             "resume_replay_buffer": str(replay_path) if replay_path else None,
-            "early_stopping": early_stopping_metadata(
-                config.sac.early_stopping
-            ),
+            "early_stopping": early_stopping_metadata(config.sac.early_stopping),
         }
     )
     (run_dir / "config.json").write_text(
@@ -980,16 +939,16 @@ def main(argv=None) -> None:
         print(f"Replay buffer transitions: {model.replay_buffer.size()}")
         model.save(run_dir / "final_model")
         print(f"Final model saved to: {run_dir / 'final_model.zip'}")
-        if isinstance(evaluation_callback.results, list) and evaluation_callback.results:
-            best_return_index = int(
-                np.argmax(np.mean(evaluation_callback.results, axis=1))
-            )
-            best_success_index = max(
-                range(len(evaluation_callback.results)),
-                key=lambda index: (
-                    np.mean(evaluation_callback.successes[index]),
-                    np.mean(evaluation_callback.results[index]),
-                ),
+        if (
+            isinstance(evaluation_callback.results, list)
+            and evaluation_callback.results
+        ):
+            mean_returns = np.mean(evaluation_callback.results, axis=1)
+            success_rates = np.mean(evaluation_callback.successes, axis=1)
+            return_index = best_return_index(mean_returns)
+            success_index = best_success_index(
+                success_rates,
+                mean_returns,
             )
 
             def qualification(index):
@@ -999,8 +958,7 @@ def main(argv=None) -> None:
                     return_std=float(evaluation_callback.return_stddevs[index]),
                     episodes=config.evaluation.episodes,
                     task_set_seed=config.evaluation.task_set_seed,
-                    evaluation_seed=config.runtime.seed
-                    + config.evaluation.seed_offset,
+                    evaluation_seed=config.runtime.seed + config.evaluation.seed_offset,
                     deterministic=True,
                     task_hashes=list(evaluation_callback.task_hashes),
                 )
@@ -1008,10 +966,10 @@ def main(argv=None) -> None:
             config_path = run_dir / "config.yaml"
             for checkpoint, index in (
                 (run_dir / "final_model.zip", -1),
-                (run_dir / "best_model" / "best_model.zip", best_return_index),
+                (run_dir / "best_model" / "best_model.zip", return_index),
                 (
                     run_dir / "best_success_model" / "best_success_model.zip",
-                    best_success_index,
+                    success_index,
                 ),
             ):
                 write_expert_manifest(

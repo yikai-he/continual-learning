@@ -5,13 +5,129 @@ from __future__ import annotations
 import sys
 from typing import TYPE_CHECKING, TextIO
 
+from src.continual.bc_policy import BC_CLAMP_EPSILON
 from src.continual.metrics import average_performance, forgetting
+from src.continual.replay_allocation import replay_counts
 
 if TYPE_CHECKING:
     from src.continual.evaluation import EvaluationMatrix
 
 
 MISSING = "—"
+
+
+def build_diffcrl_stage_report(
+    config,
+    context,
+    data,
+    diffusion_training,
+    policy_training,
+    artifacts,
+    *,
+    policy_after_state_sha256: str,
+    diffusion_sha256: str | None,
+    policy_sha256: str,
+    flow_matching_sha256: str | None = None,
+) -> dict[str, object]:
+    """Construct one DiffCRL stage report without side effects."""
+    normalizer = diffusion_training.normalizer
+    goal_normalizer = diffusion_training.goal_normalizer
+    return {
+        "stage": context.index,
+        "task": context.task.task_name,
+        "bc_normalization_mode": config.bc.normalization_mode,
+        "bc_loss": config.bc.loss,
+        "bc_clamp_epsilon": BC_CLAMP_EPSILON,
+        "diffusion_action_space": config.diffusion.action_space,
+        "diffusion_action_clamp_epsilon": config.diffusion.action_clamp_epsilon,
+        "generated_action_projection": config.diffusion.generated_action_projection,
+        "real_diffusion_encode_clip_fraction": data.real_encode_clip_fraction,
+        "sources": data.sources,
+        "splits": data.splits,
+        "diffusion_before_state_sha256": context.diffusion_before_hash,
+        "flow_matching_before_state_sha256": context.flow_matching_before_hash,
+        "policy_before_state_sha256": context.policy_before_hash,
+        "policy_after_state_sha256": policy_after_state_sha256,
+        "diffusion_checkpoint": str(artifacts.diffusion_path)
+        if artifacts.diffusion_path is not None
+        else None,
+        "diffusion_sha256": diffusion_sha256,
+        "flow_matching_checkpoint": str(artifacts.flow_matching_path)
+        if artifacts.flow_matching_path is not None
+        else None,
+        "flow_matching_sha256": flow_matching_sha256,
+        **(
+            {
+                "replay_budget": config.continual.replay_budget,
+                "replay_priority_strategy": config.continual.replay_priority_strategy,
+                "replay_allocation_mode": getattr(
+                    config.continual, "replay_allocation", "generator-default"
+                ),
+                "replay_allocation": {
+                    config.continual.tasks[task_id]: count
+                    for task_id, count in replay_counts(
+                        range(context.index),
+                        generator=(
+                            "diffusion"
+                            if config.continual.replay_mode == "real"
+                            else config.continual.replay_mode
+                        ),
+                        allocation=getattr(
+                            config.continual,
+                            "replay_allocation",
+                            "generator-default",
+                        ),
+                        trajectories_per_task=getattr(
+                            config.continual,
+                            "trajectories_per_task",
+                            context.trajectory_count,
+                        ),
+                        total_budget=(
+                            config.continual.replay_budget if context.index else 0
+                        ),
+                        strategy=config.continual.replay_priority_strategy,
+                    ).items()
+                },
+            }
+            if config.continual.replay_mode in ("flow-matching", "real")
+            or config.continual.replay_mode == "diffusion"
+            and getattr(config.continual, "replay_allocation", "generator-default")
+            == "fixed-total"
+            else {}
+        ),
+        "generator_mode": config.continual.replay_mode,
+        "generator_checkpoint": str(
+            artifacts.flow_matching_path or artifacts.diffusion_path
+        )
+        if artifacts.flow_matching_path is not None
+        or artifacts.diffusion_path is not None
+        else None,
+        "policy_checkpoint": str(artifacts.policy_path),
+        "policy_sha256": policy_sha256,
+        "normalization_mean": normalizer.mean.tolist(),
+        "normalization_scale": normalizer.scale.tolist(),
+        "goal_normalization_mean": goal_normalizer.mean.tolist()
+        if goal_normalizer is not None
+        else None,
+        "goal_normalization_scale": goal_normalizer.scale.tolist()
+        if goal_normalizer is not None
+        else None,
+        "diffusion_losses": diffusion_training.losses
+        if config.continual.replay_mode == "diffusion"
+        else None,
+        "flow_matching_losses": diffusion_training.losses
+        if config.continual.replay_mode == "flow-matching"
+        else None,
+        "bc_losses": policy_training.losses,
+        "generator_training_seconds": diffusion_training.training_seconds,
+        "nan_count": 0,
+        "inf_count": 0,
+        "generated_success": None,
+        "action_targets_modified": any(
+            source.get("clipped_component_fraction", 0) > 0
+            for source in data.sources.values()
+        ),
+    }
 
 
 def _percentage(value):

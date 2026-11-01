@@ -25,6 +25,13 @@ class EnvironmentConfig:
     reward_function_version: str = "v2"
     hammer_reward_variant: str = "original"
     hammer_nail_progress_weight: float = 0.0
+    peg_unplug_reward_variant: str = "original"
+    peg_unplug_progress_weight: float = 0.0
+    peg_unplug_progress_gamma: float = 0.99
+    cube_push_curriculum_level: int = 3
+    cube_push_initialization: str = "default"
+    cube_y_min: float = 0.490
+    near_contact_gap_m: float = 0.005
 
 
 @dataclass(frozen=True)
@@ -83,6 +90,26 @@ class DiffusionConfig:
 
 
 @dataclass(frozen=True)
+class FlowMatchingConfig:
+    """Flow Matching training, temporal-network, and fixed-step ODE settings."""
+
+    epochs: int = 300
+    batch_size: int = 8
+    learning_rate: float = 0.001
+    width: int = 64
+    residual_blocks: int = 6
+    time_embedding: str = "sinusoidal"
+    time_embedding_scale: float = 100.0
+    integration_steps: int = 100
+    gradient_clip_norm: float = 1.0
+    validation_samples: int = 4
+    checkpoint_selection: str = "validation-loss"
+    probability_path: str = "linear"
+    source_distribution: str = "standard-normal"
+    ode_solver: str = "euler"
+
+
+@dataclass(frozen=True)
 class DiffusionModelConfig:
     """Existing serialized model dimensions and action-coordinate contract."""
 
@@ -97,9 +124,9 @@ class DiffusionModelConfig:
 
 def _default_experts():
     return {
-        "reach-v3": "runs/reward_v2/reach-v3/seed_0/final_model.zip",
-        "push-v3": "runs/reward_v2/push-v3/seed_0/final_model.zip",
-        "hammer-v3": "runs/reward_v2/hammer-v3/seed_0/final_model.zip",
+        "reach-v3": "runs/experts/metaworld-v3/reach-v3/policy.zip",
+        "button-press-v3": "runs/experts/metaworld-v3/button-press-v3/policy.zip",
+        "hammer-v3": "runs/experts/metaworld-v3/hammer-v3/policy.zip",
     }
 
 
@@ -108,11 +135,20 @@ class ContinualConfig:
     """Ordered curriculum, expert sources, stage budget, and replay behavior."""
 
     tasks: List[str] = field(
-        default_factory=lambda: ["reach-v3", "push-v3", "hammer-v3"]
+        default_factory=lambda: ["reach-v3", "button-press-v3", "hammer-v3"]
     )
     experts: Dict[str, str] = field(default_factory=_default_experts)
     trajectories_per_task: int = 200
     replay_mode: str = "diffusion"  # Old-task generation or current-task-only BC.
+    # ``generator-default`` preserves legacy behavior: DDPM uses a per-task
+    # count while Flow Matching uses one fixed total.  New matched experiments
+    # select ``fixed-total`` explicitly for either generator.
+    replay_allocation: str = "generator-default"
+    replay_budget: int = 200
+    replay_priority_strategy: str = "uniform"
+    # Opt-in comparison protocol: historical groups are used only for training,
+    # leaving the current task's real holdout as the common validation set.
+    historical_replay_training_only: bool = False
     steps_per_task: int = 1_000_000
     # Update-free random-action steps after each sequential-SAC task switch.
     boundary_warmup_steps: int = 10_000
@@ -150,6 +186,7 @@ class ExperimentConfig:
     sac: SACConfig = field(default_factory=SACConfig)
     bc: BCConfig = field(default_factory=BCConfig)
     diffusion: DiffusionConfig = field(default_factory=DiffusionConfig)
+    flow_matching: FlowMatchingConfig = field(default_factory=FlowMatchingConfig)
     continual: ContinualConfig = field(default_factory=ContinualConfig)
     evaluation: EvaluationConfig = field(default_factory=EvaluationConfig)
     runtime: RuntimeConfig = field(default_factory=RuntimeConfig)
@@ -177,6 +214,13 @@ _EXPERIMENT_FIELDS = {
             "reward_function_version",
             "hammer_reward_variant",
             "hammer_nail_progress_weight",
+            "peg_unplug_reward_variant",
+            "peg_unplug_progress_weight",
+            "peg_unplug_progress_gamma",
+            "cube_push_curriculum_level",
+            "cube_push_initialization",
+            "cube_y_min",
+            "near_contact_gap_m",
         ),
         "sac": ("steps", *_COMMON_SAC_FIELDS, "checkpoint_freq", "early_stopping"),
         "continual": ("tasks",),
@@ -202,10 +246,18 @@ _EXPERIMENT_FIELDS = {
             "reward_function_version",
             "hammer_reward_variant",
             "hammer_nail_progress_weight",
+            "peg_unplug_reward_variant",
+            "peg_unplug_progress_weight",
+            "peg_unplug_progress_gamma",
         ),
         "bc": tuple(BCConfig.__annotations__),
         "diffusion": tuple(DiffusionConfig.__annotations__),
-        "continual": ("tasks", "experts", "trajectories_per_task", "replay_mode"),
+        "flow_matching": tuple(FlowMatchingConfig.__annotations__),
+        "continual": (
+            "tasks", "experts", "trajectories_per_task", "replay_mode",
+            "replay_allocation", "replay_budget", "replay_priority_strategy",
+            "historical_replay_training_only",
+        ),
         "evaluation": _CONTINUAL_EVALUATION_FIELDS,
         "runtime": _RUNTIME_FIELDS,
     },
@@ -262,10 +314,31 @@ def config_to_dict(config: ExperimentConfig) -> dict:
     values = asdict(config)
     projected = {"experiment": config.experiment}
     for section, fields in _EXPERIMENT_FIELDS[config.experiment].items():
+        # Preserve the exact historical serialization and resume identity of
+        # diffusion and no-replay runs. Flow settings are scientific inputs only
+        # when Flow Matching is the selected replay method.
+        if section == "flow_matching" and config.continual.replay_mode != "flow-matching":
+            continue
         projected[section] = {
             name: values[section][name]
             for name in fields
             if name != "run_dir" or values[section][name] is not None
+            if not (
+                section == "continual"
+                and (
+                    name == "historical_replay_training_only"
+                    and not config.continual.historical_replay_training_only
+                    or
+                    name == "replay_allocation"
+                    and config.continual.replay_allocation == "generator-default"
+                    or name in ("replay_budget", "replay_priority_strategy")
+                    and (
+                        config.continual.replay_mode == "none"
+                        or config.continual.replay_mode == "diffusion"
+                        and config.continual.replay_allocation == "generator-default"
+                    )
+                )
+            )
         }
     return projected
 
@@ -351,6 +424,23 @@ def config_from_dict(
         raise ValueError("Missing required field: experiment.")
     default = default_config(values["experiment"])
     _check_experiment_fields(values, default.experiment)
+    if "flow_matching" in values and (
+        default.experiment != "diffcrl"
+        or values.get("continual", {}).get("replay_mode", "diffusion")
+        != "flow-matching"
+    ):
+        raise ValueError(
+            "Config section flow_matching requires continual.replay_mode: flow-matching."
+        )
+    continual_values = values.get("continual", {})
+    if (
+        isinstance(continual_values, dict)
+        and {"replay_allocation", "replay_budget", "replay_priority_strategy"} & set(continual_values)
+        and continual_values.get("replay_mode", "diffusion") == "none"
+    ):
+        raise ValueError(
+            "Replay allocation settings require a generative replay mode or real replay mode."
+        )
     config = _merge(default, values)
     if expected_experiment is not None and config.experiment != expected_experiment:
         raise ValueError(
@@ -388,6 +478,14 @@ def validate_config(config: ExperimentConfig) -> None:
         ),
         "bc": ("epochs", "batch_size", "learning_rate"),
         "diffusion": ("epochs", "batch_size", "learning_rate"),
+        "flow_matching": (
+            "epochs",
+            "batch_size",
+            "learning_rate",
+            "residual_blocks",
+            "integration_steps",
+            "validation_samples",
+        ),
         "continual": ("steps_per_task",),
         "evaluation": ("episodes", "frequency"),
     }.items():
@@ -425,17 +523,36 @@ def validate_config(config: ExperimentConfig) -> None:
         )
     if not config.sac.net_arch or any(n < 1 for n in config.sac.net_arch):
         raise ValueError("sac.net_arch must contain positive widths.")
-    if len(config.bc.hidden_sizes) != 2 or any(n < 1 for n in config.bc.hidden_sizes):
-        raise ValueError("bc.hidden_sizes must contain two positive widths.")
+    if not config.bc.hidden_sizes or any(
+        isinstance(n, bool) or not isinstance(n, int) or n < 1
+        for n in config.bc.hidden_sizes
+    ):
+        raise ValueError(
+            "bc.hidden_sizes must contain one or more positive integer widths."
+        )
     for path, allowed in {
         "environment.backend": ("metaworld-v3", "kuka-v2", "kuka-v3"),
-        "environment.reward_function_version": ("v1", "v2", "v3", "v3_1"),
+        "environment.reward_function_version": (
+                "v1", "v2", "v3", "v3_1", "v3_2_retention",
+                "v3_3_contact_push_progress",
+                "v4_simple_approach_progress",
+                "v5_contact_start_progress",
+                "v6_rear_contact_push_progress",
+                "v1_initial_to_contact",
+                "v1_1_initial_to_contact_aperture",
+                "sawyer_push_v2_adapted",
+        ),
         "environment.hammer_reward_variant": ("original", "nail_progress"),
+        "environment.peg_unplug_reward_variant": (
+            "original",
+            "peg_unplug_progress_v1",
+        ),
+        "environment.cube_push_initialization": ("default", "contact", "near_contact"),
         "bc.normalization_mode": ("layer-norm",),
         "bc.loss": ("post-tanh-mse", "pre-tanh-mse"),
         "diffusion.action_space": ("raw", "pre-tanh"),
         "diffusion.generated_action_projection": ("none", "clip"),
-        "continual.replay_mode": ("diffusion", "none"),
+        "continual.replay_mode": ("diffusion", "flow-matching", "real", "none"),
         "evaluation.mode": ("fixed-tasks", "sampled"),
     }.items():
         section, name = path.split(".")
@@ -443,6 +560,16 @@ def validate_config(config: ExperimentConfig) -> None:
             raise ValueError(f"{path} must be one of {allowed}.")
     if config.environment.hammer_nail_progress_weight < 0:
         raise ValueError("environment.hammer_nail_progress_weight must be nonnegative.")
+    if config.environment.peg_unplug_progress_weight < 0:
+        raise ValueError("environment.peg_unplug_progress_weight must be nonnegative.")
+    if not 0 < config.environment.peg_unplug_progress_gamma <= 1:
+        raise ValueError("environment.peg_unplug_progress_gamma must be in (0, 1].")
+    if config.environment.cube_push_curriculum_level not in (1, 2, 3):
+        raise ValueError("environment.cube_push_curriculum_level must be 1, 2, or 3.")
+    if not math.isfinite(config.environment.cube_y_min) or not 0.484 <= config.environment.cube_y_min <= 0.55:
+        raise ValueError("environment.cube_y_min must be in [0.484, 0.55].")
+    if not math.isfinite(config.environment.near_contact_gap_m) or config.environment.near_contact_gap_m <= 0:
+        raise ValueError("environment.near_contact_gap_m must be positive and finite.")
     if (
         config.diffusion.steps < 2
         or config.diffusion.width < 4
@@ -453,10 +580,42 @@ def validate_config(config: ExperimentConfig) -> None:
         )
     if not 0 < config.diffusion.action_clamp_epsilon < 1:
         raise ValueError("diffusion.action_clamp_epsilon must be in (0, 1).")
+    flow = config.flow_matching
+    if flow.width < 4 or flow.width % 4:
+        raise ValueError("flow_matching.width must be a positive multiple of 4.")
+    if not math.isfinite(flow.time_embedding_scale) or flow.time_embedding_scale <= 0:
+        raise ValueError("flow_matching.time_embedding_scale must be positive and finite.")
+    if not math.isfinite(flow.gradient_clip_norm) or flow.gradient_clip_norm <= 0:
+        raise ValueError("flow_matching.gradient_clip_norm must be positive and finite.")
+    for name, actual, supported in (
+        ("residual_blocks", flow.residual_blocks, 6),
+        ("validation_samples", flow.validation_samples, 4),
+        ("time_embedding", flow.time_embedding, "sinusoidal"),
+        ("checkpoint_selection", flow.checkpoint_selection, "validation-loss"),
+        ("probability_path", flow.probability_path, "linear"),
+        ("source_distribution", flow.source_distribution, "standard-normal"),
+        ("ode_solver", flow.ode_solver, "euler"),
+    ):
+        if actual != supported:
+            raise ValueError(
+                f"flow_matching.{name} must be {supported!r} in the Phase 1 implementation."
+            )
+    if flow.gradient_clip_norm != 1.0:
+        raise ValueError(
+            "flow_matching.gradient_clip_norm must be 1.0 in the Phase 1 implementation."
+        )
     if config.continual.trajectories_per_task < 2:
         raise ValueError(
             "continual.trajectories_per_task must be >=2 for a disjoint holdout."
         )
+    if isinstance(config.continual.replay_budget, bool) or config.continual.replay_budget < 0:
+        raise ValueError("continual.replay_budget must be a nonnegative integer.")
+    if config.continual.replay_allocation not in ("generator-default", "fixed-total"):
+        raise ValueError(
+            "continual.replay_allocation must be 'generator-default' or 'fixed-total'."
+        )
+    if config.continual.replay_priority_strategy != "uniform":
+        raise ValueError("continual.replay_priority_strategy must be 'uniform'.")
     tasks = config.continual.tasks
     if not tasks or len(set(tasks)) != len(tasks):
         raise ValueError("continual.tasks must be a nonempty list of unique task names.")
@@ -483,8 +642,11 @@ def validate_config(config: ExperimentConfig) -> None:
     kuka_v3_tasks = {
         "kuka-reach-v3",
         "kuka-push-v3",
+        "kuka-push-cube-v3",
         "kuka-handle-press-side-v3",
         "kuka-button-press-v3",
+        "kuka-button-press-topdown-v3",
+        "kuka-peg-unplug-side-v3",
         "kuka-hammer-v3",
         "kuka-drawer-close-v3",
         "kuka-faucet-open-v3",
@@ -510,6 +672,92 @@ def validate_config(config: ExperimentConfig) -> None:
         raise ValueError("The kuka-v3 backend is implemented only for sac and diffcrl.")
     if config.experiment == "sac" and len(tasks) != 1:
         raise ValueError("continual.tasks must contain exactly one task for sac.")
+    if config.environment.cube_push_curriculum_level != 3 and not (
+        config.environment.backend == "kuka-v3"
+        and config.experiment == "sac"
+        and tasks == ["kuka-push-cube-v3"]
+    ):
+        raise ValueError(
+            "Cube Push curriculum levels 1 and 2 require single-task KUKA-v3 SAC "
+            "on kuka-push-cube-v3."
+        )
+    if config.environment.cube_push_initialization in ("contact", "near_contact") and not (
+        config.environment.backend == "kuka-v3"
+        and config.experiment == "sac"
+        and config.environment.cube_push_curriculum_level == 2
+        and tasks == ["kuka-push-cube-v3"]
+    ):
+        raise ValueError(
+            "Contact initializations require Level 2 single-task KUKA-v3 Cube Push SAC."
+        )
+    if config.environment.reward_function_version == "v3_3_contact_push_progress":
+        if not (
+            config.environment.backend == "kuka-v3"
+            and config.experiment == "sac"
+            and tasks == ["kuka-push-cube-v3"]
+        ):
+            raise ValueError(
+                "v3_3_contact_push_progress is supported only for single-task "
+                "KUKA-v3 SAC on kuka-push-cube-v3."
+            )
+    if config.environment.reward_function_version == "v4_simple_approach_progress":
+        if not (
+            config.environment.backend == "kuka-v3"
+            and config.experiment == "sac"
+            and tasks == ["kuka-push-cube-v3"]
+        ):
+            raise ValueError(
+                "v4_simple_approach_progress is supported only for single-task "
+                "KUKA-v3 SAC on kuka-push-cube-v3."
+            )
+    if config.environment.reward_function_version == "v5_contact_start_progress":
+        if not (
+            config.environment.backend == "kuka-v3"
+            and config.experiment == "sac"
+            and tasks == ["kuka-push-cube-v3"]
+        ):
+            raise ValueError(
+                "v5_contact_start_progress is supported only for single-task "
+                "KUKA-v3 SAC on kuka-push-cube-v3."
+            )
+    if config.environment.reward_function_version == "v6_rear_contact_push_progress":
+        if not (
+            config.environment.backend == "kuka-v3"
+            and config.experiment == "sac"
+            and tasks == ["kuka-push-cube-v3"]
+        ):
+            raise ValueError(
+                "v6_rear_contact_push_progress is supported only for single-task "
+                "KUKA-v3 SAC on kuka-push-cube-v3."
+            )
+    if config.environment.reward_function_version in (
+        "v1_initial_to_contact", "v1_1_initial_to_contact_aperture"
+    ):
+        reward_version = config.environment.reward_function_version
+        if config.continual.tasks != ["kuka-push-cube-v3"]:
+            raise ValueError(
+                f"{reward_version} is supported only for single-task "
+                "kuka-push-cube-v3"
+            )
+        if (
+            config.environment.backend != "kuka-v3"
+            or config.environment.cube_push_curriculum_level != 2
+            or config.environment.cube_push_initialization != "default"
+        ):
+            raise ValueError(
+                f"{reward_version} requires kuka-v3, curriculum level 2, "
+                "and default initialization"
+            )
+    if config.environment.reward_function_version == "sawyer_push_v2_adapted":
+        if not (
+            config.environment.backend == "kuka-v3"
+            and config.experiment == "sac"
+            and tasks == ["kuka-push-cube-v3"]
+        ):
+            raise ValueError(
+                "sawyer_push_v2_adapted is supported only for single-task "
+                "KUKA-v3 SAC on kuka-push-cube-v3."
+            )
     if config.environment.backend == "kuka-v2" and config.evaluation.mode != "sampled":
         raise ValueError(
             f"evaluation.mode must be sampled for the {config.environment.backend} backend."
@@ -536,8 +784,52 @@ def validate_config(config: ExperimentConfig) -> None:
         and config.environment.hammer_nail_progress_weight <= 0
     ):
         raise ValueError("The nail_progress Hammer reward requires a positive weight.")
+    peg_options_active = (
+        config.environment.peg_unplug_reward_variant != "original"
+        or config.environment.peg_unplug_progress_weight != 0
+    )
+    peg_scope_valid = config.environment.backend == "kuka-v3" and (
+        (config.experiment == "sac" and tasks == ["kuka-peg-unplug-side-v3"])
+        or config.experiment == "diffcrl"
+    )
+    if peg_options_active and not peg_scope_valid:
+        raise ValueError(
+            "Peg Unplug reward options require KUKA-v3 Peg Unplug SAC or "
+            "KUKA-v3 DiffCRL."
+        )
+    if (
+        config.environment.peg_unplug_reward_variant == "original"
+        and config.environment.peg_unplug_progress_weight != 0
+    ):
+        raise ValueError("The original Peg Unplug reward requires zero progress weight.")
+    if (
+        config.environment.peg_unplug_reward_variant == "peg_unplug_progress_v1"
+        and config.environment.peg_unplug_progress_weight <= 0
+    ):
+        raise ValueError(
+            "The peg_unplug_progress_v1 reward requires a positive weight."
+        )
+    if peg_options_active and not math.isclose(
+        config.environment.peg_unplug_progress_gamma, config.sac.gamma
+    ):
+        raise ValueError(
+            "Peg Unplug progress gamma must match the SAC discount factor."
+        )
     if config.experiment == "continual_sac" and config.continual.replay_mode != "none":
         raise ValueError("continual.replay_mode must be none for continual_sac.")
+    if config.continual.replay_mode == "none" and (
+        config.continual.replay_allocation != "generator-default"
+        or config.continual.replay_budget != 200
+        or config.continual.replay_priority_strategy != "uniform"
+    ):
+        raise ValueError(
+            "Replay allocation settings require a generative replay mode or real replay mode."
+        )
+    if (
+        config.continual.historical_replay_training_only
+        and config.continual.replay_mode == "none"
+    ):
+        raise ValueError("historical_replay_training_only requires replay.")
     if config.evaluation.mode == "fixed-tasks" and config.evaluation.episodes > 50:
         raise ValueError("evaluation.episodes cannot exceed 50 in fixed-tasks mode.")
     if config.experiment == "diffcrl":

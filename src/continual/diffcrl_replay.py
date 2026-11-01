@@ -2,33 +2,34 @@
 
 from __future__ import annotations
 
+from collections.abc import Callable
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Callable, Dict
 
-import numpy as np
 import torch
-from tqdm.auto import tqdm
-
 from src.envs import (
     CURRENT_STATE_SLICE,
     GOAL_SLICE,
     PREVIOUS_STATE_SLICE,
 )
 from src.support.reproducibility import file_hash, state_hash
+from tqdm.auto import tqdm
 
-from .diagnostics import generated_action_diagnostics
 from .diffusion_data import (
-    DIFFUSION_ACTION_SLICE,
     PHYSICAL_ACTION_SLICE,
-    decode_trajectory,
-    project_actions,
-    transform_actions,
+    validate_stage_trajectory_group,
+)
+from .replay_common import (
+    decode_generated_replay,
+    normalize_replay_goals,
+    prepare_replay_task,
+    training_configuration_hashes,
+    valid_replay_counts,
 )
 from .task_bank import reconstruct_goals, sample_training_configurations
 from .trajectory_diffusion import TrajectoryDiffusion
 
-ReplaySource = Dict[str, object]
+ReplaySource = dict[str, object]
 ProgressMessage = Callable[..., None]
 
 
@@ -54,8 +55,10 @@ class ReplayRequest:
     action_projection: str
     bc_clamp_epsilon: float
     progress: bool
+    trajectory_counts: dict[int, int] | None = None
     hammer_reward_variant: str = "original"
     hammer_nail_progress_weight: float = 0.0
+    execution_mode: str = "legacy"
 
 
 @dataclass
@@ -73,8 +76,11 @@ def generate_previous_task_replay(
 ) -> ReplayResult:
     """Reconstruct old training goals and decode sampled 22D dynamics to 43D replay.
 
-    Each prior task receives ``trajectory_count`` full-horizon physical trajectories.
+    ``trajectory_counts`` selects shared fixed-total allocation when present;
+    otherwise each prior task receives legacy ``trajectory_count`` replay.
     """
+    if request.execution_mode not in ("legacy", "device-native"):
+        raise ValueError("Invalid DDPM replay execution mode.")
     old, old_norm, old_goal_norm, old_meta = TrajectoryDiffusion.load(
         request.checkpoint,
         expected_action_space=request.action_space,
@@ -88,63 +94,55 @@ def generate_previous_task_replay(
 
     groups: dict[int, torch.Tensor] = {}
     sources: dict[str, ReplaySource] = {}
+    counts = request.trajectory_counts or {
+        index: request.trajectory_count for index in range(request.stage)
+    }
+    if not valid_replay_counts(counts, request.stage):
+        raise ValueError("Invalid DDPM replay trajectory allocation.")
     for old_index in range(request.stage):
+        trajectory_count = counts[old_index]
+        if trajectory_count == 0:
+            continue
         name = request.task_names[old_index]
         if progress_message is not None:
             progress_message(
                 "Generating replay",
                 Task=name,
-                Trajectories=request.trajectory_count,
+                Trajectories=trajectory_count,
             )
-        seed = request.runtime_seed + 100000 + request.stage * 1000 + old_index
-        labels = torch.full((request.trajectory_count,), old_index, dtype=torch.long)
-        source = old_meta["training_banks"][name]
-        selected = sample_training_configurations(
-            source,
-            old_meta["train_configurations"][name]["indices"],
-            request.trajectory_count,
-            seed,
-        )
-        environment_kwargs = {
-            "backend": request.backend,
-            "reward_function_version": request.reward_function_version,
-        }
-        if request.backend == "kuka-v3":
-            environment_kwargs.update(
-                hammer_reward_variant=request.hammer_reward_variant,
-                hammer_nail_progress_weight=request.hammer_nail_progress_weight,
-            )
-        goals = torch.as_tensor(
-            reconstruct_goals(source, selected, **environment_kwargs),
-            dtype=torch.float32,
+        task = prepare_replay_task(
+            request,
+            old_meta,
+            old_index,
+            trajectory_count,
+            sample_configurations=sample_training_configurations,
+            reconstruct=reconstruct_goals,
         )
         with tqdm(
-            total=request.trajectory_count,
+            total=trajectory_count,
             desc=f"Replay: {name}",
             unit="trajectory",
             disable=not request.progress,
         ) as replay_progress:
             sampled = old_norm.denormalize(
                 old.sample(
-                    request.trajectory_count,
-                    seed=seed,
-                    task_ids=labels,
-                    goals=old_goal_norm.normalize(goals[:, None, :])[:, 0],
+                    trajectory_count,
+                    seed=task.seed,
+                    task_ids=task.labels,
+                    goals=normalize_replay_goals(task, old_goal_norm),
+                    execution_mode=request.execution_mode,
                 )
             )
-            replay_progress.update(request.trajectory_count)
+            replay_progress.update(trajectory_count)
 
-        sampled_actions = sampled[..., DIFFUSION_ACTION_SLICE]
-        latent_cap = float(np.arctanh(1 - request.bc_clamp_epsilon))
-        latent_cap_fraction = (
-            float((sampled_actions.abs() > latent_cap).float().mean())
-            if request.action_space == "pre-tanh"
-            else None
+        replay = decode_generated_replay(
+            sampled,
+            task.goals,
+            action_space=request.action_space,
+            action_projection=request.action_projection,
+            bc_clamp_epsilon=request.bc_clamp_epsilon,
         )
-        decoded_dynamic = transform_actions(sampled, request.action_space, decode=True)
-        decoded = decode_trajectory(decoded_dynamic, goals)
-        projected_dynamic = project_actions(decoded_dynamic, request.action_projection)
-        projected = decode_trajectory(projected_dynamic, goals)
+        projected = replay.projected
         assert torch.equal(
             projected[..., PREVIOUS_STATE_SLICE],
             torch.cat(
@@ -157,32 +155,35 @@ def generate_previous_task_replay(
         )
         assert torch.equal(
             projected[..., GOAL_SLICE],
-            goals[:, None].expand(-1, request.horizon, -1),
+            task.goals[:, None].expand(-1, request.horizon, -1),
         )
         if projected.shape[1] != request.horizon:
             raise ValueError("Replay checkpoint horizon differs from selected backend.")
-        groups[old_index] = projected
-        action_diagnostics = generated_action_diagnostics(
-            decoded, projected, request.action_projection
-        )
         if request.action_space == "pre-tanh" and torch.any(
-            groups[old_index][..., PHYSICAL_ACTION_SLICE].abs() > 1
+            projected[..., PHYSICAL_ACTION_SLICE].abs() > 1
         ):
             raise ValueError("Decoded replay actions exceed environment bounds.")
         sources[name] = {
             "kind": "generated",
             "checkpoint": str(request.checkpoint),
             "checkpoint_sha256": file_hash(request.checkpoint),
-            "sampling_seed": seed,
+            "sampling_seed": task.seed,
             "condition": old_index,
+            "trajectory_count": trajectory_count,
             "success": None,
             "return": None,
-            "generated_latent_abs_gt_bc_cap_fraction": latent_cap_fraction,
-            **action_diagnostics,
+            "generated_latent_abs_gt_bc_cap_fraction": replay.latent_cap_fraction,
+            **replay.action_diagnostics,
         }
-        sources[name]["training_configuration_indices"] = selected
-        sources[name]["training_configuration_hashes"] = [
-            source["ordered_task_hashes"][i] for i in selected
-        ]
+        sources[name]["training_configuration_indices"] = (
+            task.selected_configuration_indices
+        )
+        sources[name]["training_configuration_hashes"] = training_configuration_hashes(
+            task
+        )
+        validate_stage_trajectory_group(
+            projected, stage=request.stage, task=name, source=sources[name]
+        )
+        groups[old_index] = projected
     del old
     return ReplayResult(groups=groups, sources=sources)

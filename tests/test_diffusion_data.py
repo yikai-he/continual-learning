@@ -1,13 +1,18 @@
 """Scientific contracts for physical and structured trajectory representations."""
 
+import random
 import unittest
 
+import numpy as np
 import torch
 
 from src.continual.diffusion_data import (
     decode_trajectory,
     encode_trajectory,
+    generated_action_diagnostics,
+    normalize_generator_data,
     project_actions,
+    prepare_generator_data,
     transform_actions,
     validate_stage_trajectory_group,
 )
@@ -23,6 +28,119 @@ def valid_batch():
 
 
 class StructuredTrajectoryTests(unittest.TestCase):
+    def test_generator_preparation_matches_exact_operations_without_rng_use(self):
+        observations, actions = valid_batch()
+        physical = torch.cat((observations, actions), dim=-1)
+        train, validation = physical[:1], physical[1:]
+        train_dynamic, train_goals = encode_trajectory(
+            train[..., :39], train[..., 39:]
+        )
+        validation_dynamic, validation_goals = encode_trajectory(
+            validation[..., :39], validation[..., 39:]
+        )
+        transformed_train = transform_actions(train_dynamic, "pre-tanh", 1e-4)
+        transformed_validation = transform_actions(
+            validation_dynamic, "pre-tanh", 1e-4
+        )
+        from src.continual.generator_normalization import FeatureNormalizer
+
+        expected_goal_normalizer = FeatureNormalizer.fit(train_goals[:, None, :])
+        expected_normalizer = FeatureNormalizer.fit(transformed_train)
+        random.seed(61)
+        np.random.seed(67)
+        torch.manual_seed(71)
+        python_rng = random.getstate()
+        numpy_rng = np.random.get_state()
+        torch_rng = torch.get_rng_state().clone()
+
+        result = prepare_generator_data(
+            train,
+            validation,
+            action_space="pre-tanh",
+            action_clamp_epsilon=1e-4,
+        )
+
+        torch.testing.assert_close(
+            result.normalizer.mean, expected_normalizer.mean, rtol=0, atol=0
+        )
+        torch.testing.assert_close(
+            result.normalizer.scale, expected_normalizer.scale, rtol=0, atol=0
+        )
+        torch.testing.assert_close(
+            result.goal_normalizer.mean,
+            expected_goal_normalizer.mean,
+            rtol=0,
+            atol=0,
+        )
+        torch.testing.assert_close(
+            result.goal_normalizer.scale,
+            expected_goal_normalizer.scale,
+            rtol=0,
+            atol=0,
+        )
+        torch.testing.assert_close(
+            result.train,
+            transformed_train,
+            rtol=0,
+            atol=0,
+        )
+        torch.testing.assert_close(
+            result.validation,
+            transformed_validation,
+            rtol=0,
+            atol=0,
+        )
+        torch.testing.assert_close(
+            result.train_goals,
+            train_goals,
+            rtol=0,
+            atol=0,
+        )
+        torch.testing.assert_close(
+            result.validation_goals,
+            validation_goals,
+            rtol=0,
+            atol=0,
+        )
+        self.assertEqual(random.getstate(), python_rng)
+        numpy_after = np.random.get_state()
+        self.assertEqual(numpy_after[0], numpy_rng[0])
+        np.testing.assert_array_equal(numpy_after[1], numpy_rng[1])
+        self.assertEqual(numpy_after[2:], numpy_rng[2:])
+        torch.testing.assert_close(torch.get_rng_state(), torch_rng, rtol=0, atol=0)
+
+        normalized = normalize_generator_data(result)
+        torch.testing.assert_close(
+            normalized.train,
+            expected_normalizer.normalize(transformed_train),
+            rtol=0,
+            atol=0,
+        )
+        torch.testing.assert_close(
+            normalized.validation,
+            expected_normalizer.normalize(transformed_validation),
+            rtol=0,
+            atol=0,
+        )
+        torch.testing.assert_close(
+            normalized.train_goals,
+            expected_goal_normalizer.normalize(train_goals[:, None, :])[:, 0],
+            rtol=0,
+            atol=0,
+        )
+        torch.testing.assert_close(
+            normalized.validation_goals,
+            expected_goal_normalizer.normalize(validation_goals[:, None, :])[:, 0],
+            rtol=0,
+            atol=0,
+        )
+        self.assertEqual(random.getstate(), python_rng)
+        numpy_after = np.random.get_state()
+        self.assertEqual(numpy_after[0], numpy_rng[0])
+        np.testing.assert_array_equal(numpy_after[1], numpy_rng[1])
+        self.assertEqual(numpy_after[2:], numpy_rng[2:])
+        torch.testing.assert_close(torch.get_rng_state(), torch_rng, rtol=0, atol=0)
+
     def test_encode_decode_round_trip(self):
         observations, actions = valid_batch()
 
@@ -90,6 +208,30 @@ class StructuredTrajectoryTests(unittest.TestCase):
                     task="kuka-faucet-close-v3",
                     source=source,
                 )
+
+    def test_generated_action_diagnostics_preserve_existing_contract(self):
+        observations, actions = valid_batch()
+        before = torch.cat((observations, 2 * torch.ones_like(actions)), dim=-1)
+        after = before.clone()
+        after[..., -4:] = after[..., -4:].clamp(-1, 1)
+
+        result = generated_action_diagnostics(before, after, "clip")
+
+        self.assertEqual(result["generated_action_projection"], "clip")
+        self.assertEqual(result["pre_projection_oob_component_fraction"], 1.0)
+        self.assertEqual(result["post_projection_oob_component_fraction"], 0.0)
+        self.assertEqual(result["clipped_component_fraction"], 1.0)
+
+        changed_observation = after.clone()
+        changed_observation[..., 0] += 1
+        with self.assertRaisesRegex(ValueError, "changed replay shape or observations"):
+            generated_action_diagnostics(before, changed_observation, "clip")
+
+        from src.continual.diagnostics import (
+            generated_action_diagnostics as compatibility_export,
+        )
+
+        self.assertIs(compatibility_export, generated_action_diagnostics)
 
 
 if __name__ == "__main__":

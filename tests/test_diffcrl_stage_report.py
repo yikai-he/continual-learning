@@ -2,12 +2,14 @@
 
 import copy
 import json
+import random
 import tempfile
 import unittest
 from pathlib import Path
 from types import SimpleNamespace
 from unittest.mock import patch
 
+import numpy as np
 import torch
 
 from src.continual.diffcrl import (
@@ -19,6 +21,7 @@ from src.continual.diffcrl import (
     StageData,
     _build_stage_report,
 )
+from src.continual.reporting import build_diffcrl_stage_report
 from src.continual.evaluation import EvaluationMatrix
 from src.continual.task_sequence import TaskSequence
 from src.continual.trajectory_diffusion import FeatureNormalizer
@@ -28,6 +31,11 @@ from src.support.reproducibility import file_hash
 def report_inputs(directory: Path):
     config = SimpleNamespace(
         bc=SimpleNamespace(normalization_mode="bounds", loss="mse"),
+        continual=SimpleNamespace(
+            replay_mode="diffusion",
+            replay_budget=200,
+            replay_priority_strategy="uniform",
+        ),
         diffusion=SimpleNamespace(
             action_space="normalized",
             action_clamp_epsilon=1e-4,
@@ -113,10 +121,15 @@ def expected_report(directory: Path):
             }
         },
         "diffusion_before_state_sha256": "diffusion-before",
+        "flow_matching_before_state_sha256": None,
         "policy_before_state_sha256": "policy-before",
         "policy_after_state_sha256": "policy-after",
         "diffusion_checkpoint": str(directory / "diffusion.pt"),
         "diffusion_sha256": "diffusion-hash",
+        "flow_matching_checkpoint": None,
+        "flow_matching_sha256": None,
+        "generator_mode": "diffusion",
+        "generator_checkpoint": str(directory / "diffusion.pt"),
         "policy_checkpoint": str(directory / "policy.pt"),
         "policy_sha256": "policy-hash",
         "normalization_mean": [1.0, 2.0],
@@ -124,7 +137,9 @@ def expected_report(directory: Path):
         "goal_normalization_mean": [5.0],
         "goal_normalization_scale": [6.0],
         "diffusion_losses": {"train": [1.25], "validation": [2.5]},
+        "flow_matching_losses": None,
         "bc_losses": {"train": [3.75], "validation": [4.5], "best_epoch": 0},
+        "generator_training_seconds": 0.0,
         "nan_count": 0,
         "inf_count": 0,
         "generated_success": None,
@@ -133,6 +148,9 @@ def expected_report(directory: Path):
 
 
 class StageReportTests(unittest.TestCase):
+    def test_legacy_report_builder_is_the_canonical_function(self):
+        self.assertIs(_build_stage_report, build_diffcrl_stage_report)
+
     def test_builder_matches_exact_schema_without_mutating_inputs_or_state(self):
         directory = Path("/fixture/stage_0_reach-v3")
         inputs = report_inputs(directory)
@@ -159,6 +177,12 @@ class StageReportTests(unittest.TestCase):
         trainer.previous_diffusion = Path("/fixture/previous.pt")
         trainer.next_stage = 0
         matrix_before = copy.deepcopy(trainer.matrix.to_dict())
+        random.seed(29)
+        np.random.seed(31)
+        torch.manual_seed(37)
+        python_rng = random.getstate()
+        numpy_rng = np.random.get_state()
+        torch_rng = torch.get_rng_state().clone()
 
         report = _build_stage_report(
             config,
@@ -194,6 +218,12 @@ class StageReportTests(unittest.TestCase):
         self.assertEqual(trainer.matrix.to_dict(), matrix_before)
         self.assertEqual(trainer.previous_diffusion, Path("/fixture/previous.pt"))
         self.assertEqual(trainer.next_stage, 0)
+        self.assertEqual(random.getstate(), python_rng)
+        numpy_after = np.random.get_state()
+        self.assertEqual(numpy_after[0], numpy_rng[0])
+        np.testing.assert_array_equal(numpy_after[1], numpy_rng[1])
+        self.assertEqual(numpy_after[2:], numpy_rng[2:])
+        torch.testing.assert_close(torch.get_rng_state(), torch_rng, rtol=0, atol=0)
 
     def test_finish_persists_exact_report_and_advances_state_after_integrity_check(
         self,

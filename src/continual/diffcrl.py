@@ -2,22 +2,25 @@
 
 from __future__ import annotations
 
-from dataclasses import asdict, dataclass
 import json
+import time
+from dataclasses import asdict, dataclass
 from pathlib import Path
-from typing import Dict
 
 import numpy as np
 import torch
-from stable_baselines3 import SAC
-from tqdm.auto import tqdm
-
 from src.config import (
     ExperimentConfig,
     output_directory,
     resolve_device,
     save_resolved_config,
     validate_config,
+)
+from src.continual.stage_dataset import (
+    bc_dataset,
+    finalize_stage_groups,
+    prepare_stage_group_split,
+    validate_stage_group,
 )
 from src.envs import (
     ACTION_SHAPE,
@@ -26,36 +29,46 @@ from src.envs import (
     horizon_for_backend,
     make_env,
 )
-from src.support.dataset import (
-    bc_dataset,
-    concatenate_trajectory_groups,
-    prepare_trajectory_group,
-    validate_trajectory_group,
-)
-from src.support.io import write_json
 from src.support.expert_manifest import validate_expert_checkpoint
+from src.support.io import write_json
 from src.support.reproducibility import file_hash, state_hash
 from src.support.run_manifest import complete_run, create_run_manifest
+from stable_baselines3 import SAC
+from tqdm.auto import tqdm
 
 from .bc_policy import BC_CLAMP_EPSILON, GeneralPolicy, fit_bc
 from .collector import collect_trajectories
 from .diffcrl_replay import ReplayRequest, generate_previous_task_replay
 from .diffusion_data import (
     PHYSICAL_ACTION_SLICE,
-    PHYSICAL_OBSERVATION_SLICE,
-    encode_trajectory,
+    normalize_generator_data,
     pack_trajectories,
-    transform_actions,
-    validate_stage_trajectory_group,
+    prepare_generator_data,
 )
 from .evaluation import EvaluationMatrix, evaluate_stage
 from .expert_space import validate_expert_spaces
+from .flow_matching_replay import (
+    FlowMatchingReplayRequest,
+    generate_previous_task_flow_matching_replay,
+)
+from .diffcrl_artifacts import (
+    build_initial_run_summary,
+    stage_checkpoint_paths,
+    validate_finite_model_state,
+)
 from .policy_adapter import SB3SACPolicy
-from .reporting import print_final_report, print_stage_report
+from .real_replay import RealReplayRequest, load_previous_task_real_replay
+from .replay_allocation import replay_counts
+from .reporting import (
+    build_diffcrl_stage_report,
+    print_final_report,
+    print_stage_report,
+)
 from .resume import (
     completed_stage_markers,
     load_boundary_state,
     restore_rng_state,
+    resolve_stage_attempt_paths,
     validate_resume_configuration,
     write_stage_boundary,
 )
@@ -65,15 +78,22 @@ from .task_bank import (
     verify_disjoint_task_banks,
 )
 from .task_sequence import TaskSequence, TaskSpec
+from .generator_normalization import FeatureNormalizer
 from .trajectory_diffusion import (
     DiffusionConfig,
-    FeatureNormalizer,
     TrajectoryDiffusion,
     fit_diffusion,
 )
+from .trajectory_flow_matching import (
+    FlowMatchingConfig as FlowMatchingModelConfig,
+)
+from .trajectory_flow_matching import (
+    TrajectoryFlowMatching,
+    fit_flow_matching,
+)
 
-Metadata = Dict[str, object]
-LossReport = Dict[str, object]
+Metadata = dict[str, object]
+LossReport = dict[str, object]
 
 
 @dataclass(frozen=True)
@@ -86,6 +106,7 @@ class StageContext:
     directory: Path
     policy_before_hash: str | None
     diffusion_before_hash: str | None
+    flow_matching_before_hash: str | None = None
     artifact_suffix: str = ""
 
 
@@ -127,6 +148,7 @@ class DiffusionTrainingResult:
     normalizer: FeatureNormalizer
     goal_normalizer: FeatureNormalizer | None
     losses: LossReport | None
+    training_seconds: float = 0.0
 
 
 @dataclass
@@ -142,62 +164,10 @@ class StageArtifacts:
 
     diffusion_path: Path | None
     policy_path: Path
+    flow_matching_path: Path | None = None
 
 
-def _build_stage_report(
-    config: ExperimentConfig,
-    context: StageContext,
-    data: StageData,
-    diffusion_training: DiffusionTrainingResult,
-    policy_training: PolicyTrainingResult,
-    artifacts: StageArtifacts,
-    *,
-    policy_after_state_sha256: str,
-    diffusion_sha256: str | None,
-    policy_sha256: str,
-) -> Metadata:
-    """Construct one stage's machine-readable report without side effects."""
-    normalizer = diffusion_training.normalizer
-    goal_normalizer = diffusion_training.goal_normalizer
-    return {
-        "stage": context.index,
-        "task": context.task.task_name,
-        "bc_normalization_mode": config.bc.normalization_mode,
-        "bc_loss": config.bc.loss,
-        "bc_clamp_epsilon": BC_CLAMP_EPSILON,
-        "diffusion_action_space": config.diffusion.action_space,
-        "diffusion_action_clamp_epsilon": config.diffusion.action_clamp_epsilon,
-        "generated_action_projection": config.diffusion.generated_action_projection,
-        "real_diffusion_encode_clip_fraction": data.real_encode_clip_fraction,
-        "sources": data.sources,
-        "splits": data.splits,
-        "diffusion_before_state_sha256": context.diffusion_before_hash,
-        "policy_before_state_sha256": context.policy_before_hash,
-        "policy_after_state_sha256": policy_after_state_sha256,
-        "diffusion_checkpoint": str(artifacts.diffusion_path)
-        if artifacts.diffusion_path is not None
-        else None,
-        "diffusion_sha256": diffusion_sha256,
-        "policy_checkpoint": str(artifacts.policy_path),
-        "policy_sha256": policy_sha256,
-        "normalization_mean": normalizer.mean.tolist(),
-        "normalization_scale": normalizer.scale.tolist(),
-        "goal_normalization_mean": goal_normalizer.mean.tolist()
-        if goal_normalizer is not None
-        else None,
-        "goal_normalization_scale": goal_normalizer.scale.tolist()
-        if goal_normalizer is not None
-        else None,
-        "diffusion_losses": diffusion_training.losses,
-        "bc_losses": policy_training.losses,
-        "nan_count": 0,
-        "inf_count": 0,
-        "generated_success": None,
-        "action_targets_modified": any(
-            source.get("clipped_component_fraction", 0) > 0
-            for source in data.sources.values()
-        ),
-    }
+_build_stage_report = build_diffcrl_stage_report
 
 
 class DiffCRLTrainer:
@@ -305,12 +275,32 @@ class DiffCRLTrainer:
             if config.continual.replay_mode == "diffusion"
             else None
         )
+        self.flow_matching = (
+            TrajectoryFlowMatching(
+                FlowMatchingModelConfig(
+                    horizon=self.horizon,
+                    width=config.flow_matching.width,
+                    num_tasks=sequence.num_tasks,
+                    integration_steps=config.flow_matching.integration_steps,
+                    time_embedding_scale=config.flow_matching.time_embedding_scale,
+                )
+            )
+            if config.continual.replay_mode == "flow-matching"
+            else None
+        )
         if self.diffusion is not None:
             self.diffusion.denoiser.to(config.runtime.device)
+        if self.flow_matching is not None:
+            self.flow_matching.velocity_model.to(config.runtime.device)
+        if self.diffusion is not None and self.flow_matching is not None:
+            raise RuntimeError("Replay generator selection must be mutually exclusive.")
         self.policy = None
         self.policy_optimizer = None
         self.matrix = EvaluationMatrix(sequence)
         self.previous_diffusion = None
+        self.previous_flow_matching = None
+        self.flow_dynamic_normalizer = None
+        self.flow_goal_normalizer = None
         self.training_banks = {}
         self.train_configurations = {}
         self.next_stage = 0
@@ -329,56 +319,15 @@ class DiffCRLTrainer:
             )
             write_json(
                 self.output / "config.json",
-                {
-                "trajectories_per_task": config.continual.trajectories_per_task,
-                "diffusion_epochs": config.diffusion.epochs,
-                "bc_epochs": config.bc.epochs,
-                "eval_episodes": config.evaluation.episodes,
-                "seed": config.runtime.seed,
-                "eval_seed": config.evaluation.seed,
-                "diffusion_steps": config.diffusion.steps,
-                "diffusion_width": config.diffusion.width,
-                "bc_normalization_mode": config.bc.normalization_mode,
-                "replay_mode": config.continual.replay_mode,
-                "bc_loss": config.bc.loss,
-                "diffusion_action_space": config.diffusion.action_space,
-                "diffusion_action_clamp_epsilon": config.diffusion.action_clamp_epsilon,
-                "generated_action_projection": config.diffusion.generated_action_projection,
-                "evaluation_mode": config.evaluation.mode,
-                "tasks": sequence.task_names,
-                "environment_backend": config.environment.backend,
-                "horizon": self.horizon,
-                "task_set_seed": config.evaluation.task_set_seed
-                if config.evaluation.mode == "fixed-tasks"
-                else None,
-                "diffusion": asdict(self.diffusion.config)
-                if self.diffusion is not None
-                else None,
-                "experts": {
-                    name: {"path": str(path), "sha256": self.expert_hashes[name]}
-                    for name, path in self.experts.items()
-                },
-                "replay_per_old_task": config.continual.trajectories_per_task
-                if self.diffusion is not None
-                else 0,
-                "split": "per-task whole episodes; rounded 20% validation",
-                "bc": {
-                    "hidden_sizes": config.bc.hidden_sizes,
-                    "epochs": config.bc.epochs,
-                    "batch_size": config.bc.batch_size,
-                    "learning_rate": config.bc.learning_rate,
-                    "objective": config.bc.loss,
-                    "clamp_epsilon": BC_CLAMP_EPSILON,
-                },
-                "diffusion_fit": {
-                    "batch_size": config.diffusion.batch_size,
-                    "learning_rate": config.diffusion.learning_rate,
-                    "prediction": "x0",
-                },
-                "normalization": "stage training split only, feature std floor .001; no normalization clipping",
-                "optimizers": "BC Adam fresh per stage with paired best-epoch restoration; diffusion Adam fresh per fit",
-                "collection": "deterministic; all episodes retained; any-step success recorded",
-                },
+                build_initial_run_summary(
+                    config,
+                    sequence,
+                    self.horizon,
+                    self.diffusion,
+                    self.flow_matching,
+                    self.experts,
+                    self.expert_hashes,
+                ),
             )
         else:
             self._restore_completed_run_state()
@@ -391,25 +340,45 @@ class DiffCRLTrainer:
             raise ValueError(
                 "Resume directory has no stage completion markers; start a new run."
             )
-        if len(markers) < self.sequence.num_tasks and not (
-            self.output / "RUNNING"
-        ).is_file():
+        if (
+            len(markers) < self.sequence.num_tasks
+            and not (self.output / "RUNNING").is_file()
+        ):
             raise ValueError("Incomplete resume run is missing its RUNNING marker.")
         marker = markers[-1]
         artifacts = marker["artifacts"]
-        self.policy, self.policy_optimizer, policy_metadata = GeneralPolicy.load_training(
-            artifacts["policy"]["resolved_path"]
+        self.policy, self.policy_optimizer, policy_metadata = (
+            GeneralPolicy.load_training(artifacts["policy"]["resolved_path"])
         )
-        if not isinstance(policy_metadata, dict) or policy_metadata.get(
-            "stage"
-        ) != marker["stage"]:
+        if (
+            not isinstance(policy_metadata, dict)
+            or policy_metadata.get("stage") != marker["stage"]
+        ):
             raise ValueError("Policy checkpoint stage differs from completion marker.")
         self.policy.to(self.config.runtime.device)
-        if self.diffusion is not None:
+        mode = self.config.continual.replay_mode
+        has_diffusion = "diffusion" in artifacts
+        has_flow = "flow_matching" in artifacts
+        if mode == "diffusion":
+            if has_flow:
+                raise ValueError(
+                    "Diffusion resume marker unexpectedly contains Flow Matching."
+                )
             if "diffusion" not in artifacts:
                 raise ValueError("Diffusion resume marker has no diffusion checkpoint.")
+            expected_diffusion_config = DiffusionConfig(
+                horizon=self.horizon,
+                steps=self.config.diffusion.steps,
+                width=self.config.diffusion.width,
+                num_tasks=self.sequence.num_tasks,
+                diffusion_action_space=self.config.diffusion.action_space,
+                diffusion_action_clamp_epsilon=(
+                    self.config.diffusion.action_clamp_epsilon
+                ),
+            )
             self.diffusion, _, _, diffusion_metadata = TrajectoryDiffusion.load(
                 artifacts["diffusion"]["resolved_path"],
+                expected_config=expected_diffusion_config,
                 expected_action_space=self.config.diffusion.action_space,
                 expected_clamp_epsilon=self.config.diffusion.action_clamp_epsilon,
                 expected_projection=self.config.diffusion.generated_action_projection,
@@ -417,16 +386,56 @@ class DiffCRLTrainer:
             )
             self.diffusion.denoiser.to(self.config.runtime.device)
             self.previous_diffusion = Path(artifacts["diffusion"]["resolved_path"])
+            self.previous_flow_matching = None
+        elif mode == "flow-matching":
+            if has_diffusion:
+                raise ValueError(
+                    "Flow Matching resume marker unexpectedly contains diffusion."
+                )
+            if not has_flow:
+                raise ValueError("Flow Matching resume marker has no Flow checkpoint.")
+            expected_flow_config = FlowMatchingModelConfig(
+                horizon=self.horizon,
+                width=self.config.flow_matching.width,
+                num_tasks=self.sequence.num_tasks,
+                integration_steps=self.config.flow_matching.integration_steps,
+                time_embedding_scale=self.config.flow_matching.time_embedding_scale,
+            )
+            (
+                self.flow_matching,
+                self.flow_dynamic_normalizer,
+                self.flow_goal_normalizer,
+                diffusion_metadata,
+            ) = TrajectoryFlowMatching.load(
+                artifacts["flow_matching"]["resolved_path"],
+                expected_config=expected_flow_config,
+                expected_projection=self.config.diffusion.generated_action_projection,
+                expected_action_space=self.config.diffusion.action_space,
+                expected_clamp_epsilon=self.config.diffusion.action_clamp_epsilon,
+                expected_task_order=self.sequence.task_names,
+                expected_stage=marker["stage"],
+                expected_task=marker["task"],
+            )
+            self.flow_matching.velocity_model.to(self.config.runtime.device)
+            self.previous_flow_matching = Path(
+                artifacts["flow_matching"]["resolved_path"]
+            )
+            self.previous_diffusion = None
         else:
-            if "diffusion" in artifacts:
-                raise ValueError("No-Replay resume marker unexpectedly contains diffusion.")
+            if has_diffusion or has_flow:
+                raise ValueError(
+                    "No-Replay resume marker unexpectedly contains a generator."
+                )
             diffusion_metadata = {}
             self.previous_diffusion = None
+            self.previous_flow_matching = None
         self.matrix = EvaluationMatrix.load(
             artifacts["evaluation_matrix"]["resolved_path"]
         )
         if self.matrix.sequence.task_names != self.sequence.task_names:
-            raise ValueError("Evaluation matrix task sequence differs from configuration.")
+            raise ValueError(
+                "Evaluation matrix task sequence differs from configuration."
+            )
         state = load_boundary_state(marker)
         self.training_banks = state["training_banks"]
         self.train_configurations = state["train_configurations"]
@@ -435,7 +444,7 @@ class DiffCRLTrainer:
             or diffusion_metadata.get("train_configurations")
             != self.train_configurations
         ):
-            raise ValueError("Diffusion replay metadata differs from boundary state.")
+            raise ValueError("Generator replay metadata differs from boundary state.")
         self.next_stage = marker["stage"] + 1
         restore_rng_state(state["rng"])
 
@@ -471,37 +480,81 @@ class DiffCRLTrainer:
             reward_function_version=self.config.environment.reward_function_version,
             hammer_reward_variant=self.config.environment.hammer_reward_variant,
             hammer_nail_progress_weight=self.config.environment.hammer_nail_progress_weight,
+            peg_unplug_reward_variant=self.config.environment.peg_unplug_reward_variant,
+            peg_unplug_progress_weight=self.config.environment.peg_unplug_progress_weight,
+            peg_unplug_progress_gamma=self.config.environment.peg_unplug_progress_gamma,
             backend=self.config.environment.backend,
             progress=self.progress,
         )
 
     def _generate_replay(self, context: StageContext) -> StageRawData:
         """Generate old-task replay before accessing the current task."""
-        if not context.index or self.diffusion is None:
+        if not context.index or self.config.continual.replay_mode == "none":
             return StageRawData(groups={}, sources={})
         cfg = self.config
-        replay = generate_previous_task_replay(
-            ReplayRequest(
-                stage=context.index,
-                trajectory_count=context.trajectory_count,
-                checkpoint=self.previous_diffusion,
-                expected_state_hash=context.diffusion_before_hash,
-                task_names=tuple(self.sequence.task_names),
-                backend=cfg.environment.backend,
-                horizon=self.horizon,
-                runtime_seed=cfg.runtime.seed,
-                device=cfg.runtime.device,
-                reward_function_version=cfg.environment.reward_function_version,
-                hammer_reward_variant=cfg.environment.hammer_reward_variant,
-                hammer_nail_progress_weight=cfg.environment.hammer_nail_progress_weight,
-                action_space=cfg.diffusion.action_space,
-                action_clamp_epsilon=cfg.diffusion.action_clamp_epsilon,
-                action_projection=cfg.diffusion.generated_action_projection,
-                bc_clamp_epsilon=BC_CLAMP_EPSILON,
-                progress=self.progress,
+        common = {
+            "stage": context.index,
+            "task_names": tuple(self.sequence.task_names),
+            "backend": cfg.environment.backend,
+            "horizon": self.horizon,
+            "runtime_seed": cfg.runtime.seed,
+            "device": cfg.runtime.device,
+            "reward_function_version": cfg.environment.reward_function_version,
+            "hammer_reward_variant": cfg.environment.hammer_reward_variant,
+            "hammer_nail_progress_weight": cfg.environment.hammer_nail_progress_weight,
+            "action_space": cfg.diffusion.action_space,
+            "action_clamp_epsilon": cfg.diffusion.action_clamp_epsilon,
+            "action_projection": cfg.diffusion.generated_action_projection,
+            "bc_clamp_epsilon": BC_CLAMP_EPSILON,
+            "progress": self.progress,
+        }
+        allocation = replay_counts(
+            range(context.index),
+            generator=(
+                "diffusion"
+                if cfg.continual.replay_mode == "real"
+                else cfg.continual.replay_mode
             ),
-            progress_message=self._progress_message,
+            allocation=cfg.continual.replay_allocation,
+            trajectories_per_task=context.trajectory_count,
+            total_budget=cfg.continual.replay_budget,
+            strategy=cfg.continual.replay_priority_strategy,
         )
+        if cfg.continual.replay_mode == "real":
+            groups, sources = load_previous_task_real_replay(
+                RealReplayRequest(
+                    stage=context.index,
+                    task_names=tuple(self.sequence.task_names),
+                    trajectory_counts=allocation,
+                    run_directory=self.output,
+                    runtime_seed=cfg.runtime.seed,
+                )
+            )
+            return StageRawData(groups=groups, sources=sources)
+        if self.diffusion is not None:
+            replay = generate_previous_task_replay(
+                ReplayRequest(
+                    trajectory_count=context.trajectory_count,
+                    trajectory_counts=allocation,
+                    checkpoint=self.previous_diffusion,
+                    expected_state_hash=context.diffusion_before_hash,
+                    **common,
+                ),
+                progress_message=self._progress_message,
+            )
+        elif self.flow_matching is not None:
+            replay = generate_previous_task_flow_matching_replay(
+                FlowMatchingReplayRequest(
+                    trajectory_counts=allocation,
+                    checkpoint=self.previous_flow_matching,
+                    expected_state_hash=context.flow_matching_before_hash,
+                    integration_steps=cfg.flow_matching.integration_steps,
+                    **common,
+                ),
+                progress_message=self._progress_message,
+            )
+        else:
+            return StageRawData(groups={}, sources={})
         return StageRawData(groups=replay.groups, sources=replay.sources)
 
     def _collect_current_task(self, context: StageContext) -> CurrentTaskData:
@@ -519,9 +572,7 @@ class DiffCRLTrainer:
         self._progress_message(
             "Collecting expert trajectories", Task=task.task_name, Trajectories=count
         )
-        expert_model = SAC.load(
-            self.experts[task.task_name], device=cfg.runtime.device
-        )
+        expert_model = SAC.load(self.experts[task.task_name], device=cfg.runtime.device)
         settings = getattr(
             self,
             "environment_settings",
@@ -630,28 +681,32 @@ class DiffCRLTrainer:
         directory = context.directory
         groups, sources = raw_data.groups, raw_data.sources
         collected_configurations = current_task.collected_configurations
-        preparations, splits = {}, {}
+        preparations = {}
         for index, values in groups.items():
             name = self.sequence.task(index).task_name
-            validate_trajectory_group(
-                values, count=count, horizon=self.horizon
-            )
-            validate_stage_trajectory_group(
+            group_count = validate_stage_group(
                 values,
+                sources[name],
                 stage=stage,
                 task=name,
-                source=sources[name],
+                horizon=self.horizon,
             )
             path = directory / f"data_task_{index}.npy"
             np.save(path, values.numpy(), allow_pickle=False)
             sources[name].update(data_path=str(path), data_sha256=file_hash(path))
-            prepared = prepare_trajectory_group(
+            prepared = prepare_stage_group_split(
                 values,
-                count=count,
-                seed=cfg.runtime.seed + stage * 1000 + index,
+                count=group_count,
+                split_seed=cfg.runtime.seed + stage * 1000 + index,
                 action_low=self.policy.action_low.cpu(),
                 action_high=self.policy.action_high.cpu(),
                 clamp_epsilon=BC_CLAMP_EPSILON,
+                training_only=getattr(
+                    getattr(cfg, "continual", None),
+                    "historical_replay_training_only",
+                    False,
+                )
+                and index < stage,
             )
             preparations[index] = prepared
             sources[name]["bc_target_clip_fraction"] = prepared.bc_target_clip_fraction
@@ -663,14 +718,12 @@ class DiffCRLTrainer:
                     ],
                     "source_trajectory_ids": prepared.train_ids,
                 }
-            splits[name] = {
-                "train_ids": prepared.train_ids,
-                "validation_ids": prepared.validation_ids,
-                "trajectories": count,
-                "train_samples": len(prepared.train_ids) * self.horizon,
-                "validation_samples": len(prepared.validation_ids) * self.horizon,
-            }
-        prepared_data = concatenate_trajectory_groups(groups, preparations)
+        prepared_data, splits = finalize_stage_groups(
+            groups,
+            preparations,
+            self.sequence.task_names,
+            horizon=self.horizon,
+        )
         return StageData(
             train=prepared_data.train,
             validation=prepared_data.validation,
@@ -684,7 +737,7 @@ class DiffCRLTrainer:
     def _fit_stage_diffusion(
         self, context: StageContext, data: StageData
     ) -> DiffusionTrainingResult:
-        """Prepare stage normalization and fit diffusion when replay is enabled.
+        """Prepare stage normalization and fit the selected replay generator.
 
         Physical 43D data is encoded as 22D dynamics plus a separately
         normalized 3D goal. Normalizers use only the stage training split.
@@ -697,41 +750,33 @@ class DiffCRLTrainer:
         train, validation = data.train, data.validation
         labels, vlabels = data.train_labels, data.validation_labels
         goal_normalizer = None
+        generator_enabled = self.diffusion is not None or self.flow_matching is not None
         # Old replay was decoded with OLD statistics; now all groups are physical.
-        if self.diffusion is not None:
-            train_dynamic, train_goals = encode_trajectory(
-                train[..., PHYSICAL_OBSERVATION_SLICE],
-                train[..., PHYSICAL_ACTION_SLICE],
+        if generator_enabled:
+            prepared_generator = prepare_generator_data(
+                train,
+                validation,
+                action_space=cfg.diffusion.action_space,
+                action_clamp_epsilon=cfg.diffusion.action_clamp_epsilon,
             )
-            val_dynamic, val_goals = encode_trajectory(
-                validation[..., PHYSICAL_OBSERVATION_SLICE],
-                validation[..., PHYSICAL_ACTION_SLICE],
-            )
-            diffusion_train = transform_actions(
-                train_dynamic,
-                cfg.diffusion.action_space,
-                cfg.diffusion.action_clamp_epsilon,
-            )
-            diffusion_validation = transform_actions(
-                val_dynamic,
-                cfg.diffusion.action_space,
-                cfg.diffusion.action_clamp_epsilon,
-            )
-            goal_normalizer = FeatureNormalizer.fit(train_goals[:, None, :])
-        normalizer = FeatureNormalizer.fit(
-            diffusion_train if self.diffusion is not None else train
-        )
+            normalizer = prepared_generator.normalizer
+            goal_normalizer = prepared_generator.goal_normalizer
+        else:
+            normalizer = FeatureNormalizer.fit(train)
         if policy_before is not None and state_hash(self.policy) != policy_before:
             raise RuntimeError("GeneralPolicy changed before its stage update.")
         diff_losses = None
+        training_seconds = 0.0
         if self.diffusion is not None:
             self._progress_message("Training diffusion", Epochs=cfg.diffusion.epochs)
+            training_started = time.perf_counter()
+            normalized_generator = normalize_generator_data(prepared_generator)
             diff_losses = fit_diffusion(
                 self.diffusion,
-                normalizer.normalize(diffusion_train),
-                normalizer.normalize(diffusion_validation),
-                goal_normalizer.normalize(train_goals[:, None, :])[:, 0],
-                goal_normalizer.normalize(val_goals[:, None, :])[:, 0],
+                normalized_generator.train,
+                normalized_generator.validation,
+                normalized_generator.train_goals,
+                normalized_generator.validation_goals,
                 epochs=cfg.diffusion.epochs,
                 seed=cfg.runtime.seed + stage,
                 batch_size=cfg.diffusion.batch_size,
@@ -740,10 +785,33 @@ class DiffCRLTrainer:
                 validation_task_ids=vlabels,
                 progress=self.progress,
             )
+            training_seconds = time.perf_counter() - training_started
+        elif self.flow_matching is not None:
+            self._progress_message(
+                "Training Flow Matching", Epochs=cfg.flow_matching.epochs
+            )
+            training_started = time.perf_counter()
+            normalized_generator = normalize_generator_data(prepared_generator)
+            diff_losses = fit_flow_matching(
+                self.flow_matching,
+                normalized_generator.train,
+                normalized_generator.validation,
+                normalized_generator.train_goals,
+                normalized_generator.validation_goals,
+                epochs=cfg.flow_matching.epochs,
+                seed=cfg.runtime.seed + stage,
+                batch_size=cfg.flow_matching.batch_size,
+                learning_rate=cfg.flow_matching.learning_rate,
+                train_task_ids=labels,
+                validation_task_ids=vlabels,
+                progress=self.progress,
+            )
+            training_seconds = time.perf_counter() - training_started
         return DiffusionTrainingResult(
             normalizer=normalizer,
             goal_normalizer=goal_normalizer,
             losses=diff_losses,
+            training_seconds=training_seconds,
         )
 
     def _fit_stage_policy(
@@ -795,22 +863,14 @@ class DiffCRLTrainer:
         normalizer = diffusion_training.normalizer
         goal_normalizer = diffusion_training.goal_normalizer
         bc_losses = policy_training.losses
-        if not all(
-            torch.isfinite(v).all()
-            for m in (self.policy, self.diffusion)
-            if m is not None
-            for v in m.state_dict().values()
-        ):
-            raise ValueError("Nonfinite trained state.")
-        diffusion_path = (
-            self.output
-            / f"diffusion_after_task_{stage}_{task.task_name}{context.artifact_suffix}.pt"
-            if self.diffusion is not None
-            else None
-        )
-        policy_path = (
-            self.output
-            / f"general_policy_after_task_{stage}_{task.task_name}{context.artifact_suffix}.pt"
+        validate_finite_model_state(self.policy, self.diffusion, self.flow_matching)
+        diffusion_path, policy_path, flow_matching_path = stage_checkpoint_paths(
+            self.output,
+            stage=stage,
+            task=task.task_name,
+            artifact_suffix=context.artifact_suffix,
+            has_diffusion=self.diffusion is not None,
+            has_flow_matching=self.flow_matching is not None,
         )
         if self.diffusion is not None:
             self.diffusion.save(
@@ -830,6 +890,25 @@ class DiffCRLTrainer:
                         "batch_size": cfg.diffusion.batch_size,
                         "learning_rate": cfg.diffusion.learning_rate,
                     },
+                },
+            )
+        if self.flow_matching is not None:
+            self.flow_matching.save(
+                flow_matching_path,
+                normalizer,
+                goal_normalizer,
+                {
+                    "stage": stage,
+                    "task": task.task_name,
+                    "seed": cfg.runtime.seed,
+                    "task_order": self.sequence.task_names,
+                    "task_conditioning": "integer task embedding plus projected normalized 3D goal",
+                    "training_banks": self.training_banks,
+                    "train_configurations": self.train_configurations,
+                    "generated_action_projection": cfg.diffusion.generated_action_projection,
+                    "action_space": cfg.diffusion.action_space,
+                    "action_clamp_epsilon": cfg.diffusion.action_clamp_epsilon,
+                    "flow_matching_fit": asdict(cfg.flow_matching),
                 },
             )
         self.policy.save(
@@ -852,6 +931,7 @@ class DiffCRLTrainer:
         return StageArtifacts(
             diffusion_path=diffusion_path,
             policy_path=policy_path,
+            flow_matching_path=flow_matching_path,
         )
 
     def _finish_stage(
@@ -874,6 +954,7 @@ class DiffCRLTrainer:
         count = context.trajectory_count
         directory = context.directory
         diffusion_path = artifacts.diffusion_path
+        flow_matching_path = artifacts.flow_matching_path
         policy_path = artifacts.policy_path
         report = _build_stage_report(
             cfg,
@@ -885,6 +966,9 @@ class DiffCRLTrainer:
             policy_after_state_sha256=state_hash(self.policy),
             diffusion_sha256=file_hash(diffusion_path)
             if diffusion_path is not None
+            else None,
+            flow_matching_sha256=file_hash(flow_matching_path)
+            if flow_matching_path is not None
             else None,
             policy_sha256=file_hash(policy_path),
         )
@@ -901,6 +985,7 @@ class DiffCRLTrainer:
             if file_hash(path) != self.expert_hashes[name]:
                 raise RuntimeError("Source expert changed during experiment.")
         self.previous_diffusion = diffusion_path
+        self.previous_flow_matching = flow_matching_path
         self.next_stage += 1
         write_stage_boundary(
             self.output,
@@ -908,6 +993,7 @@ class DiffCRLTrainer:
             task=task.task_name,
             policy_path=policy_path,
             diffusion_path=diffusion_path,
+            flow_matching_path=flow_matching_path,
             report_path=directory / "report.json",
             matrix_path=directory / "evaluation_matrix.json",
             training_banks=self.training_banks,
@@ -940,28 +1026,16 @@ class DiffCRLTrainer:
                 f"\nStage {stage + 1}/{self.sequence.num_tasks}: {task.task_name}"
             )
         count = self.config.continual.trajectories_per_task
-        base_name = f"stage_{stage}_{task.task_name}"
-        attempt = 0
-        while True:
-            suffix = "" if attempt == 0 else f".resume_{attempt}"
-            directory = self.output / f"{base_name}{suffix}"
-            collisions = (
-                directory,
-                self.output
-                / f"general_policy_after_task_{stage}_{task.task_name}{suffix}.pt",
-                self.output
-                / f"diffusion_after_task_{stage}_{task.task_name}{suffix}.pt",
-                self.output
-                / f"stage_state_after_task_{stage}_{task.task_name}{suffix}.pt",
-            )
-            if not any(path.exists() for path in collisions):
-                break
-            attempt += 1
+        directory, artifact_suffix = resolve_stage_attempt_paths(
+            self.output, stage, task.task_name
+        )
         directory.mkdir()
-        artifact_suffix = "" if attempt == 0 else f".resume_{attempt}"
         policy_before = None if self.policy is None else state_hash(self.policy)
         diffusion_before = (
             state_hash(self.diffusion) if self.diffusion is not None else None
+        )
+        flow_matching_before = (
+            state_hash(self.flow_matching) if self.flow_matching is not None else None
         )
 
         context = StageContext(
@@ -971,6 +1045,7 @@ class DiffCRLTrainer:
             directory=directory,
             policy_before_hash=policy_before,
             diffusion_before_hash=diffusion_before,
+            flow_matching_before_hash=flow_matching_before,
             artifact_suffix=artifact_suffix,
         )
         replay = self._generate_replay(context)
@@ -1002,7 +1077,9 @@ class DiffCRLTrainer:
         if final_matrix.exists():
             existing = json.loads(final_matrix.read_text(encoding="utf-8"))
             if existing != self.matrix.to_dict():
-                raise ValueError("Existing final evaluation matrix differs from resumed state.")
+                raise ValueError(
+                    "Existing final evaluation matrix differs from resumed state."
+                )
         else:
             write_json(final_matrix, self.matrix.to_dict())
         print_final_report(self.matrix)

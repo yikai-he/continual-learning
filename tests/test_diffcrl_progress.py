@@ -43,7 +43,9 @@ class DiffCRLProgressTests(unittest.TestCase):
 
         def recording_tqdm(iterable, **kwargs):
             seen.append(kwargs["disable"])
-            return iterable
+            # Preserve tqdm's iterator and context-manager protocol while
+            # suppressing terminal output from this infrastructure test.
+            return tqdm(iterable, **{**kwargs, "disable": True})
 
         data = TensorDataset(torch.zeros(2, 39), torch.zeros(2, 4))
         with patch.object(bc_policy, "tqdm", side_effect=recording_tqdm):

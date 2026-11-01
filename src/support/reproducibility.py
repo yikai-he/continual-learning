@@ -1,4 +1,5 @@
 import hashlib
+import subprocess
 from pathlib import Path
 
 
@@ -8,6 +9,18 @@ def file_hash(path):
         for chunk in iter(lambda: stream.read(1024 * 1024), b""):
             digest.update(chunk)
     return digest.hexdigest()
+
+
+def git_output(path, *args):
+    """Return one read-only Git command's stripped output, or ``None``."""
+    try:
+        return subprocess.check_output(
+            ("git", "-C", str(path), *args),
+            text=True,
+            stderr=subprocess.DEVNULL,
+        ).strip()
+    except (OSError, subprocess.CalledProcessError):
+        return None
 
 
 def state_hash(model):

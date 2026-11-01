@@ -11,10 +11,6 @@ from collections import deque
 
 import numpy as np
 import torch
-from stable_baselines3 import SAC
-from stable_baselines3.common.callbacks import BaseCallback
-from stable_baselines3.common.monitor import Monitor
-
 from src.config import (
     ExperimentConfig,
     output_directory,
@@ -25,12 +21,15 @@ from src.config import (
 from src.continual.evaluation import EvaluationMatrix, evaluate_stage
 from src.continual.policy_adapter import SB3SACPolicy
 from src.continual.reporting import print_final_report, print_stage_report
+from src.continual.task_bank import verify_disjoint_task_banks
 from src.continual.task_sequence import TaskSequence
 from src.envs import make_metaworld_env
 from src.support.io import write_json
 from src.support.reproducibility import file_hash
 from src.support.run_manifest import complete_run, create_run_manifest
-from src.continual.task_bank import verify_disjoint_task_banks
+from stable_baselines3 import SAC
+from stable_baselines3.common.callbacks import BaseCallback
+from stable_baselines3.common.monitor import Monitor
 
 
 class FiniteTransitions(BaseCallback):

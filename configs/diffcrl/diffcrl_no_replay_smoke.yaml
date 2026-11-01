@@ -16,8 +16,8 @@ continual:
   - reach-v3
   - hammer-v3
   experts:
-    reach-v3: runs/reward_v2/reach-v3/seed_0/final_model.zip
-    hammer-v3: runs/reward_v2/hammer-v3/seed_0/final_model.zip
+    reach-v3: runs/experts/metaworld-v3/reach-v3/policy.zip
+    hammer-v3: runs/experts/metaworld-v3/hammer-v3/policy.zip
   trajectories_per_task: 4
   replay_mode: none
 evaluation:

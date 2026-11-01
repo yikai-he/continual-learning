@@ -1,0 +1,43 @@
+# Five-stage DDPM fixed-budget integration smoke; not a performance experiment.
+experiment: diffcrl
+environment:
+  reward_function_version: v2
+bc:
+  epochs: 2
+  batch_size: 256
+  learning_rate: 0.001
+  hidden_sizes: [256, 256]
+  normalization_mode: layer-norm
+  loss: post-tanh-mse
+diffusion:
+  epochs: 2
+  batch_size: 4
+  learning_rate: 0.001
+  steps: 10
+  width: 64
+  action_space: raw
+  action_clamp_epsilon: 0.0001
+  generated_action_projection: none
+continual:
+  tasks: [hammer-v3, button-press-v3, faucet-close-v3, handle-press-side-v3, window-close-v3]
+  experts:
+    hammer-v3: runs/experts/metaworld-v3/hammer-v3/policy.zip
+    button-press-v3: runs/experts/metaworld-v3/button-press-v3/policy.zip
+    faucet-close-v3: runs/experts/metaworld-v3/faucet-close-v3/policy.zip
+    handle-press-side-v3: runs/experts/metaworld-v3/handle-press-side-v3/policy.zip
+    window-close-v3: runs/experts/metaworld-v3/window-close-v3/policy.zip
+  trajectories_per_task: 4
+  replay_mode: diffusion
+  replay_allocation: fixed-total
+  replay_budget: 4
+  replay_priority_strategy: uniform
+evaluation:
+  episodes: 2
+  seed: 10000
+  mode: fixed-tasks
+  task_set_seed: 10000
+runtime:
+  seed: 0
+  device: cpu
+  output: runs/smoke/fixed_budget_5task/hammer_first/ddpm
+  run_name: ddpm_hammer_first_5task_fixed_budget_smoke

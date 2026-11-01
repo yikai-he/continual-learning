@@ -32,11 +32,11 @@ continual:
   - handle-press-side-v3
   - window-close-v3
   experts:
-    button-press-v3: runs/reward_v2/button-press-v3/seed_0/best_model/best_model.zip
-    faucet-close-v3: runs/reward_v2/faucet-close-v3/seed_0/best_model/best_model.zip
-    hammer-v3: runs/reward_v2/hammer-v3/seed_0/best_model/best_model.zip
-    handle-press-side-v3: runs/reward_v2/handle-press-side-v3/seed_0/best_model/best_model.zip
-    window-close-v3: runs/reward_v2/window-close-v3/seed_0/final_model.zip
+    button-press-v3: runs/experts/metaworld-v3/button-press-v3/policy.zip
+    faucet-close-v3: runs/experts/metaworld-v3/faucet-close-v3/policy.zip
+    hammer-v3: runs/experts/metaworld-v3/hammer-v3/policy.zip
+    handle-press-side-v3: runs/experts/metaworld-v3/handle-press-side-v3/policy.zip
+    window-close-v3: runs/experts/metaworld-v3/window-close-v3/policy.zip
   trajectories_per_task: 200
   replay_mode: diffusion
 

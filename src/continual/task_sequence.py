@@ -77,6 +77,9 @@ class TaskSwitcher:
         reward_function_version="v2",
         hammer_reward_variant="original",
         hammer_nail_progress_weight=0.0,
+        peg_unplug_reward_variant="original",
+        peg_unplug_progress_weight=0.0,
+        peg_unplug_progress_gamma=0.99,
         render_mode=None,
     ):
         self.sequence = sequence
@@ -87,6 +90,9 @@ class TaskSwitcher:
             reward_function_version=reward_function_version,
             hammer_reward_variant=hammer_reward_variant,
             hammer_nail_progress_weight=hammer_nail_progress_weight,
+            peg_unplug_reward_variant=peg_unplug_reward_variant,
+            peg_unplug_progress_weight=peg_unplug_progress_weight,
+            peg_unplug_progress_gamma=peg_unplug_progress_gamma,
         )
         self.backend = backend
         self.env = None

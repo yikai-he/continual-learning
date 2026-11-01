@@ -9,8 +9,6 @@ from dataclasses import asdict
 from pathlib import Path
 
 import numpy as np
-from tqdm.auto import tqdm
-
 from src.continual.collector import collect_trajectory
 from src.continual.metrics import average_performance, forgetting, forward_transfer
 from src.continual.reporting import format_evaluation_result
@@ -21,6 +19,7 @@ from src.continual.task_bank import (
 )
 from src.continual.task_sequence import PILOT_SEQUENCE, TaskSequence, TaskSwitcher
 from src.envs import task_configuration
+from tqdm.auto import tqdm
 
 
 class EvaluationMatrix:
@@ -145,6 +144,9 @@ def evaluate_task(
     reward_function_version="v2",
     hammer_reward_variant="original",
     hammer_nail_progress_weight=0.0,
+    peg_unplug_reward_variant="original",
+    peg_unplug_progress_weight=0.0,
+    peg_unplug_progress_gamma=0.99,
     backend="metaworld-v3",
     progress=False,
     render_mode=None,
@@ -176,6 +178,9 @@ def evaluate_task(
         reward_function_version=reward_function_version,
         hammer_reward_variant=hammer_reward_variant,
         hammer_nail_progress_weight=hammer_nail_progress_weight,
+        peg_unplug_reward_variant=peg_unplug_reward_variant,
+        peg_unplug_progress_weight=peg_unplug_progress_weight,
+        peg_unplug_progress_gamma=peg_unplug_progress_gamma,
         render_mode=render_mode,
     ) as switcher:
         env = switcher.switch(0, seed=seed)
@@ -265,6 +270,9 @@ def evaluate_stage(
     reward_function_version="v2",
     hammer_reward_variant="original",
     hammer_nail_progress_weight=0.0,
+    peg_unplug_reward_variant="original",
+    peg_unplug_progress_weight=0.0,
+    peg_unplug_progress_gamma=0.99,
     backend="metaworld-v3",
     progress=False,
 ):
@@ -301,6 +309,9 @@ def evaluate_stage(
             reward_function_version=reward_function_version,
             hammer_reward_variant=hammer_reward_variant,
             hammer_nail_progress_weight=hammer_nail_progress_weight,
+            peg_unplug_reward_variant=peg_unplug_reward_variant,
+            peg_unplug_progress_weight=peg_unplug_progress_weight,
+            peg_unplug_progress_gamma=peg_unplug_progress_gamma,
             backend=backend,
             progress=progress,
         )

@@ -9,7 +9,6 @@ from pathlib import Path
 
 import numpy as np
 import torch
-
 from src.config import config_to_dict, load_config
 from src.support.io import atomic_torch_save, atomic_write_json
 from src.support.reproducibility import file_hash
@@ -17,11 +16,33 @@ from src.support.reproducibility import file_hash
 STAGE_MARKER_SCHEMA = 1
 
 
+def resolve_stage_attempt_paths(run_dir, stage: int, task: str) -> tuple[Path, str]:
+    """Return the first collision-free stage directory and artifact suffix."""
+    run_dir = Path(run_dir)
+    base_name = f"stage_{stage}_{task}"
+    attempt = 0
+    while True:
+        suffix = "" if attempt == 0 else f".resume_{attempt}"
+        directory = run_dir / f"{base_name}{suffix}"
+        collisions = (
+            directory,
+            run_dir / f"general_policy_after_task_{stage}_{task}{suffix}.pt",
+            run_dir / f"diffusion_after_task_{stage}_{task}{suffix}.pt",
+            run_dir / f"flow_matching_after_task_{stage}_{task}{suffix}.pt",
+            run_dir / f"stage_state_after_task_{stage}_{task}{suffix}.pt",
+        )
+        if not any(path.exists() for path in collisions):
+            return directory, suffix
+        attempt += 1
+
+
 def _relative(run_dir: Path, path: Path) -> str:
     try:
         return str(path.resolve().relative_to(run_dir.resolve()))
     except ValueError as error:
-        raise ValueError(f"Stage artifact is outside the run directory: {path}") from error
+        raise ValueError(
+            f"Stage artifact is outside the run directory: {path}"
+        ) from error
 
 
 def _scientific_config(config) -> dict:
@@ -38,7 +59,9 @@ def validate_resume_configuration(run_dir, requested, expert_hashes) -> None:
     run_dir = Path(run_dir).resolve()
     saved = load_config(run_dir / "config.yaml", expected_experiment="diffcrl")
     if _scientific_config(saved) != _scientific_config(requested):
-        raise ValueError("Resume configuration differs from the saved scientific configuration.")
+        raise ValueError(
+            "Resume configuration differs from the saved scientific configuration."
+        )
     manifest = json.loads((run_dir / "run_manifest.json").read_text(encoding="utf-8"))
     recorded = manifest.get("experts", {})
     if set(recorded) != set(expert_hashes):
@@ -61,7 +84,9 @@ def capture_rng_state() -> dict:
             "cached_gaussian": np_state[4],
         },
         "torch_cpu": torch.get_rng_state(),
-        "torch_cuda": torch.cuda.get_rng_state_all() if torch.cuda.is_available() else [],
+        "torch_cuda": torch.cuda.get_rng_state_all()
+        if torch.cuda.is_available()
+        else [],
     }
 
 
@@ -110,13 +135,12 @@ def write_stage_boundary(
     matrix_path,
     training_banks,
     train_configurations,
+    flow_matching_path=None,
     artifact_suffix="",
 ) -> Path:
     """Persist restorable state and write the completion marker last."""
     run_dir = Path(run_dir).resolve()
-    state_path = (
-        run_dir / f"stage_state_after_task_{stage}_{task}{artifact_suffix}.pt"
-    )
+    state_path = run_dir / f"stage_state_after_task_{stage}_{task}{artifact_suffix}.pt"
     state = {
         "kind": "diffcrl_stage_boundary_v1",
         "stage": stage,
@@ -134,6 +158,10 @@ def write_stage_boundary(
     }
     if diffusion_path is not None:
         paths["diffusion"] = Path(diffusion_path)
+    if flow_matching_path is not None:
+        paths["flow_matching"] = Path(flow_matching_path)
+    if diffusion_path is not None and flow_matching_path is not None:
+        raise ValueError("A stage boundary cannot contain two replay generators.")
     artifacts = {
         name: {"path": _relative(run_dir, path), "sha256": file_hash(path)}
         for name, path in paths.items()
@@ -176,9 +204,13 @@ def completed_stage_markers(run_dir, task_names) -> list[dict]:
             try:
                 artifact.relative_to(run_dir)
             except ValueError as error:
-                raise ValueError(f"Marker artifact escapes run directory: {name}") from error
+                raise ValueError(
+                    f"Marker artifact escapes run directory: {name}"
+                ) from error
             if not artifact.is_file():
-                raise FileNotFoundError(f"Completed-stage artifact is missing: {artifact}")
+                raise FileNotFoundError(
+                    f"Completed-stage artifact is missing: {artifact}"
+                )
             if file_hash(artifact) != identity["sha256"]:
                 raise ValueError(f"Completed-stage artifact is corrupted: {artifact}")
             identity["resolved_path"] = str(artifact)

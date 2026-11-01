@@ -31,8 +31,10 @@ class FakeDiffusion:
         self.denoiser = FakeDenoiser()
         self.calls = []
 
-    def sample(self, count, *, seed, task_ids, goals):
-        self.calls.append((count, seed, task_ids.clone(), goals.clone()))
+    def sample(self, count, *, seed, task_ids, goals, execution_mode="legacy"):
+        self.calls.append(
+            (count, seed, task_ids.clone(), goals.clone(), execution_mode)
+        )
         generator = torch.Generator().manual_seed(seed)
         result = torch.randn((count, 200, 22), generator=generator)
         result[..., :18] += task_ids[:, None, None]
@@ -77,6 +79,32 @@ def metadata():
 
 
 class DiffCRLReplayTests(unittest.TestCase):
+    def test_fixed_total_counts_control_ddpm_group_sizes(self):
+        model = FakeDiffusion()
+        normalizer = IdentityNormalizer()
+        with patch(
+            "src.continual.diffcrl_replay.TrajectoryDiffusion.load",
+            return_value=(model, normalizer, normalizer, metadata()),
+        ), patch(
+            "src.continual.diffcrl_replay.reconstruct_goals",
+            side_effect=lambda bank, selected, **kwargs: [
+                [0.1, 0.2, 0.3] for _ in selected
+            ],
+        ), patch(
+            "src.continual.diffcrl_replay.file_hash", return_value="checkpoint-sha"
+        ), patch(
+            "src.continual.diffcrl_replay.state_hash", return_value="expected-state"
+        ):
+            result = generate_previous_task_replay(
+                request(trajectory_counts={0: 2, 1: 1})
+            )
+
+        self.assertEqual(result.groups[0].shape, (2, 200, 43))
+        self.assertEqual(result.groups[1].shape, (1, 200, 43))
+        self.assertEqual(sum(len(group) for group in result.groups.values()), 3)
+        self.assertEqual(result.sources["reach-v3"]["trajectory_count"], 2)
+        self.assertEqual(result.sources["push-v3"]["trajectory_count"], 1)
+
     def test_exact_order_seeds_projection_provenance_and_progress(self):
         model = FakeDiffusion()
         normalizer = IdentityNormalizer()
@@ -109,8 +137,10 @@ class DiffCRLReplayTests(unittest.TestCase):
             [(3, 200, 43), (3, 200, 43)],
         )
         self.assertEqual([call[1] for call in model.calls], [102023, 102024])
+        self.assertEqual([call[4] for call in model.calls], ["legacy", "legacy"])
         torch.testing.assert_close(model.calls[0][2], torch.tensor([0, 0, 0]))
         torch.testing.assert_close(model.calls[1][2], torch.tensor([1, 1, 1]))
+
         self.assertEqual(model.denoiser.devices, ["cpu"])
         load.assert_called_once_with(
             Path("/tmp/replay-checkpoint.pt"),
@@ -130,6 +160,28 @@ class DiffCRLReplayTests(unittest.TestCase):
             self.assertEqual(source["post_projection_oob_component_fraction"], 0.0)
             self.assertEqual(source["clipped_component_fraction"], 1.0)
             self.assertEqual(len(source["training_configuration_indices"]), 3)
+
+    def test_device_native_execution_is_forwarded(self):
+        model = FakeDiffusion()
+        normalizer = IdentityNormalizer()
+        with patch(
+            "src.continual.diffcrl_replay.TrajectoryDiffusion.load",
+            return_value=(model, normalizer, normalizer, metadata()),
+        ), patch(
+            "src.continual.diffcrl_replay.reconstruct_goals",
+            side_effect=lambda bank, selected, **kwargs: [
+                [0.1, 0.2, 0.3] for _ in selected
+            ],
+        ), patch(
+            "src.continual.diffcrl_replay.file_hash", return_value="checkpoint-sha"
+        ), patch(
+            "src.continual.diffcrl_replay.state_hash", return_value="expected-state"
+        ):
+            generate_previous_task_replay(
+                request(stage=1, execution_mode="device-native")
+            )
+
+        self.assertEqual(model.calls[0][4], "device-native")
 
     def test_identical_request_produces_exact_tensors(self):
         def run_once():
