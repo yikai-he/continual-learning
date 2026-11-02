@@ -1,0 +1,32 @@
+experiment: forward_transfer
+condition: random
+target_task: hammer-v3
+task_history:
+- button-press-v3
+- faucet-close-v3
+source_checkpoint: runs/formal/diffcrl_5task_15plus15_2layer/seed0/general_policy_after_task_1_faucet-close-v3.pt
+environment_backend: metaworld-v3
+reward_function_version: v2
+sac:
+  steps: 100000
+  learning_rate: 0.0003
+  buffer_size: 1000000
+  learning_starts: 10000
+  batch_size: 256
+  gamma: 0.99
+  tau: 0.005
+  train_freq: 1
+  gradient_steps: 1
+  ent_coef: auto
+  log_std_init: -3.0
+  checkpoint_frequency: 10000
+evaluation:
+  frequency: 10000
+  episodes: 50
+  seed: 10000
+  task_set_seed: 10000
+  success_threshold: 0.8
+runtime:
+  seed: 0
+  device: cpu
+  output: runs/forward_transfer
