@@ -12,7 +12,7 @@ from stable_baselines3.sac.policies import (
 from torch import nn
 
 
-GENERAL_POLICY_HIDDEN_SIZES = (256, 256)
+GENERAL_POLICY_HIDDEN_SIZES = (256, 256, 256, 256)
 
 
 class TransferableActor(Actor):
@@ -30,8 +30,7 @@ class TransferableActor(Actor):
             raise ValueError("TransferableActor does not support gSDE.")
         if tuple(self.net_arch) != GENERAL_POLICY_HIDDEN_SIZES:
             raise ValueError(
-                "TransferableActor requires net_arch=[256, 256] to match "
-                "GeneralPolicy."
+                "TransferableActor supports only net_arch=[256, 256, 256, 256]."
             )
         if self.features_dim != 39:
             raise ValueError("TransferableActor requires 39D observations.")
@@ -41,13 +40,11 @@ class TransferableActor(Actor):
             raise ValueError(
                 f"log_std_init must be finite and in [{LOG_STD_MIN}, {LOG_STD_MAX}]."
             )
-        self.latent_pi = nn.Sequential(
-            nn.Linear(39, 256),
-            nn.LayerNorm(256),
-            nn.ReLU(),
-            nn.Linear(256, 256),
-            nn.ReLU(),
-        )
+        layers: list[nn.Module] = [nn.Linear(39, self.net_arch[0])]
+        layers.extend((nn.LayerNorm(self.net_arch[0]), nn.ReLU()))
+        for input_size, output_size in zip(self.net_arch, self.net_arch[1:]):
+            layers.extend((nn.Linear(input_size, output_size), nn.ReLU()))
+        self.latent_pi = nn.Sequential(*layers)
         if not isinstance(self.mu, nn.Linear) or not isinstance(
             self.log_std, nn.Linear
         ):

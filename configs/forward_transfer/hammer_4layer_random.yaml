@@ -1,13 +1,13 @@
 experiment: forward_transfer
-condition: transferred
+condition: random
 target_task: hammer-v3
-task_history:
-- button-press-v3
-- faucet-close-v3
-source_checkpoint: runs/formal/diffcrl_5task_15plus15_2layer/seed0/general_policy_after_task_1_faucet-close-v3.pt
+task_history: [button-press-v3, faucet-close-v3]
+# Used only for paired provenance validation; random initialization remains untouched.
+source_checkpoint: runs/formal/diffcrl_5task_15plus15_4layer/seed0/general_policy_after_task_1_faucet-close-v3.pt
 environment_backend: metaworld-v3
 reward_function_version: v2
 sac:
+  net_arch: [256, 256, 256, 256]
   steps: 100000
   learning_rate: 0.0003
   buffer_size: 1000000
@@ -29,4 +29,4 @@ evaluation:
 runtime:
   seed: 0
   device: cpu
-  output: runs/forward_transfer
+  output: runs/forward_transfer_4layer

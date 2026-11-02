@@ -26,7 +26,7 @@ bc:
   epochs: 100
   batch_size: 256
   learning_rate: 0.001
-  hidden_sizes: [256, 256]
+  hidden_sizes: [256, 256, 256, 256]
   loss: post-tanh-mse
   initialization_seed: 17
   shuffle_seed: 0

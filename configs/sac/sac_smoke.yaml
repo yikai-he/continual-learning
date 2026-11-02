@@ -16,6 +16,8 @@ sac:
   net_arch:
   - 256
   - 256
+  - 256
+  - 256
   checkpoint_freq: 250
 continual:
   tasks:

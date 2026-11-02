@@ -203,7 +203,7 @@ def test_peg_fixed_evaluation_forwards_environment_settings() -> None:
 
 
 def test_diffcrl_stage_evaluation_forwards_peg_environment_settings() -> None:
-    config = _config("diffcrl_kuka_10task_15plus15_2layer.yaml")
+    config = _config("diffcrl_kuka_10task_15plus15_4layer.yaml")
     trainer = DiffCRLTrainer.__new__(DiffCRLTrainer)
     trainer.config = config
     trainer.policy = MagicMock()

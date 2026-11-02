@@ -19,6 +19,7 @@ from tqdm.auto import tqdm
 
 BC_CLAMP_EPSILON = 1e-4
 BC_LOSSES = ("post-tanh-mse", "pre-tanh-mse")
+GENERAL_POLICY_HIDDEN_SIZES = (256, 256, 256, 256)
 
 
 class GeneralPolicy(nn.Module):
@@ -34,7 +35,7 @@ class GeneralPolicy(nn.Module):
         action_low: np.ndarray,
         action_high: np.ndarray,
         *,
-        hidden_sizes: tuple[int, ...] = (256, 256),
+        hidden_sizes: tuple[int, ...] = (256, 256, 256, 256),
         use_layer_norm: bool = True,
     ) -> None:
         super().__init__()
@@ -47,14 +48,13 @@ class GeneralPolicy(nn.Module):
             or not (low < high).all()
         ):
             raise ValueError("Expected finite, ordered MetaWorld action bounds.")
-        if not hidden_sizes or any(
-            isinstance(h, bool) or not isinstance(h, int) or h <= 0
-            for h in hidden_sizes
-        ):
-            raise ValueError("Provide one or more positive integer hidden sizes.")
+        if tuple(hidden_sizes) != GENERAL_POLICY_HIDDEN_SIZES:
+            raise ValueError(
+                "GeneralPolicy supports only hidden_sizes=(256, 256, 256, 256)."
+            )
         self.hidden_sizes = tuple(hidden_sizes)
-        if not isinstance(use_layer_norm, bool):
-            raise ValueError("use_layer_norm must be a boolean.")
+        if use_layer_norm is not True:
+            raise ValueError("GeneralPolicy requires LayerNorm after its first layer.")
         self.use_layer_norm = use_layer_norm
         self.register_buffer("action_low", torch.tensor(low, dtype=torch.float32))
         self.register_buffer("action_high", torch.tensor(high, dtype=torch.float32))
@@ -109,6 +109,14 @@ class GeneralPolicy(nn.Module):
             path,
             {
                 "kind": "general_policy_v2",
+                "architecture": {
+                    "observation_dim": OBSERVATION_SHAPE[0],
+                    "hidden_sizes": list(self.hidden_sizes),
+                    "action_dim": ACTION_SHAPE[0],
+                    "activation": "relu",
+                    "output_activation": "tanh",
+                    "layer_norm_after_hidden": [0] if self.use_layer_norm else [],
+                },
                 "hidden_sizes": self.hidden_sizes,
                 "use_layer_norm": self.use_layer_norm,
                 "state_dict": self.state_dict(),
@@ -122,13 +130,12 @@ class GeneralPolicy(nn.Module):
         path: str | Path,
         *,
         expected_use_layer_norm: bool | None = None,
+        expected_hidden_sizes: tuple[int, ...] | None = None,
     ) -> GeneralPolicy:
         """Restore a compatible inference checkpoint on CPU in evaluation mode."""
         data = torch.load(path, map_location="cpu", weights_only=True)
         kind = data.get("kind")
-        if kind == "general_policy_layer_norm_v1":
-            use_layer_norm = True
-        elif kind == "general_policy_v2":
+        if kind == "general_policy_v2":
             use_layer_norm = data.get("use_layer_norm")
             if not isinstance(use_layer_norm, bool):
                 raise ValueError(
@@ -148,10 +155,21 @@ class GeneralPolicy(nn.Module):
                 f"requested={expected_use_layer_norm}."
             )
         state = data["state_dict"]
+        hidden_sizes = _validated_hidden_sizes(data)
+        if hidden_sizes != GENERAL_POLICY_HIDDEN_SIZES:
+            raise ValueError(
+                "GeneralPolicy checkpoint uses an unsupported architecture; only "
+                "four hidden layers of width 256 are accepted."
+            )
+        if expected_hidden_sizes is not None and hidden_sizes != tuple(expected_hidden_sizes):
+            raise ValueError(
+                "GeneralPolicy checkpoint architecture does not match the requested "
+                f"architecture: checkpoint={hidden_sizes}, requested={tuple(expected_hidden_sizes)}."
+            )
         policy = cls(
             state["action_low"].numpy(),
             state["action_high"].numpy(),
-            hidden_sizes=tuple(data["hidden_sizes"]),
+            hidden_sizes=hidden_sizes,
             use_layer_norm=use_layer_norm,
         )
         try:
@@ -170,6 +188,7 @@ class GeneralPolicy(nn.Module):
         path: str | Path,
         *,
         expected_use_layer_norm: bool | None = None,
+        expected_hidden_sizes: tuple[int, ...] | None = None,
     ):
         """Return (policy, Adam or None, metadata).
 
@@ -177,7 +196,9 @@ class GeneralPolicy(nn.Module):
         Checkpoints from the former observation-z-score architecture are rejected.
         """
         policy = cls.load(
-            path, expected_use_layer_norm=expected_use_layer_norm
+            path,
+            expected_use_layer_norm=expected_use_layer_norm,
+            expected_hidden_sizes=expected_hidden_sizes,
         )
         data = torch.load(path, map_location="cpu", weights_only=True)
         if "optimizer_state" not in data:
@@ -201,6 +222,29 @@ def _validate_optimizer(policy, optimizer):
     actual = [id(p) for group in optimizer.param_groups for p in group["params"]]
     if len(actual) != len(expected) or set(actual) != expected:
         raise ValueError("Optimizer must own each policy parameter exactly once.")
+
+
+def _validated_hidden_sizes(data: dict) -> tuple[int, ...]:
+    """Validate explicit v2 architecture or safely infer the legacy v1 shape."""
+    value = data.get("hidden_sizes")
+    if not isinstance(value, (tuple, list)):
+        raise ValueError("GeneralPolicy checkpoint has invalid hidden_sizes metadata.")
+    hidden_sizes = tuple(value)
+    architecture = data.get("architecture")
+    expected = {
+        "observation_dim": OBSERVATION_SHAPE[0],
+        "hidden_sizes": list(hidden_sizes),
+        "action_dim": ACTION_SHAPE[0],
+        "activation": "relu",
+        "output_activation": "tanh",
+        "layer_norm_after_hidden": [0] if data.get("use_layer_norm", True) else [],
+    }
+    if architecture != expected:
+        raise ValueError(
+            "Checkpoint state_dict is incompatible with its stored "
+            "GeneralPolicy architecture metadata."
+        )
+    return hidden_sizes
 
 
 def fit_bc(

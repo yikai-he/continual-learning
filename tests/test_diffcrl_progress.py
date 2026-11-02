@@ -51,7 +51,7 @@ class DiffCRLProgressTests(unittest.TestCase):
         with patch.object(bc_policy, "tqdm", side_effect=recording_tqdm):
             for progress in (True, False):
                 policy = bc_policy.GeneralPolicy(
-                    -np.ones(4), np.ones(4), hidden_sizes=(4, 4)
+                    -np.ones(4), np.ones(4)
                 )
                 bc_policy.fit_bc(policy, data, data, epochs=1, progress=progress)
         self.assertEqual(seen, [False, True])

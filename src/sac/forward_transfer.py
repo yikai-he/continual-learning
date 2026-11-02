@@ -28,6 +28,7 @@ class ForwardTransferSACConfig:
     ent_coef: str = "auto"
     log_std_init: float = -3.0
     checkpoint_frequency: int = 10_000
+    net_arch: list[int] = field(default_factory=lambda: [256, 256, 256, 256])
 
 
 @dataclass(frozen=True)
@@ -136,6 +137,8 @@ def validate_forward_transfer_config(config: ForwardTransferConfig) -> None:
         raise ValueError("sac.gamma and sac.tau must be in (0, 1].")
     if config.sac.ent_coef != "auto":
         raise ValueError("sac.ent_coef must remain auto.")
+    if config.sac.net_arch != [256, 256, 256, 256]:
+        raise ValueError("Forward transfer requires net_arch=[256, 256, 256, 256].")
     if config.evaluation.episodes <= 0 or config.evaluation.episodes > 50:
         raise ValueError("evaluation.episodes must be in [1, 50].")
     if not 0 <= config.evaluation.success_threshold <= 1:
@@ -161,7 +164,9 @@ def load_temporally_valid_general_policy(
     if not path.is_file():
         raise FileNotFoundError(f"GeneralPolicy checkpoint does not exist: {path}")
     policy, _, metadata = GeneralPolicy.load_training(
-        path, expected_use_layer_norm=True
+        path,
+        expected_use_layer_norm=True,
+        expected_hidden_sizes=tuple(config.sac.net_arch),
     )
     expected_stage = len(config.task_history) - 1
     valid = (

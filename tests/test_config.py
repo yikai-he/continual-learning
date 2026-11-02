@@ -141,7 +141,7 @@ class ConfigTests(unittest.TestCase):
         first, second = self.config(), self.config()
         self.assertEqual(first.bc.epochs, 100)
         first.bc.hidden_sizes.append(42)
-        self.assertEqual(second.bc.hidden_sizes, [256, 256])
+        self.assertEqual(second.bc.hidden_sizes, [256, 256, 256, 256])
 
     def test_cli_overrides_yaml_including_zero(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -274,14 +274,13 @@ class ConfigTests(unittest.TestCase):
             with self.subTest(field=f"{section}.{name}"), self.assertRaises(ValueError):
                 config_from_dict(values)
 
-    def test_general_policy_hidden_architecture_is_configurable(self):
-        for hidden_sizes in ([256, 256], [256, 256, 256, 256], [8]):
+    def test_general_policy_hidden_architecture_is_fixed(self):
+        for hidden_sizes in ([256, 256], [8], [256] * 5):
             with self.subTest(hidden_sizes=hidden_sizes):
                 values = config_to_dict(self.config())
                 values["bc"]["hidden_sizes"] = hidden_sizes
-                self.assertEqual(
-                    config_from_dict(values).bc.hidden_sizes, hidden_sizes
-                )
+                with self.assertRaises(ValueError):
+                    config_from_dict(values)
         for name, value in [
             ("gamma", 1.1),
             ("batch_size", -1),
@@ -396,11 +395,10 @@ class ConfigTests(unittest.TestCase):
 
     def test_general_policy_layer_norm_flag_defaults_and_validates(self):
         self.assertTrue(self.config().bc.use_layer_norm)
-        self.assertFalse(
+        with self.assertRaisesRegex(ValueError, "bc.use_layer_norm"):
             self.config(
                 bc={"use_layer_norm": False, "normalization_mode": "none"}
-            ).bc.use_layer_norm
-        )
+            )
         with self.assertRaisesRegex(ValueError, "bc.use_layer_norm"):
             validate_config(
                 replace(self.config(), bc=replace(self.config().bc, use_layer_norm=1))

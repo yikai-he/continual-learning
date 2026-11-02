@@ -6,15 +6,13 @@ from src.continual.replay_allocation import allocate_replay
 
 ROOT = Path(__file__).parents[1]
 PILOT = ROOT / "configs/diffcrl/flow_matching_5task_pilot.yaml"
-FORMAL = ROOT / "runs/formal/diffcrl_5task_200traj/diffcrl_5task_200traj_seed0/config.yaml"
+FORMAL = ROOT / "configs/diffcrl/diffcrl_5task_4layer.yaml"
 
 
 def test_pilot_matches_formal_diffusion_science_except_generator():
     pilot = load_config(PILOT, expected_experiment="diffcrl")
     formal = load_config(FORMAL, expected_experiment="diffcrl")
     assert pilot.continual.tasks == formal.continual.tasks
-    # Formal run configs retain their original paths as immutable provenance;
-    # active configs use the canonical expert registry after artifact cleanup.
     assert pilot.continual.experts.keys() == formal.continual.experts.keys()
     assert all((ROOT / path).is_file() for path in pilot.continual.experts.values())
     assert pilot.continual.trajectories_per_task == formal.continual.trajectories_per_task == 200

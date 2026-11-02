@@ -179,7 +179,9 @@ This is a **CONDITIONAL GO**:
 ## Compatibility with fixed 15+15 replay
 
 The sequences are mechanically compatible with 15 current-task expert
-trajectories, DDPM, both GeneralPolicy depths, and fixed-total uniform replay.
+trajectories, DDPM, the GeneralPolicy depth comparison, and fixed-total uniform
+replay. This paragraph describes a historical research comparison; active code
+now supports only the four-hidden-layer architecture.
 The configuration must explicitly select `replay_allocation: fixed-total` and
 `replay_budget: 15`; the existing formal KUKA five-task configuration instead
 uses legacy generator-default allocation and 200 current trajectories.

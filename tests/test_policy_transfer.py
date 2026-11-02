@@ -53,7 +53,7 @@ def make_model(env, *, log_std_init=-2.25):
         batch_size=2,
         train_freq=1,
         gradient_steps=1,
-        policy_kwargs={"net_arch": [256, 256], "log_std_init": log_std_init},
+        policy_kwargs={"net_arch": [256, 256, 256, 256], "log_std_init": log_std_init},
         seed=7,
         device="cpu",
         verbose=0,
@@ -65,7 +65,7 @@ def make_general_policy(env):
     return GeneralPolicy(
         env.action_space.low,
         env.action_space.high,
-        hidden_sizes=(256, 256),
+        hidden_sizes=(256, 256, 256, 256),
         use_layer_norm=True,
     )
 
@@ -79,6 +79,10 @@ def test_actor_architecture_transfer_scaling_and_exact_equivalence():
     assert [type(module) for module in actor.latent_pi] == [
         torch.nn.Linear,
         torch.nn.LayerNorm,
+        torch.nn.ReLU,
+        torch.nn.Linear,
+        torch.nn.ReLU,
+        torch.nn.Linear,
         torch.nn.ReLU,
         torch.nn.Linear,
         torch.nn.ReLU,
@@ -182,19 +186,14 @@ def test_sac_save_reload_preserves_deterministic_predictions():
 
 def test_incompatible_general_policy_has_clear_error():
     env = ContinuousTestEnv()
-    model = make_model(env)
-    without_layer_norm = GeneralPolicy(
-        env.action_space.low,
-        env.action_space.high,
-        hidden_sizes=(256, 256),
-        use_layer_norm=False,
-    )
-    with pytest.raises(ValueError, match="requires a LayerNorm"):
-        transfer_general_policy_to_sac(model, without_layer_norm)
-    wrong_width = GeneralPolicy(
-        env.action_space.low,
-        env.action_space.high,
-        hidden_sizes=(8, 8),
-    )
-    with pytest.raises(ValueError, match="hidden sizes"):
-        transfer_general_policy_to_sac(model, wrong_width)
+    with pytest.raises(ValueError, match="only hidden_sizes"):
+        GeneralPolicy(env.action_space.low, env.action_space.high, hidden_sizes=(256, 256))
+    with pytest.raises(ValueError, match="requires LayerNorm"):
+        GeneralPolicy(env.action_space.low, env.action_space.high, use_layer_norm=False)
+    with pytest.raises(ValueError, match="only net_arch"):
+        SAC(
+            TransferableSACPolicy,
+            env,
+            policy_kwargs={"net_arch": [256, 256], "log_std_init": -3.0},
+            device="cpu",
+        )

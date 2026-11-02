@@ -83,7 +83,7 @@ class TrainingConfigTests(unittest.TestCase):
                     learning_rate=0.002,
                     gamma=0.95,
                     batch_size=17,
-                    net_arch=[16, 8],
+                    net_arch=[256, 256, 256, 256],
                     checkpoint_freq=3,
                 ),
                 evaluation=replace(
@@ -120,7 +120,7 @@ class TrainingConfigTests(unittest.TestCase):
                     (kwargs["gamma"], kwargs["learning_rate"], kwargs["batch_size"]),
                     (0.95, 0.002, 17),
                 )
-                self.assertEqual(kwargs["policy_kwargs"], {"net_arch": [16, 8]})
+                self.assertEqual(kwargs["policy_kwargs"], {"net_arch": [256, 256, 256, 256]})
                 self.assertEqual((kwargs["seed"], kwargs["device"]), (3, "cpu"))
                 self.assertEqual(kwargs["verbose"], 0)
                 self.assertEqual(
@@ -171,7 +171,8 @@ class TrainingConfigTests(unittest.TestCase):
             c = replace(
                 c,
                 sac=replace(
-                    c.sac, learning_rate=0.002, gamma=0.9, batch_size=7, net_arch=[8, 8]
+                    c.sac, learning_rate=0.002, gamma=0.9, batch_size=7,
+                    net_arch=[256, 256, 256, 256]
                 ),
                 continual=replace(c.continual, tasks=["reach-v3"], steps_per_task=3),
                 evaluation=replace(c.evaluation, episodes=1),
@@ -211,7 +212,7 @@ class TrainingConfigTests(unittest.TestCase):
                     (kwargs["gamma"], kwargs["learning_rate"], kwargs["batch_size"]),
                     (0.9, 0.002, 7),
                 )
-                self.assertEqual(kwargs["policy_kwargs"], {"net_arch": [8, 8]})
+                self.assertEqual(kwargs["policy_kwargs"], {"net_arch": [256, 256, 256, 256]})
                 self.assertEqual((kwargs["seed"], kwargs["device"]), (4, "cpu"))
                 self.assertTrue(model.learn.call_args.kwargs["progress_bar"])
                 self.assertEqual(
@@ -253,7 +254,7 @@ class TrainingConfigTests(unittest.TestCase):
         self.assertEqual(next(model.denoiser.parameters()).grad.device.type, "cuda")
         sample = model.sample(2, task_ids=ids, goals=goals)
         self.assertEqual((sample.device.type, sample.shape), ("cpu", (2, 4, 22)))
-        policy = GeneralPolicy(-np.ones(4), np.ones(4), hidden_sizes=(8, 8)).to("cuda")
+        policy = GeneralPolicy(-np.ones(4), np.ones(4)).to("cuda")
         dataset = TensorDataset(torch.randn(4, 39), torch.zeros(4, 4))
         result = fit_bc(policy, dataset, dataset, epochs=1, batch_size=2)
         self.assertTrue(np.isfinite(result["train_loss"]))

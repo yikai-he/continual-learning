@@ -17,7 +17,7 @@ from src.continual.trajectory_diffusion import FeatureNormalizer
 
 def policy():
     torch.manual_seed(3)
-    return GeneralPolicy(-np.ones(4), np.ones(4), hidden_sizes=(8, 6))
+    return GeneralPolicy(-np.ones(4), np.ones(4))
 
 
 def dataset(offset=0.0):
@@ -28,51 +28,13 @@ def dataset(offset=0.0):
 
 
 class GeneralPolicyTests(unittest.TestCase):
-    def test_layer_norm_ablation_preserves_layers_actions_and_training(self):
-        expected = {
-            True: [
-                nn.Linear, nn.LayerNorm, nn.ReLU, nn.Linear, nn.ReLU,
-                nn.Linear, nn.Tanh,
-            ],
-            False: [nn.Linear, nn.ReLU, nn.Linear, nn.ReLU, nn.Linear, nn.Tanh],
-        }
-        for use_layer_norm, modules in expected.items():
-            with self.subTest(use_layer_norm=use_layer_norm):
-                model = GeneralPolicy(
-                    -np.ones(4), np.ones(4), hidden_sizes=(8, 6),
-                    use_layer_norm=use_layer_norm,
-                )
-                self.assertEqual([type(module) for module in model.network], modules)
-                actions = model(torch.randn(7, 39))
-                self.assertEqual(actions.shape, (7, 4))
-                self.assertTrue(torch.all(actions >= model.action_low))
-                self.assertTrue(torch.all(actions <= model.action_high))
-                result = fit_bc(model, dataset(), dataset(), epochs=1)
-                self.assertTrue(np.isfinite(result["validation_loss"]))
+    def test_layer_norm_is_required(self):
+        with self.assertRaisesRegex(ValueError, "requires LayerNorm"):
+            GeneralPolicy(-np.ones(4), np.ones(4), use_layer_norm=False)
 
-    def test_two_layer_architecture_preserves_module_order_and_state_keys(self):
-        model = GeneralPolicy(
-            -np.ones(4), np.ones(4), hidden_sizes=(256, 256)
-        )
-        self.assertEqual(
-            [type(module) for module in model.network],
-            [nn.Linear, nn.LayerNorm, nn.ReLU, nn.Linear, nn.ReLU, nn.Linear, nn.Tanh],
-        )
-        self.assertEqual(
-            list(model.state_dict()),
-            [
-                "action_low",
-                "action_high",
-                "network.0.weight",
-                "network.0.bias",
-                "network.1.weight",
-                "network.1.bias",
-                "network.3.weight",
-                "network.3.bias",
-                "network.5.weight",
-                "network.5.bias",
-            ],
-        )
+    def test_two_layer_architecture_is_rejected(self):
+        with self.assertRaisesRegex(ValueError, "only hidden_sizes"):
+            GeneralPolicy(-np.ones(4), np.ones(4), hidden_sizes=(256, 256))
 
     def test_four_layer_architecture_forward_shape_and_bounds(self):
         model = GeneralPolicy(
@@ -115,7 +77,7 @@ class GeneralPolicyTests(unittest.TestCase):
         self.assertIsInstance(model.network[0], nn.Linear)
         self.assertIsInstance(model.network[1], nn.LayerNorm)
         self.assertIsInstance(model.network[2], nn.ReLU)
-        self.assertEqual(model.network[1].normalized_shape, (8,))
+        self.assertEqual(model.network[1].normalized_shape, (256,))
         self.assertFalse(hasattr(model, "obs_mean"))
         self.assertFalse(hasattr(model, "obs_std"))
 
@@ -183,10 +145,11 @@ class GeneralPolicyTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             for use_layer_norm in (True, False):
                 with self.subTest(use_layer_norm=use_layer_norm):
-                    model = GeneralPolicy(
-                        -np.ones(4), np.ones(4), hidden_sizes=(8, 6),
-                        use_layer_norm=use_layer_norm,
-                    ).eval()
+                    if not use_layer_norm:
+                        with self.assertRaisesRegex(ValueError, "requires LayerNorm"):
+                            GeneralPolicy(-np.ones(4), np.ones(4), use_layer_norm=False)
+                        continue
+                    model = GeneralPolicy(-np.ones(4), np.ones(4)).eval()
                     path = Path(tmp) / f"policy_{use_layer_norm}.pt"
                     model.save(path)
                     restored = GeneralPolicy.load(
@@ -200,7 +163,7 @@ class GeneralPolicyTests(unittest.TestCase):
                             expected_use_layer_norm=not use_layer_norm,
                         )
 
-    def test_legacy_layer_norm_checkpoint_remains_loadable(self):
+    def test_legacy_layer_norm_checkpoint_is_rejected(self):
         model = policy().eval()
         raw = torch.randn(3, 39)
         with tempfile.TemporaryDirectory() as tmp:
@@ -214,15 +177,12 @@ class GeneralPolicyTests(unittest.TestCase):
                 },
                 path,
             )
-            restored = GeneralPolicy.load(path, expected_use_layer_norm=True)
-            self.assertTrue(restored.use_layer_norm)
-            torch.testing.assert_close(restored(raw), model(raw))
+            with self.assertRaisesRegex(ValueError, "incompatible"):
+                GeneralPolicy.load(path, expected_use_layer_norm=True)
 
     def test_four_layer_save_reload_and_training_resume_equivalence(self):
         torch.manual_seed(13)
-        model = GeneralPolicy(
-            -np.ones(4), np.ones(4), hidden_sizes=(8, 7, 6, 5)
-        ).eval()
+        model = GeneralPolicy(-np.ones(4), np.ones(4)).eval()
         optimizer = torch.optim.Adam(model.parameters(), lr=3e-4)
         raw = torch.randn(3, 39)
         expected = model(raw).detach()
@@ -230,7 +190,7 @@ class GeneralPolicyTests(unittest.TestCase):
             path = Path(tmp) / "policy.pt"
             model.save(path, optimizer=optimizer, metadata={"stage": 1})
             restored, restored_optimizer, metadata = GeneralPolicy.load_training(path)
-            self.assertEqual(restored.hidden_sizes, (8, 7, 6, 5))
+            self.assertEqual(restored.hidden_sizes, (256, 256, 256, 256))
             self.assertEqual(metadata, {"stage": 1})
             self.assertIsInstance(restored_optimizer, torch.optim.Adam)
             torch.testing.assert_close(restored(raw), expected)
@@ -245,9 +205,21 @@ class GeneralPolicyTests(unittest.TestCase):
             path = Path(tmp) / "policy.pt"
             model.save(path)
             data = torch.load(path, map_location="cpu", weights_only=True)
-            data["hidden_sizes"] = (8, 6, 5)
+            data["hidden_sizes"] = (256, 256)
             torch.save(data, path)
             with self.assertRaisesRegex(ValueError, "stored GeneralPolicy architecture"):
+                GeneralPolicy.load(path)
+
+    def test_two_layer_v2_checkpoint_is_explicitly_rejected(self):
+        model = policy()
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "policy.pt"
+            model.save(path)
+            data = torch.load(path, map_location="cpu", weights_only=True)
+            data["hidden_sizes"] = (256, 256)
+            data["architecture"]["hidden_sizes"] = [256, 256]
+            torch.save(data, path)
+            with self.assertRaisesRegex(ValueError, "unsupported architecture"):
                 GeneralPolicy.load(path)
 
     def test_diffusion_feature_normalizer_is_unchanged(self):

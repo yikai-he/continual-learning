@@ -66,7 +66,9 @@ class BCConfig:
     epochs: int = 100
     batch_size: int = 256
     learning_rate: float = 0.001
-    hidden_sizes: List[int] = field(default_factory=lambda: [256, 256])
+    hidden_sizes: List[int] = field(
+        default_factory=lambda: [256, 256, 256, 256]
+    )
     normalization_mode: str = "layer-norm"  # Network LayerNorm, not data z-scoring.
     use_layer_norm: bool = True
     loss: str = "post-tanh-mse"  # Physical-action or pre-tanh latent-space MSE.
@@ -271,9 +273,7 @@ def default_config(experiment: str) -> ExperimentConfig:
     if experiment == "continual_sac":
         return replace(
             config,
-            sac=replace(
-                config.sac, learning_rate=3e-4, batch_size=256, net_arch=[256, 256]
-            ),
+            sac=replace(config.sac, learning_rate=3e-4, batch_size=256),
             continual=replace(config.continual, experts={}, replay_mode="none"),
             evaluation=replace(config.evaluation, episodes=100, mode="sampled"),
             runtime=replace(config.runtime, device="auto"),
@@ -514,17 +514,12 @@ def validate_config(config: ExperimentConfig) -> None:
         raise ValueError(
             "sac.early_stopping.success_threshold must be in [0, 1]."
         )
-    if not config.sac.net_arch or any(n < 1 for n in config.sac.net_arch):
-        raise ValueError("sac.net_arch must contain positive widths.")
-    if not config.bc.hidden_sizes or any(
-        isinstance(n, bool) or not isinstance(n, int) or n < 1
-        for n in config.bc.hidden_sizes
-    ):
-        raise ValueError(
-            "bc.hidden_sizes must contain one or more positive integer widths."
-        )
-    if not isinstance(config.bc.use_layer_norm, bool):
-        raise ValueError("bc.use_layer_norm must be a boolean.")
+    if config.sac.net_arch != [256, 256, 256, 256]:
+        raise ValueError("sac.net_arch must be [256, 256, 256, 256].")
+    if config.bc.hidden_sizes != [256, 256, 256, 256]:
+        raise ValueError("bc.hidden_sizes must be [256, 256, 256, 256].")
+    if config.bc.use_layer_norm is not True:
+        raise ValueError("bc.use_layer_norm must be true.")
     for path, allowed in {
         "environment.backend": ("metaworld-v3", "kuka-v2", "kuka-v3"),
         "environment.reward_function_version": ("v1", "v2"),

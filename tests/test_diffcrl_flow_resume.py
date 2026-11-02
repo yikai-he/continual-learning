@@ -79,7 +79,7 @@ def build_completed_flow_run(
     *,
     checkpoint_metadata=None,
     model_config=None,
-    policy_hidden_sizes=(8, 8),
+    policy_hidden_sizes=(256, 256, 256, 256),
 ):
     run = tmp_path / "run"
     run.mkdir()
@@ -219,7 +219,7 @@ def test_successful_flow_resume_restores_all_stage_state(tmp_path):
 
 
 def test_flow_resume_reconstructs_four_layer_general_policy(tmp_path):
-    hidden_sizes = (8, 7, 6, 5)
+    hidden_sizes = (256, 256, 256, 256)
     completed = build_completed_flow_run(
         tmp_path, policy_hidden_sizes=hidden_sizes
     )
@@ -410,6 +410,7 @@ def test_generator_free_stage_restores_policy_optimizer_rng_and_matrix(
     flow = flow_config(tmp_path, run)
     config = replace(
         flow,
+        bc=replace(flow.bc, hidden_sizes=[256, 256, 256, 256]),
         continual=replace(flow.continual, replay_mode=replay_mode),
         runtime=replace(flow.runtime, output=str(run)),
     )
@@ -423,7 +424,7 @@ def test_generator_free_stage_restores_policy_optimizer_rng_and_matrix(
             for task, path in experts.items()
         },
     )
-    policy = GeneralPolicy(-np.ones(4), np.ones(4), hidden_sizes=(8, 8))
+    policy = GeneralPolicy(-np.ones(4), np.ones(4))
     optimizer = torch.optim.Adam(policy.parameters(), lr=1e-3)
     loss = policy(torch.zeros(2, 39)).square().sum()
     loss.backward()

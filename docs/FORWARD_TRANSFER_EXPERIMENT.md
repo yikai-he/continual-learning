@@ -5,6 +5,11 @@ initialization of the same LayerNorm SAC actor on Hammer. It does not modify or
 invoke DiffCRL. The source checkpoint is the formal GeneralPolicy after Faucet,
 before Hammer.
 
+Only the four-hidden-layer `[256, 256, 256, 256]` GeneralPolicy and SAC
+architecture is supported. A completed four-layer DiffCRL checkpoint through
+Faucet is a prerequisite; historical incompatible checkpoints are rejected and
+are not converted.
+
 ## Conditions
 
 - Random: construct `TransferableSACPolicy` and retain its random actor.
@@ -20,13 +25,13 @@ and paired training seeds 0, 1, and 2.
 
 ```bash
 conda run -n metaworld python -m scripts.run_forward_transfer \
-  --config configs/forward_transfer/hammer_random.yaml \
+  --config configs/forward_transfer/hammer_4layer_random.yaml \
   --seed 0
 ```
 
 ```bash
 conda run -n metaworld python -m scripts.run_forward_transfer \
-  --config configs/forward_transfer/hammer_transferred.yaml \
+  --config configs/forward_transfer/hammer_4layer_transferred.yaml \
   --seed 0
 ```
 
@@ -35,10 +40,10 @@ conda run -n metaworld python -m scripts.run_forward_transfer \
 ```bash
 for seed in 0 1 2; do
   conda run -n metaworld python -m scripts.run_forward_transfer \
-    --config configs/forward_transfer/hammer_random.yaml \
+    --config configs/forward_transfer/hammer_4layer_random.yaml \
     --seed "$seed"
   conda run -n metaworld python -m scripts.run_forward_transfer \
-    --config configs/forward_transfer/hammer_transferred.yaml \
+    --config configs/forward_transfer/hammer_4layer_transferred.yaml \
     --seed "$seed"
 done
 ```
@@ -52,7 +57,7 @@ Use the same condition, seed, and configuration with `--resume`:
 
 ```bash
 conda run -n metaworld python -m scripts.run_forward_transfer \
-  --config configs/forward_transfer/hammer_transferred.yaml \
+  --config configs/forward_transfer/hammer_4layer_transferred.yaml \
   --seed 0 \
   --resume
 ```
@@ -65,9 +70,9 @@ history is restored before training continues.
 
 ```bash
 conda run -n metaworld python -m scripts.aggregate_forward_transfer \
-  --root runs/forward_transfer \
+  --root runs/forward_transfer_4layer \
   --seeds 0 1 2 \
-  --output runs/forward_transfer/hammer-v3/aggregate.json
+  --output runs/forward_transfer_4layer/hammer-v3/aggregate.json
 ```
 
 The output path must not already exist. The aggregator requires all six

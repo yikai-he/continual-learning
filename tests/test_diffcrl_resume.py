@@ -279,7 +279,7 @@ def _advance(module, seed):
 def test_deterministic_stage_boundary_matches_uninterrupted_execution(tmp_path):
     """Compare exact final model state for uninterrupted vs restored stage 1."""
     torch.manual_seed(12)
-    policy = GeneralPolicy(-np.ones(4), np.ones(4), hidden_sizes=(4, 4))
+    policy = GeneralPolicy(-np.ones(4), np.ones(4))
     diffusion = TrajectoryDiffusion(
         DiffusionConfig(horizon=2, steps=2, width=4, num_tasks=2)
     )

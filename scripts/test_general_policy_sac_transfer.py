@@ -71,7 +71,7 @@ def main() -> None:
             train_freq=1,
             gradient_steps=1,
             policy_kwargs={
-                "net_arch": [256, 256],
+                "net_arch": [256, 256, 256, 256],
                 "log_std_init": args.log_std_init,
             },
             seed=args.seed,

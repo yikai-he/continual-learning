@@ -12,11 +12,7 @@ from torch import nn
 
 from src.continual.bc_policy import GeneralPolicy
 from src.envs import ACTION_SHAPE, OBSERVATION_SHAPE
-from src.sac.transferable_actor import (
-    GENERAL_POLICY_HIDDEN_SIZES,
-    TransferableActor,
-    TransferableSACPolicy,
-)
+from src.sac.transferable_actor import TransferableActor, TransferableSACPolicy
 
 
 @dataclass(frozen=True)
@@ -40,20 +36,36 @@ class EquivalenceReport:
         return asdict(self)
 
 
+def parameter_mapping(policy: GeneralPolicy, actor: TransferableActor) -> dict[str, str]:
+    """Derive the complete transferable pathway from module structure."""
+    source = [(name, module) for name, module in policy.network.named_children()
+              if isinstance(module, (nn.Linear, nn.LayerNorm))]
+    target = [(name, module) for name, module in actor.latent_pi.named_children()
+              if isinstance(module, (nn.Linear, nn.LayerNorm))]
+    target.append(("mu", actor.mu))
+    if len(source) != len(target) or any(type(a[1]) is not type(b[1]) for a, b in zip(source, target)):
+        raise ValueError("GeneralPolicy and SAC actor parameter pathways are incompatible.")
+    return {f"network.{a[0]}": f"actor.{('latent_pi.' + b[0]) if b[0] != 'mu' else 'mu'}"
+            for a, b in zip(source, target)}
+
+
 PARAMETER_MAPPING = {
     "network.0": "actor.latent_pi.0",
     "network.1": "actor.latent_pi.1",
     "network.3": "actor.latent_pi.3",
-    "network.5": "actor.mu",
+    "network.5": "actor.latent_pi.5",
+    "network.7": "actor.latent_pi.7",
+    "network.9": "actor.mu",
 }
 
 
 def _validate_compatibility(policy: GeneralPolicy, actor: TransferableActor) -> None:
     if not policy.use_layer_norm:
         raise ValueError("Immediate Policy transfer requires a LayerNorm GeneralPolicy.")
-    if policy.hidden_sizes != GENERAL_POLICY_HIDDEN_SIZES:
+    if policy.hidden_sizes != tuple(actor.net_arch):
         raise ValueError(
-            "Immediate Policy transfer requires GeneralPolicy hidden sizes (256, 256)."
+            "Immediate Policy transfer requires matching GeneralPolicy and SAC "
+            f"hidden sizes; checkpoint={policy.hidden_sizes}, actor={tuple(actor.net_arch)}."
         )
     if actor.observation_space.shape != OBSERVATION_SHAPE:
         raise ValueError("SAC actor observation space is not 39D.")
@@ -67,9 +79,7 @@ def _validate_compatibility(policy: GeneralPolicy, actor: TransferableActor) -> 
     )
     if not low_matches or not high_matches:
         raise ValueError("GeneralPolicy and SAC action bounds differ.")
-    expected = (nn.Linear, nn.LayerNorm, nn.ReLU, nn.Linear, nn.ReLU)
-    if tuple(type(module) for module in actor.latent_pi) != expected:
-        raise ValueError("SAC actor mean pathway is incompatible with GeneralPolicy.")
+    parameter_mapping(policy, actor)
 
 
 def transfer_general_policy_to_sac(
@@ -95,22 +105,15 @@ def transfer_general_policy_to_sac(
     ):
         raise ValueError("SAC model does not use TransferableSACPolicy.")
     _validate_compatibility(policy, actor)
-    source_modules = (
-        policy.network[0],
-        policy.network[1],
-        policy.network[3],
-        policy.network[5],
-    )
-    target_modules = (
-        actor.latent_pi[0],
-        actor.latent_pi[1],
-        actor.latent_pi[3],
-        actor.mu,
-    )
+    mapping = parameter_mapping(policy, actor)
+    source_modules = dict(policy.network.named_modules())
+    target_modules = dict(actor.named_modules())
     with torch.no_grad():
-        for source_module, target_module in zip(source_modules, target_modules):
-            target_module.load_state_dict(source_module.state_dict(), strict=True)
-    return TransferReport(source_path, dict(PARAMETER_MAPPING))
+        for source_name, target_name in mapping.items():
+            target_modules[target_name.removeprefix("actor.")].load_state_dict(
+                source_modules[source_name.removeprefix("network.")].state_dict(), strict=True
+            )
+    return TransferReport(source_path, mapping)
 
 
 def deterministic_equivalence(

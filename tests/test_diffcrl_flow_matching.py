@@ -309,7 +309,7 @@ def test_flow_checkpoint_filename_metadata_and_artifact_key(tmp_path):
 def test_ddpm_and_policy_checkpoint_metadata_optimizer_and_load_compatibility(tmp_path):
     trainer = initialize(tmp_path, "diffusion")
     trainer.output = tmp_path
-    trainer.policy = GeneralPolicy(-np.ones(4), np.ones(4), hidden_sizes=(8, 8))
+    trainer.policy = GeneralPolicy(-np.ones(4), np.ones(4))
     trainer.policy_optimizer = torch.optim.Adam(trainer.policy.parameters(), lr=1e-3)
     loss = trainer.policy(torch.zeros(2, 39)).square().sum()
     loss.backward()
@@ -374,6 +374,7 @@ def test_ddpm_and_policy_checkpoint_metadata_optimizer_and_load_compatibility(tm
         "bc_clamp_epsilon": 1e-4,
         "bc_normalization_mode": trainer.config.bc.normalization_mode,
         "bc_use_layer_norm": trainer.config.bc.use_layer_norm,
+            "bc_hidden_sizes": trainer.config.bc.hidden_sizes,
         "diffusion_action_space": trainer.config.diffusion.action_space,
         "diffusion_action_clamp_epsilon": trainer.config.diffusion.action_clamp_epsilon,
         "generated_action_projection": trainer.config.diffusion.generated_action_projection,

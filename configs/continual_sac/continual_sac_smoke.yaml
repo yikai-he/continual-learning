@@ -16,6 +16,8 @@ sac:
   net_arch:
   - 256
   - 256
+  - 256
+  - 256
 continual:
   tasks:
   - reach-v3

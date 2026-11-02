@@ -1,6 +1,5 @@
-"""Controlled KUKA ten-task GeneralPolicy architecture comparison."""
+"""Unified four-layer KUKA ten-task configuration contract."""
 
-from dataclasses import asdict
 from pathlib import Path
 
 from src.config import load_config
@@ -8,7 +7,6 @@ from src.continual.replay_allocation import replay_counts
 
 
 ROOT = Path(__file__).resolve().parents[1]
-TWO = ROOT / "configs/diffcrl/diffcrl_kuka_10task_15plus15_2layer.yaml"
 FOUR = ROOT / "configs/diffcrl/diffcrl_kuka_10task_15plus15_4layer.yaml"
 TASKS = [
     "kuka-hammer-v3",
@@ -24,27 +22,14 @@ TASKS = [
 ]
 
 
-def _without_architecture_and_output(config):
-    value = asdict(config)
-    del value["bc"]["hidden_sizes"]
-    del value["runtime"]["output"]
-    return value
-
-
-def test_resolved_architecture_configs_differ_only_as_permitted() -> None:
-    two = load_config(TWO, expected_experiment="diffcrl")
+def test_resolved_architecture_is_four_layers() -> None:
     four = load_config(FOUR, expected_experiment="diffcrl")
-    assert two.bc.hidden_sizes == [256, 256]
     assert four.bc.hidden_sizes == [256, 256, 256, 256]
-    assert two.runtime.output == "runs/formal/kuka_10task_15plus15_2layer/"
     assert four.runtime.output == "runs/formal/kuka_10task_15plus15_4layer/"
-    assert _without_architecture_and_output(two) == _without_architecture_and_output(
-        four
-    )
 
 
 def test_kuka_ten_task_protocol_and_experts_are_exact() -> None:
-    for config in (load_config(TWO), load_config(FOUR)):
+    for config in (load_config(FOUR),):
         assert config.environment.backend == "kuka-v3"
         assert config.environment.reward_function_version == "v2"
         assert config.environment.hammer_reward_variant == "nail_progress"

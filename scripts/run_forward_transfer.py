@@ -170,7 +170,11 @@ def main(argv=None) -> None:
             "source_general_policy": source_identity,
             "task_bank_check": task_bank,
             "initialization": config.condition,
-            "actor_architecture": "TransferableSACPolicy LayerNorm [256, 256]",
+            "actor_architecture": {
+                "policy": "TransferableSACPolicy",
+                "net_arch": list(config.sac.net_arch),
+                "layer_norm_after_hidden": [0],
+            },
         }
         _write_run_metadata(run_dir / "metadata.json", metadata, initial=True)
 
@@ -239,7 +243,7 @@ def main(argv=None) -> None:
                 gradient_steps=config.sac.gradient_steps,
                 ent_coef=config.sac.ent_coef,
                 policy_kwargs={
-                    "net_arch": [256, 256],
+                    "net_arch": config.sac.net_arch,
                     "log_std_init": config.sac.log_std_init,
                 },
                 tensorboard_log=str(run_dir / "tensorboard"),

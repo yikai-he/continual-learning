@@ -306,8 +306,11 @@ Replay allocation supports:
 
 The `none` mode trains BC only from the current expert group. All methods use
 the same persistent `GeneralPolicy`: an MLP over raw 39D observations with
-LayerNorm in the first hidden layer and a final `tanh` mapped to environment
-action bounds. BC supports physical post-`tanh` MSE and pre-`tanh` latent MSE;
+exactly four 256-unit hidden layers, LayerNorm after the first Linear layer,
+ReLU activations, and a final `tanh` mapped to environment action bounds. This
+is the only supported GeneralPolicy and transferable SAC architecture;
+incompatible checkpoints and `net_arch` values are rejected. BC supports
+physical post-`tanh` MSE and pre-`tanh` latent MSE;
 checkpoint selection always uses held-out physical action MSE.
 
 ## 7. Data contracts

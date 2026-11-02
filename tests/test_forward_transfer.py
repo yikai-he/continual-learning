@@ -50,7 +50,7 @@ def _model(seed=0):
     return SAC(
         TransferableSACPolicy,
         SpacesOnlyEnv(),
-        policy_kwargs={"net_arch": [256, 256], "log_std_init": -3.0},
+        policy_kwargs={"net_arch": [256, 256, 256, 256], "log_std_init": -3.0},
         seed=seed,
         device="cpu",
         verbose=0,
@@ -59,10 +59,10 @@ def _model(seed=0):
 
 def test_paired_configs_differ_only_in_condition_and_output_path():
     random = load_forward_transfer_config(
-        ROOT / "configs/forward_transfer/hammer_random.yaml"
+        ROOT / "configs/forward_transfer/hammer_4layer_random.yaml"
     )
     transferred = load_forward_transfer_config(
-        ROOT / "configs/forward_transfer/hammer_transferred.yaml"
+        ROOT / "configs/forward_transfer/hammer_4layer_transferred.yaml"
     )
     left, right = asdict(random), asdict(transferred)
     left.pop("condition")
@@ -71,10 +71,10 @@ def test_paired_configs_differ_only_in_condition_and_output_path():
     assert random.condition == "random"
     assert transferred.condition == "transferred"
     assert resolved_run_directory(random).as_posix().endswith(
-        "runs/forward_transfer/hammer-v3/random/seed_0"
+        "runs/forward_transfer_4layer/hammer-v3/random/seed_0"
     )
     assert resolved_run_directory(transferred).as_posix().endswith(
-        "runs/forward_transfer/hammer-v3/transferred/seed_0"
+        "runs/forward_transfer_4layer/hammer-v3/transferred/seed_0"
     )
 
 
@@ -89,9 +89,7 @@ def test_random_and_transferred_start_identically_except_mean_pathway():
         random.policy.critic.parameters(), transferred.policy.critic.parameters()
     ):
         torch.testing.assert_close(left, right, rtol=0, atol=0)
-    general = GeneralPolicy(
-        -np.ones(4), np.ones(4), hidden_sizes=(256, 256), use_layer_norm=True
-    )
+    general = GeneralPolicy(-np.ones(4), np.ones(4))
     log_std = {
         name: value.detach().clone()
         for name, value in transferred.policy.actor.log_std.named_parameters()
@@ -118,10 +116,10 @@ def test_random_and_transferred_start_identically_except_mean_pathway():
 
 def test_temporal_checkpoint_requires_faucet_before_hammer(tmp_path):
     config = load_forward_transfer_config(
-        ROOT / "configs/forward_transfer/hammer_transferred.yaml"
+        ROOT / "configs/forward_transfer/hammer_4layer_transferred.yaml"
     )
     checkpoint = tmp_path / "policy.pt"
-    policy = GeneralPolicy(-np.ones(4), np.ones(4), hidden_sizes=(256, 256))
+    policy = GeneralPolicy(-np.ones(4), np.ones(4))
     policy.save(
         checkpoint,
         metadata={
@@ -187,7 +185,7 @@ def test_evaluation_grid_auc_threshold_and_pairing():
 
 def test_config_exclusive_save_and_resume_evaluation_hydration(tmp_path):
     config = load_forward_transfer_config(
-        ROOT / "configs/forward_transfer/hammer_random.yaml", seed=2
+        ROOT / "configs/forward_transfer/hammer_4layer_random.yaml", seed=2
     )
     config_path = tmp_path / "config.yaml"
     save_resolved_forward_transfer_config(config, config_path)

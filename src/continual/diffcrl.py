@@ -351,6 +351,7 @@ class DiffCRLTrainer:
             GeneralPolicy.load_training(
                 artifacts["policy"]["resolved_path"],
                 expected_use_layer_norm=self.config.bc.use_layer_norm,
+                expected_hidden_sizes=tuple(self.config.bc.hidden_sizes),
             )
         )
         if (
@@ -928,6 +929,7 @@ class DiffCRLTrainer:
                 "bc_clamp_epsilon": BC_CLAMP_EPSILON,
                 "bc_normalization_mode": cfg.bc.normalization_mode,
                 "bc_use_layer_norm": cfg.bc.use_layer_norm,
+                "bc_hidden_sizes": list(cfg.bc.hidden_sizes),
                 "diffusion_action_space": cfg.diffusion.action_space,
                 "diffusion_action_clamp_epsilon": cfg.diffusion.action_clamp_epsilon,
                 "generated_action_projection": cfg.diffusion.generated_action_projection,
