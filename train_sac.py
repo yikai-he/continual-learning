@@ -5,6 +5,7 @@ from __future__ import annotations
 import csv
 import hashlib
 import json
+import os
 import re
 from collections import deque
 from datetime import datetime
@@ -216,6 +217,9 @@ class FixedSeedEvalCallback(BaseCallback):
         evaluation_mode: str = "sampled",
         evaluate_on_training_start: bool = True,
         early_stopping: EarlyStoppingConfig | None = None,
+        save_best_return: bool = True,
+        best_success_model_name: str = "best_success_model",
+        atomic_model_replacement: bool = False,
     ) -> None:
         super().__init__()
         self.eval_env = eval_env
@@ -230,6 +234,9 @@ class FixedSeedEvalCallback(BaseCallback):
         self.task_name = task_name
         self.evaluate_on_training_start = evaluate_on_training_start
         self.early_stopping = early_stopping or EarlyStoppingConfig()
+        self.save_best_return = save_best_return
+        self.best_success_model_name = best_success_model_name
+        self.atomic_model_replacement = atomic_model_replacement
         self.consecutive_successful_evaluations = 0
         self.early_stopped = False
         self.stop_timestep: int | None = None
@@ -275,6 +282,20 @@ class FixedSeedEvalCallback(BaseCallback):
         self.success_diagnostics: list[list[dict]] = []
         self.hammer_metrics: list[list[dict]] = []
         self.handoff_metrics: list[list[dict]] = []
+
+    def _save_model(self, path: Path) -> None:
+        """Save directly by default, or atomically replace one named archive."""
+        path = Path(path)
+        if not self.atomic_model_replacement:
+            self.model.save(path)
+            return
+        target = path if path.suffix == ".zip" else path.with_suffix(".zip")
+        temporary = target.with_name(f".{target.stem}.{os.getpid()}.tmp.zip")
+        try:
+            self.model.save(temporary)
+            os.replace(temporary, target)
+        finally:
+            temporary.unlink(missing_ok=True)
 
     def _evaluate(self) -> tuple[list[float], list[int], list[bool]]:
         returns, lengths, successes = [], [], []
@@ -464,13 +485,17 @@ class FixedSeedEvalCallback(BaseCallback):
                 if values:
                     self.logger.record(f"eval/handoff_{metric}", float(np.mean(values)))
 
-        if mean_return > self.best_mean_return:
+        if self.save_best_return and mean_return > self.best_mean_return:
             self.best_mean_return = mean_return
-            self.model.save(self.best_model_save_path / "best_model")
+            self._save_model(self.best_model_save_path / "best_model")
+        elif mean_return > self.best_mean_return:
+            self.best_mean_return = mean_return
         score = success_score(success_rate, mean_return)
         if score > self.best_success_score:
             self.best_success_score = score
-            self.model.save(self.best_success_model_save_path / "best_success_model")
+            self._save_model(
+                self.best_success_model_save_path / self.best_success_model_name
+            )
         return self._update_early_stopping(success_rate) if allow_early_stop else True
 
     def _update_early_stopping(self, success_rate: float) -> bool:
@@ -681,6 +706,11 @@ def load_resumable_sac(checkpoint_path: Path, env, *, device: str):
             "Resume checkpoint is incompatible with the current task's "
             f"observation or action space: {error}"
         ) from error
+    if getattr(model.policy, "net_arch", None) != [256, 256, 256, 256]:
+        raise ValueError(
+            "Resume checkpoint uses an unsupported SAC architecture; only "
+            "net_arch=[256, 256, 256, 256] is accepted."
+        )
     model.load_replay_buffer(buffer_path)
     if model.replay_buffer is None:
         raise RuntimeError("Replay buffer loading completed without a replay buffer.")

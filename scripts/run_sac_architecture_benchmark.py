@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
-"""Run independent two-layer LayerNorm SAC benchmarks (no policy transfer)."""
+"""Run independent four-layer LayerNorm SAC benchmarks (no policy transfer)."""
 
 from __future__ import annotations
 
 import argparse
+import csv
 import json
+import os
 import time
 from dataclasses import asdict
 from pathlib import Path
@@ -12,7 +14,7 @@ from pathlib import Path
 import numpy as np
 import torch
 from stable_baselines3 import SAC
-from stable_baselines3.common.callbacks import CallbackList
+from stable_baselines3.common.callbacks import BaseCallback, CallbackList
 from stable_baselines3.common.monitor import Monitor
 
 from src.config import EarlyStoppingConfig
@@ -22,7 +24,7 @@ from src.continual.task_bank import backend_tasks, bank_hashes
 from src.continual.task_sequence import TaskSpec
 from src.envs import make_env
 from src.sac.transferable_actor import TransferableSACPolicy
-from src.sac.two_layer_benchmark import (
+from src.sac.architecture_benchmark import (
     load_benchmark_config, run_directory, success_auc,
     stopping_reason, validate_installed_tasks,
 )
@@ -30,7 +32,7 @@ from src.support.io import atomic_replace_json, atomic_write_json
 from src.support.reproducibility import file_hash
 from train_sac import (
     FixedSeedEvalCallback, GlobalCheckpointCallback, TrainingSuccessCallback,
-    load_resumable_sac, remaining_timesteps,
+    load_resumable_sac, next_global_boundary, remaining_timesteps,
 )
 
 
@@ -45,7 +47,81 @@ class BenchmarkEvalCallback(FixedSeedEvalCallback):
         )
         self.logger.record("eval/best_success_rate", self.best_success_score[0])
         self.logger.record("time/actual_training_timesteps", self.num_timesteps)
+        self._write_evaluation_csv()
         return result
+
+    def _write_evaluation_csv(self):
+        """Atomically retain the complete evaluation history in tabular form."""
+        path = Path(self.log_path) / "evaluation_history.csv"
+        temporary = path.with_name(f".{path.name}.{os.getpid()}.tmp")
+        best_success = (-np.inf, -np.inf)
+        best_return = -np.inf
+        try:
+            with temporary.open("w", encoding="utf-8", newline="") as output:
+                fields = [
+                    "timestep", "success_rate", "mean_return", "return_std",
+                    "best_success_rate", "best_mean_return",
+                ]
+                writer = csv.DictWriter(output, fieldnames=fields)
+                writer.writeheader()
+                for step, returns, successes, return_std in zip(
+                    self.timesteps,
+                    self.results,
+                    self.successes,
+                    self.return_stddevs,
+                ):
+                    success_rate = float(np.mean(successes))
+                    mean_return = float(np.mean(returns))
+                    best_success = max(best_success, (success_rate, mean_return))
+                    best_return = max(best_return, mean_return)
+                    writer.writerow(
+                        {
+                            "timestep": step,
+                            "success_rate": success_rate,
+                            "mean_return": mean_return,
+                            "return_std": return_std,
+                            "best_success_rate": best_success[0],
+                            "best_mean_return": best_return,
+                        }
+                    )
+            os.replace(temporary, path)
+        finally:
+            temporary.unlink(missing_ok=True)
+
+
+def _atomic_replace_model(model, path: Path) -> None:
+    """Replace one SB3 zip without exposing a partially written destination."""
+    path = Path(path)
+    temporary = path.with_name(f".{path.stem}.{os.getpid()}.tmp.zip")
+    try:
+        model.save(temporary)
+        os.replace(temporary, path)
+    finally:
+        temporary.unlink(missing_ok=True)
+
+
+class LatestModelCallback(BaseCallback):
+    """Atomically replace a single inference checkpoint on global boundaries."""
+
+    def __init__(self, save_freq: int, path: Path) -> None:
+        super().__init__()
+        self.save_freq = save_freq
+        self.path = Path(path)
+        self._next_checkpoint_timestep = None
+
+    def _on_training_start(self) -> None:
+        self._next_checkpoint_timestep = next_global_boundary(
+            self.model.num_timesteps, self.save_freq
+        )
+
+    def _on_step(self) -> bool:
+        if self.num_timesteps < self._next_checkpoint_timestep:
+            return True
+        _atomic_replace_model(self.model, self.path)
+        self._next_checkpoint_timestep = next_global_boundary(
+            self.num_timesteps, self.save_freq
+        )
+        return True
 
 
 def _write_metadata(path, value, *, initial):
@@ -111,6 +187,8 @@ def _hydrate(callback, run_dir, maximum_step, settings):
         count += 1
     callback.consecutive_successful_evaluations = count
     if (
+        getattr(settings, "enabled", True)
+        and
         callback.timesteps[-1] >= settings.min_timesteps
         and count >= settings.consecutive_evaluations
     ):
@@ -154,6 +232,12 @@ def _final_test(config, task, model):
 
 
 def run_one(config, task, seed, *, resume=False):
+    low_disk = config.experiment == "sac_4layer_3task_1m"
+    if low_disk and resume:
+        raise ValueError(
+            "The low-disk three-task experiment cannot resume training because "
+            "replay buffers are intentionally not persisted. Restart from scratch."
+        )
     run_dir = run_directory(config, task, seed)
     if resume:
         if not (run_dir / "RUNNING").is_file() or (run_dir / "RUN_COMPLETE").exists():
@@ -170,7 +254,7 @@ def run_one(config, task, seed, *, resume=False):
         checkpoint = checkpoints[-1]
         metadata = json.loads((run_dir / "metadata.json").read_text())
         if (
-            metadata.get("kind") != "sac_2layer_benchmark_run_v1"
+            metadata.get("kind") != f"{config.experiment}_run_v1"
             or metadata.get("task") != task
             or metadata.get("seed") != seed
             or metadata.get("config") != asdict(config)
@@ -184,18 +268,33 @@ def run_one(config, task, seed, *, resume=False):
         with (run_dir / "config.yaml").open("x", encoding="utf-8") as output:
             yaml.safe_dump(asdict(config), output, sort_keys=False)
         (run_dir / "RUNNING").write_text("running\n", encoding="utf-8")
-        for name in ("tensorboard", "evaluations", "checkpoints", "best_model", "best_success_model"):
+        directories = ("tensorboard", "evaluations") if low_disk else (
+            "tensorboard", "evaluations", "checkpoints", "best_model",
+            "best_success_model",
+        )
+        for name in directories:
             (run_dir / name).mkdir()
         checkpoint = None
         metadata = {
-            "kind": "sac_2layer_benchmark_run_v1", "task": task, "seed": seed,
+            "kind": f"{config.experiment}_run_v1", "task": task, "seed": seed,
             "config": asdict(config),
             "task_banks": _bank_provenance(
                 task, seed, config.evaluation.validation_task_set_seed,
                 config.evaluation.final_task_set_seeds,
             ),
             "initialization": "random; no GeneralPolicy or expert transfer",
+            "architecture": {
+                "actor_hidden_sizes": list(config.policy.net_arch),
+                "critic_hidden_sizes": list(config.policy.net_arch),
+                "actor_layer_norm_after_hidden": [0],
+            },
             "training_duration_seconds": 0.0,
+            "checkpoint_strategy": (
+                "low-disk: atomically replaced best_model.zip and latest_model.zip; "
+                "no replay persistence or exact resume"
+                if low_disk
+                else "periodic paired model and replay-buffer checkpoints"
+            ),
         }
         _write_metadata(run_dir / "metadata.json", metadata, initial=True)
 
@@ -213,7 +312,9 @@ def run_one(config, task, seed, *, resume=False):
             seed=config.evaluation.validation_reset_seed,
             log_path=run_dir / "evaluations",
             best_model_save_path=run_dir / "best_model",
-            best_success_model_save_path=run_dir / "best_success_model",
+            best_success_model_save_path=(
+                run_dir if low_disk else run_dir / "best_success_model"
+            ),
             task_name=task,
             task_set_seed=config.evaluation.validation_task_set_seed,
             evaluation_mode="fixed-tasks", evaluate_on_training_start=not resume,
@@ -222,15 +323,22 @@ def run_one(config, task, seed, *, resume=False):
                 success_threshold=stop.threshold,
                 patience=stop.consecutive_evaluations,
             ),
+            save_best_return=not low_disk,
+            best_success_model_name=("best_model" if low_disk else "best_success_model"),
+            atomic_model_replacement=low_disk,
         )
-        callbacks = CallbackList([
-            TrainingSuccessCallback(), callback,
-            GlobalCheckpointCallback(
+        checkpoint_callback = (
+            LatestModelCallback(config.checkpoint_frequency, run_dir / "latest_model.zip")
+            if low_disk
+            else GlobalCheckpointCallback(
                 save_freq=config.checkpoint_frequency,
                 save_path=str(run_dir / "checkpoints"), name_prefix="sac",
                 save_replay_buffer=True,
-            ),
-        ])
+            )
+        )
+        callbacks = CallbackList(
+            [TrainingSuccessCallback(), callback, checkpoint_callback]
+        )
         if resume:
             model, _ = load_resumable_sac(checkpoint, train_env, device=config.training.device)
             _hydrate(callback, run_dir, model.num_timesteps, stop)
@@ -264,23 +372,35 @@ def run_one(config, task, seed, *, resume=False):
         if remaining:
             model.learn(
                 total_timesteps=remaining, callback=callbacks,
-                tb_log_name="SAC_2layer", progress_bar=True,
+                tb_log_name=config.experiment, progress_bar=True,
                 reset_num_timesteps=reset,
             )
         duration = float(metadata.get("training_duration_seconds", 0.0)) + (
             time.monotonic() - started
         )
-        model.save(run_dir / "final_model")
-        model.save_replay_buffer(run_dir / "final_replay_buffer.pkl")
-        best_path = run_dir / "best_success_model" / "best_success_model.zip"
+        if not stop.enabled and model.num_timesteps != config.training.max_timesteps:
+            raise RuntimeError(
+                "Full-budget training ended without exactly reaching max_timesteps."
+            )
+        if low_disk:
+            _atomic_replace_model(model, run_dir / "latest_model.zip")
+        else:
+            model.save(run_dir / "final_model")
+            model.save_replay_buffer(run_dir / "final_replay_buffer.pkl")
+        best_path = (
+            run_dir / "best_model.zip"
+            if low_disk
+            else run_dir / "best_success_model" / "best_success_model.zip"
+        )
         best = SAC.load(best_path, device=config.training.device)
         final_test = _final_test(config, task, best)
         with np.load(run_dir / "evaluations" / "evaluations.npz") as archive:
             steps = archive["timesteps"].astype(int).tolist()
             rates = np.mean(archive["successes"], axis=1).tolist()
             returns = np.mean(archive["results"], axis=1).tolist()
+            return_stddevs = archive["return_stddevs"].astype(float).tolist()
         result = {
-            "kind": "sac_2layer_benchmark_result_v1", "task": task, "seed": seed,
+            "kind": f"{config.experiment}_result_v1", "task": task, "seed": seed,
             "actual_training_steps": model.num_timesteps,
             "stopping_reason": stopping_reason(
                 callback.early_stopped,
@@ -289,13 +409,32 @@ def run_one(config, task, seed, *, resume=False):
             ),
             "best_validation_success": max(rates),
             "best_validation_mean_return_at_best_success": max(zip(rates, returns))[1],
+            "best_validation_mean_return": max(returns),
             "best_success_checkpoint": str(best_path),
             "best_success_checkpoint_sha256": file_hash(best_path),
+            "latest_model": str(
+                run_dir / ("latest_model.zip" if low_disk else "final_model.zip")
+            ),
+            "latest_model_sha256": file_hash(
+                run_dir / ("latest_model.zip" if low_disk else "final_model.zip")
+            ),
             "training_duration_seconds": duration,
             "evaluation_steps": steps, "validation_success_rates": rates,
+            "validation_mean_returns": returns,
+            "validation_return_standard_deviations": return_stddevs,
             "success_auc": success_auc(steps, rates), "final_test": final_test,
         }
+        if not low_disk:
+            result.update(
+                best_return_checkpoint=str(
+                    run_dir / "best_model" / "best_model.zip"
+                ),
+                best_return_checkpoint_sha256=file_hash(
+                    run_dir / "best_model" / "best_model.zip"
+                ),
+            )
         atomic_write_json(run_dir / "result.json", result)
+        atomic_write_json(run_dir / "summary.json", result)
         metadata["result"] = result
         metadata["training_duration_seconds"] = duration
         _write_metadata(run_dir / "metadata.json", metadata, initial=False)
@@ -307,7 +446,7 @@ def run_one(config, task, seed, *, resume=False):
 
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--config", type=Path, default=Path("configs/sac_2layer_benchmark.yaml"))
+    parser.add_argument("--config", type=Path, default=Path("configs/sac_4layer_benchmark.yaml"))
     group = parser.add_mutually_exclusive_group(required=True)
     group.add_argument("--task", choices=None)
     group.add_argument("--all", action="store_true")

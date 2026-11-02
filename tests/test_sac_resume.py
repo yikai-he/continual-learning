@@ -125,6 +125,7 @@ class SACResumeTests(unittest.TestCase):
             model = MagicMock()
             model.num_timesteps = 400_000
             model.replay_buffer = MagicMock()
+            model.policy.net_arch = [256, 256, 256, 256]
             env = MagicMock()
             with patch.object(train_sac.SAC, "load", return_value=model) as load:
                 loaded, replay_path = train_sac.load_resumable_sac(
@@ -135,6 +136,19 @@ class SACResumeTests(unittest.TestCase):
             self.assertEqual(replay_path, replay.resolve())
             load.assert_called_once_with(checkpoint.resolve(), env=env, device="cpu")
             model.load_replay_buffer.assert_called_once_with(replay.resolve())
+
+    def test_unsupported_checkpoint_architecture_is_rejected(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            checkpoint = Path(tmp) / "sac_10_steps.zip"
+            replay = Path(tmp) / "sac_replay_buffer_10_steps.pkl"
+            checkpoint.write_bytes(b"model")
+            replay.write_bytes(b"buffer")
+            model = MagicMock()
+            model.policy.net_arch = [256, 256]
+            with patch.object(train_sac.SAC, "load", return_value=model), self.assertRaisesRegex(
+                ValueError, "unsupported SAC architecture"
+            ):
+                train_sac.load_resumable_sac(checkpoint, MagicMock(), device="cpu")
 
     def test_incompatible_spaces_have_clear_error(self):
         with tempfile.TemporaryDirectory() as tmp:

@@ -1,11 +1,20 @@
 # Diffusion Replay for Continual RL
 
+GeneralPolicy, Immediate SAC, continual SAC, and active SAC benchmarks use one
+supported policy architecture: four hidden layers of width 256. GeneralPolicy
+and the transferable SAC actor apply LayerNorm after the first Linear layer.
+Older incompatible checkpoints are historical artifacts and are rejected by
+active training, transfer, and resume entry points.
+
 This repository contains the continual-learning and DiffCRL experiments for
 modern MetaWorld v3. Default Sawyer tasks use the `metaworld` Conda
 environment.
 
 For the implemented system design, data contracts, replay methods, checkpoint
 formats, and developer guide, see [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
+
+The full-budget three-task SAC protocol and remote-server commands are in
+[docs/SAC_4LAYER_3TASK_1M.md](docs/SAC_4LAYER_3TASK_1M.md).
 
 ## Environment setup
 

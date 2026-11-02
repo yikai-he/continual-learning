@@ -1,4 +1,4 @@
-"""Configuration and read-only summaries for the ten-task SAC benchmark."""
+"""Configuration and read-only summaries for the four-layer SAC benchmark."""
 
 from __future__ import annotations
 
@@ -16,6 +16,7 @@ TASKS = [
     "button-press-topdown-v3", "faucet-open-v3", "drawer-close-v3",
     "window-close-v3", "door-open-v3", "peg-unplug-side-v3",
 ]
+THREE_TASK_1M_TASKS = ["reach-v3", "hammer-v3", "handle-press-side-v3"]
 
 
 @dataclass(frozen=True)
@@ -37,7 +38,7 @@ class BenchmarkTraining:
 @dataclass(frozen=True)
 class BenchmarkPolicy:
     type: str = "TransferableSACPolicy"
-    net_arch: list[int] = field(default_factory=lambda: [256, 256])
+    net_arch: list[int] = field(default_factory=lambda: [256, 256, 256, 256])
     log_std_init: float = -3.0
 
 
@@ -61,7 +62,7 @@ class BenchmarkEarlyStopping:
 
 @dataclass(frozen=True)
 class BenchmarkConfig:
-    experiment: str = "sac_2layer_benchmark"
+    experiment: str = "sac_4layer_benchmark"
     algorithm: str = "SAC"
     tasks: list[str] = field(default_factory=lambda: list(TASKS))
     seeds: list[int] = field(default_factory=lambda: [0, 1, 2])
@@ -71,7 +72,7 @@ class BenchmarkConfig:
     evaluation: BenchmarkEvaluation = field(default_factory=BenchmarkEvaluation)
     early_stopping: BenchmarkEarlyStopping = field(default_factory=BenchmarkEarlyStopping)
     checkpoint_frequency: int = 50_000
-    output: str = "runs/sac_2layer_benchmark"
+    output: str = "runs/sac_4layer_benchmark"
 
 
 def _section(value, cls, name):
@@ -101,33 +102,52 @@ def load_benchmark_config(path: str | Path) -> BenchmarkConfig:
 
 
 def validate_benchmark_config(config: BenchmarkConfig) -> None:
-    if config.experiment != "sac_2layer_benchmark" or config.tasks != TASKS:
+    profiles = {
+        "sac_4layer_benchmark": (TASKS, True, "runs/sac_4layer_benchmark"),
+        "sac_4layer_3task_1m": (
+            THREE_TASK_1M_TASKS,
+            False,
+            "runs/sac_4layer_3task_1m",
+        ),
+    }
+    if config.experiment not in profiles:
+        raise ValueError("Unknown SAC experiment profile.")
+    tasks, early_stopping_enabled, output = profiles[config.experiment]
+    if config.tasks != tasks:
         raise ValueError("Benchmark experiment or ordered task list is invalid.")
+    if config.output != output:
+        raise ValueError(f"{config.experiment} output must be {output}.")
     if config.algorithm != "SAC":
         raise ValueError("The benchmark algorithm must be SAC.")
     if (
         config.policy.type != "TransferableSACPolicy"
-        or config.policy.net_arch != [256, 256]
+        or config.policy.net_arch != [256, 256, 256, 256]
         or not np.isfinite(config.policy.log_std_init)
     ):
-        raise ValueError("The benchmark requires TransferableSACPolicy [256, 256].")
+        raise ValueError(
+            "The benchmark requires TransferableSACPolicy [256, 256, 256, 256]."
+        )
     if len(set(config.seeds)) != len(config.seeds) or any(s not in range(2**32) for s in config.seeds):
         raise ValueError("Benchmark seeds must be unique uint32 values.")
     t, e, stop = config.training, config.evaluation, config.early_stopping
-    if t.max_timesteps <= t.learning_starts or t.batch_size <= 0 or t.buffer_size <= 0:
-        raise ValueError("Invalid SAC budget, warm-up, batch, or buffer size.")
-    if t.train_freq != 1 or t.gradient_steps != 1 or t.ent_coef != "auto":
-        raise ValueError("Benchmark must retain standard one-to-one automatic-entropy SAC.")
+    expected_training = BenchmarkTraining()
+    if t != expected_training:
+        raise ValueError(
+            "SAC training settings must match the fixed 1M-step baseline."
+        )
     if t.device != "cpu" or t.torch_num_threads != 1:
         raise ValueError("Benchmark requires CPU with one PyTorch thread.")
-    if e.frequency <= 0 or e.episodes != 50 or t.max_timesteps % e.frequency:
-        raise ValueError("Evaluation must use 50 episodes on a divisible frequency.")
+    if e.frequency != 20_000 or e.episodes != 50:
+        raise ValueError("Evaluation must use 50 episodes every 20,000 steps.")
     if len(e.final_task_set_seeds) != 2 or len(set(e.final_task_set_seeds)) != 2:
         raise ValueError("Final test requires two distinct 50-configuration banks.")
-    if not 0 <= stop.threshold <= 1 or stop.consecutive_evaluations <= 0:
-        raise ValueError("Invalid early-stopping threshold or patience.")
-    if stop.min_timesteps < 0 or stop.min_timesteps > t.max_timesteps:
-        raise ValueError("Invalid early-stopping minimum timestep.")
+    if stop.threshold != 0.95 or stop.consecutive_evaluations != 3 or stop.min_timesteps != 100_000:
+        raise ValueError("Early stopping requires 95% three times after 100,000 steps.")
+    if stop.enabled is not early_stopping_enabled:
+        raise ValueError(
+            f"{config.experiment} requires early_stopping.enabled="
+            f"{str(early_stopping_enabled).lower()}."
+        )
     if config.checkpoint_frequency <= 0:
         raise ValueError("checkpoint_frequency must be positive.")
 
@@ -192,7 +212,7 @@ def write_aggregate(rows, json_path: Path, csv_path: Path) -> None:
     json_path.parent.mkdir(parents=True, exist_ok=True)
     csv_path.parent.mkdir(parents=True, exist_ok=True)
     with json_path.open("x", encoding="utf-8") as output:
-        json.dump({"kind": "sac_2layer_benchmark_aggregate_v1", "runs": rows}, output, indent=2)
+        json.dump({"kind": "sac_4layer_benchmark_aggregate_v1", "runs": rows}, output, indent=2)
         output.write("\n")
     with csv_path.open("x", encoding="utf-8", newline="") as output:
         writer = csv.DictWriter(output, fieldnames=list(rows[0]))

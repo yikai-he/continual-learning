@@ -1,4 +1,4 @@
-experiment: sac_2layer_benchmark
+experiment: sac_4layer_benchmark
 algorithm: SAC
 tasks:
 - reach-v3
@@ -15,7 +15,7 @@ seeds: [0, 1, 2]
 reward_function_version: v2
 policy:
   type: TransferableSACPolicy
-  net_arch: [256, 256]
+  net_arch: [256, 256, 256, 256]
   log_std_init: -3.0
 training:
   max_timesteps: 1000000
@@ -43,4 +43,4 @@ early_stopping:
   consecutive_evaluations: 3
   min_timesteps: 100000
 checkpoint_frequency: 50000
-output: runs/sac_2layer_benchmark
+output: runs/sac_4layer_benchmark

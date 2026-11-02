@@ -15,7 +15,7 @@ import torch
 from stable_baselines3 import SAC
 from torch import nn
 
-from scripts.run_sac_2layer_benchmark import (
+from scripts.run_sac_architecture_benchmark import (
     BenchmarkEvalCallback,
     _bank_provenance,
     _hydrate,
@@ -23,7 +23,7 @@ from scripts.run_sac_2layer_benchmark import (
 )
 from src.config import EarlyStoppingConfig
 from src.sac.transferable_actor import TransferableSACPolicy
-from src.sac.two_layer_benchmark import (
+from src.sac.architecture_benchmark import (
     TASKS,
     aggregate_results,
     load_benchmark_config,
@@ -52,7 +52,7 @@ def _model(seed=0):
     return SAC(
         TransferableSACPolicy,
         SpacesOnlyEnv(),
-        policy_kwargs={"net_arch": [256, 256], "log_std_init": -3.0},
+        policy_kwargs={"net_arch": [256, 256, 256, 256], "log_std_init": -3.0},
         seed=seed,
         device="cpu",
         verbose=0,
@@ -60,11 +60,11 @@ def _model(seed=0):
 
 
 def test_exact_tasks_and_resolved_configuration():
-    config = load_benchmark_config(ROOT / "configs/sac_2layer_benchmark.yaml")
+    config = load_benchmark_config(ROOT / "configs/sac_4layer_benchmark.yaml")
     assert config.tasks == TASKS
     assert config.algorithm == "SAC"
     assert config.policy.type == "TransferableSACPolicy"
-    assert config.policy.net_arch == [256, 256]
+    assert config.policy.net_arch == [256, 256, 256, 256]
     assert config.seeds == [0, 1, 2]
     assert asdict(config.training) == {
         "max_timesteps": 1_000_000, "learning_rate": 3e-4,
@@ -91,8 +91,17 @@ def test_actor_and_critics_have_required_architecture_and_no_transfer():
     assert isinstance(actor.latent_pi[2], nn.ReLU)
     assert isinstance(actor.latent_pi[3], nn.Linear)
     assert isinstance(actor.latent_pi[4], nn.ReLU)
+    assert isinstance(actor.latent_pi[5], nn.Linear)
+    assert isinstance(actor.latent_pi[6], nn.ReLU)
+    assert isinstance(actor.latent_pi[7], nn.Linear)
+    assert isinstance(actor.latent_pi[8], nn.ReLU)
     assert actor.mu is not actor.log_std
     assert not any(isinstance(module, nn.LayerNorm) for module in left.policy.critic.modules())
+    critic_linears = [
+        module for module in left.policy.critic.q_networks[0]
+        if isinstance(module, nn.Linear)
+    ]
+    assert [module.out_features for module in critic_linears[:-1]] == [256] * 4
     for first, second in zip(left.policy.parameters(), right.policy.parameters()):
         torch.testing.assert_close(first, second, rtol=0, atol=0)
     assert left.policy.actor.optimizer.state == {}
@@ -184,13 +193,13 @@ def test_all_four_task_banks_must_be_pairwise_disjoint():
     def hashes(tasks):
         return tasks
 
-    with patch("scripts.run_sac_2layer_benchmark.backend_tasks", side_effect=lambda task, seed: [f"h{seed}"]), patch(
-        "scripts.run_sac_2layer_benchmark.bank_hashes", side_effect=hashes
+    with patch("scripts.run_sac_architecture_benchmark.backend_tasks", side_effect=lambda task, seed: [f"h{seed}"]), patch(
+        "scripts.run_sac_architecture_benchmark.bank_hashes", side_effect=hashes
     ):
         value = _bank_provenance("hammer-v3", 0, 10_000, [20_000, 20_001])
         assert value["all_banks_pairwise_disjoint"] is True
-    with patch("scripts.run_sac_2layer_benchmark.backend_tasks", return_value=["same"]), patch(
-        "scripts.run_sac_2layer_benchmark.bank_hashes", side_effect=hashes
+    with patch("scripts.run_sac_architecture_benchmark.backend_tasks", return_value=["same"]), patch(
+        "scripts.run_sac_architecture_benchmark.bank_hashes", side_effect=hashes
     ), pytest.raises(ValueError, match="overlap"):
         _bank_provenance("hammer-v3", 0, 10_000, [20_000, 20_001])
 
