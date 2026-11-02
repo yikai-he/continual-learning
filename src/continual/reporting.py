@@ -36,6 +36,7 @@ def build_diffcrl_stage_report(
         "stage": context.index,
         "task": context.task.task_name,
         "bc_normalization_mode": config.bc.normalization_mode,
+        "bc_use_layer_norm": config.bc.use_layer_norm,
         "bc_loss": config.bc.loss,
         "bc_clamp_epsilon": BC_CLAMP_EPSILON,
         "diffusion_action_space": config.diffusion.action_space,

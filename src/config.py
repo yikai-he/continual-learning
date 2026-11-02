@@ -68,6 +68,7 @@ class BCConfig:
     learning_rate: float = 0.001
     hidden_sizes: List[int] = field(default_factory=lambda: [256, 256])
     normalization_mode: str = "layer-norm"  # Network LayerNorm, not data z-scoring.
+    use_layer_norm: bool = True
     loss: str = "post-tanh-mse"  # Physical-action or pre-tanh latent-space MSE.
 
 
@@ -522,6 +523,8 @@ def validate_config(config: ExperimentConfig) -> None:
         raise ValueError(
             "bc.hidden_sizes must contain one or more positive integer widths."
         )
+    if not isinstance(config.bc.use_layer_norm, bool):
+        raise ValueError("bc.use_layer_norm must be a boolean.")
     for path, allowed in {
         "environment.backend": ("metaworld-v3", "kuka-v2", "kuka-v3"),
         "environment.reward_function_version": ("v1", "v2"),
@@ -530,7 +533,7 @@ def validate_config(config: ExperimentConfig) -> None:
             "original",
             "peg_unplug_progress_v1",
         ),
-        "bc.normalization_mode": ("layer-norm",),
+        "bc.normalization_mode": ("layer-norm", "none"),
         "bc.loss": ("post-tanh-mse", "pre-tanh-mse"),
         "diffusion.action_space": ("raw", "pre-tanh"),
         "diffusion.generated_action_projection": ("none", "clip"),
@@ -540,6 +543,14 @@ def validate_config(config: ExperimentConfig) -> None:
         section, name = path.split(".")
         if getattr(getattr(config, section), name) not in allowed:
             raise ValueError(f"{path} must be one of {allowed}.")
+    expected_normalization_mode = (
+        "layer-norm" if config.bc.use_layer_norm else "none"
+    )
+    if config.bc.normalization_mode != expected_normalization_mode:
+        raise ValueError(
+            "bc.normalization_mode must be layer-norm when bc.use_layer_norm "
+            "is true and none when it is false."
+        )
     if config.environment.hammer_nail_progress_weight < 0:
         raise ValueError("environment.hammer_nail_progress_weight must be nonnegative.")
     if config.environment.peg_unplug_progress_weight < 0:

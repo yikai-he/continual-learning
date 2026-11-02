@@ -28,6 +28,28 @@ def dataset(offset=0.0):
 
 
 class GeneralPolicyTests(unittest.TestCase):
+    def test_layer_norm_ablation_preserves_layers_actions_and_training(self):
+        expected = {
+            True: [
+                nn.Linear, nn.LayerNorm, nn.ReLU, nn.Linear, nn.ReLU,
+                nn.Linear, nn.Tanh,
+            ],
+            False: [nn.Linear, nn.ReLU, nn.Linear, nn.ReLU, nn.Linear, nn.Tanh],
+        }
+        for use_layer_norm, modules in expected.items():
+            with self.subTest(use_layer_norm=use_layer_norm):
+                model = GeneralPolicy(
+                    -np.ones(4), np.ones(4), hidden_sizes=(8, 6),
+                    use_layer_norm=use_layer_norm,
+                )
+                self.assertEqual([type(module) for module in model.network], modules)
+                actions = model(torch.randn(7, 39))
+                self.assertEqual(actions.shape, (7, 4))
+                self.assertTrue(torch.all(actions >= model.action_low))
+                self.assertTrue(torch.all(actions <= model.action_high))
+                result = fit_bc(model, dataset(), dataset(), epochs=1)
+                self.assertTrue(np.isfinite(result["validation_loss"]))
+
     def test_two_layer_architecture_preserves_module_order_and_state_keys(self):
         model = GeneralPolicy(
             -np.ones(4), np.ones(4), hidden_sizes=(256, 256)
@@ -155,6 +177,46 @@ class GeneralPolicyTests(unittest.TestCase):
             torch.save({"hidden_sizes": (8, 6), "state_dict": model.state_dict()}, old)
             with self.assertRaisesRegex(ValueError, "incompatible"):
                 GeneralPolicy.load(old)
+
+    def test_checkpoint_round_trip_and_architecture_validation_for_both_modes(self):
+        raw = torch.randn(3, 39)
+        with tempfile.TemporaryDirectory() as tmp:
+            for use_layer_norm in (True, False):
+                with self.subTest(use_layer_norm=use_layer_norm):
+                    model = GeneralPolicy(
+                        -np.ones(4), np.ones(4), hidden_sizes=(8, 6),
+                        use_layer_norm=use_layer_norm,
+                    ).eval()
+                    path = Path(tmp) / f"policy_{use_layer_norm}.pt"
+                    model.save(path)
+                    restored = GeneralPolicy.load(
+                        path, expected_use_layer_norm=use_layer_norm
+                    )
+                    self.assertEqual(restored.use_layer_norm, use_layer_norm)
+                    torch.testing.assert_close(restored(raw), model(raw))
+                    with self.assertRaisesRegex(ValueError, "does not match"):
+                        GeneralPolicy.load(
+                            path,
+                            expected_use_layer_norm=not use_layer_norm,
+                        )
+
+    def test_legacy_layer_norm_checkpoint_remains_loadable(self):
+        model = policy().eval()
+        raw = torch.randn(3, 39)
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "legacy.pt"
+            torch.save(
+                {
+                    "kind": "general_policy_layer_norm_v1",
+                    "hidden_sizes": model.hidden_sizes,
+                    "state_dict": model.state_dict(),
+                    "metadata": None,
+                },
+                path,
+            )
+            restored = GeneralPolicy.load(path, expected_use_layer_norm=True)
+            self.assertTrue(restored.use_layer_norm)
+            torch.testing.assert_close(restored(raw), model(raw))
 
     def test_four_layer_save_reload_and_training_resume_equivalence(self):
         torch.manual_seed(13)

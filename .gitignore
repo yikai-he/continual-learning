@@ -21,6 +21,8 @@ htmlcov/
 venv/
 env/
 .env
+.conda/
+conda-env/
 
 # --------------------
 # IDE / OS

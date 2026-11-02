@@ -35,6 +35,7 @@ class GeneralPolicy(nn.Module):
         action_high: np.ndarray,
         *,
         hidden_sizes: tuple[int, ...] = (256, 256),
+        use_layer_norm: bool = True,
     ) -> None:
         super().__init__()
         low, high = np.asarray(action_low), np.asarray(action_high)
@@ -52,13 +53,15 @@ class GeneralPolicy(nn.Module):
         ):
             raise ValueError("Provide one or more positive integer hidden sizes.")
         self.hidden_sizes = tuple(hidden_sizes)
+        if not isinstance(use_layer_norm, bool):
+            raise ValueError("use_layer_norm must be a boolean.")
+        self.use_layer_norm = use_layer_norm
         self.register_buffer("action_low", torch.tensor(low, dtype=torch.float32))
         self.register_buffer("action_high", torch.tensor(high, dtype=torch.float32))
-        layers: list[nn.Module] = [
-            nn.Linear(OBSERVATION_SHAPE[0], hidden_sizes[0]),
-            nn.LayerNorm(hidden_sizes[0]),
-            nn.ReLU(),
-        ]
+        layers: list[nn.Module] = [nn.Linear(OBSERVATION_SHAPE[0], hidden_sizes[0])]
+        if use_layer_norm:
+            layers.append(nn.LayerNorm(hidden_sizes[0]))
+        layers.append(nn.ReLU())
         for input_size, output_size in zip(hidden_sizes, hidden_sizes[1:]):
             layers.extend((nn.Linear(input_size, output_size), nn.ReLU()))
         layers.extend((nn.Linear(hidden_sizes[-1], ACTION_SHAPE[0]), nn.Tanh()))
@@ -105,26 +108,51 @@ class GeneralPolicy(nn.Module):
         atomic_torch_save(
             path,
             {
-                "kind": "general_policy_layer_norm_v1",
+                "kind": "general_policy_v2",
                 "hidden_sizes": self.hidden_sizes,
+                "use_layer_norm": self.use_layer_norm,
                 "state_dict": self.state_dict(),
                 **extra,
             },
         )
 
     @classmethod
-    def load(cls, path: str | Path) -> GeneralPolicy:
+    def load(
+        cls,
+        path: str | Path,
+        *,
+        expected_use_layer_norm: bool | None = None,
+    ) -> GeneralPolicy:
         """Restore a compatible inference checkpoint on CPU in evaluation mode."""
         data = torch.load(path, map_location="cpu", weights_only=True)
-        if data.get("kind") != "general_policy_layer_norm_v1":
+        kind = data.get("kind")
+        if kind == "general_policy_layer_norm_v1":
+            use_layer_norm = True
+        elif kind == "general_policy_v2":
+            use_layer_norm = data.get("use_layer_norm")
+            if not isinstance(use_layer_norm, bool):
+                raise ValueError(
+                    "GeneralPolicy checkpoint has no valid use_layer_norm flag."
+                )
+        else:
             raise ValueError(
-                "Checkpoint is incompatible with the LayerNorm GeneralPolicy."
+                "Checkpoint is incompatible with the GeneralPolicy architecture."
+            )
+        if (
+            expected_use_layer_norm is not None
+            and use_layer_norm != expected_use_layer_norm
+        ):
+            raise ValueError(
+                "GeneralPolicy checkpoint LayerNorm architecture does not match "
+                f"the requested configuration: checkpoint={use_layer_norm}, "
+                f"requested={expected_use_layer_norm}."
             )
         state = data["state_dict"]
         policy = cls(
             state["action_low"].numpy(),
             state["action_high"].numpy(),
             hidden_sizes=tuple(data["hidden_sizes"]),
+            use_layer_norm=use_layer_norm,
         )
         try:
             policy.load_state_dict(state)
@@ -137,13 +165,20 @@ class GeneralPolicy(nn.Module):
         return policy
 
     @classmethod
-    def load_training(cls, path: str | Path):
+    def load_training(
+        cls,
+        path: str | Path,
+        *,
+        expected_use_layer_norm: bool | None = None,
+    ):
         """Return (policy, Adam or None, metadata).
 
         No optimizer is silently initialized for a checkpoint lacking its state.
         Checkpoints from the former observation-z-score architecture are rejected.
         """
-        policy = cls.load(path)
+        policy = cls.load(
+            path, expected_use_layer_norm=expected_use_layer_norm
+        )
         data = torch.load(path, map_location="cpu", weights_only=True)
         if "optimizer_state" not in data:
             return policy, None, data.get("metadata")

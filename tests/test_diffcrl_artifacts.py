@@ -59,7 +59,8 @@ def test_initial_summary_preserves_schema_order_values_and_rng(tmp_path):
         "trajectories_per_task", "replay_allocation", "replay_budget",
         "replay_priority_strategy", "diffusion_epochs", "bc_epochs",
         "eval_episodes", "seed", "eval_seed", "diffusion_steps",
-        "diffusion_width", "bc_normalization_mode", "replay_mode", "bc_loss",
+        "diffusion_width", "bc_normalization_mode", "bc_use_layer_norm",
+        "replay_mode", "bc_loss",
         "diffusion_action_space", "diffusion_action_clamp_epsilon",
         "generated_action_projection", "evaluation_mode", "tasks",
         "environment_backend", "horizon", "task_set_seed", "diffusion",
@@ -71,6 +72,8 @@ def test_initial_summary_preserves_schema_order_values_and_rng(tmp_path):
         name: {"path": str(experts[name]), "sha256": hashes[name]} for name in tasks
     }
     assert result["historical_replay_budget"] == 17
+    assert result["bc_use_layer_norm"] is True
+    assert result["bc"]["use_layer_norm"] is True
     assert result["diffusion"] == {
         "horizon": 200,
         "features": 22,

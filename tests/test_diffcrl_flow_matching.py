@@ -373,6 +373,7 @@ def test_ddpm_and_policy_checkpoint_metadata_optimizer_and_load_compatibility(tm
         "bc_loss": trainer.config.bc.loss,
         "bc_clamp_epsilon": 1e-4,
         "bc_normalization_mode": trainer.config.bc.normalization_mode,
+        "bc_use_layer_norm": trainer.config.bc.use_layer_norm,
         "diffusion_action_space": trainer.config.diffusion.action_space,
         "diffusion_action_clamp_epsilon": trainer.config.diffusion.action_clamp_epsilon,
         "generated_action_projection": trainer.config.diffusion.generated_action_projection,

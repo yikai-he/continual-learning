@@ -114,6 +114,7 @@ def create_run_manifest(
             "bc": resolved.get("bc"),
             "diffusion": resolved.get("diffusion"),
             "normalization": getattr(config.bc, "normalization_mode", None),
+            "use_layer_norm": getattr(config.bc, "use_layer_norm", True),
             "action_representation": getattr(config.diffusion, "action_space", None),
             "action_projection": getattr(
                 config.diffusion, "generated_action_projection", None

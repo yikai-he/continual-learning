@@ -394,6 +394,18 @@ class ConfigTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "bc.epochs"):
             validate_config(replace(c, bc=replace(c.bc, epochs="one")))
 
+    def test_general_policy_layer_norm_flag_defaults_and_validates(self):
+        self.assertTrue(self.config().bc.use_layer_norm)
+        self.assertFalse(
+            self.config(
+                bc={"use_layer_norm": False, "normalization_mode": "none"}
+            ).bc.use_layer_norm
+        )
+        with self.assertRaisesRegex(ValueError, "bc.use_layer_norm"):
+            validate_config(
+                replace(self.config(), bc=replace(self.config().bc, use_layer_norm=1))
+            )
+
     def test_flow_matching_configuration_is_typed_serialized_and_model_compatible(self):
         config = self.config(
             continual={"replay_mode": "flow-matching"},

@@ -348,7 +348,10 @@ class DiffCRLTrainer:
         marker = markers[-1]
         artifacts = marker["artifacts"]
         self.policy, self.policy_optimizer, policy_metadata = (
-            GeneralPolicy.load_training(artifacts["policy"]["resolved_path"])
+            GeneralPolicy.load_training(
+                artifacts["policy"]["resolved_path"],
+                expected_use_layer_norm=self.config.bc.use_layer_norm,
+            )
         )
         if (
             not isinstance(policy_metadata, dict)
@@ -614,6 +617,7 @@ class DiffCRLTrainer:
                     env.action_space.low,
                     env.action_space.high,
                     hidden_sizes=tuple(cfg.bc.hidden_sizes),
+                    use_layer_norm=cfg.bc.use_layer_norm,
                 ).to(cfg.runtime.device)
         finally:
             env.close()
@@ -923,6 +927,7 @@ class DiffCRLTrainer:
                 "bc_loss": cfg.bc.loss,
                 "bc_clamp_epsilon": BC_CLAMP_EPSILON,
                 "bc_normalization_mode": cfg.bc.normalization_mode,
+                "bc_use_layer_norm": cfg.bc.use_layer_norm,
                 "diffusion_action_space": cfg.diffusion.action_space,
                 "diffusion_action_clamp_epsilon": cfg.diffusion.action_clamp_epsilon,
                 "generated_action_projection": cfg.diffusion.generated_action_projection,
@@ -975,6 +980,7 @@ class DiffCRLTrainer:
         self.matrix.stage_provenance[str(stage)] = {
             "report": str(directory / "report.json"),
             "bc_normalization_mode": cfg.bc.normalization_mode,
+            "bc_use_layer_norm": cfg.bc.use_layer_norm,
             "bc_loss": cfg.bc.loss,
             "bc_clamp_epsilon": BC_CLAMP_EPSILON,
             "generated_action_projection": cfg.diffusion.generated_action_projection,

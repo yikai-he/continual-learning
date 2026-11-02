@@ -69,6 +69,7 @@ def build_initial_run_summary(
         "diffusion_steps": config.diffusion.steps,
         "diffusion_width": config.diffusion.width,
         "bc_normalization_mode": config.bc.normalization_mode,
+        "bc_use_layer_norm": config.bc.use_layer_norm,
         "replay_mode": config.continual.replay_mode,
         "bc_loss": config.bc.loss,
         "diffusion_action_space": config.diffusion.action_space,
@@ -98,6 +99,7 @@ def build_initial_run_summary(
         "split": "per-task whole episodes; rounded 20% validation",
         "bc": {
             "hidden_sizes": config.bc.hidden_sizes,
+            "use_layer_norm": config.bc.use_layer_norm,
             "epochs": config.bc.epochs,
             "batch_size": config.bc.batch_size,
             "learning_rate": config.bc.learning_rate,
