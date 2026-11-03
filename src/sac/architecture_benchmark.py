@@ -17,6 +17,13 @@ TASKS = [
     "window-close-v3", "door-open-v3", "peg-unplug-side-v3",
 ]
 THREE_TASK_1M_TASKS = ["reach-v3", "hammer-v3", "handle-press-side-v3"]
+FOUR_TASK_1M_TASKS = [
+    "button-press-topdown-v3",
+    "faucet-open-v3",
+    "drawer-close-v3",
+    "window-close-v3",
+]
+LOW_DISK_EXPERIMENTS = {"sac_4layer_3task_1m", "sac_4layer_4task_1m"}
 
 
 @dataclass(frozen=True)
@@ -109,6 +116,11 @@ def validate_benchmark_config(config: BenchmarkConfig) -> None:
             False,
             "runs/sac_4layer_3task_1m",
         ),
+        "sac_4layer_4task_1m": (
+            FOUR_TASK_1M_TASKS,
+            False,
+            "runs/sac_4layer_4task_1m",
+        ),
     }
     if config.experiment not in profiles:
         raise ValueError("Unknown SAC experiment profile.")
@@ -137,10 +149,10 @@ def validate_benchmark_config(config: BenchmarkConfig) -> None:
         )
     if t.device != "cpu" or t.torch_num_threads != 1:
         raise ValueError("Benchmark requires CPU with one PyTorch thread.")
-    if e.frequency != 20_000 or e.episodes != 50:
-        raise ValueError("Evaluation must use 50 episodes every 20,000 steps.")
-    if len(e.final_task_set_seeds) != 2 or len(set(e.final_task_set_seeds)) != 2:
-        raise ValueError("Final test requires two distinct 50-configuration banks.")
+    if e != BenchmarkEvaluation():
+        raise ValueError(
+            "Evaluation settings must match the fixed validation and test banks."
+        )
     if stop.threshold != 0.95 or stop.consecutive_evaluations != 3 or stop.min_timesteps != 100_000:
         raise ValueError("Early stopping requires 95% three times after 100,000 steps.")
     if stop.enabled is not early_stopping_enabled:
@@ -148,8 +160,8 @@ def validate_benchmark_config(config: BenchmarkConfig) -> None:
             f"{config.experiment} requires early_stopping.enabled="
             f"{str(early_stopping_enabled).lower()}."
         )
-    if config.checkpoint_frequency <= 0:
-        raise ValueError("checkpoint_frequency must be positive.")
+    if config.checkpoint_frequency != 50_000:
+        raise ValueError("Checkpoints must be updated every 50,000 steps.")
 
 
 def validate_installed_tasks(tasks=TASKS) -> None:

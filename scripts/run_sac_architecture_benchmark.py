@@ -25,7 +25,7 @@ from src.continual.task_sequence import TaskSpec
 from src.envs import make_env
 from src.sac.transferable_actor import TransferableSACPolicy
 from src.sac.architecture_benchmark import (
-    load_benchmark_config, run_directory, success_auc,
+    LOW_DISK_EXPERIMENTS, load_benchmark_config, run_directory, success_auc,
     stopping_reason, validate_installed_tasks,
 )
 from src.support.io import atomic_replace_json, atomic_write_json
@@ -232,10 +232,10 @@ def _final_test(config, task, model):
 
 
 def run_one(config, task, seed, *, resume=False):
-    low_disk = config.experiment == "sac_4layer_3task_1m"
+    low_disk = config.experiment in LOW_DISK_EXPERIMENTS
     if low_disk and resume:
         raise ValueError(
-            "The low-disk three-task experiment cannot resume training because "
+            "Low-disk experiments cannot resume training because "
             "replay buffers are intentionally not persisted. Restart from scratch."
         )
     run_dir = run_directory(config, task, seed)
