@@ -1,0 +1,45 @@
+experiment: sac_kuka_5task_1m
+algorithm: SAC
+tasks:
+- reach-v3
+- hammer-v3
+- handle-press-side-v3
+- button-press-topdown-v3
+- faucet-open-v3
+seeds: [0]
+reward_function_version: v2
+environment:
+  env_backend: kuka-v3
+  hammer_reward_variant: original
+  hammer_nail_progress_weight: 0.0
+policy:
+  type: TransferableSACPolicy
+  net_arch: [256, 256, 256, 256]
+  log_std_init: -3.0
+training:
+  max_timesteps: 1000000
+  learning_rate: 0.0003
+  batch_size: 256
+  buffer_size: 1000000
+  learning_starts: 10000
+  gamma: 0.99
+  tau: 0.005
+  train_freq: 1
+  gradient_steps: 1
+  ent_coef: auto
+  device: cpu
+  torch_num_threads: 1
+evaluation:
+  frequency: 20000
+  episodes: 50
+  validation_task_set_seed: 10000
+  validation_reset_seed: 10000
+  final_task_set_seeds: [20000, 20001]
+  final_reset_seed: 30000
+early_stopping:
+  enabled: false
+  threshold: 0.95
+  consecutive_evaluations: 3
+  min_timesteps: 100000
+checkpoint_frequency: 50000
+output: runs/sac_kuka_5task_1m

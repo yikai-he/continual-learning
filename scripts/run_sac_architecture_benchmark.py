@@ -25,11 +25,12 @@ from src.continual.task_sequence import TaskSpec
 from src.envs import make_env
 from src.sac.transferable_actor import TransferableSACPolicy
 from src.sac.architecture_benchmark import (
-    LOW_DISK_EXPERIMENTS, load_benchmark_config, run_directory, success_auc,
+    LOW_DISK_EXPERIMENTS, environment_task_id, load_benchmark_config,
+    run_directory, success_auc,
     stopping_reason, validate_installed_tasks,
 )
 from src.support.io import atomic_replace_json, atomic_write_json
-from src.support.reproducibility import file_hash
+from src.support.reproducibility import file_hash, git_output
 from train_sac import (
     FixedSeedEvalCallback, GlobalCheckpointCallback, TrainingSuccessCallback,
     load_resumable_sac, next_global_boundary, remaining_timesteps,
@@ -133,9 +134,18 @@ def _write_metadata(path, value, *, initial):
         atomic_replace_json(path, value, allow_nan=False)
 
 
-def _bank_provenance(task, training_seed, validation_seed, final_seeds):
+def _bank_provenance(
+    task, training_seed, validation_seed, final_seeds, *, backend="metaworld-v3"
+):
     seeds = [training_seed, validation_seed, *final_seeds]
-    banks = {str(seed): bank_hashes(backend_tasks(task, seed)) for seed in seeds}
+    banks = {
+        str(seed): bank_hashes(
+            backend_tasks(task, seed)
+            if backend == "metaworld-v3"
+            else backend_tasks(task, seed, backend=backend)
+        )
+        for seed in seeds
+    }
     for i, left in enumerate(seeds):
         for right in seeds[i + 1:]:
             if set(banks[str(left)]) & set(banks[str(right)]):
@@ -199,19 +209,25 @@ def _hydrate(callback, run_dir, maximum_step, settings):
 
 
 def _final_test(config, task, model):
+    backend = config.environment.env_backend
+    env_task = environment_task_id(config, task)
     policy = SB3SACPolicy(model)
     results = []
     for index, bank_seed in enumerate(config.evaluation.final_task_set_seeds):
         results.append(
             evaluate_task(
                 policy,
-                TaskSpec(task_id=task, task_name=task),
+                TaskSpec(task_id=env_task, task_name=env_task),
                 episodes=50,
                 seed=config.evaluation.final_reset_seed + 50 * index,
                 evaluation_mode="fixed-tasks",
                 task_set_seed=bank_seed,
                 reward_function_version=config.reward_function_version,
-                backend="metaworld-v3",
+                hammer_reward_variant=config.environment.hammer_reward_variant,
+                hammer_nail_progress_weight=(
+                    config.environment.hammer_nail_progress_weight
+                ),
+                backend=backend,
                 progress=True,
             )
         )
@@ -231,6 +247,31 @@ def _final_test(config, task, model):
     }
 
 
+def _validate_backend_identity(env, config, env_task):
+    """Fail before training if a KUKA profile resolved to a Sawyer class."""
+    base = env.unwrapped
+    if config.environment.env_backend == "kuka-v3":
+        from metaworld_kuka.registration import KUKA_ENVIRONMENTS
+
+        expected = KUKA_ENVIRONMENTS[env_task]
+        if not isinstance(base, expected) or not type(base).__module__.startswith(
+            "metaworld_kuka."
+        ):
+            raise RuntimeError("KUKA profile resolved to a non-KUKA environment.")
+    return type(base).__module__, type(base).__name__
+
+
+def _git_provenance():
+    import metaworld
+
+    continual_root = Path(__file__).resolve().parents[1]
+    kuka_root = Path(metaworld.__file__).resolve().parent.parent
+    return {
+        "continual_learning": git_output(continual_root, "rev-parse", "HEAD"),
+        "metaworld_kuka_v3": git_output(kuka_root, "rev-parse", "HEAD"),
+    }
+
+
 def run_one(config, task, seed, *, resume=False):
     low_disk = config.experiment in LOW_DISK_EXPERIMENTS
     if low_disk and resume:
@@ -239,6 +280,8 @@ def run_one(config, task, seed, *, resume=False):
             "replay buffers are intentionally not persisted. Restart from scratch."
         )
     run_dir = run_directory(config, task, seed)
+    backend = config.environment.env_backend
+    env_task = environment_task_id(config, task)
     if resume:
         if not (run_dir / "RUNNING").is_file() or (run_dir / "RUN_COMPLETE").exists():
             raise ValueError("Resume requires one incomplete RUNNING benchmark.")
@@ -279,14 +322,30 @@ def run_one(config, task, seed, *, resume=False):
             "kind": f"{config.experiment}_run_v1", "task": task, "seed": seed,
             "config": asdict(config),
             "task_banks": _bank_provenance(
-                task, seed, config.evaluation.validation_task_set_seed,
-                config.evaluation.final_task_set_seeds,
+                env_task, seed, config.evaluation.validation_task_set_seed,
+                config.evaluation.final_task_set_seeds, backend=backend,
             ),
             "initialization": "random; no GeneralPolicy or expert transfer",
+            "training_status": "running",
             "architecture": {
                 "actor_hidden_sizes": list(config.policy.net_arch),
                 "critic_hidden_sizes": list(config.policy.net_arch),
                 "actor_layer_norm_after_hidden": [0],
+            },
+            "git_commits": _git_provenance(),
+            "environment": {
+                "backend": backend,
+                "task_label": task,
+                "registered_task_id": env_task,
+                "robot": "KUKA iiwa" if backend == "kuka-v3" else "Sawyer",
+                "gripper": (
+                    "Robotiq 2F-85" if backend == "kuka-v3" else "Sawyer gripper"
+                ),
+                "reward_function_version": config.reward_function_version,
+                "hammer_reward_variant": config.environment.hammer_reward_variant,
+                "hammer_nail_progress_weight": (
+                    config.environment.hammer_nail_progress_weight
+                ),
             },
             "training_duration_seconds": 0.0,
             "checkpoint_strategy": (
@@ -299,12 +358,22 @@ def run_one(config, task, seed, *, resume=False):
         _write_metadata(run_dir / "metadata.json", metadata, initial=True)
 
     torch.set_num_threads(config.training.torch_num_threads)
-    train_env = Monitor(make_env("metaworld-v3", task, seed, reward_function_version=config.reward_function_version))
-    eval_env = Monitor(make_env(
-        "metaworld-v3", task, config.evaluation.validation_task_set_seed,
+    env_options = dict(
         reward_function_version=config.reward_function_version,
+        hammer_reward_variant=config.environment.hammer_reward_variant,
+        hammer_nail_progress_weight=config.environment.hammer_nail_progress_weight,
+    )
+    train_env = Monitor(make_env(backend, env_task, seed, **env_options))
+    eval_env = Monitor(make_env(
+        backend, env_task, config.evaluation.validation_task_set_seed, **env_options,
     ))
     try:
+        module_name, class_name = _validate_backend_identity(train_env, config, env_task)
+        _validate_backend_identity(eval_env, config, env_task)
+        metadata["environment"].update(
+            environment_class=f"{module_name}.{class_name}"
+        )
+        _write_metadata(run_dir / "metadata.json", metadata, initial=False)
         stop = config.early_stopping
         callback = BenchmarkEvalCallback(
             eval_env, eval_freq=config.evaluation.frequency,
@@ -315,7 +384,7 @@ def run_one(config, task, seed, *, resume=False):
             best_success_model_save_path=(
                 run_dir if low_disk else run_dir / "best_success_model"
             ),
-            task_name=task,
+            task_name=env_task,
             task_set_seed=config.evaluation.validation_task_set_seed,
             evaluation_mode="fixed-tasks", evaluate_on_training_start=not resume,
             early_stopping=EarlyStoppingConfig(
@@ -437,6 +506,7 @@ def run_one(config, task, seed, *, resume=False):
         atomic_write_json(run_dir / "summary.json", result)
         metadata["result"] = result
         metadata["training_duration_seconds"] = duration
+        metadata["training_status"] = "complete"
         _write_metadata(run_dir / "metadata.json", metadata, initial=False)
         (run_dir / "RUN_COMPLETE").write_text("complete\n", encoding="utf-8")
         (run_dir / "RUNNING").unlink()
@@ -455,7 +525,9 @@ def main(argv=None):
     parser.add_argument("--resume", action="store_true")
     args = parser.parse_args(argv)
     config = load_benchmark_config(args.config)
-    validate_installed_tasks(config.tasks)
+    validate_installed_tasks(
+        config.tasks, backend=config.environment.env_backend
+    )
     tasks = config.tasks if args.all else [args.task]
     seeds = args.seeds or ([args.seed] if args.seed is not None else config.seeds)
     if args.resume and (len(tasks) != 1 or len(seeds) != 1):

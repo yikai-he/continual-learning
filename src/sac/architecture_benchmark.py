@@ -24,6 +24,14 @@ FOUR_TASK_1M_TASKS = [
     "window-close-v3",
 ]
 LOW_DISK_EXPERIMENTS = {"sac_4layer_3task_1m", "sac_4layer_4task_1m"}
+KUKA_FIVE_TASK_1M_TASKS = [
+    "reach-v3",
+    "hammer-v3",
+    "handle-press-side-v3",
+    "button-press-topdown-v3",
+    "faucet-open-v3",
+]
+LOW_DISK_EXPERIMENTS.add("sac_kuka_5task_1m")
 
 
 @dataclass(frozen=True)
@@ -60,6 +68,13 @@ class BenchmarkEvaluation:
 
 
 @dataclass(frozen=True)
+class BenchmarkEnvironment:
+    env_backend: str = "metaworld-v3"
+    hammer_reward_variant: str = "original"
+    hammer_nail_progress_weight: float = 0.0
+
+
+@dataclass(frozen=True)
 class BenchmarkEarlyStopping:
     enabled: bool = True
     threshold: float = 0.95
@@ -74,6 +89,7 @@ class BenchmarkConfig:
     tasks: list[str] = field(default_factory=lambda: list(TASKS))
     seeds: list[int] = field(default_factory=lambda: [0, 1, 2])
     reward_function_version: str = "v2"
+    environment: BenchmarkEnvironment = field(default_factory=BenchmarkEnvironment)
     policy: BenchmarkPolicy = field(default_factory=BenchmarkPolicy)
     training: BenchmarkTraining = field(default_factory=BenchmarkTraining)
     evaluation: BenchmarkEvaluation = field(default_factory=BenchmarkEvaluation)
@@ -97,6 +113,9 @@ def load_benchmark_config(path: str | Path) -> BenchmarkConfig:
     if unknown:
         raise ValueError(f"Unknown benchmark fields: {sorted(unknown)}")
     data = dict(data)
+    data["environment"] = _section(
+        data.get("environment", {}), BenchmarkEnvironment, "environment"
+    )
     data["policy"] = _section(data.get("policy", {}), BenchmarkPolicy, "policy")
     data["training"] = _section(data.get("training", {}), BenchmarkTraining, "training")
     data["evaluation"] = _section(data.get("evaluation", {}), BenchmarkEvaluation, "evaluation")
@@ -110,25 +129,45 @@ def load_benchmark_config(path: str | Path) -> BenchmarkConfig:
 
 def validate_benchmark_config(config: BenchmarkConfig) -> None:
     profiles = {
-        "sac_4layer_benchmark": (TASKS, True, "runs/sac_4layer_benchmark"),
+        "sac_4layer_benchmark": (
+            TASKS,
+            True,
+            "runs/sac_4layer_benchmark",
+            "metaworld-v3",
+        ),
         "sac_4layer_3task_1m": (
             THREE_TASK_1M_TASKS,
             False,
             "runs/sac_4layer_3task_1m",
+            "metaworld-v3",
         ),
         "sac_4layer_4task_1m": (
             FOUR_TASK_1M_TASKS,
             False,
             "runs/sac_4layer_4task_1m",
+            "metaworld-v3",
+        ),
+        "sac_kuka_5task_1m": (
+            KUKA_FIVE_TASK_1M_TASKS,
+            False,
+            "runs/sac_kuka_5task_1m",
+            "kuka-v3",
         ),
     }
     if config.experiment not in profiles:
         raise ValueError("Unknown SAC experiment profile.")
-    tasks, early_stopping_enabled, output = profiles[config.experiment]
+    tasks, early_stopping_enabled, output, backend = profiles[config.experiment]
     if config.tasks != tasks:
         raise ValueError("Benchmark experiment or ordered task list is invalid.")
     if config.output != output:
         raise ValueError(f"{config.experiment} output must be {output}.")
+    if config.environment.env_backend != backend:
+        raise ValueError(f"{config.experiment} requires env_backend={backend!r}.")
+    if (
+        config.environment.hammer_reward_variant != "original"
+        or config.environment.hammer_nail_progress_weight != 0.0
+    ):
+        raise ValueError("This benchmark requires the default original Hammer reward.")
     if config.algorithm != "SAC":
         raise ValueError("The benchmark algorithm must be SAC.")
     if (
@@ -164,13 +203,35 @@ def validate_benchmark_config(config: BenchmarkConfig) -> None:
         raise ValueError("Checkpoints must be updated every 50,000 steps.")
 
 
-def validate_installed_tasks(tasks=TASKS) -> None:
+def validate_installed_tasks(tasks=TASKS, *, backend="metaworld-v3") -> None:
     """Validate registry support without constructing an environment."""
+    if backend == "kuka-v3":
+        from metaworld_kuka.registration import KUKA_ENVIRONMENTS
+
+        tasks = [
+            f"kuka-{task}" if not task.startswith("kuka-") else task
+            for task in tasks
+        ]
+        missing = sorted(set(tasks) - set(KUKA_ENVIRONMENTS))
+        if missing:
+            raise ValueError(
+                f"Installed KUKA MetaWorld does not support tasks: {missing}"
+            )
+        return
+    if backend != "metaworld-v3":
+        raise ValueError(f"Unsupported benchmark backend: {backend!r}.")
     import metaworld
 
     missing = sorted(set(tasks) - set(metaworld.MT1.ENV_NAMES))
     if missing:
         raise ValueError(f"Installed MetaWorld does not support tasks: {missing}")
+
+
+def environment_task_id(config: BenchmarkConfig, task: str) -> str:
+    """Resolve a profile label to the backend's actual registered task ID."""
+    if task not in config.tasks:
+        raise ValueError("Task is outside the declared benchmark matrix.")
+    return f"kuka-{task}" if config.environment.env_backend == "kuka-v3" else task
 
 
 def run_directory(config: BenchmarkConfig, task: str, seed: int) -> Path:
