@@ -227,6 +227,15 @@ def _final_test(config, task, model):
                 hammer_nail_progress_weight=(
                     config.environment.hammer_nail_progress_weight
                 ),
+                peg_unplug_reward_variant=(
+                    config.environment.peg_unplug_reward_variant
+                ),
+                peg_unplug_progress_weight=(
+                    config.environment.peg_unplug_progress_weight
+                ),
+                peg_unplug_progress_gamma=(
+                    config.environment.peg_unplug_progress_gamma
+                ),
                 backend=backend,
                 progress=True,
             )
@@ -346,6 +355,15 @@ def run_one(config, task, seed, *, resume=False):
                 "hammer_nail_progress_weight": (
                     config.environment.hammer_nail_progress_weight
                 ),
+                "peg_unplug_reward_variant": (
+                    config.environment.peg_unplug_reward_variant
+                ),
+                "peg_unplug_progress_weight": (
+                    config.environment.peg_unplug_progress_weight
+                ),
+                "peg_unplug_progress_gamma": (
+                    config.environment.peg_unplug_progress_gamma
+                ),
             },
             "training_duration_seconds": 0.0,
             "checkpoint_strategy": (
@@ -362,6 +380,9 @@ def run_one(config, task, seed, *, resume=False):
         reward_function_version=config.reward_function_version,
         hammer_reward_variant=config.environment.hammer_reward_variant,
         hammer_nail_progress_weight=config.environment.hammer_nail_progress_weight,
+        peg_unplug_reward_variant=config.environment.peg_unplug_reward_variant,
+        peg_unplug_progress_weight=config.environment.peg_unplug_progress_weight,
+        peg_unplug_progress_gamma=config.environment.peg_unplug_progress_gamma,
     )
     train_env = Monitor(make_env(backend, env_task, seed, **env_options))
     eval_env = Monitor(make_env(

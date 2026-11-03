@@ -23,7 +23,12 @@ FOUR_TASK_1M_TASKS = [
     "drawer-close-v3",
     "window-close-v3",
 ]
-LOW_DISK_EXPERIMENTS = {"sac_4layer_3task_1m", "sac_4layer_4task_1m"}
+LOW_DISK_EXPERIMENTS = {
+    "sac_4layer_3task_1m",
+    "sac_4layer_4task_1m",
+    "sac_kuka_5task_1m",
+    "sac_kuka_remaining_4task_1m",
+}
 KUKA_FIVE_TASK_1M_TASKS = [
     "reach-v3",
     "hammer-v3",
@@ -31,7 +36,12 @@ KUKA_FIVE_TASK_1M_TASKS = [
     "button-press-topdown-v3",
     "faucet-open-v3",
 ]
-LOW_DISK_EXPERIMENTS.add("sac_kuka_5task_1m")
+KUKA_REMAINING_FOUR_TASK_1M_TASKS = [
+    "drawer-close-v3",
+    "window-close-v3",
+    "door-open-v3",
+    "peg-unplug-side-v3",
+]
 
 
 @dataclass(frozen=True)
@@ -72,6 +82,9 @@ class BenchmarkEnvironment:
     env_backend: str = "metaworld-v3"
     hammer_reward_variant: str = "original"
     hammer_nail_progress_weight: float = 0.0
+    peg_unplug_reward_variant: str = "original"
+    peg_unplug_progress_weight: float = 0.0
+    peg_unplug_progress_gamma: float = 0.99
 
 
 @dataclass(frozen=True)
@@ -153,6 +166,12 @@ def validate_benchmark_config(config: BenchmarkConfig) -> None:
             "runs/sac_kuka_5task_1m",
             "kuka-v3",
         ),
+        "sac_kuka_remaining_4task_1m": (
+            KUKA_REMAINING_FOUR_TASK_1M_TASKS,
+            False,
+            "runs/sac_kuka_remaining_4task_1m",
+            "kuka-v3",
+        ),
     }
     if config.experiment not in profiles:
         raise ValueError("Unknown SAC experiment profile.")
@@ -168,6 +187,14 @@ def validate_benchmark_config(config: BenchmarkConfig) -> None:
         or config.environment.hammer_nail_progress_weight != 0.0
     ):
         raise ValueError("This benchmark requires the default original Hammer reward.")
+    if (
+        config.environment.peg_unplug_reward_variant != "original"
+        or config.environment.peg_unplug_progress_weight != 0.0
+        or config.environment.peg_unplug_progress_gamma != 0.99
+    ):
+        raise ValueError(
+            "This benchmark requires the default original Peg Unplug reward."
+        )
     if config.algorithm != "SAC":
         raise ValueError("The benchmark algorithm must be SAC.")
     if (
