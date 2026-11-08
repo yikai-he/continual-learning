@@ -16,7 +16,7 @@ from src.continual.trajectory_flow_matching import (
     TrajectoryFlowMatching,
 )
 from src.continual.trajectory_diffusion import FeatureNormalizer
-from src.support.dataset import bc_dataset
+from src.continual.stage_dataset import bc_dataset
 
 
 class RecordingFlow:
@@ -36,7 +36,9 @@ class RecordingFlow:
         task_ids,
         goals,
         integration_steps=None,
-        execution_mode="legacy",
+        solver="euler",
+        rtol=1e-5,
+        atol=1e-5,
     ):
         self.calls.append(
             {
@@ -45,7 +47,9 @@ class RecordingFlow:
                 "task_ids": task_ids.clone(),
                 "goals": goals.clone(),
                 "integration_steps": integration_steps,
-                "execution_mode": execution_mode,
+                "solver": solver,
+                "rtol": rtol,
+                "atol": atol,
             }
         )
         generator = torch.Generator().manual_seed(seed)
@@ -141,7 +145,7 @@ def test_shapes_conditions_group_counts_alignment_and_bc_compatibility():
     ):
         call = model.calls[old_index]
         assert call["count"] == 3
-        assert call["execution_mode"] == "legacy"
+        assert call["solver"] == "euler"
         torch.testing.assert_close(
             call["task_ids"], torch.full((3,), old_index, dtype=torch.long)
         )
@@ -163,13 +167,17 @@ def test_shapes_conditions_group_counts_alignment_and_bc_compatibility():
         assert len(source["training_configuration_indices"]) == 3
 
 
-def test_device_native_execution_is_forwarded():
+def test_solver_and_tolerances_are_forwarded():
     model, _ = run_adapter(
         stage=1,
         trajectory_counts={0: 3},
-        execution_mode="device-native",
+        solver="rk4",
+        rtol=2e-5,
+        atol=3e-5,
     )
-    assert model.calls[0]["execution_mode"] == "device-native"
+    assert model.calls[0]["solver"] == "rk4"
+    assert model.calls[0]["rtol"] == 2e-5
+    assert model.calls[0]["atol"] == 3e-5
 
 
 def test_goal_normalization_and_dynamic_denormalization_are_used():

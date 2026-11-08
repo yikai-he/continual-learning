@@ -7,7 +7,6 @@ source_checkpoint: runs/formal/diffcrl_5task_15plus15_4layer/seed0/general_polic
 environment_backend: metaworld-v3
 reward_function_version: v2
 sac:
-  net_arch: [256, 256, 256, 256]
   steps: 100000
   learning_rate: 0.0003
   buffer_size: 1000000
@@ -17,7 +16,6 @@ sac:
   tau: 0.005
   train_freq: 1
   gradient_steps: 1
-  ent_coef: auto
   log_std_init: -3.0
   checkpoint_frequency: 10000
 evaluation:

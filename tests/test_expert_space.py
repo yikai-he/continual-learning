@@ -41,8 +41,6 @@ def identity(**updates):
         observation_shape=(39,),
         action_shape=(4,),
         horizon=200,
-        hammer_reward_variant=None,
-        hammer_nail_progress_weight=None,
         qualification={"protocol": "fixed-mt1-task-bank-v1"},
         manifest_path="/checkpoints/expert_manifest.json",
         legacy=False,

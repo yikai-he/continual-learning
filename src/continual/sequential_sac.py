@@ -13,6 +13,8 @@ import numpy as np
 import torch
 from src.config import (
     ExperimentConfig,
+    SAC_ENT_COEF,
+    SAC_NET_ARCH,
     output_directory,
     resolve_device,
     save_resolved_config,
@@ -101,6 +103,8 @@ def run(config: ExperimentConfig, *, observer=None):
             "eval_seed": config.evaluation.seed,
             "learning_starts": config.sac.learning_starts,
             "boundary_warmup_steps": config.continual.boundary_warmup_steps,
+            "ent_coef": SAC_ENT_COEF,
+            "net_arch": list(SAC_NET_ARCH),
             **{
                 name: getattr(config.sac, name)
                 for name in (
@@ -111,8 +115,6 @@ def run(config: ExperimentConfig, *, observer=None):
                     "tau",
                     "train_freq",
                     "gradient_steps",
-                    "ent_coef",
-                    "net_arch",
                 )
             },
             "boundary": "retain policy/critics/targets/optimizers/entropy; reset replay only",
@@ -141,8 +143,8 @@ def run(config: ExperimentConfig, *, observer=None):
             tau=config.sac.tau,
             train_freq=config.sac.train_freq,
             gradient_steps=config.sac.gradient_steps,
-            ent_coef=config.sac.ent_coef,
-            policy_kwargs={"net_arch": config.sac.net_arch},
+            ent_coef=SAC_ENT_COEF,
+            policy_kwargs={"net_arch": list(SAC_NET_ARCH)},
             optimize_memory_usage=False,
             seed=config.runtime.seed,
             device=config.runtime.device,

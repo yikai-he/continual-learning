@@ -16,6 +16,18 @@ from typing import Dict, List, Optional, Union, get_args, get_origin, get_type_h
 
 import yaml
 
+SAC_ENT_COEF = "auto"
+SAC_NET_ARCH = (256, 256, 256, 256)
+BC_HIDDEN_SIZES = (256, 256, 256, 256)
+FLOW_RESIDUAL_BLOCKS = 6
+FLOW_TIME_EMBEDDING = "sinusoidal"
+GENERATOR_GRADIENT_CLIP_NORM = 1.0
+GENERATOR_VALIDATION_DRAWS = 4
+FLOW_CHECKPOINT_SELECTION = "validation-loss"
+FLOW_PROBABILITY_PATH = "linear"
+FLOW_SOURCE_DISTRIBUTION = "standard-normal"
+REPLAY_PRIORITY_STRATEGY = "uniform"
+
 
 @dataclass(frozen=True)
 class EnvironmentConfig:
@@ -23,11 +35,6 @@ class EnvironmentConfig:
 
     backend: str = "metaworld-v3"
     reward_function_version: str = "v2"
-    hammer_reward_variant: str = "original"
-    hammer_nail_progress_weight: float = 0.0
-    peg_unplug_reward_variant: str = "original"
-    peg_unplug_progress_weight: float = 0.0
-    peg_unplug_progress_gamma: float = 0.99
 
 
 @dataclass(frozen=True)
@@ -53,9 +60,8 @@ class SACConfig:
     tau: float = 0.005
     train_freq: int = 1
     gradient_steps: int = 1
-    ent_coef: str = "auto"
-    net_arch: List[int] = field(default_factory=lambda: [256, 256, 256, 256])
     checkpoint_freq: int = 10_000
+    checkpoint_mode: str = "low_disk"
     early_stopping: EarlyStoppingConfig = field(default_factory=EarlyStoppingConfig)
 
 
@@ -66,12 +72,8 @@ class BCConfig:
     epochs: int = 100
     batch_size: int = 256
     learning_rate: float = 0.001
-    hidden_sizes: List[int] = field(
-        default_factory=lambda: [256, 256, 256, 256]
-    )
-    normalization_mode: str = "layer-norm"  # Network LayerNorm, not data z-scoring.
-    use_layer_norm: bool = True
     loss: str = "post-tanh-mse"  # Physical-action or pre-tanh latent-space MSE.
+    task_conditioning: str = "none"  # "none" or explicit task-order one-hot.
 
 
 @dataclass(frozen=True)
@@ -96,16 +98,11 @@ class FlowMatchingConfig:
     batch_size: int = 8
     learning_rate: float = 0.001
     width: int = 64
-    residual_blocks: int = 6
-    time_embedding: str = "sinusoidal"
     time_embedding_scale: float = 100.0
     integration_steps: int = 100
-    gradient_clip_norm: float = 1.0
-    validation_samples: int = 4
-    checkpoint_selection: str = "validation-loss"
-    probability_path: str = "linear"
-    source_distribution: str = "standard-normal"
     ode_solver: str = "euler"
+    rtol: float = 1e-5
+    atol: float = 1e-5
 
 
 @dataclass(frozen=True)
@@ -144,7 +141,6 @@ class ContinualConfig:
     # select ``fixed-total`` explicitly for either generator.
     replay_allocation: str = "generator-default"
     replay_budget: int = 200
-    replay_priority_strategy: str = "uniform"
     # Opt-in comparison protocol: historical groups are used only for training,
     # leaving the current task's real holdout as the common validation set.
     historical_replay_training_only: bool = False
@@ -163,6 +159,8 @@ class EvaluationConfig:
     task_set_seed: int = 10_000  # Identifies the ordered fixed MT1 task bank.
     frequency: int = 5_000
     seed_offset: int = 10_000  # Single-task SAC uses runtime.seed + this offset.
+    final_task_set_seeds: List[int] = field(default_factory=lambda: [20_000, 20_001])
+    final_reset_seed: int = 30_000
 
 
 @dataclass(frozen=True)
@@ -200,8 +198,6 @@ _COMMON_SAC_FIELDS = (
     "tau",
     "train_freq",
     "gradient_steps",
-    "ent_coef",
-    "net_arch",
 )
 _CONTINUAL_EVALUATION_FIELDS = ("episodes", "seed", "mode", "task_set_seed")
 _RUNTIME_FIELDS = ("seed", "device", "output", "run_name", "run_dir")
@@ -211,13 +207,11 @@ _EXPERIMENT_FIELDS = {
         "environment": (
             "backend",
             "reward_function_version",
-            "hammer_reward_variant",
-            "hammer_nail_progress_weight",
-            "peg_unplug_reward_variant",
-            "peg_unplug_progress_weight",
-            "peg_unplug_progress_gamma",
         ),
-        "sac": ("steps", *_COMMON_SAC_FIELDS, "checkpoint_freq", "early_stopping"),
+        "sac": (
+            "steps", *_COMMON_SAC_FIELDS, "checkpoint_freq", "checkpoint_mode",
+            "early_stopping",
+        ),
         "continual": ("tasks",),
         "evaluation": (
             "episodes",
@@ -225,6 +219,8 @@ _EXPERIMENT_FIELDS = {
             "seed_offset",
             "mode",
             "task_set_seed",
+            "final_task_set_seeds",
+            "final_reset_seed",
         ),
         "runtime": _RUNTIME_FIELDS,
     },
@@ -239,18 +235,13 @@ _EXPERIMENT_FIELDS = {
         "environment": (
             "backend",
             "reward_function_version",
-            "hammer_reward_variant",
-            "hammer_nail_progress_weight",
-            "peg_unplug_reward_variant",
-            "peg_unplug_progress_weight",
-            "peg_unplug_progress_gamma",
         ),
         "bc": tuple(BCConfig.__annotations__),
         "diffusion": tuple(DiffusionConfig.__annotations__),
         "flow_matching": tuple(FlowMatchingConfig.__annotations__),
         "continual": (
             "tasks", "experts", "trajectories_per_task", "replay_mode",
-            "replay_allocation", "replay_budget", "replay_priority_strategy",
+            "replay_allocation", "replay_budget",
             "historical_replay_training_only",
         ),
         "evaluation": _CONTINUAL_EVALUATION_FIELDS,
@@ -317,6 +308,10 @@ def config_to_dict(config: ExperimentConfig) -> dict:
             for name in fields
             if name != "run_dir" or values[section][name] is not None
             if not (
+                section == "bc"
+                and name == "task_conditioning"
+                and config.bc.task_conditioning == "none"
+                or
                 section == "continual"
                 and (
                     name == "historical_replay_training_only"
@@ -324,7 +319,7 @@ def config_to_dict(config: ExperimentConfig) -> dict:
                     or
                     name == "replay_allocation"
                     and config.continual.replay_allocation == "generator-default"
-                    or name in ("replay_budget", "replay_priority_strategy")
+                    or name == "replay_budget"
                     and (
                         config.continual.replay_mode == "none"
                         or config.continual.replay_mode == "diffusion"
@@ -407,14 +402,58 @@ def _merge(default, values, path=""):
     return replace(default, **updates)
 
 
+_LEGACY_FIXED_FIELDS = {
+    "sac": {"ent_coef": SAC_ENT_COEF, "net_arch": list(SAC_NET_ARCH)},
+    "bc": {
+        "hidden_sizes": list(BC_HIDDEN_SIZES),
+        "normalization_mode": "layer-norm",
+        "use_layer_norm": True,
+    },
+    "flow_matching": {
+        "residual_blocks": FLOW_RESIDUAL_BLOCKS,
+        "time_embedding": FLOW_TIME_EMBEDDING,
+        "gradient_clip_norm": GENERATOR_GRADIENT_CLIP_NORM,
+        "validation_samples": GENERATOR_VALIDATION_DRAWS,
+        "checkpoint_selection": FLOW_CHECKPOINT_SELECTION,
+        "probability_path": FLOW_PROBABILITY_PATH,
+        "source_distribution": FLOW_SOURCE_DISTRIBUTION,
+    },
+    "continual": {"replay_priority_strategy": REPLAY_PRIORITY_STRATEGY},
+}
+
+
+def _without_legacy_fixed_fields(values: dict) -> dict:
+    """Normalize an old resolved config without accepting obsolete alternatives."""
+    normalized = dict(values)
+    for section, expected_fields in _LEGACY_FIXED_FIELDS.items():
+        section_values = normalized.get(section)
+        if not isinstance(section_values, dict):
+            continue
+        section_values = dict(section_values)
+        for name, expected in expected_fields.items():
+            if name not in section_values:
+                continue
+            actual = section_values.pop(name)
+            if actual != expected:
+                raise ValueError(
+                    f"Legacy config field {section}.{name} must be {expected!r}, "
+                    f"got {actual!r}."
+                )
+        normalized[section] = section_values
+    return normalized
+
+
 def config_from_dict(
     values: dict,
     *,
     expected_experiment: Optional[str] = None,
     overrides: Optional[dict] = None,
+    allow_legacy_fixed_fields: bool = False,
 ) -> ExperimentConfig:
     if not isinstance(values, dict) or "experiment" not in values:
         raise ValueError("Missing required field: experiment.")
+    if allow_legacy_fixed_fields:
+        values = _without_legacy_fixed_fields(values)
     default = default_config(values["experiment"])
     _check_experiment_fields(values, default.experiment)
     if "flow_matching" in values and (
@@ -428,11 +467,13 @@ def config_from_dict(
     continual_values = values.get("continual", {})
     if (
         isinstance(continual_values, dict)
-        and {"replay_allocation", "replay_budget", "replay_priority_strategy"} & set(continual_values)
+        and {"replay_allocation", "replay_budget"} & set(continual_values)
         and continual_values.get("replay_mode", "diffusion") == "none"
+        and continual_values.get("replay_allocation", "generator-default")
+        != "fixed-total"
     ):
         raise ValueError(
-            "Replay allocation settings require a generative replay mode or real replay mode."
+            "No Replay accepts explicit replay settings only as a nominal fixed-total budget."
         )
     config = _merge(default, values)
     if expected_experiment is not None and config.experiment != expected_experiment:
@@ -445,14 +486,23 @@ def config_from_dict(
     return config
 
 
-def load_config(path, *, expected_experiment=None, overrides=None) -> ExperimentConfig:
+def load_config(
+    path,
+    *,
+    expected_experiment=None,
+    overrides=None,
+    allow_legacy_fixed_fields=False,
+) -> ExperimentConfig:
     try:
         with Path(path).open(encoding="utf-8") as stream:
             values = yaml.load(stream, Loader=_UniqueKeyLoader)
     except (OSError, yaml.YAMLError) as error:
         raise ValueError(f"Cannot load config {path}: {error}") from error
     return config_from_dict(
-        values, expected_experiment=expected_experiment, overrides=overrides
+        values,
+        expected_experiment=expected_experiment,
+        overrides=overrides,
+        allow_legacy_fixed_fields=allow_legacy_fixed_fields,
     )
 
 
@@ -475,9 +525,7 @@ def validate_config(config: ExperimentConfig) -> None:
             "epochs",
             "batch_size",
             "learning_rate",
-            "residual_blocks",
             "integration_steps",
-            "validation_samples",
         ),
         "continual": ("steps_per_task",),
         "evaluation": ("episodes", "frequency"),
@@ -502,10 +550,6 @@ def validate_config(config: ExperimentConfig) -> None:
     for name in ("gamma", "tau"):
         if not 0 < getattr(config.sac, name) <= 1:
             raise ValueError(f"sac.{name} must be in (0, 1].")
-    if config.sac.ent_coef != "auto":
-        raise ValueError(
-            "sac.ent_coef must be auto (the existing entropy-state contract)."
-        )
     if config.sac.early_stopping.min_steps < 0:
         raise ValueError("sac.early_stopping.min_steps must be nonnegative.")
     if config.sac.early_stopping.patience <= 0:
@@ -514,44 +558,27 @@ def validate_config(config: ExperimentConfig) -> None:
         raise ValueError(
             "sac.early_stopping.success_threshold must be in [0, 1]."
         )
-    if config.sac.net_arch != [256, 256, 256, 256]:
-        raise ValueError("sac.net_arch must be [256, 256, 256, 256].")
-    if config.bc.hidden_sizes != [256, 256, 256, 256]:
-        raise ValueError("bc.hidden_sizes must be [256, 256, 256, 256].")
-    if config.bc.use_layer_norm is not True:
-        raise ValueError("bc.use_layer_norm must be true.")
     for path, allowed in {
-        "environment.backend": ("metaworld-v3", "kuka-v2", "kuka-v3"),
+        "environment.backend": ("metaworld-v3", "kuka-v3"),
         "environment.reward_function_version": ("v1", "v2"),
-        "environment.hammer_reward_variant": ("original", "nail_progress"),
-        "environment.peg_unplug_reward_variant": (
-            "original",
-            "peg_unplug_progress_v1",
-        ),
-        "bc.normalization_mode": ("layer-norm", "none"),
         "bc.loss": ("post-tanh-mse", "pre-tanh-mse"),
+        "bc.task_conditioning": ("none", "one_hot"),
         "diffusion.action_space": ("raw", "pre-tanh"),
         "diffusion.generated_action_projection": ("none", "clip"),
         "continual.replay_mode": ("diffusion", "flow-matching", "real", "none"),
         "evaluation.mode": ("fixed-tasks", "sampled"),
+        "sac.checkpoint_mode": ("low_disk", "full"),
     }.items():
         section, name = path.split(".")
         if getattr(getattr(config, section), name) not in allowed:
             raise ValueError(f"{path} must be one of {allowed}.")
-    expected_normalization_mode = (
-        "layer-norm" if config.bc.use_layer_norm else "none"
-    )
-    if config.bc.normalization_mode != expected_normalization_mode:
-        raise ValueError(
-            "bc.normalization_mode must be layer-norm when bc.use_layer_norm "
-            "is true and none when it is false."
-        )
-    if config.environment.hammer_nail_progress_weight < 0:
-        raise ValueError("environment.hammer_nail_progress_weight must be nonnegative.")
-    if config.environment.peg_unplug_progress_weight < 0:
-        raise ValueError("environment.peg_unplug_progress_weight must be nonnegative.")
-    if not 0 < config.environment.peg_unplug_progress_gamma <= 1:
-        raise ValueError("environment.peg_unplug_progress_gamma must be in (0, 1].")
+    if config.experiment == "sac":
+        final_seeds = config.evaluation.final_task_set_seeds
+        if not final_seeds or len(set(final_seeds)) != len(final_seeds):
+            raise ValueError("evaluation.final_task_set_seeds must be nonempty and unique.")
+        for seed in (*final_seeds, config.evaluation.final_reset_seed):
+            if not 0 <= seed < 2**32:
+                raise ValueError("Final evaluation seeds must be in [0, 2**32).")
     if (
         config.diffusion.steps < 2
         or config.diffusion.width < 4
@@ -567,25 +594,15 @@ def validate_config(config: ExperimentConfig) -> None:
         raise ValueError("flow_matching.width must be a positive multiple of 4.")
     if not math.isfinite(flow.time_embedding_scale) or flow.time_embedding_scale <= 0:
         raise ValueError("flow_matching.time_embedding_scale must be positive and finite.")
-    if not math.isfinite(flow.gradient_clip_norm) or flow.gradient_clip_norm <= 0:
-        raise ValueError("flow_matching.gradient_clip_norm must be positive and finite.")
-    for name, actual, supported in (
-        ("residual_blocks", flow.residual_blocks, 6),
-        ("validation_samples", flow.validation_samples, 4),
-        ("time_embedding", flow.time_embedding, "sinusoidal"),
-        ("checkpoint_selection", flow.checkpoint_selection, "validation-loss"),
-        ("probability_path", flow.probability_path, "linear"),
-        ("source_distribution", flow.source_distribution, "standard-normal"),
-        ("ode_solver", flow.ode_solver, "euler"),
+    if (
+        not math.isfinite(flow.rtol)
+        or not math.isfinite(flow.atol)
+        or flow.rtol <= 0
+        or flow.atol <= 0
     ):
-        if actual != supported:
-            raise ValueError(
-                f"flow_matching.{name} must be {supported!r} in the Phase 1 implementation."
-            )
-    if flow.gradient_clip_norm != 1.0:
-        raise ValueError(
-            "flow_matching.gradient_clip_norm must be 1.0 in the Phase 1 implementation."
-        )
+        raise ValueError("flow_matching.rtol and flow_matching.atol must be positive and finite.")
+    if flow.ode_solver not in ("euler", "midpoint", "heun2", "rk4", "dopri5"):
+        raise ValueError("flow_matching.ode_solver is unsupported.")
     if config.continual.trajectories_per_task < 2:
         raise ValueError(
             "continual.trajectories_per_task must be >=2 for a disjoint holdout."
@@ -596,8 +613,6 @@ def validate_config(config: ExperimentConfig) -> None:
         raise ValueError(
             "continual.replay_allocation must be 'generator-default' or 'fixed-total'."
         )
-    if config.continual.replay_priority_strategy != "uniform":
-        raise ValueError("continual.replay_priority_strategy must be 'uniform'.")
     tasks = config.continual.tasks
     if not tasks or len(set(tasks)) != len(tasks):
         raise ValueError("continual.tasks must be a nonempty list of unique task names.")
@@ -606,20 +621,6 @@ def validate_config(config: ExperimentConfig) -> None:
     ):
         raise ValueError(
             "continual.tasks must be a nonempty list of unique MetaWorld v3 task names."
-        )
-    kuka_v2_tasks = {
-        "kuka-reach-v2",
-        "kuka-push-v2",
-        "kuka-hammer-v2",
-        "kuka-handle-press-side-v2",
-        "kuka-button-press-v2",
-    }
-    if config.environment.backend == "kuka-v2" and any(
-        task not in kuka_v2_tasks for task in tasks
-    ):
-        raise ValueError(
-            "The kuka-v2 backend supports only these tasks: "
-            f"{sorted(kuka_v2_tasks)}."
         )
     kuka_v3_tasks = {
         "kuka-reach-v3",
@@ -645,8 +646,6 @@ def validate_config(config: ExperimentConfig) -> None:
             "The kuka-v3 backend supports only these tasks: "
             f"{sorted(kuka_v3_tasks)}."
         )
-    if config.environment.backend == "kuka-v2" and config.experiment == "continual_sac":
-        raise ValueError("The kuka-v2 backend is not implemented for continual_sac.")
     if config.environment.backend == "kuka-v3" and config.experiment not in (
         "sac",
         "diffcrl",
@@ -654,72 +653,17 @@ def validate_config(config: ExperimentConfig) -> None:
         raise ValueError("The kuka-v3 backend is implemented only for sac and diffcrl.")
     if config.experiment == "sac" and len(tasks) != 1:
         raise ValueError("continual.tasks must contain exactly one task for sac.")
-    if config.environment.backend == "kuka-v2" and config.evaluation.mode != "sampled":
-        raise ValueError(
-            f"evaluation.mode must be sampled for the {config.environment.backend} backend."
-        )
-    hammer_options_active = (
-        config.environment.hammer_reward_variant != "original"
-        or config.environment.hammer_nail_progress_weight != 0
-    )
-    hammer_scope_valid = config.environment.backend == "kuka-v3" and (
-        (config.experiment == "sac" and tasks == ["kuka-hammer-v3"])
-        or config.experiment == "diffcrl"
-    )
-    if hammer_options_active and not hammer_scope_valid:
-        raise ValueError(
-            "Hammer reward options require KUKA-v3 Hammer SAC or KUKA-v3 DiffCRL."
-        )
-    if (
-        config.environment.hammer_reward_variant == "original"
-        and config.environment.hammer_nail_progress_weight != 0
-    ):
-        raise ValueError("The original Hammer reward requires zero progress weight.")
-    if (
-        config.environment.hammer_reward_variant == "nail_progress"
-        and config.environment.hammer_nail_progress_weight <= 0
-    ):
-        raise ValueError("The nail_progress Hammer reward requires a positive weight.")
-    peg_options_active = (
-        config.environment.peg_unplug_reward_variant != "original"
-        or config.environment.peg_unplug_progress_weight != 0
-    )
-    peg_scope_valid = config.environment.backend == "kuka-v3" and (
-        (config.experiment == "sac" and tasks == ["kuka-peg-unplug-side-v3"])
-        or config.experiment == "diffcrl"
-    )
-    if peg_options_active and not peg_scope_valid:
-        raise ValueError(
-            "Peg Unplug reward options require KUKA-v3 Peg Unplug SAC or "
-            "KUKA-v3 DiffCRL."
-        )
-    if (
-        config.environment.peg_unplug_reward_variant == "original"
-        and config.environment.peg_unplug_progress_weight != 0
-    ):
-        raise ValueError("The original Peg Unplug reward requires zero progress weight.")
-    if (
-        config.environment.peg_unplug_reward_variant == "peg_unplug_progress_v1"
-        and config.environment.peg_unplug_progress_weight <= 0
-    ):
-        raise ValueError(
-            "The peg_unplug_progress_v1 reward requires a positive weight."
-        )
-    if peg_options_active and not math.isclose(
-        config.environment.peg_unplug_progress_gamma, config.sac.gamma
-    ):
-        raise ValueError(
-            "Peg Unplug progress gamma must match the SAC discount factor."
-        )
     if config.experiment == "continual_sac" and config.continual.replay_mode != "none":
         raise ValueError("continual.replay_mode must be none for continual_sac.")
-    if config.continual.replay_mode == "none" and (
-        config.continual.replay_allocation != "generator-default"
-        or config.continual.replay_budget != 200
-        or config.continual.replay_priority_strategy != "uniform"
+    if config.continual.replay_mode == "none" and not (
+        (
+            config.continual.replay_allocation == "generator-default"
+            and config.continual.replay_budget == 200
+        )
+        or config.continual.replay_allocation == "fixed-total"
     ):
         raise ValueError(
-            "Replay allocation settings require a generative replay mode or real replay mode."
+            "No Replay accepts either legacy replay defaults or a nominal fixed-total budget."
         )
     if (
         config.continual.historical_replay_training_only

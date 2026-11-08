@@ -7,7 +7,14 @@ from pathlib import Path
 
 import torch
 
-from .bc_policy import BC_CLAMP_EPSILON
+from src.config import (
+    FLOW_CHECKPOINT_SELECTION,
+    GENERATOR_GRADIENT_CLIP_NORM,
+    GENERATOR_VALIDATION_DRAWS,
+    REPLAY_PRIORITY_STRATEGY,
+)
+
+from .bc_policy import BC_CLAMP_EPSILON, GENERAL_POLICY_HIDDEN_SIZES
 
 
 def stage_checkpoint_paths(
@@ -60,7 +67,7 @@ def build_initial_run_summary(
         "trajectories_per_task": config.continual.trajectories_per_task,
         "replay_allocation": config.continual.replay_allocation,
         "replay_budget": config.continual.replay_budget,
-        "replay_priority_strategy": config.continual.replay_priority_strategy,
+        "replay_priority_strategy": REPLAY_PRIORITY_STRATEGY,
         "diffusion_epochs": config.diffusion.epochs,
         "bc_epochs": config.bc.epochs,
         "eval_episodes": config.evaluation.episodes,
@@ -68,8 +75,8 @@ def build_initial_run_summary(
         "eval_seed": config.evaluation.seed,
         "diffusion_steps": config.diffusion.steps,
         "diffusion_width": config.diffusion.width,
-        "bc_normalization_mode": config.bc.normalization_mode,
-        "bc_use_layer_norm": config.bc.use_layer_norm,
+        "bc_normalization_mode": "layer-norm",
+        "bc_use_layer_norm": True,
         "replay_mode": config.continual.replay_mode,
         "bc_loss": config.bc.loss,
         "diffusion_action_space": config.diffusion.action_space,
@@ -98,8 +105,8 @@ def build_initial_run_summary(
         else None,
         "split": "per-task whole episodes; rounded 20% validation",
         "bc": {
-            "hidden_sizes": config.bc.hidden_sizes,
-            "use_layer_norm": config.bc.use_layer_norm,
+            "hidden_sizes": list(GENERAL_POLICY_HIDDEN_SIZES),
+            "use_layer_norm": True,
             "epochs": config.bc.epochs,
             "batch_size": config.bc.batch_size,
             "learning_rate": config.bc.learning_rate,
@@ -117,9 +124,9 @@ def build_initial_run_summary(
                     "epochs": config.flow_matching.epochs,
                     "batch_size": config.flow_matching.batch_size,
                     "learning_rate": config.flow_matching.learning_rate,
-                    "gradient_clip_norm": config.flow_matching.gradient_clip_norm,
-                    "validation_samples": config.flow_matching.validation_samples,
-                    "checkpoint_selection": config.flow_matching.checkpoint_selection,
+                    "gradient_clip_norm": GENERATOR_GRADIENT_CLIP_NORM,
+                    "validation_samples": GENERATOR_VALIDATION_DRAWS,
+                    "checkpoint_selection": FLOW_CHECKPOINT_SELECTION,
                 }
             }
             if flow_matching is not None

@@ -227,12 +227,5 @@ class StructuredTrajectoryTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "changed replay shape or observations"):
             generated_action_diagnostics(before, changed_observation, "clip")
 
-        from src.continual.diagnostics import (
-            generated_action_diagnostics as compatibility_export,
-        )
-
-        self.assertIs(compatibility_export, generated_action_diagnostics)
-
-
 if __name__ == "__main__":
     unittest.main()

@@ -76,8 +76,6 @@ def prepare_replay_task(
     }
     if request.backend == "kuka-v3":
         environment_kwargs.update(
-            hammer_reward_variant=request.hammer_reward_variant,
-            hammer_nail_progress_weight=request.hammer_nail_progress_weight,
         )
     goals = torch.as_tensor(
         reconstruct(bank, selected, **environment_kwargs), dtype=torch.float32

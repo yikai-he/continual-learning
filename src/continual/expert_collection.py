@@ -67,7 +67,7 @@ def load_collection_config(path: str | Path) -> CollectionConfig:
         device=runtime.get("device"),
         output=Path(runtime.get("output", "")).expanduser().resolve(),
     )
-    if config.backend not in ("metaworld-v3", "kuka-v2"):
+    if config.backend not in ("metaworld-v3", "kuka-v3"):
         raise ValueError("environment.backend is unsupported.")
     if config.reward_function_version not in ("v1", "v2"):
         raise ValueError("environment.reward_function_version must be v1 or v2.")

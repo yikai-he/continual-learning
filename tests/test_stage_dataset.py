@@ -119,13 +119,6 @@ class StageDatasetTests(unittest.TestCase):
         self.assertEqual(result.splits["reach-v3"]["train_samples"], 1000)
         self.assertEqual(result.splits["reach-v3"]["validation_samples"], 0)
 
-    def test_legacy_support_imports_reexport_stage_dataset_api(self):
-        from src.support import dataset as legacy
-        from src.continual import stage_dataset
-
-        for name in legacy.__all__:
-            self.assertIs(getattr(legacy, name), getattr(stage_dataset, name))
-
     def test_group_preparation_preserves_split_and_clip_diagnostic(self):
         values = fixture_groups()[1]
         result = prepare_trajectory_group(

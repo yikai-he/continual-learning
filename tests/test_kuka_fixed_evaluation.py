@@ -40,8 +40,6 @@ def test_kuka_fixed_configs_and_method_parity() -> None:
     assert replay.evaluation == control.evaluation
     assert hammer.evaluation == hammer_control.evaluation
     assert hammer.continual.tasks[-1] == "kuka-hammer-v3"
-    assert hammer.environment.hammer_reward_variant == "nail_progress"
-    assert hammer.environment.hammer_nail_progress_weight == 4.0
 
 
 def test_kuka_formal_configs_match_except_replay_and_output() -> None:
@@ -118,8 +116,6 @@ def test_hammer_fixed_evaluation_forwards_environment_settings() -> None:
         "kuka-hammer-v3",
         20_000,
         reward_function_version="v2",
-        hammer_reward_variant="nail_progress",
-        hammer_nail_progress_weight=4.0,
     )
     switcher = MagicMock()
     switcher.__enter__.return_value = switcher
@@ -136,21 +132,12 @@ def test_hammer_fixed_evaluation_forwards_environment_settings() -> None:
             task_set_seed=10_000,
             backend="kuka-v3",
             reward_function_version="v2",
-            hammer_reward_variant="nail_progress",
-            hammer_nail_progress_weight=4.0,
         )
     env.close()
-    assert env.unwrapped.hammer_reward_variant == "nail_progress"
-    assert env.unwrapped.hammer_nail_progress_weight == 4.0
     switcher_type.assert_called_once_with(
         TaskSequence((task,)),
         backend="kuka-v3",
         reward_function_version="v2",
-        hammer_reward_variant="nail_progress",
-        hammer_nail_progress_weight=4.0,
-        peg_unplug_reward_variant="original",
-        peg_unplug_progress_weight=0.0,
-        peg_unplug_progress_gamma=0.99,
         render_mode=None,
     )
 
@@ -162,9 +149,6 @@ def test_peg_fixed_evaluation_forwards_environment_settings() -> None:
         "kuka-peg-unplug-side-v3",
         20_000,
         reward_function_version="v2",
-        peg_unplug_reward_variant="peg_unplug_progress_v1",
-        peg_unplug_progress_weight=2.0,
-        peg_unplug_progress_gamma=0.99,
     )
     switcher = MagicMock()
     switcher.__enter__.return_value = switcher
@@ -181,28 +165,17 @@ def test_peg_fixed_evaluation_forwards_environment_settings() -> None:
             task_set_seed=10_000,
             backend="kuka-v3",
             reward_function_version="v2",
-            peg_unplug_reward_variant="peg_unplug_progress_v1",
-            peg_unplug_progress_weight=2.0,
-            peg_unplug_progress_gamma=0.99,
         )
     env.close()
-    assert env.unwrapped.peg_unplug_reward_variant == "peg_unplug_progress_v1"
-    assert env.unwrapped.peg_unplug_progress_weight == 2.0
-    assert env.unwrapped.peg_unplug_progress_gamma == 0.99
     switcher_type.assert_called_once_with(
         TaskSequence((task,)),
         backend="kuka-v3",
         reward_function_version="v2",
-        hammer_reward_variant="original",
-        hammer_nail_progress_weight=0.0,
-        peg_unplug_reward_variant="peg_unplug_progress_v1",
-        peg_unplug_progress_weight=2.0,
-        peg_unplug_progress_gamma=0.99,
         render_mode=None,
     )
 
 
-def test_diffcrl_stage_evaluation_forwards_peg_environment_settings() -> None:
+def test_diffcrl_stage_evaluation_uses_fixed_environment_settings() -> None:
     config = _config("diffcrl_kuka_10task_15plus15_4layer.yaml")
     trainer = DiffCRLTrainer.__new__(DiffCRLTrainer)
     trainer.config = config
@@ -211,11 +184,7 @@ def test_diffcrl_stage_evaluation_forwards_peg_environment_settings() -> None:
     trainer.progress = False
     with patch("src.continual.diffcrl.evaluate_stage") as evaluate:
         trainer._evaluate_stage(0)
-    assert evaluate.call_args.kwargs["peg_unplug_reward_variant"] == (
-        "peg_unplug_progress_v1"
-    )
-    assert evaluate.call_args.kwargs["peg_unplug_progress_weight"] == 2.0
-    assert evaluate.call_args.kwargs["peg_unplug_progress_gamma"] == 0.99
+    assert evaluate.call_count == 1
 
 
 def test_replay_reconstruction_remains_on_training_bank() -> None:
@@ -255,8 +224,6 @@ def test_every_kuka_task_bank_target_is_representable_without_clipping(name) -> 
         name,
         0,
         reward_function_version="v2",
-        hammer_reward_variant="nail_progress",
-        hammer_nail_progress_weight=4.0,
     )
     try:
         disable_task_sampling(env)
@@ -294,8 +261,6 @@ def test_formal_kuka_task_goal_is_exactly_constant_for_full_episode(name) -> Non
         name,
         0,
         reward_function_version="v2",
-        hammer_reward_variant="nail_progress",
-        hammer_nail_progress_weight=4.0,
     )
     try:
         from src.continual.evaluation import disable_task_sampling, validate_active_task

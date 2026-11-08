@@ -1,0 +1,29 @@
+# Task-incremental counterpart of diffcrl_no_replay.yaml.
+experiment: diffcrl
+environment:
+  reward_function_version: v2
+bc:
+  epochs: 100
+  batch_size: 256
+  learning_rate: 0.001
+  loss: post-tanh-mse
+  task_conditioning: one_hot
+continual:
+  tasks: [button-press-v3, faucet-close-v3, hammer-v3, handle-press-side-v3, window-close-v3]
+  experts:
+    button-press-v3: runs/experts/metaworld-v3/button-press-v3/policy.zip
+    faucet-close-v3: runs/experts/metaworld-v3/faucet-close-v3/policy.zip
+    hammer-v3: runs/experts/metaworld-v3/hammer-v3/policy.zip
+    handle-press-side-v3: runs/experts/metaworld-v3/handle-press-side-v3/policy.zip
+    window-close-v3: runs/experts/metaworld-v3/window-close-v3/policy.zip
+  trajectories_per_task: 200
+  replay_mode: none
+evaluation:
+  episodes: 50
+  seed: 10000
+  mode: fixed-tasks
+  task_set_seed: 10000
+runtime:
+  seed: 0
+  device: cpu
+  output: runs/formal/no_replay_5task_task_conditioned

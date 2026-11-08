@@ -2,14 +2,10 @@ experiment: diffcrl
 environment:
   backend: kuka-v3
   reward_function_version: v2
-  hammer_reward_variant: nail_progress
-  hammer_nail_progress_weight: 4.0
 bc:
   epochs: 2
   batch_size: 256
   learning_rate: 0.001
-  hidden_sizes: [256, 256, 256, 256]
-  normalization_mode: layer-norm
   loss: post-tanh-mse
 continual:
   tasks:

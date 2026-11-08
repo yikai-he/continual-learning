@@ -285,7 +285,9 @@ def prepare_generator_data(
     )
 
 
-def normalize_generator_data(prepared: PreparedGeneratorData) -> NormalizedGeneratorData:
+def normalize_generator_data(
+    prepared: PreparedGeneratorData,
+) -> NormalizedGeneratorData:
     """Normalize prepared inputs in the historical timed argument order."""
     return NormalizedGeneratorData(
         train=prepared.normalizer.normalize(prepared.train),

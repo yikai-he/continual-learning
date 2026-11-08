@@ -16,25 +16,23 @@ import numpy as np
 from src.config import (
     EarlyStoppingConfig,
     ExperimentConfig,
+    SAC_ENT_COEF,
+    SAC_NET_ARCH,
     output_directory,
     parse_config,
     save_resolved_config,
 )
-from src.continual.evaluation import disable_task_sampling, fixed_mt1_tasks
-from src.continual.task_bank import verify_disjoint_task_banks
+from src.continual.evaluation import disable_task_sampling, evaluate_task, fixed_mt1_tasks
+from src.continual.policy_adapter import SB3SACPolicy
+from src.continual.task_bank import backend_tasks, bank_hashes
+from src.continual.task_sequence import TaskSpec
 from src.envs import ACTION_SHAPE, OBSERVATION_SHAPE, horizon_for_backend, make_env
 from src.support.reproducibility import git_output
-from src.hammer_diagnostics import (
-    HAMMER_TASK,
-    HammerEpisodeTracker,
-    summarize_hammer_episodes,
-)
 from src.sac.checkpoint_ranking import (
     best_return_index,
     best_success_index,
     success_score,
 )
-from src.sac.kuka_diagnostics import KukaEpisodeDiagnostics
 from src.support.expert_manifest import qualification_record, write_expert_manifest
 from src.support.reproducibility import file_hash
 from src.support.run_manifest import complete_run, create_run_manifest
@@ -172,33 +170,6 @@ class TrainingSuccessCallback(BaseCallback):
         return True
 
 
-def summarize_success_trace(successes, *, sustained_steps: int = 10) -> dict:
-    """Summarize observational success retention without changing success semantics."""
-    trace = [bool(value) for value in successes]
-    if not trace:
-        raise ValueError("Success trace must contain at least one environment step.")
-    if sustained_steps <= 0:
-        raise ValueError("sustained_steps must be positive.")
-    longest_run = run = 0
-    for success in trace:
-        run = run + 1 if success else 0
-        longest_run = max(longest_run, run)
-    first_success = next((i for i, success in enumerate(trace) if success), None)
-    retained_steps = sum(trace[first_success:]) if first_success is not None else 0
-    post_success_steps = len(trace) - first_success if first_success is not None else 0
-    return {
-        "any_step_success": any(trace),
-        "final_step_success": trace[-1],
-        "sustained_success": longest_run >= sustained_steps,
-        "longest_success_run": longest_run,
-        "first_success_step": first_success,
-        "success_retention_steps": retained_steps,
-        "success_retention_fraction": (
-            retained_steps / post_success_steps if post_success_steps else 0.0
-        ),
-    }
-
-
 class FixedSeedEvalCallback(BaseCallback):
     """Evaluate on one fixed seed bank and retain return- and success-best models."""
 
@@ -278,10 +249,6 @@ class FixedSeedEvalCallback(BaseCallback):
         self.ep_lengths: list[list[int]] = []
         self.successes: list[list[bool]] = []
         self.return_stddevs: list[float] = []
-        self.behavior_metrics: list[list[dict]] = []
-        self.success_diagnostics: list[list[dict]] = []
-        self.hammer_metrics: list[list[dict]] = []
-        self.handoff_metrics: list[list[dict]] = []
 
     def _save_model(self, path: Path) -> None:
         """Save directly by default, or atomically replace one named archive."""
@@ -290,33 +257,17 @@ class FixedSeedEvalCallback(BaseCallback):
             self.model.save(path)
             return
         target = path if path.suffix == ".zip" else path.with_suffix(".zip")
-        temporary = target.with_name(f".{target.stem}.{os.getpid()}.tmp.zip")
-        try:
-            self.model.save(temporary)
-            os.replace(temporary, target)
-        finally:
-            temporary.unlink(missing_ok=True)
+        atomic_replace_model(self.model, target)
 
     def _evaluate(self) -> tuple[list[float], list[int], list[bool]]:
         returns, lengths, successes = [], [], []
-        evaluation_behavior = []
-        evaluation_success_diagnostics = []
-        evaluation_hammer = []
-        evaluation_handoff = []
         for index, seed in enumerate(self.seeds):
             if self.fixed_tasks is not None:
                 self.eval_env.unwrapped.set_task(self.fixed_tasks[index])
             observation, _ = self.eval_env.reset(seed=seed)
-            diagnostics = KukaEpisodeDiagnostics(
-                self.task_name,
-                self.eval_env,
-                observation,
-                HammerEpisodeTracker,
-            )
             episode_return = 0.0
             episode_length = 0
             episode_success = False
-            episode_success_trace = []
             while True:
                 action, _ = self.model.predict(observation, deterministic=True)
                 observation, reward, terminated, truncated, info = self.eval_env.step(
@@ -326,35 +277,11 @@ class FixedSeedEvalCallback(BaseCallback):
                 episode_length += 1
                 step_success = bool(info.get("success", info.get("is_success", False)))
                 episode_success |= step_success
-                episode_success_trace.append(step_success)
-                diagnostics.observe_step(
-                    action, observation, reward, info, episode_length
-                )
                 if terminated or truncated:
                     break
             returns.append(episode_return)
             lengths.append(episode_length)
             successes.append(episode_success)
-            success_diagnostic = summarize_success_trace(episode_success_trace)
-            evaluation_success_diagnostics.append({"seed": seed, **success_diagnostic})
-            behavior, hammer, handoff = diagnostics.finish(
-                seed=seed,
-                episode_return=episode_return,
-                episode_length=episode_length,
-                episode_success=episode_success,
-                success_diagnostic=success_diagnostic,
-                final_info=info,
-            )
-            if behavior is not None:
-                evaluation_behavior.append(behavior)
-            if hammer is not None:
-                evaluation_hammer.append(hammer)
-            if handoff is not None:
-                evaluation_handoff.append(handoff)
-        self._last_behavior_metrics = evaluation_behavior
-        self._last_success_diagnostics = evaluation_success_diagnostics
-        self._last_hammer_metrics = evaluation_hammer
-        self._last_handoff_metrics = evaluation_handoff
         return returns, lengths, successes
 
     def _save_evaluations(self) -> None:
@@ -372,56 +299,6 @@ class FixedSeedEvalCallback(BaseCallback):
             ),
             ordered_task_data_sha256=np.asarray(self.task_hashes),
         )
-        if self.behavior_metrics:
-            (self.log_path / "behavior_metrics.json").write_text(
-                json.dumps(
-                    [
-                        {"step": step, "episodes": episodes}
-                        for step, episodes in zip(self.timesteps, self.behavior_metrics)
-                    ],
-                    indent=2,
-                )
-                + "\n",
-                encoding="utf-8",
-            )
-        if self.success_diagnostics:
-            (self.log_path / "success_diagnostics.json").write_text(
-                json.dumps(
-                    [
-                        {"step": step, "episodes": episodes}
-                        for step, episodes in zip(
-                            self.timesteps, self.success_diagnostics
-                        )
-                    ],
-                    indent=2,
-                )
-                + "\n",
-                encoding="utf-8",
-            )
-        if self.hammer_metrics:
-            (self.log_path / "hammer_metrics.json").write_text(
-                json.dumps(
-                    [
-                        {"step": step, "episodes": episodes}
-                        for step, episodes in zip(self.timesteps, self.hammer_metrics)
-                    ],
-                    indent=2,
-                )
-                + "\n",
-                encoding="utf-8",
-            )
-        if self.handoff_metrics:
-            (self.log_path / "handoff_metrics.json").write_text(
-                json.dumps(
-                    [
-                        {"step": step, "episodes": episodes}
-                        for step, episodes in zip(self.timesteps, self.handoff_metrics)
-                    ],
-                    indent=2,
-                )
-                + "\n",
-                encoding="utf-8",
-            )
 
     def _record_evaluation(self, *, allow_early_stop: bool = True) -> bool:
         returns, lengths, successes = self._evaluate()
@@ -433,58 +310,10 @@ class FixedSeedEvalCallback(BaseCallback):
         self.ep_lengths.append(lengths)
         self.successes.append(successes)
         self.return_stddevs.append(return_stddev)
-        if getattr(self, "_last_behavior_metrics", None):
-            self.behavior_metrics.append(self._last_behavior_metrics)
-        if getattr(self, "_last_success_diagnostics", None):
-            self.success_diagnostics.append(self._last_success_diagnostics)
-        hammer_metrics = getattr(self, "_last_hammer_metrics", None)
-        if hammer_metrics:
-            self.hammer_metrics.append(hammer_metrics)
-        handoff_metrics = getattr(self, "_last_handoff_metrics", None)
-        if handoff_metrics:
-            self.handoff_metrics.append(handoff_metrics)
         self._save_evaluations()
         self.logger.record("eval/mean_reward", mean_return)
         self.logger.record("eval/std_reward", return_stddev)
         self.logger.record("eval/success_rate", success_rate)
-        if hammer_metrics:
-            for name, value in summarize_hammer_episodes(hammer_metrics).items():
-                self.logger.record(f"eval/{name}", value)
-        if handoff_metrics:
-            self.logger.record(
-                "eval/handoff_instantaneous_success_rate",
-                float(
-                    np.mean([item["instantaneous_success"] for item in handoff_metrics])
-                ),
-            )
-            self.logger.record("eval/handoff_sustained_success_rate", success_rate)
-            for metric in (
-                "valid_rear_contact_episode",
-                "first_valid_rear_contact_step",
-                "initial_tcp_target_distance",
-                "minimum_tcp_target_distance",
-                "final_tcp_target_distance",
-                "mean_physical_aperture",
-                "final_physical_aperture",
-                "mean_aperture_error",
-                "maximum_cube_displacement",
-                "maximum_cube_tilt",
-                "reward_tcp_shaping_total",
-                "reward_aperture_shaping_total",
-                "reward_handoff_total",
-                "final_tcp_potential",
-                "final_aperture_potential",
-                "final_total_potential",
-                "discounted_episode_return_gamma_0_99",
-            ):
-                values = [
-                    float(item[metric])
-                    for item in handoff_metrics
-                    if item.get(metric) is not None
-                ]
-                if values:
-                    self.logger.record(f"eval/handoff_{metric}", float(np.mean(values)))
-
         if self.save_best_return and mean_return > self.best_mean_return:
             self.best_mean_return = mean_return
             self._save_model(self.best_model_save_path / "best_model")
@@ -571,6 +400,88 @@ class GlobalCheckpointCallback(CheckpointCallback):
         return True
 
 
+def atomic_replace_model(model, path: Path) -> None:
+    """Serialize and atomically replace one inference-only SB3 checkpoint."""
+    path = Path(path)
+    temporary = path.with_name(f".{path.stem}.{os.getpid()}.tmp.zip")
+    try:
+        model.save(temporary)
+        if not temporary.is_file() or temporary.stat().st_size == 0:
+            raise RuntimeError(f"SAC checkpoint serialization failed: {temporary}")
+        os.replace(temporary, path)
+    finally:
+        temporary.unlink(missing_ok=True)
+
+
+class LatestModelCallback(BaseCallback):
+    """Atomically retain only the latest inference checkpoint."""
+
+    def __init__(self, save_freq: int, path: Path) -> None:
+        super().__init__()
+        self.save_freq = save_freq
+        self.path = Path(path)
+        self._next_checkpoint_timestep = None
+
+    def _on_training_start(self) -> None:
+        self._next_checkpoint_timestep = next_global_boundary(
+            self.model.num_timesteps, self.save_freq
+        )
+
+    def _on_step(self) -> bool:
+        if self.num_timesteps < self._next_checkpoint_timestep:
+            return True
+        atomic_replace_model(self.model, self.path)
+        self._next_checkpoint_timestep = next_global_boundary(
+            self.num_timesteps, self.save_freq
+        )
+        return True
+
+
+def task_bank_provenance(task: str, training_seed: int, validation_seed: int,
+                         final_seeds: list[int], *, backend: str) -> dict:
+    """Record task identities and prove all optimization/evaluation banks disjoint."""
+    seeds = [training_seed, validation_seed, *final_seeds]
+    if len(set(seeds)) != len(seeds):
+        raise ValueError("Training, validation, and final task-bank seeds must differ.")
+    banks = {
+        str(seed): bank_hashes(backend_tasks(task, seed, backend=backend))
+        for seed in seeds
+    }
+    for index, left in enumerate(seeds):
+        for right in seeds[index + 1:]:
+            overlap = set(banks[str(left)]) & set(banks[str(right)])
+            if overlap:
+                raise ValueError(
+                    f"Task banks {left} and {right} overlap by {len(overlap)} configuration(s)."
+                )
+    return {
+        "training_task_set_seed": training_seed,
+        "validation_task_set_seed": validation_seed,
+        "final_test_task_set_seeds": list(final_seeds),
+        "ordered_task_hashes": banks,
+        "all_banks_pairwise_disjoint": True,
+    }
+
+
+def final_test(config: ExperimentConfig, model) -> list[dict]:
+    """Evaluate a selected checkpoint once on final banks; never rank with results."""
+    task = config.continual.tasks[0]
+    policy = SB3SACPolicy(model)
+    fixed = config.environment.backend in ("metaworld-v3", "kuka-v3")
+    return [
+        evaluate_task(
+            policy, TaskSpec(task, task), episodes=config.evaluation.episodes,
+            seed=(config.evaluation.final_reset_seed + index * config.evaluation.episodes
+                  if fixed else bank_seed),
+            evaluation_mode="fixed-tasks" if fixed else "sampled",
+            task_set_seed=bank_seed,
+            reward_function_version=config.environment.reward_function_version,
+            backend=config.environment.backend,
+        )
+        for index, bank_seed in enumerate(config.evaluation.final_task_set_seeds)
+    ]
+
+
 def _git_identity(path: Path) -> dict[str, str | None]:
     """Read local Git provenance without changing repository state."""
     return {
@@ -586,7 +497,6 @@ def _runtime_provenance(backend: str) -> dict:
     checkout = Path(metaworld.__file__).resolve().parent.parent
     registration_ids = {
         "metaworld-v3": "Meta-World/MT1",
-        "kuka-v2": None,
         "kuka-v3": "Meta-World-KUKA/MT1",
     }
     return {
@@ -706,7 +616,7 @@ def load_resumable_sac(checkpoint_path: Path, env, *, device: str):
             "Resume checkpoint is incompatible with the current task's "
             f"observation or action space: {error}"
         ) from error
-    if getattr(model.policy, "net_arch", None) != [256, 256, 256, 256]:
+    if getattr(model.policy, "net_arch", None) != list(SAC_NET_ARCH):
         raise ValueError(
             "Resume checkpoint uses an unsupported SAC architecture; only "
             "net_arch=[256, 256, 256, 256] is accepted."
@@ -750,28 +660,30 @@ def main(argv=None) -> None:
     """
     config, cli_args = parse_args(argv)
     resume_from = cli_args.resume_from
+    low_disk = config.sac.checkpoint_mode == "low_disk"
+    if low_disk and resume_from is not None:
+        raise ValueError(
+            "Low-disk checkpoints are inference-only and cannot faithfully resume; "
+            "use sac.checkpoint_mode: full for replay-backed resume."
+        )
     task_bank_checks = (
-        {
-            config.continual.tasks[0]: verify_disjoint_task_banks(
-                config.continual.tasks[0],
-                config.runtime.seed,
-                config.evaluation.task_set_seed,
-            )
-        }
-        if config.environment.backend == "metaworld-v3"
+        {config.continual.tasks[0]: task_bank_provenance(
+            config.continual.tasks[0], config.runtime.seed,
+            config.evaluation.task_set_seed,
+            config.evaluation.final_task_set_seeds,
+            backend=config.environment.backend,
+        )}
+        if config.environment.backend in ("metaworld-v3", "kuka-v3")
         and config.evaluation.mode == "fixed-tasks"
         else {}
     )
     run_dir = create_run_directory(config)
     save_resolved_config(config, run_dir)
     create_run_manifest(run_dir, config, task_banks=task_bank_checks)
-    for directory in (
-        "tensorboard",
-        "evaluations",
-        "checkpoints",
-        "best_model",
-        "best_success_model",
-    ):
+    directories = ("tensorboard", "evaluations") if low_disk else (
+        "tensorboard", "evaluations", "checkpoints", "best_model", "best_success_model",
+    )
+    for directory in directories:
         (run_dir / directory).mkdir()
     # Keep existing provenance keys for checkpoint audits and consumers.
     metadata = {
@@ -795,22 +707,27 @@ def main(argv=None) -> None:
             )
         ),
         "checkpoint_freq": config.sac.checkpoint_freq,
+        "checkpoint_mode": config.sac.checkpoint_mode,
+        "checkpoint_selection": {
+            "primary": "success_rate", "secondary": "mean_return",
+            "tie_policy": "keep_previous",
+        },
+        "best_checkpoint": "best_model.zip" if low_disk else "best_success_model/best_success_model.zip",
+        "latest_checkpoint": "latest_model.zip" if low_disk else "final_model.zip",
+        "low_disk_resume_supported": False if low_disk else None,
         "run_dir": str(run_dir),
         "algorithm": "SAC",
         "env_backend": config.environment.backend,
         "effective_horizon": horizon_for_backend(config.environment.backend),
         "reward_function_version": config.environment.reward_function_version,
-        "hammer_reward_variant": config.environment.hammer_reward_variant,
-        "hammer_nail_progress_weight": (config.environment.hammer_nail_progress_weight),
-        "peg_unplug_reward_variant": config.environment.peg_unplug_reward_variant,
-        "peg_unplug_progress_weight": config.environment.peg_unplug_progress_weight,
-        "peg_unplug_progress_gamma": config.environment.peg_unplug_progress_gamma,
         "policy": "MlpPolicy",
         "resumed": resume_from is not None,
         "resume_checkpoint": str(resume_from.expanduser().resolve())
         if resume_from is not None
         else None,
         **_runtime_provenance(config.environment.backend),
+        "ent_coef": SAC_ENT_COEF,
+        "net_arch": list(SAC_NET_ARCH),
         **{
             name: getattr(config.sac, name)
             for name in (
@@ -821,8 +738,6 @@ def main(argv=None) -> None:
                 "tau",
                 "train_freq",
                 "gradient_steps",
-                "ent_coef",
-                "net_arch",
             )
         },
     }
@@ -836,13 +751,6 @@ def main(argv=None) -> None:
             config.continual.tasks[0],
             config.runtime.seed,
             reward_function_version=config.environment.reward_function_version,
-            hammer_reward_variant=config.environment.hammer_reward_variant,
-            hammer_nail_progress_weight=(
-                config.environment.hammer_nail_progress_weight
-            ),
-            peg_unplug_reward_variant=config.environment.peg_unplug_reward_variant,
-            peg_unplug_progress_weight=config.environment.peg_unplug_progress_weight,
-            peg_unplug_progress_gamma=config.environment.peg_unplug_progress_gamma,
         )
     )
     eval_env = Monitor(
@@ -853,13 +761,6 @@ def main(argv=None) -> None:
             if config.evaluation.mode == "fixed-tasks"
             else config.runtime.seed + config.evaluation.seed_offset,
             reward_function_version=config.environment.reward_function_version,
-            hammer_reward_variant=config.environment.hammer_reward_variant,
-            hammer_nail_progress_weight=(
-                config.environment.hammer_nail_progress_weight
-            ),
-            peg_unplug_reward_variant=config.environment.peg_unplug_reward_variant,
-            peg_unplug_progress_weight=config.environment.peg_unplug_progress_weight,
-            peg_unplug_progress_gamma=config.environment.peg_unplug_progress_gamma,
         )
     )
     evaluation_callback = FixedSeedEvalCallback(
@@ -869,24 +770,27 @@ def main(argv=None) -> None:
         seed=config.runtime.seed + config.evaluation.seed_offset,
         log_path=run_dir / "evaluations",
         best_model_save_path=run_dir / "best_model",
-        best_success_model_save_path=run_dir / "best_success_model",
+        best_success_model_save_path=run_dir if low_disk else run_dir / "best_success_model",
         task_name=config.continual.tasks[0],
         task_set_seed=config.evaluation.task_set_seed,
         evaluation_mode=config.evaluation.mode,
         evaluate_on_training_start=resume_from is None,
         early_stopping=config.sac.early_stopping,
+        save_best_return=not low_disk,
+        best_success_model_name="best_model" if low_disk else "best_success_model",
+        atomic_model_replacement=low_disk,
+    )
+    checkpoint_callback = (
+        LatestModelCallback(config.sac.checkpoint_freq, run_dir / "latest_model.zip")
+        if low_disk else
+        GlobalCheckpointCallback(
+            save_freq=config.sac.checkpoint_freq,
+            save_path=str(run_dir / "checkpoints"),
+            name_prefix="sac", save_replay_buffer=True,
+        )
     )
     callbacks = CallbackList(
-        [
-            TrainingSuccessCallback(),
-            evaluation_callback,
-            GlobalCheckpointCallback(
-                save_freq=config.sac.checkpoint_freq,
-                save_path=str(run_dir / "checkpoints"),
-                name_prefix="sac",
-                save_replay_buffer=True,
-            ),
-        ]
+        [TrainingSuccessCallback(), evaluation_callback, checkpoint_callback]
     )
 
     if resume_from is None:
@@ -901,8 +805,8 @@ def main(argv=None) -> None:
             tau=config.sac.tau,
             train_freq=config.sac.train_freq,
             gradient_steps=config.sac.gradient_steps,
-            ent_coef=config.sac.ent_coef,
-            policy_kwargs={"net_arch": config.sac.net_arch},
+            ent_coef=SAC_ENT_COEF,
+            policy_kwargs={"net_arch": list(SAC_NET_ARCH)},
             tensorboard_log=str(run_dir / "tensorboard"),
             seed=config.runtime.seed,
             device=config.runtime.device,
@@ -955,8 +859,18 @@ def main(argv=None) -> None:
                 "SAC training completed without creating a replay buffer."
             )
         print(f"Replay buffer transitions: {model.replay_buffer.size()}")
-        model.save(run_dir / "final_model")
-        print(f"Final model saved to: {run_dir / 'final_model.zip'}")
+        if low_disk:
+            atomic_replace_model(model, run_dir / "latest_model.zip")
+            best_path = run_dir / "best_model.zip"
+            selected = SAC.load(best_path, device=config.runtime.device)
+            metadata["final_test"] = final_test(config, selected)
+            metadata["best_checkpoint_sha256"] = file_hash(best_path)
+            metadata["latest_checkpoint_sha256"] = file_hash(run_dir / "latest_model.zip")
+            print(f"Best model saved to: {best_path}")
+            print(f"Latest model saved to: {run_dir / 'latest_model.zip'}")
+        else:
+            model.save(run_dir / "final_model")
+            print(f"Final model saved to: {run_dir / 'final_model.zip'}")
         if (
             isinstance(evaluation_callback.results, list)
             and evaluation_callback.results
@@ -982,14 +896,15 @@ def main(argv=None) -> None:
                 )
 
             config_path = run_dir / "config.yaml"
-            for checkpoint, index in (
-                (run_dir / "final_model.zip", -1),
-                (run_dir / "best_model" / "best_model.zip", return_index),
-                (
-                    run_dir / "best_success_model" / "best_success_model.zip",
-                    success_index,
-                ),
-            ):
+            checkpoint_rows = (
+                ((run_dir / "best_model.zip", success_index),
+                 (run_dir / "latest_model.zip", -1))
+                if low_disk else
+                ((run_dir / "final_model.zip", -1),
+                 (run_dir / "best_model" / "best_model.zip", return_index),
+                 (run_dir / "best_success_model" / "best_success_model.zip", success_index))
+            )
+            for checkpoint, index in checkpoint_rows:
                 write_expert_manifest(
                     checkpoint,
                     task_name=config.continual.tasks[0],
@@ -1001,20 +916,14 @@ def main(argv=None) -> None:
                     observation_shape=OBSERVATION_SHAPE,
                     action_shape=ACTION_SHAPE,
                     horizon=horizon_for_backend(config.environment.backend),
-                    hammer_reward_variant=(
-                        config.environment.hammer_reward_variant
-                        if config.continual.tasks[0] == HAMMER_TASK
-                        else None
-                    ),
-                    hammer_nail_progress_weight=(
-                        config.environment.hammer_nail_progress_weight
-                        if config.continual.tasks[0] == HAMMER_TASK
-                        else None
-                    ),
                     qualification=qualification(index),
                 )
+        (run_dir / "config.json").write_text(
+            json.dumps(metadata, indent=2, sort_keys=True) + "\n", encoding="utf-8"
+        )
         try:
-            export_run_summaries(run_dir)
+            if not low_disk:
+                export_run_summaries(run_dir)
         except Exception as error:
             print(f"WARNING: Could not write SAC result summaries: {error}")
         complete_run(run_dir)

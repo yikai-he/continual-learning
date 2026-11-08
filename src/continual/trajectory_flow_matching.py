@@ -8,7 +8,7 @@ from dataclasses import dataclass
 import torch
 from src.support.io import atomic_torch_save
 from torch import nn
-from tqdm.auto import tqdm
+from torchdiffeq import odeint
 
 from .diffusion_data import DIFFUSION_FEATURES
 from .generator_normalization import FeatureNormalizer
@@ -228,10 +228,11 @@ class TrajectoryFlowMatching(nn.Module):
         task_ids=None,
         goals=None,
         integration_steps=None,
-        progress=False,
-        execution_mode="legacy",
+        solver="euler",
+        rtol=1e-5,
+        atol=1e-5,
     ):
-        """Integrate the ODE with legacy or device-native Euler execution."""
+        """Integrate the learned velocity field through ``torchdiffeq.odeint``."""
         if isinstance(count, bool) or not isinstance(count, int) or count < 1:
             raise ValueError("Sample count must be a positive integer.")
         self.validate_tasks(task_ids, count)
@@ -243,63 +244,51 @@ class TrajectoryFlowMatching(nn.Module):
         )
         if isinstance(steps, bool) or not isinstance(steps, int) or steps < 1:
             raise ValueError("integration_steps must be a positive integer.")
-        if execution_mode not in ("legacy", "device-native"):
-            raise ValueError("execution_mode must be legacy or device-native.")
+        fixed_step_solvers = {"euler", "midpoint", "heun2", "rk4"}
+        if solver not in fixed_step_solvers | {"dopri5"}:
+            raise ValueError("Unsupported ODE solver.")
+        if (
+            isinstance(rtol, bool)
+            or isinstance(atol, bool)
+            or not math.isfinite(rtol)
+            or not math.isfinite(atol)
+            or rtol <= 0
+            or atol <= 0
+        ):
+            raise ValueError("rtol and atol must be positive and finite.")
         self.eval()
-        if execution_mode == "device-native":
-            return self._sample_device_native(
-                count, seed, task_ids, goals, steps, progress
-            )
-
         generator = torch.Generator().manual_seed(seed)
-        x = torch.randn(
-            (count, self.config.horizon, self.config.features), generator=generator
-        )
-        dt = 1.0 / steps
-        self.last_sample_nfe = 0
-        for step in tqdm(
-            range(steps),
-            desc="Flow Euler sampling",
-            unit="step",
-            disable=not progress,
-        ):
-            time = torch.full((count,), step / steps, dtype=torch.float32)
-            x = x + dt * self(x, time, task_ids, goals=goals)
-            self.last_sample_nfe += 1
-            if not torch.isfinite(x).all():
-                raise ValueError("Nonfinite flow matching sample.")
-        self._validate(x)
-        return x
-
-    def _sample_device_native(self, count, seed, task_ids, goals, steps, progress):
-        """Run the complete Euler solve on the velocity-model device."""
         device = next(self.velocity_model.parameters()).device
-        generator = torch.Generator(device=device).manual_seed(seed)
-        device_tasks = task_ids.to(device) if task_ids is not None else None
-        device_goals = goals.to(device)
-        x = torch.randn(
-            (count, self.config.horizon, self.config.features),
-            generator=generator,
-            device=device,
-        )
-        dt = 1.0 / steps
+        initial = torch.randn(
+            (count, self.config.horizon, self.config.features), generator=generator
+        ).to(device)
+        conditioned_tasks = task_ids.to(device) if task_ids is not None else None
+        conditioned_goals = goals.to(device)
         self.last_sample_nfe = 0
-        for step in tqdm(
-            range(steps),
-            desc="Flow Euler sampling",
-            unit="step",
-            disable=not progress,
-        ):
-            time = torch.full(
-                (count,), step / steps, dtype=torch.float32, device=device
-            )
-            x = x + dt * self.velocity_model(
-                x, time, device_tasks, device_goals
-            )
+
+        def velocity(time, state):
             self.last_sample_nfe += 1
-            if not torch.isfinite(x).all():
-                raise ValueError("Nonfinite flow matching sample.")
-        result = x.cpu()
+            time = time.clamp(0, 1)
+            time = torch.full(
+                (count,), time, dtype=state.dtype, device=state.device
+            )
+            return self.velocity_model(
+                state, time, conditioned_tasks, conditioned_goals
+            )
+
+        times = torch.tensor([0.0, 1.0], device=device)
+        options = {"step_size": 1.0 / steps} if solver in fixed_step_solvers else None
+        result = odeint(
+            velocity,
+            initial,
+            times,
+            method=solver,
+            rtol=rtol,
+            atol=atol,
+            options=options,
+        )[-1].cpu()
+        if not torch.isfinite(result).all():
+            raise ValueError("Nonfinite flow matching sample.")
         self._validate(result)
         return result
 

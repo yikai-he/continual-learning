@@ -23,17 +23,13 @@ def kuka_v3_tasks(task: str, seed: int):
                        {"partially_observable": False}, seed=seed)
 
 def make_kuka_v3_env(task: str, seed: int, render_mode: str | None = None, *,
-    reward_function_version: str = "v2", hammer_reward_variant: str = "original",
-    hammer_nail_progress_weight: float = 0.0, peg_unplug_reward_variant: str = "original",
-    peg_unplug_progress_weight: float = 0.0, peg_unplug_progress_gamma: float = 0.99) -> gym.Env:
+    reward_function_version: str = "v2") -> gym.Env:
     if task not in KUKA_V3_TASKS: raise ValueError(f"KUKA-v3 backend supports {KUKA_V3_TASKS!r}, got {task!r}.")
     if reward_function_version not in ("v1", "v2"): raise ValueError("reward_function_version must be v1 or v2.")
     import metaworld_kuka  # noqa: F401
     env = gym.make(KUKA_V3_REGISTRATION_ID, env_name=task, seed=seed,
         reward_function_version=reward_function_version,
-        hammer_reward_variant=hammer_reward_variant, hammer_nail_progress_weight=hammer_nail_progress_weight,
-        peg_unplug_reward_variant=peg_unplug_reward_variant, peg_unplug_progress_weight=peg_unplug_progress_weight,
-        peg_unplug_progress_gamma=peg_unplug_progress_gamma, render_mode=render_mode, disable_env_checker=True)
+        render_mode=render_mode, disable_env_checker=True)
     env = EpisodeSuccessWrapper(env); observation, _ = env.reset(seed=seed)
     if env.observation_space.shape != OBSERVATION_SHAPE or observation.shape != OBSERVATION_SHAPE: raise ValueError("KUKA-v3 observation contract must be 39D.")
     if observation.dtype != np.float32 or env.action_space.shape != ACTION_SHAPE: raise ValueError("KUKA-v3 requires float32 observations and 4D actions.")

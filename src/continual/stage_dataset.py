@@ -120,10 +120,19 @@ def split_indices(count: int, seed: int) -> tuple[list[int], list[int]]:
     return indices[nval:].tolist(), indices[:nval].tolist()
 
 
-def bc_dataset(packed: torch.Tensor) -> TensorDataset:
+def bc_dataset(
+    packed: torch.Tensor, task_labels: torch.Tensor | None = None
+) -> TensorDataset:
     """Flatten episode/time axes into (N*T,39) observation-action BC samples."""
     observations, actions = unpack_trajectories(packed)
-    return TensorDataset(observations.flatten(0, 1), actions.flatten(0, 1))
+    tensors = [observations.flatten(0, 1), actions.flatten(0, 1)]
+    if task_labels is not None:
+        if task_labels.shape != (len(packed),) or task_labels.dtype != torch.long:
+            raise ValueError("BC task labels must be one integer label per episode.")
+        tensors.append(
+            task_labels[:, None].expand(-1, packed.shape[1]).reshape(-1)
+        )
+    return TensorDataset(*tensors)
 
 
 def validate_trajectory_group(

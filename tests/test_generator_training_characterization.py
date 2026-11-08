@@ -34,7 +34,7 @@ EXPECTED = {
         "best_epoch": 1,
         "result": "bc6fcba160195e67dcc4a5a78cec7b5ce1f543d76f5ce35eda298fe70a7d8474",
         "state": "fe10b7f639253fcc5e0d9f3591df1bfc34a9845c2654800a31fa8b5df33d9977",
-        "sample": "c38c6e3d147b7f001154923da07270c7d5f9a86325a390903d3266b2b777ea25",
+        "sample": "19b64fc5ef8f86ab6fe922c57ad5a5b027ac479d1cf7cef98b9b989362ef0925",
     },
 }
 

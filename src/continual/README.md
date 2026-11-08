@@ -1,3 +1,9 @@
+---
+status: current
+last_verified: 2026-11-07
+applies_to: continual-learning
+---
+
 # Continual package architecture
 
 Modules are grouped below by architectural responsibility.
@@ -26,9 +32,11 @@ Trainable policies, generative trajectory memory, and replay support.
 - `trajectory_diffusion.py` — Implements trajectory diffusion training, sampling, and persistence.
 - `diffcrl_replay.py` — Generates previous-task replay from the prior diffusion checkpoint.
 - `trajectory_flow_matching.py` — Implements Flow Matching training and sampling.
+- `generator_training.py`, `generator_normalization.py` — Share fitting, validation, checkpoint, and normalization behavior.
 - `replay_allocation.py` — Allocates a fixed historical budget across prior tasks.
 - `flow_matching_replay.py` — Generates fresh allocated replay from the prior Flow checkpoint.
-- `diagnostics.py` — Reports action-bound and projection diagnostics for generated replay.
+- `real_replay.py` — Samples retained physical trajectories for historical replay.
+- `stage_dataset.py`, `replay_common.py` — Assemble stage data and validate common replay provenance.
 
 ## Evaluation
 

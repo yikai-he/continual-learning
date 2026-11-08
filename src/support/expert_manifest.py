@@ -24,8 +24,6 @@ class ExpertIdentity:
     observation_shape: tuple[int, ...]
     action_shape: tuple[int, ...]
     horizon: int | None
-    hammer_reward_variant: str | None
-    hammer_nail_progress_weight: float | None
     qualification: dict | None
     manifest_path: str | None
     legacy: bool
@@ -67,8 +65,6 @@ def validate_expert_checkpoint(
     expected_observation_shape: tuple[int, ...],
     expected_action_shape: tuple[int, ...],
     expected_horizon: int | None = None,
-    expected_hammer_reward_variant: str | None = None,
-    expected_hammer_nail_progress_weight: float | None = None,
     manifest_path: str | Path | None = None,
     allow_legacy: bool = True,
 ) -> ExpertIdentity:
@@ -102,8 +98,6 @@ def validate_expert_checkpoint(
             observation_shape=tuple(expected_observation_shape),
             action_shape=tuple(expected_action_shape),
             horizon=expected_horizon,
-            hammer_reward_variant=expected_hammer_reward_variant,
-            hammer_nail_progress_weight=expected_hammer_nail_progress_weight,
             qualification=None,
             manifest_path=None,
             legacy=True,
@@ -125,10 +119,6 @@ def validate_expert_checkpoint(
         raise ValueError(f"Expert manifest missing field: {missing[0]}.")
     if expected_horizon is not None and "horizon" not in data:
         raise ValueError("Expert manifest missing field: horizon.")
-    if expected_hammer_reward_variant is not None:
-        for field in ("hammer_reward_variant", "hammer_nail_progress_weight"):
-            if field not in data:
-                raise ValueError(f"Expert manifest missing field: {field}.")
     checks = (
         (data["task_name"] == expected_task, "task name"),
         (data["checkpoint_sha256"] == digest, "checkpoint SHA-256"),
@@ -146,17 +136,6 @@ def validate_expert_checkpoint(
             "action shape",
         ),
         (expected_horizon is None or data["horizon"] == expected_horizon, "horizon"),
-        (
-            expected_hammer_reward_variant is None
-            or data["hammer_reward_variant"] == expected_hammer_reward_variant,
-            "Hammer reward variant",
-        ),
-        (
-            expected_hammer_nail_progress_weight is None
-            or data["hammer_nail_progress_weight"]
-            == expected_hammer_nail_progress_weight,
-            "Hammer nail progress weight",
-        ),
     )
     for valid, label in checks:
         if not valid:
@@ -179,8 +158,6 @@ def validate_expert_checkpoint(
         observation_shape=tuple(data["observation_shape"]),
         action_shape=tuple(data["action_shape"]),
         horizon=data.get("horizon"),
-        hammer_reward_variant=data.get("hammer_reward_variant"),
-        hammer_nail_progress_weight=data.get("hammer_nail_progress_weight"),
         qualification=qualification,
         manifest_path=str(located),
         legacy=False,
@@ -226,8 +203,6 @@ def write_expert_manifest(
     observation_shape: tuple[int, ...],
     action_shape: tuple[int, ...],
     horizon: int | None = None,
-    hammer_reward_variant: str | None = None,
-    hammer_nail_progress_weight: float | None = None,
     qualification: dict | None,
 ) -> Path:
     """Write the checkpoint-specific sidecar consumed by validation."""
@@ -253,9 +228,6 @@ def write_expert_manifest(
         else "not-qualified",
         "qualification": qualification,
     }
-    if hammer_reward_variant is not None:
-        value["hammer_reward_variant"] = hammer_reward_variant
-        value["hammer_nail_progress_weight"] = hammer_nail_progress_weight
     with path.open("x", encoding="utf-8") as stream:
         json.dump(value, stream, indent=2, allow_nan=False)
         stream.write("\n")

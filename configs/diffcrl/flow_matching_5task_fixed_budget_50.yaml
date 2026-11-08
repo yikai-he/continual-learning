@@ -6,8 +6,6 @@ bc:
   epochs: 100
   batch_size: 256
   learning_rate: 0.001
-  hidden_sizes: [256, 256, 256, 256]
-  normalization_mode: layer-norm
   loss: post-tanh-mse
 diffusion:
   epochs: 300
@@ -23,15 +21,8 @@ flow_matching:
   batch_size: 8
   learning_rate: 0.001
   width: 64
-  residual_blocks: 6
-  time_embedding: sinusoidal
   time_embedding_scale: 100.0
   integration_steps: 10
-  gradient_clip_norm: 1.0
-  validation_samples: 4
-  checkpoint_selection: validation-loss
-  probability_path: linear
-  source_distribution: standard-normal
   ode_solver: euler
 continual:
   tasks: [hammer-v3, button-press-v3, faucet-close-v3, handle-press-side-v3, window-close-v3]
@@ -45,7 +36,6 @@ continual:
   replay_mode: flow-matching
   replay_allocation: fixed-total
   replay_budget: 50
-  replay_priority_strategy: uniform
 evaluation:
   episodes: 50
   seed: 10000

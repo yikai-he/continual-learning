@@ -1,0 +1,50 @@
+# Controlled four-task KUKA-v3 Flow Matching comparison with 50 Euler steps.
+experiment: diffcrl
+environment:
+  backend: kuka-v3
+  reward_function_version: v2
+bc:
+  epochs: 100
+  batch_size: 256
+  learning_rate: 0.001
+  loss: post-tanh-mse
+diffusion:
+  # Shared structured trajectory/action representation contract.
+  epochs: 300
+  batch_size: 8
+  learning_rate: 0.001
+  steps: 100
+  width: 64
+  action_space: raw
+  action_clamp_epsilon: 0.0001
+  generated_action_projection: none
+flow_matching:
+  epochs: 300
+  batch_size: 8
+  learning_rate: 0.001
+  width: 64
+  time_embedding_scale: 100.0
+  integration_steps: 50
+  ode_solver: euler
+continual:
+  # Preserve the authoritative order in configs/sac_kuka_remaining_4task_1m.yaml.
+  tasks: [kuka-drawer-close-v3, kuka-window-close-v3, kuka-door-open-v3, kuka-peg-unplug-side-v3]
+  experts:
+    kuka-drawer-close-v3: runs/sac_kuka_remaining_4task_1m/drawer-close-v3/seed_0/best_model.zip
+    kuka-window-close-v3: runs/sac_kuka_remaining_4task_1m/window-close-v3/seed_0/best_model.zip
+    kuka-door-open-v3: runs/sac_kuka_remaining_4task_1m/door-open-v3/seed_0/best_model.zip
+    kuka-peg-unplug-side-v3: runs/sac_kuka_remaining_4task_1m/peg-unplug-side-v3/seed_0/best_model.zip
+  trajectories_per_task: 15
+  replay_mode: flow-matching
+  replay_allocation: fixed-total
+  replay_budget: 15
+evaluation:
+  episodes: 50
+  seed: 10000
+  mode: fixed-tasks
+  task_set_seed: 10000
+runtime:
+  seed: 0
+  device: cpu
+  output: runs/kuka_4task_generative_comparison_15plus15/flow_matching_50steps
+  run_name: seed_0

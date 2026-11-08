@@ -57,7 +57,11 @@ def _scientific_config(config) -> dict:
 def validate_resume_configuration(run_dir, requested, expert_hashes) -> None:
     """Require identical science and expert bytes while allowing path relocation."""
     run_dir = Path(run_dir).resolve()
-    saved = load_config(run_dir / "config.yaml", expected_experiment="diffcrl")
+    saved = load_config(
+        run_dir / "config.yaml",
+        expected_experiment="diffcrl",
+        allow_legacy_fixed_fields=True,
+    )
     if _scientific_config(saved) != _scientific_config(requested):
         raise ValueError(
             "Resume configuration differs from the saved scientific configuration."

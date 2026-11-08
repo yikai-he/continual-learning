@@ -52,9 +52,9 @@ class FlowMatchingReplayRequest:
     bc_clamp_epsilon: float
     progress: bool
     integration_steps: int | None = None
-    hammer_reward_variant: str = "original"
-    hammer_nail_progress_weight: float = 0.0
-    execution_mode: str = "legacy"
+    solver: str = "euler"
+    rtol: float = 1e-5
+    atol: float = 1e-5
 
 
 @dataclass
@@ -78,7 +78,9 @@ def _validate_request(request: FlowMatchingReplayRequest) -> None:
         or request.action_projection not in ("none", "clip")
         or not 0 < request.action_clamp_epsilon < 1
         or not 0 < request.bc_clamp_epsilon < 1
-        or request.execution_mode not in ("legacy", "device-native")
+        or request.solver not in ("euler", "midpoint", "heun2", "rk4", "dopri5")
+        or not 0 < request.rtol < float("inf")
+        or not 0 < request.atol < float("inf")
         or request.integration_steps is not None
         and (
             isinstance(request.integration_steps, bool)
@@ -192,7 +194,9 @@ def generate_previous_task_flow_matching_replay(
                 task_ids=task.labels,
                 goals=normalized_goals,
                 integration_steps=request.integration_steps,
-                execution_mode=request.execution_mode,
+                solver=request.solver,
+                rtol=request.rtol,
+                atol=request.atol,
             )
             generation_seconds = time.perf_counter() - generation_started
             if normalized.shape != (
@@ -258,6 +262,9 @@ def generate_previous_task_flow_matching_replay(
                 else request.integration_steps
             ),
             "neural_function_evaluations": old.last_sample_nfe,
+            "ode_solver": request.solver,
+            "rtol": request.rtol,
+            "atol": request.atol,
             "generation_seconds": generation_seconds,
             "success": None,
             "return": None,

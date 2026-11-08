@@ -3,17 +3,10 @@ experiment: diffcrl
 environment:
   backend: kuka-v3
   reward_function_version: v2
-  hammer_reward_variant: nail_progress
-  hammer_nail_progress_weight: 4.0
-  peg_unplug_reward_variant: peg_unplug_progress_v1
-  peg_unplug_progress_weight: 2.0
-  peg_unplug_progress_gamma: 0.99
 bc:
   epochs: 100
   batch_size: 256
   learning_rate: 0.001
-  hidden_sizes: [256, 256, 256, 256]
-  normalization_mode: layer-norm
   loss: post-tanh-mse
 diffusion:
   epochs: 300
@@ -51,7 +44,6 @@ continual:
   replay_mode: diffusion
   replay_allocation: fixed-total
   replay_budget: 15
-  replay_priority_strategy: uniform
 evaluation:
   episodes: 50
   seed: 10000

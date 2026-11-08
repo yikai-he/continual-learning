@@ -30,13 +30,10 @@ from src.support.reproducibility import file_hash
 
 def report_inputs(directory: Path):
     config = SimpleNamespace(
-        bc=SimpleNamespace(
-            normalization_mode="bounds", use_layer_norm=True, loss="mse"
-        ),
+        bc=SimpleNamespace(loss="mse"),
         continual=SimpleNamespace(
             replay_mode="diffusion",
             replay_budget=200,
-            replay_priority_strategy="uniform",
         ),
         diffusion=SimpleNamespace(
             action_space="normalized",
@@ -103,7 +100,7 @@ def expected_report(directory: Path):
     return {
         "stage": 0,
         "task": "reach-v3",
-        "bc_normalization_mode": "bounds",
+        "bc_normalization_mode": "layer-norm",
         "bc_use_layer_norm": True,
         "bc_loss": "mse",
         "bc_clamp_epsilon": 1e-4,

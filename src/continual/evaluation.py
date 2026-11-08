@@ -142,14 +142,10 @@ def evaluate_task(
     evaluation_mode="sampled",
     task_set_seed=10000,
     reward_function_version="v2",
-    hammer_reward_variant="original",
-    hammer_nail_progress_weight=0.0,
-    peg_unplug_reward_variant="original",
-    peg_unplug_progress_weight=0.0,
-    peg_unplug_progress_gamma=0.99,
     backend="metaworld-v3",
     progress=False,
     render_mode=None,
+    policy_task_id=None,
 ):
     """Fresh task env, reset(seed+i) each episode, deterministic act; any-step success."""
     if evaluation_mode not in ("sampled", "fixed-tasks"):
@@ -176,11 +172,6 @@ def evaluate_task(
         sequence,
         backend=backend,
         reward_function_version=reward_function_version,
-        hammer_reward_variant=hammer_reward_variant,
-        hammer_nail_progress_weight=hammer_nail_progress_weight,
-        peg_unplug_reward_variant=peg_unplug_reward_variant,
-        peg_unplug_progress_weight=peg_unplug_progress_weight,
-        peg_unplug_progress_gamma=peg_unplug_progress_gamma,
         render_mode=render_mode,
     ) as switcher:
         env = switcher.switch(0, seed=seed)
@@ -202,8 +193,22 @@ def evaluate_task(
             for i in evaluation_progress:
                 if selected is not None:
                     env.unwrapped.set_task(selected[i])
+                rollout_policy = policy
+                if getattr(policy, "task_conditioning", "none") == "one_hot":
+                    if policy_task_id is None:
+                        raise ValueError("Task-conditioned evaluation requires a task ID.")
+
+                    class _FixedTaskPolicy:
+                        def act(self, observation, deterministic=True):
+                            return policy.act(
+                                observation,
+                                deterministic=deterministic,
+                                task_id=policy_task_id,
+                            )
+
+                    rollout_policy = _FixedTaskPolicy()
                 trajectory = collect_trajectory(
-                    env, policy, task.task_id, seed=seed + i, deterministic=True
+                    env, rollout_policy, task.task_id, seed=seed + i, deterministic=True
                 )
                 if selected is not None:
                     validate_active_task(env, selected[i], backend)
@@ -268,11 +273,6 @@ def evaluate_stage(
     evaluation_mode="sampled",
     task_set_seed=10000,
     reward_function_version="v2",
-    hammer_reward_variant="original",
-    hammer_nail_progress_weight=0.0,
-    peg_unplug_reward_variant="original",
-    peg_unplug_progress_weight=0.0,
-    peg_unplug_progress_gamma=0.99,
     backend="metaworld-v3",
     progress=False,
 ):
@@ -307,13 +307,9 @@ def evaluate_stage(
             evaluation_mode=evaluation_mode,
             task_set_seed=task_set_seed,
             reward_function_version=reward_function_version,
-            hammer_reward_variant=hammer_reward_variant,
-            hammer_nail_progress_weight=hammer_nail_progress_weight,
-            peg_unplug_reward_variant=peg_unplug_reward_variant,
-            peg_unplug_progress_weight=peg_unplug_progress_weight,
-            peg_unplug_progress_gamma=peg_unplug_progress_gamma,
             backend=backend,
             progress=progress,
+            policy_task_id=j,
         )
         for j in indices
     }

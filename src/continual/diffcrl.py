@@ -11,6 +11,7 @@ import numpy as np
 import torch
 from src.config import (
     ExperimentConfig,
+    REPLAY_PRIORITY_STRATEGY,
     output_directory,
     resolve_device,
     save_resolved_config,
@@ -36,8 +37,13 @@ from src.support.run_manifest import complete_run, create_run_manifest
 from stable_baselines3 import SAC
 from tqdm.auto import tqdm
 
-from .bc_policy import BC_CLAMP_EPSILON, GeneralPolicy, fit_bc
+from .bc_policy import BC_CLAMP_EPSILON, GENERAL_POLICY_HIDDEN_SIZES, GeneralPolicy, fit_bc
 from .collector import collect_trajectories
+from .diffcrl_artifacts import (
+    build_initial_run_summary,
+    stage_checkpoint_paths,
+    validate_finite_model_state,
+)
 from .diffcrl_replay import ReplayRequest, generate_previous_task_replay
 from .diffusion_data import (
     PHYSICAL_ACTION_SLICE,
@@ -51,11 +57,7 @@ from .flow_matching_replay import (
     FlowMatchingReplayRequest,
     generate_previous_task_flow_matching_replay,
 )
-from .diffcrl_artifacts import (
-    build_initial_run_summary,
-    stage_checkpoint_paths,
-    validate_finite_model_state,
-)
+from .generator_normalization import FeatureNormalizer
 from .policy_adapter import SB3SACPolicy
 from .real_replay import RealReplayRequest, load_previous_task_real_replay
 from .replay_allocation import replay_counts
@@ -67,8 +69,8 @@ from .reporting import (
 from .resume import (
     completed_stage_markers,
     load_boundary_state,
-    restore_rng_state,
     resolve_stage_attempt_paths,
+    restore_rng_state,
     validate_resume_configuration,
     write_stage_boundary,
 )
@@ -78,7 +80,6 @@ from .task_bank import (
     verify_disjoint_task_banks,
 )
 from .task_sequence import TaskSequence, TaskSpec
-from .generator_normalization import FeatureNormalizer
 from .trajectory_diffusion import (
     DiffusionConfig,
     TrajectoryDiffusion,
@@ -94,6 +95,22 @@ from .trajectory_flow_matching import (
 
 Metadata = dict[str, object]
 LossReport = dict[str, object]
+
+
+def _synchronize_timing_device(device) -> None:
+    """Make wall-clock boundaries reliable when work runs asynchronously on CUDA."""
+    resolved = torch.device(device)
+    if resolved.type == "cuda":
+        torch.cuda.synchronize(resolved)
+
+
+def _timed_call(device, function, *args, **kwargs):
+    """Return ``(result, elapsed_seconds)`` without changing numerical behavior."""
+    _synchronize_timing_device(device)
+    started = time.perf_counter()
+    result = function(*args, **kwargs)
+    _synchronize_timing_device(device)
+    return result, time.perf_counter() - started
 
 
 @dataclass(frozen=True)
@@ -222,16 +239,6 @@ class DiffCRLTrainer:
                 expected_observation_shape=OBSERVATION_SHAPE,
                 expected_action_shape=ACTION_SHAPE,
                 expected_horizon=self.horizon,
-                expected_hammer_reward_variant=(
-                    config.environment.hammer_reward_variant
-                    if name == "kuka-hammer-v3"
-                    else None
-                ),
-                expected_hammer_nail_progress_weight=(
-                    config.environment.hammer_nail_progress_weight
-                    if name == "kuka-hammer-v3"
-                    else None
-                ),
                 allow_legacy=config.environment.backend != "kuka-v3",
             )
             for name, path in self.experts.items()
@@ -350,8 +357,14 @@ class DiffCRLTrainer:
         self.policy, self.policy_optimizer, policy_metadata = (
             GeneralPolicy.load_training(
                 artifacts["policy"]["resolved_path"],
-                expected_use_layer_norm=self.config.bc.use_layer_norm,
-                expected_hidden_sizes=tuple(self.config.bc.hidden_sizes),
+                expected_use_layer_norm=True,
+                expected_hidden_sizes=GENERAL_POLICY_HIDDEN_SIZES,
+                expected_task_conditioning=self.config.bc.task_conditioning,
+                expected_task_order=(
+                    self.sequence.task_names
+                    if self.config.bc.task_conditioning == "one_hot"
+                    else ()
+                ),
             )
         )
         if (
@@ -482,11 +495,6 @@ class DiffCRLTrainer:
             evaluation_mode=self.config.evaluation.mode,
             task_set_seed=self.config.evaluation.task_set_seed,
             reward_function_version=self.config.environment.reward_function_version,
-            hammer_reward_variant=self.config.environment.hammer_reward_variant,
-            hammer_nail_progress_weight=self.config.environment.hammer_nail_progress_weight,
-            peg_unplug_reward_variant=self.config.environment.peg_unplug_reward_variant,
-            peg_unplug_progress_weight=self.config.environment.peg_unplug_progress_weight,
-            peg_unplug_progress_gamma=self.config.environment.peg_unplug_progress_gamma,
             backend=self.config.environment.backend,
             progress=self.progress,
         )
@@ -504,8 +512,6 @@ class DiffCRLTrainer:
             "runtime_seed": cfg.runtime.seed,
             "device": cfg.runtime.device,
             "reward_function_version": cfg.environment.reward_function_version,
-            "hammer_reward_variant": cfg.environment.hammer_reward_variant,
-            "hammer_nail_progress_weight": cfg.environment.hammer_nail_progress_weight,
             "action_space": cfg.diffusion.action_space,
             "action_clamp_epsilon": cfg.diffusion.action_clamp_epsilon,
             "action_projection": cfg.diffusion.generated_action_projection,
@@ -522,7 +528,7 @@ class DiffCRLTrainer:
             allocation=cfg.continual.replay_allocation,
             trajectories_per_task=context.trajectory_count,
             total_budget=cfg.continual.replay_budget,
-            strategy=cfg.continual.replay_priority_strategy,
+            strategy=REPLAY_PRIORITY_STRATEGY,
         )
         if cfg.continual.replay_mode == "real":
             groups, sources = load_previous_task_real_replay(
@@ -553,6 +559,9 @@ class DiffCRLTrainer:
                     checkpoint=self.previous_flow_matching,
                     expected_state_hash=context.flow_matching_before_hash,
                     integration_steps=cfg.flow_matching.integration_steps,
+                    solver=cfg.flow_matching.ode_solver,
+                    rtol=cfg.flow_matching.rtol,
+                    atol=cfg.flow_matching.atol,
                     **common,
                 ),
                 progress_message=self._progress_message,
@@ -617,8 +626,12 @@ class DiffCRLTrainer:
                 self.policy = GeneralPolicy(
                     env.action_space.low,
                     env.action_space.high,
-                    hidden_sizes=tuple(cfg.bc.hidden_sizes),
-                    use_layer_norm=cfg.bc.use_layer_norm,
+                    task_conditioning=cfg.bc.task_conditioning,
+                    task_order=(
+                        self.sequence.task_names
+                        if cfg.bc.task_conditioning == "one_hot"
+                        else None
+                    ),
                 ).to(cfg.runtime.device)
         finally:
             env.close()
@@ -774,6 +787,7 @@ class DiffCRLTrainer:
         training_seconds = 0.0
         if self.diffusion is not None:
             self._progress_message("Training diffusion", Epochs=cfg.diffusion.epochs)
+            _synchronize_timing_device(cfg.runtime.device)
             training_started = time.perf_counter()
             normalized_generator = normalize_generator_data(prepared_generator)
             diff_losses = fit_diffusion(
@@ -790,11 +804,13 @@ class DiffCRLTrainer:
                 validation_task_ids=vlabels,
                 progress=self.progress,
             )
+            _synchronize_timing_device(cfg.runtime.device)
             training_seconds = time.perf_counter() - training_started
         elif self.flow_matching is not None:
             self._progress_message(
                 "Training Flow Matching", Epochs=cfg.flow_matching.epochs
             )
+            _synchronize_timing_device(cfg.runtime.device)
             training_started = time.perf_counter()
             normalized_generator = normalize_generator_data(prepared_generator)
             diff_losses = fit_flow_matching(
@@ -811,6 +827,7 @@ class DiffCRLTrainer:
                 validation_task_ids=vlabels,
                 progress=self.progress,
             )
+            _synchronize_timing_device(cfg.runtime.device)
             training_seconds = time.perf_counter() - training_started
         return DiffusionTrainingResult(
             normalizer=normalizer,
@@ -837,8 +854,16 @@ class DiffCRLTrainer:
         )
         bc_losses = fit_bc(
             self.policy,
-            bc_dataset(data.train),
-            bc_dataset(data.validation),
+            bc_dataset(
+                data.train,
+                data.train_labels if cfg.bc.task_conditioning == "one_hot" else None,
+            ),
+            bc_dataset(
+                data.validation,
+                data.validation_labels
+                if cfg.bc.task_conditioning == "one_hot"
+                else None,
+            ),
             epochs=cfg.bc.epochs,
             seed=cfg.runtime.seed + stage,
             batch_size=cfg.bc.batch_size,
@@ -916,24 +941,30 @@ class DiffCRLTrainer:
                     "flow_matching_fit": asdict(cfg.flow_matching),
                 },
             )
+        policy_metadata = {
+            "stage": stage,
+            "task": task.task_name,
+            "tasks": self.sequence.task_names,
+            "seed": cfg.runtime.seed,
+            "best_epoch": bc_losses["best_epoch"],
+            "bc_loss": cfg.bc.loss,
+            "bc_clamp_epsilon": BC_CLAMP_EPSILON,
+            "bc_normalization_mode": "layer-norm",
+            "bc_use_layer_norm": True,
+            "bc_hidden_sizes": list(GENERAL_POLICY_HIDDEN_SIZES),
+            "diffusion_action_space": cfg.diffusion.action_space,
+            "diffusion_action_clamp_epsilon": cfg.diffusion.action_clamp_epsilon,
+            "generated_action_projection": cfg.diffusion.generated_action_projection,
+        }
+        if cfg.bc.task_conditioning == "one_hot":
+            policy_metadata.update(
+                bc_task_conditioning=cfg.bc.task_conditioning,
+                task_order=list(self.sequence.task_names),
+            )
         self.policy.save(
             policy_path,
             optimizer=self.policy_optimizer,
-            metadata={
-                "stage": stage,
-                "task": task.task_name,
-                "tasks": self.sequence.task_names,
-                "seed": cfg.runtime.seed,
-                "best_epoch": bc_losses["best_epoch"],
-                "bc_loss": cfg.bc.loss,
-                "bc_clamp_epsilon": BC_CLAMP_EPSILON,
-                "bc_normalization_mode": cfg.bc.normalization_mode,
-                "bc_use_layer_norm": cfg.bc.use_layer_norm,
-                "bc_hidden_sizes": list(cfg.bc.hidden_sizes),
-                "diffusion_action_space": cfg.diffusion.action_space,
-                "diffusion_action_clamp_epsilon": cfg.diffusion.action_clamp_epsilon,
-                "generated_action_projection": cfg.diffusion.generated_action_projection,
-            },
+            metadata=policy_metadata,
         )
         return StageArtifacts(
             diffusion_path=diffusion_path,
@@ -948,6 +979,7 @@ class DiffCRLTrainer:
         diffusion_training: DiffusionTrainingResult,
         policy_training: PolicyTrainingResult,
         artifacts: StageArtifacts,
+        timing: Metadata | None = None,
     ) -> Metadata:
         """Finalize stage artifacts, replay state, and reporting.
 
@@ -979,14 +1011,25 @@ class DiffCRLTrainer:
             else None,
             policy_sha256=file_hash(policy_path),
         )
+        if timing is not None:
+            report["timing"] = timing
         self.matrix.stage_provenance[str(stage)] = {
             "report": str(directory / "report.json"),
-            "bc_normalization_mode": cfg.bc.normalization_mode,
-            "bc_use_layer_norm": cfg.bc.use_layer_norm,
+            "bc_normalization_mode": "layer-norm",
+            "bc_use_layer_norm": True,
             "bc_loss": cfg.bc.loss,
             "bc_clamp_epsilon": BC_CLAMP_EPSILON,
             "generated_action_projection": cfg.diffusion.generated_action_projection,
         }
+        if timing is not None:
+            _synchronize_timing_device(cfg.runtime.device)
+            timing["total_stage_seconds"] = time.perf_counter() - timing.pop(
+                "_stage_started_perf_counter"
+            )
+            timing["total_stage_scope"] = (
+                "stage entry through checkpointing, evaluation, report construction, "
+                "and provenance preparation; excludes final artifact serialization"
+            )
         write_json(directory / "report.json", report)
         write_json(directory / "evaluation_matrix.json", self.matrix.to_dict())
         for name, path in self.experts.items():
@@ -1028,6 +1071,8 @@ class DiffCRLTrainer:
         """
         if stage != self.next_stage:
             raise ValueError("Stages must execute once, in sequence order.")
+        _synchronize_timing_device(self.config.runtime.device)
+        stage_started = time.perf_counter()
         task = self.sequence.task(stage)
         if self.progress:
             tqdm.write(
@@ -1056,29 +1101,68 @@ class DiffCRLTrainer:
             flow_matching_before_hash=flow_matching_before,
             artifact_suffix=artifact_suffix,
         )
-        replay = self._generate_replay(context)
-        current_task = self._collect_current_task(context)
+        replay, replay_seconds = _timed_call(
+            self.config.runtime.device, self._generate_replay, context
+        )
+        current_task, collection_seconds = _timed_call(
+            self.config.runtime.device, self._collect_current_task, context
+        )
         raw_data = StageRawData(
             groups={**replay.groups, stage: current_task.group},
             sources={**replay.sources, task.task_name: current_task.source},
         )
         data = self._prepare_stage_data(context, raw_data, current_task)
         diffusion_training = self._fit_stage_diffusion(context, data)
+        _synchronize_timing_device(self.config.runtime.device)
+        bc_started = time.perf_counter()
         policy_training = self._fit_stage_policy(context, data)
+        _synchronize_timing_device(self.config.runtime.device)
+        bc_seconds = time.perf_counter() - bc_started
         artifacts = self._save_stage_checkpoints(
             context, diffusion_training, policy_training
         )
-        self._evaluate_stage(stage)
+        _, evaluation_seconds = _timed_call(
+            self.config.runtime.device, self._evaluate_stage, stage
+        )
+        _synchronize_timing_device(self.config.runtime.device)
+        timing = {
+            "expert_collection_seconds": collection_seconds,
+            "replay_generation_seconds": replay_seconds,
+            "generator_training_seconds": diffusion_training.training_seconds,
+            "bc_training_seconds": bc_seconds,
+            "evaluation_seconds": evaluation_seconds,
+            "_stage_started_perf_counter": stage_started,
+            "replay_neural_function_evaluations": sum(
+                int(source.get("neural_function_evaluations", 0))
+                for source in data.sources.values()
+                if source.get("kind") == "generated"
+            ),
+            "generator_sampling_steps": (
+                self.config.diffusion.steps
+                if self.config.continual.replay_mode == "diffusion"
+                else self.config.flow_matching.integration_steps
+                if self.config.continual.replay_mode == "flow-matching"
+                else 0
+            ),
+            "device_synchronized": torch.device(self.config.runtime.device).type
+            == "cuda",
+        }
         return self._finish_stage(
             context,
             data,
             diffusion_training,
             policy_training,
             artifacts,
+            timing=timing,
         )
 
     def run(self):
         """Train all configured tasks sequentially and return the final matrix."""
+        process_started_stage = self.next_stage
+        runtime = getattr(getattr(self, "config", None), "runtime", None)
+        timing_device = getattr(runtime, "device", "cpu")
+        _synchronize_timing_device(timing_device)
+        process_started = time.perf_counter()
         for stage in range(self.next_stage, self.sequence.num_tasks):
             self.train_task(stage)
         final_matrix = self.output / "evaluation_matrix.json"
@@ -1090,6 +1174,44 @@ class DiffCRLTrainer:
                 )
         else:
             write_json(final_matrix, self.matrix.to_dict())
+        timing_path = self.output / "timing_summary.json"
+        if not timing_path.exists() and not (self.output / "RUN_COMPLETE").exists():
+            stage_timings = []
+            for stage in range(self.sequence.num_tasks):
+                provenance = self.matrix.stage_provenance[str(stage)]
+                stage_report = json.loads(
+                    Path(provenance["report"]).read_text(encoding="utf-8")
+                )
+                stage_timings.append(stage_report["timing"])
+            _synchronize_timing_device(timing_device)
+            fields = (
+                "expert_collection_seconds",
+                "replay_generation_seconds",
+                "generator_training_seconds",
+                "bc_training_seconds",
+                "evaluation_seconds",
+                "total_stage_seconds",
+                "replay_neural_function_evaluations",
+            )
+            write_json(
+                timing_path,
+                {
+                    "kind": "diffcrl_timing_summary_v1",
+                    "status": "complete",
+                    "process_started_stage": process_started_stage,
+                    "resumed_process": process_started_stage > 0,
+                    "current_process_wall_clock_seconds": time.perf_counter()
+                    - process_started,
+                    "accumulated_completed_stage_seconds": sum(
+                        item["total_stage_seconds"] for item in stage_timings
+                    ),
+                    "totals": {
+                        field: sum(item[field] for item in stage_timings)
+                        for field in fields
+                    },
+                    "stages": stage_timings,
+                },
+            )
         print_final_report(self.matrix)
         if not (self.output / "RUN_COMPLETE").exists():
             complete_run(self.output)

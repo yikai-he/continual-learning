@@ -10,8 +10,6 @@ sac:
   tau: 0.005
   train_freq: 1
   gradient_steps: 1
-  ent_coef: auto
-  net_arch: [256, 256, 256, 256]
   checkpoint_freq: 50000
   early_stopping: {enabled: false, min_steps: 100000, success_threshold: 0.95, patience: 3}
 continual: {tasks: [kuka-window-open-v3]}

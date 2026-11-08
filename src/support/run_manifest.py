@@ -12,7 +12,7 @@ from pathlib import Path
 
 import torch
 
-from src.config import config_to_dict
+from src.config import REPLAY_PRIORITY_STRATEGY, config_to_dict
 from src.support.reproducibility import git_output
 
 
@@ -110,11 +110,11 @@ def create_run_manifest(
             "replay_mode": config.continual.replay_mode,
             "trajectory_count": config.continual.trajectories_per_task,
             "historical_replay_budget": config.continual.replay_budget,
-            "replay_priority_strategy": config.continual.replay_priority_strategy,
+            "replay_priority_strategy": REPLAY_PRIORITY_STRATEGY,
             "bc": resolved.get("bc"),
             "diffusion": resolved.get("diffusion"),
-            "normalization": getattr(config.bc, "normalization_mode", None),
-            "use_layer_norm": getattr(config.bc, "use_layer_norm", True),
+            "normalization": "layer-norm",
+            "use_layer_norm": True,
             "action_representation": getattr(config.diffusion, "action_space", None),
             "action_projection": getattr(
                 config.diffusion, "generated_action_projection", None

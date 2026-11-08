@@ -78,7 +78,7 @@ def test_legacy_behavior_is_explicit(tmp_path):
         _validate(checkpoint, allow_legacy=False)
 
 
-def test_writer_records_horizon_and_hammer_reward_metadata(tmp_path):
+def test_writer_records_horizon_and_reward_version_metadata(tmp_path):
     checkpoint = tmp_path / "expert.zip"
     checkpoint.write_bytes(b"checkpoint")
     path = write_expert_manifest(
@@ -92,12 +92,8 @@ def test_writer_records_horizon_and_hammer_reward_metadata(tmp_path):
         observation_shape=(39,),
         action_shape=(4,),
         horizon=200,
-        hammer_reward_variant="nail_progress",
-        hammer_nail_progress_weight=4.0,
         qualification=None,
     )
 
     manifest = json.loads(path.read_text(encoding="utf-8"))
     assert manifest["horizon"] == 200
-    assert manifest["hammer_reward_variant"] == "nail_progress"
-    assert manifest["hammer_nail_progress_weight"] == 4.0

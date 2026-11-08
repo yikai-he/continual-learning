@@ -2,10 +2,11 @@
 
 from __future__ import annotations
 
-import math
 from dataclasses import dataclass
 
 import torch
+
+MINIMUM_FEATURE_SCALE = 1e-3
 
 
 def validate_cpu_feature_batch(x: torch.Tensor) -> None:
@@ -28,16 +29,12 @@ class FeatureNormalizer:
     scale: torch.Tensor
 
     @classmethod
-    def fit(
-        cls, train: torch.Tensor, *, minimum_scale: float = 1e-3
-    ) -> FeatureNormalizer:
+    def fit(cls, train: torch.Tensor) -> FeatureNormalizer:
         """Fit per-feature moments over batch and time with a scale floor."""
         validate_cpu_feature_batch(train)
-        if not math.isfinite(minimum_scale) or minimum_scale <= 0:
-            raise ValueError("minimum_scale must be positive and finite.")
         return cls(
             train.mean(dim=(0, 1)),
-            train.std(dim=(0, 1), unbiased=False).clamp_min(minimum_scale),
+            train.std(dim=(0, 1), unbiased=False).clamp_min(MINIMUM_FEATURE_SCALE),
         )
 
     def normalize(self, x: torch.Tensor) -> torch.Tensor:

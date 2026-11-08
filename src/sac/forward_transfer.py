@@ -9,7 +9,7 @@ from pathlib import Path
 
 import numpy as np
 import yaml
-
+from src.config import SAC_NET_ARCH
 from src.continual.bc_policy import GeneralPolicy
 from src.support.reproducibility import file_hash
 
@@ -25,10 +25,8 @@ class ForwardTransferSACConfig:
     tau: float = 0.005
     train_freq: int = 1
     gradient_steps: int = 1
-    ent_coef: str = "auto"
     log_std_init: float = -3.0
     checkpoint_frequency: int = 10_000
-    net_arch: list[int] = field(default_factory=lambda: [256, 256, 256, 256])
 
 
 @dataclass(frozen=True)
@@ -75,12 +73,23 @@ def _construct(data: dict, cls, section: str):
 
 
 def load_forward_transfer_config(
-    path: str | Path, *, seed: int | None = None
+    path: str | Path,
+    *,
+    seed: int | None = None,
+    allow_legacy_fixed_fields: bool = False,
 ) -> ForwardTransferConfig:
     """Strictly load the standalone experiment configuration."""
     data = yaml.safe_load(Path(path).read_text(encoding="utf-8"))
     if not isinstance(data, dict):
         raise ValueError("Forward-transfer config must be a YAML mapping.")
+    if allow_legacy_fixed_fields and isinstance(data.get("sac"), dict):
+        sac = dict(data["sac"])
+        for name, expected in {"ent_coef": "auto", "net_arch": [256] * 4}.items():
+            if name in sac and sac.pop(name) != expected:
+                raise ValueError(
+                    f"Legacy config field sac.{name} must be {expected!r}."
+                )
+        data = {**data, "sac": sac}
     allowed = set(ForwardTransferConfig.__dataclass_fields__)
     unknown = set(data) - allowed
     if unknown:
@@ -117,10 +126,16 @@ def validate_forward_transfer_config(config: ForwardTransferConfig) -> None:
     if not config.source_checkpoint:
         raise ValueError("source_checkpoint is required for paired provenance.")
     if config.sac.steps <= 0 or config.sac.steps % config.evaluation.frequency:
-        raise ValueError("sac.steps must be a positive multiple of evaluation.frequency.")
+        raise ValueError(
+            "sac.steps must be a positive multiple of evaluation.frequency."
+        )
     for name in (
-        "buffer_size", "learning_starts", "batch_size", "train_freq",
-        "gradient_steps", "checkpoint_frequency",
+        "buffer_size",
+        "learning_starts",
+        "batch_size",
+        "train_freq",
+        "gradient_steps",
+        "checkpoint_frequency",
     ):
         if getattr(config.sac, name) <= 0:
             raise ValueError(f"sac.{name} must be positive.")
@@ -135,10 +150,6 @@ def validate_forward_transfer_config(config: ForwardTransferConfig) -> None:
         raise ValueError("sac.learning_rate must be positive and finite.")
     if not 0 < config.sac.gamma <= 1 or not 0 < config.sac.tau <= 1:
         raise ValueError("sac.gamma and sac.tau must be in (0, 1].")
-    if config.sac.ent_coef != "auto":
-        raise ValueError("sac.ent_coef must remain auto.")
-    if config.sac.net_arch != [256, 256, 256, 256]:
-        raise ValueError("Forward transfer requires net_arch=[256, 256, 256, 256].")
     if config.evaluation.episodes <= 0 or config.evaluation.episodes > 50:
         raise ValueError("evaluation.episodes must be in [1, 50].")
     if not 0 <= config.evaluation.success_threshold <= 1:
@@ -166,15 +177,14 @@ def load_temporally_valid_general_policy(
     policy, _, metadata = GeneralPolicy.load_training(
         path,
         expected_use_layer_norm=True,
-        expected_hidden_sizes=tuple(config.sac.net_arch),
+        expected_hidden_sizes=SAC_NET_ARCH,
     )
     expected_stage = len(config.task_history) - 1
     valid = (
         isinstance(metadata, dict)
         and metadata.get("stage") == expected_stage
         and metadata.get("task") == config.task_history[-1]
-        and metadata.get("tasks", [])[: len(config.task_history)]
-        == config.task_history
+        and metadata.get("tasks", [])[: len(config.task_history)] == config.task_history
         and len(metadata.get("tasks", [])) > expected_stage + 1
         and metadata["tasks"][expected_stage + 1] == config.target_task
     )
@@ -232,9 +242,7 @@ def learning_curve_metrics(
         raise ValueError("Invalid learning-curve arrays.")
     crossings = x[y >= success_threshold]
     return {
-        "normalized_success_auc": float(
-            np.trapezoid(y, x) / (x[-1] - x[0])
-        ),
+        "normalized_success_auc": float(np.trapezoid(y, x) / (x[-1] - x[0])),
         "final_success_rate": float(y[-1]),
         "final_mean_return": float(returns[-1]),
         "success_threshold": success_threshold,

@@ -56,8 +56,6 @@ class ReplayRequest:
     bc_clamp_epsilon: float
     progress: bool
     trajectory_counts: dict[int, int] | None = None
-    hammer_reward_variant: str = "original"
-    hammer_nail_progress_weight: float = 0.0
     execution_mode: str = "legacy"
 
 
@@ -170,6 +168,9 @@ def generate_previous_task_replay(
             "sampling_seed": task.seed,
             "condition": old_index,
             "trajectory_count": trajectory_count,
+            "diffusion_steps": old.config.steps,
+            # One batched denoiser call per reverse-diffusion step.
+            "neural_function_evaluations": old.config.steps,
             "success": None,
             "return": None,
             "generated_latent_abs_gt_bc_cap_fraction": replay.latent_cap_fraction,

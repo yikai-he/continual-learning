@@ -10,38 +10,11 @@ import numpy as np
 from train_sac import (
     FixedSeedEvalCallback,
     early_stopping_metadata,
-    summarize_success_trace,
 )
 from src.config import EarlyStoppingConfig
 
 
 class FixedSeedEvalCallbackTests(unittest.TestCase):
-    def test_auxiliary_success_trace_metrics(self):
-        summary = summarize_success_trace(
-            [False, True, True, False, True] + [True] * 10
-        )
-        self.assertTrue(summary["any_step_success"])
-        self.assertTrue(summary["final_step_success"])
-        self.assertTrue(summary["sustained_success"])
-        self.assertEqual(summary["longest_success_run"], 11)
-        self.assertEqual(summary["first_success_step"], 1)
-        self.assertEqual(summary["success_retention_steps"], 13)
-        self.assertAlmostEqual(summary["success_retention_fraction"], 13 / 14)
-
-    def test_auxiliary_metrics_distinguish_transient_success(self):
-        summary = summarize_success_trace([False, True, False, False])
-        self.assertTrue(summary["any_step_success"])
-        self.assertFalse(summary["final_step_success"])
-        self.assertFalse(summary["sustained_success"])
-        self.assertEqual(summary["longest_success_run"], 1)
-        self.assertAlmostEqual(summary["success_retention_fraction"], 1 / 3)
-
-    def test_auxiliary_metrics_reject_invalid_inputs(self):
-        with self.assertRaises(ValueError):
-            summarize_success_trace([])
-        with self.assertRaises(ValueError):
-            summarize_success_trace([False], sustained_steps=0)
-
     def _early_stopping_callback(self, **overrides):
         settings = {
             "enabled": True,

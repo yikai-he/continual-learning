@@ -9,6 +9,17 @@ from unittest.mock import patch
 import yaml
 
 from src.config import (
+    BC_HIDDEN_SIZES,
+    FLOW_CHECKPOINT_SELECTION,
+    FLOW_PROBABILITY_PATH,
+    FLOW_RESIDUAL_BLOCKS,
+    FLOW_SOURCE_DISTRIBUTION,
+    FLOW_TIME_EMBEDDING,
+    GENERATOR_GRADIENT_CLIP_NORM,
+    GENERATOR_VALIDATION_DRAWS,
+    REPLAY_PRIORITY_STRATEGY,
+    SAC_ENT_COEF,
+    SAC_NET_ARCH,
     config_from_dict,
     config_to_dict,
     load_config,
@@ -67,15 +78,16 @@ class ConfigTests(unittest.TestCase):
             (sac.sac.steps, sac.sac.learning_rate, sac.sac.batch_size),
             (1000000, 0.001, 128),
         )
-        self.assertEqual(sac.sac.net_arch, [256] * 4)
+        self.assertEqual(SAC_NET_ARCH, (256,) * 4)
+        self.assertEqual(SAC_ENT_COEF, "auto")
         self.assertEqual(
             (sac.evaluation.frequency, sac.evaluation.episodes, sac.runtime.device),
             (20000, 10, "auto"),
         )
         seq = load_config(ROOT / "configs/continual_sac/continual_sac.yaml")
         self.assertEqual(
-            (seq.sac.learning_rate, seq.sac.batch_size, seq.sac.net_arch),
-            (0.001, 128, [256] * 4),
+            (seq.sac.learning_rate, seq.sac.batch_size),
+            (0.001, 128),
         )
         self.assertEqual(
             (seq.continual.steps_per_task, seq.continual.boundary_warmup_steps),
@@ -140,8 +152,7 @@ class ConfigTests(unittest.TestCase):
     def test_optional_defaults_and_independent_instances(self):
         first, second = self.config(), self.config()
         self.assertEqual(first.bc.epochs, 100)
-        first.bc.hidden_sizes.append(42)
-        self.assertEqual(second.bc.hidden_sizes, [256, 256, 256, 256])
+        self.assertEqual(second.bc.epochs, 100)
 
     def test_cli_overrides_yaml_including_zero(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -219,7 +230,7 @@ class ConfigTests(unittest.TestCase):
             "runs/experts/metaworld-v3/button-press-v3/policy.zip",
         )
 
-    def test_kuka_diffcrl_tasks_are_explicitly_validated(self):
+    def test_removed_kuka_v2_backend_is_rejected(self):
         tasks = [
             "kuka-reach-v2",
             "kuka-push-v2",
@@ -228,33 +239,16 @@ class ConfigTests(unittest.TestCase):
             "kuka-button-press-v2",
         ]
         experts = {task: f"/tmp/{task}.zip" for task in tasks}
-        config = self.config(
-            environment={"backend": "kuka-v2"},
-            continual={"tasks": tasks, "experts": experts},
-            evaluation={"mode": "sampled"},
-        )
-        self.assertEqual(config.continual.tasks, tasks)
-        self.assertEqual(config.environment.backend, "kuka-v2")
-        with self.assertRaisesRegex(ValueError, "supports only these tasks"):
-            self.config(
-                environment={"backend": "kuka-v2"},
-                continual={
-                    "tasks": ["kuka-invalid-v2"],
-                    "experts": {"kuka-invalid-v2": "/tmp/invalid.zip"},
-                },
-                evaluation={"mode": "sampled"},
-            )
-        with self.assertRaisesRegex(ValueError, "must be sampled"):
+        with self.assertRaisesRegex(ValueError, "environment.backend must be one of"):
             self.config(
                 environment={"backend": "kuka-v2"},
                 continual={"tasks": tasks, "experts": experts},
+                evaluation={"mode": "sampled"},
             )
 
     def test_invalid_ranges_and_choices(self):
         cases = [
             ("bc", "epochs", 0),
-            ("bc", "hidden_sizes", []),
-            ("bc", "hidden_sizes", [256, True]),
             ("bc", "loss", "unknown"),
             ("diffusion", "width", 5),
             ("diffusion", "steps", 1),
@@ -274,13 +268,53 @@ class ConfigTests(unittest.TestCase):
             with self.subTest(field=f"{section}.{name}"), self.assertRaises(ValueError):
                 config_from_dict(values)
 
-    def test_general_policy_hidden_architecture_is_fixed(self):
-        for hidden_sizes in ([256, 256], [8], [256] * 5):
-            with self.subTest(hidden_sizes=hidden_sizes):
-                values = config_to_dict(self.config())
-                values["bc"]["hidden_sizes"] = hidden_sizes
-                with self.assertRaises(ValueError):
-                    config_from_dict(values)
+    def test_removed_fixed_fields_are_not_public_configuration(self):
+        fixed = {
+            "sac": {"ent_coef": SAC_ENT_COEF, "net_arch": list(SAC_NET_ARCH)},
+            "bc": {"hidden_sizes": list(BC_HIDDEN_SIZES), "normalization_mode": "layer-norm", "use_layer_norm": True},
+            "flow_matching": {
+                "residual_blocks": FLOW_RESIDUAL_BLOCKS,
+                "time_embedding": FLOW_TIME_EMBEDDING,
+                "gradient_clip_norm": GENERATOR_GRADIENT_CLIP_NORM,
+                "validation_samples": GENERATOR_VALIDATION_DRAWS,
+                "checkpoint_selection": FLOW_CHECKPOINT_SELECTION,
+                "probability_path": FLOW_PROBABILITY_PATH,
+                "source_distribution": FLOW_SOURCE_DISTRIBUTION,
+            },
+            "continual": {"replay_priority_strategy": REPLAY_PRIORITY_STRATEGY},
+        }
+        for section, fields in fixed.items():
+            for name, value in fields.items():
+                with self.subTest(field=f"{section}.{name}"), self.assertRaises(ValueError):
+                    config_from_dict({"experiment": "diffcrl", section: {name: value}})
+
+        legacy_values = {
+            "experiment": "diffcrl",
+            "runtime": {"output": "/tmp/run"},
+            **{key: value for key, value in fixed.items() if key != "sac"},
+        }
+        legacy_values["continual"] = {
+            **legacy_values["continual"],
+            "replay_mode": "flow-matching",
+        }
+        legacy = config_from_dict(
+            legacy_values,
+            allow_legacy_fixed_fields=True,
+        )
+        self.assertEqual(
+            legacy,
+            config_from_dict(
+                {"experiment": "diffcrl", "continual": {"replay_mode": "flow-matching"}, "flow_matching": {}, "runtime": {"output": "/tmp/run"}}
+            ),
+        )
+        legacy_sac = config_from_dict(
+            {"experiment": "sac", "sac": fixed["sac"]},
+            allow_legacy_fixed_fields=True,
+        )
+        self.assertEqual(legacy_sac, config_from_dict({"experiment": "sac"}))
+        bad = {"experiment": "diffcrl", "sac": {"ent_coef": 0.2}}
+        with self.assertRaisesRegex(ValueError, "Legacy config field"):
+            config_from_dict(bad, allow_legacy_fixed_fields=True)
         for name, value in [
             ("gamma", 1.1),
             ("batch_size", -1),
@@ -393,17 +427,6 @@ class ConfigTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "bc.epochs"):
             validate_config(replace(c, bc=replace(c.bc, epochs="one")))
 
-    def test_general_policy_layer_norm_flag_defaults_and_validates(self):
-        self.assertTrue(self.config().bc.use_layer_norm)
-        with self.assertRaisesRegex(ValueError, "bc.use_layer_norm"):
-            self.config(
-                bc={"use_layer_norm": False, "normalization_mode": "none"}
-            )
-        with self.assertRaisesRegex(ValueError, "bc.use_layer_norm"):
-            validate_config(
-                replace(self.config(), bc=replace(self.config().bc, use_layer_norm=1))
-            )
-
     def test_flow_matching_configuration_is_typed_serialized_and_model_compatible(self):
         config = self.config(
             continual={"replay_mode": "flow-matching"},
@@ -412,15 +435,8 @@ class ConfigTests(unittest.TestCase):
                 "batch_size": 4,
                 "learning_rate": 0.0005,
                 "width": 32,
-                "residual_blocks": 6,
-                "time_embedding": "sinusoidal",
                 "time_embedding_scale": 50.0,
                 "integration_steps": 20,
-                "gradient_clip_norm": 1.0,
-                "validation_samples": 4,
-                "checkpoint_selection": "validation-loss",
-                "probability_path": "linear",
-                "source_distribution": "standard-normal",
                 "ode_solver": "euler",
             },
         )
@@ -449,16 +465,11 @@ class ConfigTests(unittest.TestCase):
             "batch_size": 0,
             "learning_rate": 0.0,
             "width": 5,
-            "residual_blocks": 5,
-            "time_embedding": "learned",
             "time_embedding_scale": 0.0,
             "integration_steps": 0,
-            "gradient_clip_norm": 0.5,
-            "validation_samples": 3,
-            "checkpoint_selection": "last",
-            "probability_path": "ot",
-            "source_distribution": "uniform",
-            "ode_solver": "rk4",
+            "ode_solver": "bogus",
+            "rtol": 0.0,
+            "atol": float("inf"),
         }
         for name, value in invalid.items():
             with self.subTest(field=name), self.assertRaisesRegex(
@@ -468,6 +479,13 @@ class ConfigTests(unittest.TestCase):
                     continual={"replay_mode": "flow-matching"},
                     flow_matching={name: value},
                 )
+
+        for solver in ("euler", "midpoint", "heun2", "rk4", "dopri5"):
+            configured = self.config(
+                continual={"replay_mode": "flow-matching"},
+                flow_matching={"ode_solver": solver, "rtol": 1e-5, "atol": 2e-5},
+            )
+            self.assertEqual(configured.flow_matching.ode_solver, solver)
         with self.assertRaisesRegex(ValueError, "flow_matching.typo"):
             self.config(
                 continual={"replay_mode": "flow-matching"},
@@ -487,16 +505,14 @@ class ConfigTests(unittest.TestCase):
             }
         )
         self.assertEqual(fixed_ddpm.continual.replay_budget, 10)
-        with self.assertRaisesRegex(ValueError, "generative replay mode"):
-            config_from_dict(
-                {
-                    "experiment": "diffcrl",
-                    "continual": {
-                        "replay_mode": "none",
-                        "replay_budget": 10,
-                    },
-                }
-            )
+        nominal_no_replay = self.config(
+            continual={
+                "replay_mode": "none",
+                "replay_allocation": "fixed-total",
+                "replay_budget": 10,
+            }
+        )
+        self.assertEqual(nominal_no_replay.continual.replay_budget, 10)
 
     def test_existing_diffusion_and_no_replay_serialization_is_exactly_preserved(self):
         expected_sections = {

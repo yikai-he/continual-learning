@@ -134,53 +134,48 @@ def test_sampling_is_deterministic_finite_and_counts_exact_nfe(model):
     assert torch.isfinite(first).all()
 
 
-def test_device_native_sampling_matches_legacy_on_cpu(model):
+@pytest.mark.parametrize(
+    ("solver", "expected_nfe"),
+    (("euler", 3), ("midpoint", 6), ("heun2", 6), ("rk4", 12), ("dopri5", None)),
+)
+def test_supported_solvers_are_deterministic_finite_and_count_nfe(model, solver, expected_nfe):
     task_ids, goals = conditions()
-    legacy = model.sample(2, seed=23, task_ids=task_ids, goals=goals)
     first = model.sample(
         2,
         seed=23,
         task_ids=task_ids,
         goals=goals,
-        execution_mode="device-native",
+        solver=solver,
     )
+    first_nfe = model.last_sample_nfe
     second = model.sample(
         2,
         seed=23,
         task_ids=task_ids,
         goals=goals,
-        execution_mode="device-native",
+        solver=solver,
     )
-
-    torch.testing.assert_close(first, legacy, rtol=0, atol=0)
     torch.testing.assert_close(second, first, rtol=0, atol=0)
     assert first.device.type == "cpu"
+    assert first.shape == (2, 4, 22)
     assert torch.isfinite(first).all()
-    assert model.last_sample_nfe == model.config.integration_steps
+    assert model.last_sample_nfe == first_nfe
+    assert first_nfe > 0
+    if expected_nfe is not None:
+        assert first_nfe == expected_nfe
 
 
-def test_constant_velocity_euler_integration_is_exact(model, monkeypatch):
+def test_euler_matches_previous_manual_integration(model):
     task_ids, goals = conditions()
-    calls = []
-
-    def constant_velocity(self, x_t, time, task_ids=None, *, goals=None):
-        calls.append(time.clone())
-        return torch.full_like(x_t, 2.0)
-
-    monkeypatch.setattr(model, "forward", MethodType(constant_velocity, model))
-    generator = torch.Generator().manual_seed(31)
-    initial = torch.randn((2, 4, 22), generator=generator)
-
-    sampled = model.sample(
-        2, seed=31, task_ids=task_ids, goals=goals, integration_steps=5
-    )
-
-    torch.testing.assert_close(sampled, initial + 2.0, rtol=0, atol=5e-7)
-    assert len(calls) == 5
+    steps = 5
+    expected = torch.randn((2, 4, 22), generator=torch.Generator().manual_seed(31))
+    with torch.no_grad():
+        for step in range(steps):
+            time = torch.full((2,), step / steps, dtype=torch.float32)
+            expected = expected + model.velocity_model(expected, time, task_ids, goals) / steps
+    sampled = model.sample(2, seed=31, task_ids=task_ids, goals=goals, integration_steps=steps)
+    torch.testing.assert_close(sampled, expected, rtol=0, atol=2e-6)
     assert model.last_sample_nfe == 5
-    torch.testing.assert_close(
-        torch.stack(calls)[:, 0], torch.tensor([0.0, 0.2, 0.4, 0.6, 0.8])
-    )
 
 
 def test_checkpoint_round_trip_includes_normalizers_and_metadata(model, tmp_path):

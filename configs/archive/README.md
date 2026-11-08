@@ -1,3 +1,9 @@
+---
+status: current
+last_verified: 2026-11-07
+applies_to: continual-learning
+---
+
 # Archived experiment configurations
 
 These configurations are retained for thesis and result provenance. They are

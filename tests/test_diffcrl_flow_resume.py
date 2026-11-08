@@ -79,15 +79,10 @@ def build_completed_flow_run(
     *,
     checkpoint_metadata=None,
     model_config=None,
-    policy_hidden_sizes=(256, 256, 256, 256),
 ):
     run = tmp_path / "run"
     run.mkdir()
     config = flow_config(tmp_path, run)
-    config = replace(
-        config,
-        bc=replace(config.bc, hidden_sizes=list(policy_hidden_sizes)),
-    )
     save_resolved_config(config, run)
     experts = {task: Path(path) for task, path in config.continual.experts.items()}
     create_run_manifest(
@@ -124,9 +119,7 @@ def build_completed_flow_run(
         else metadata(training_banks, train_configurations),
     )
 
-    policy = GeneralPolicy(
-        -np.ones(4), np.ones(4), hidden_sizes=tuple(policy_hidden_sizes)
-    )
+    policy = GeneralPolicy(-np.ones(4), np.ones(4))
     optimizer = torch.optim.Adam(policy.parameters(), lr=1e-3)
     policy_path = run / "general_policy_after_task_0_reach-v3.pt"
     policy.save(policy_path, optimizer=optimizer, metadata={"stage": 0})
@@ -220,9 +213,7 @@ def test_successful_flow_resume_restores_all_stage_state(tmp_path):
 
 def test_flow_resume_reconstructs_four_layer_general_policy(tmp_path):
     hidden_sizes = (256, 256, 256, 256)
-    completed = build_completed_flow_run(
-        tmp_path, policy_hidden_sizes=hidden_sizes
-    )
+    completed = build_completed_flow_run(tmp_path)
 
     restored = resume(completed)
 
@@ -410,7 +401,6 @@ def test_generator_free_stage_restores_policy_optimizer_rng_and_matrix(
     flow = flow_config(tmp_path, run)
     config = replace(
         flow,
-        bc=replace(flow.bc, hidden_sizes=[256, 256, 256, 256]),
         continual=replace(flow.continual, replay_mode=replay_mode),
         runtime=replace(flow.runtime, output=str(run)),
     )

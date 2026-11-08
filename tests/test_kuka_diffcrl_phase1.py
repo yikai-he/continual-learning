@@ -70,7 +70,6 @@ def test_kuka_smoke_configs_parse() -> None:
     no_replay = load_config("configs/diffcrl/kuka_diffcrl_no_replay_smoke.yaml")
     assert replay.continual.replay_mode == "diffusion"
     assert no_replay.continual.replay_mode == "none"
-    assert replay.environment.hammer_reward_variant == "nail_progress"
     assert replay.continual.tasks == [
         "kuka-reach-v3",
         "kuka-handle-press-side-v3",
@@ -81,9 +80,13 @@ class _FactoryEnv(Env):
     observation_space = Box(-np.inf, np.inf, shape=(39,), dtype=np.float32)
     action_space = Box(-1.0, 1.0, shape=(4,), dtype=np.float32)
 
+    def __init__(self):
+        # KUKA-v3 exposes the active goal through the MetaWorld task contract.
+        self._target_pos = np.ones(3, dtype=np.float32)
+
     def reset(self, *, seed=None, options=None):
         observation = np.zeros(39, dtype=np.float32)
-        observation[36:39] = 1.0
+        observation[36:39] = self._target_pos
         return observation, {}
 
 
@@ -98,21 +101,13 @@ def test_kuka_adapter_scopes_hammer_settings(monkeypatch) -> None:
     reach = make_kuka_v3_env(
         "kuka-reach-v3",
         0,
-        hammer_reward_variant="nail_progress",
-        hammer_nail_progress_weight=4.0,
     )
     hammer = make_kuka_v3_env(
         "kuka-hammer-v3",
         0,
-        hammer_reward_variant="nail_progress",
-        hammer_nail_progress_weight=4.0,
     )
     reach.close()
     hammer.close()
-    assert calls[0]["hammer_reward_variant"] == "original"
-    assert calls[0]["hammer_nail_progress_weight"] == 0.0
-    assert calls[1]["hammer_reward_variant"] == "nail_progress"
-    assert calls[1]["hammer_nail_progress_weight"] == 4.0
 
 
 def test_selected_configuration_works_for_metaworld_v3() -> None:
@@ -213,27 +208,6 @@ def test_matching_shapes_do_not_override_backend_mismatch(tmp_path: Path) -> Non
     checkpoint = _write_expert(tmp_path, task="kuka-reach-v3", backend="metaworld-v3")
     with pytest.raises(ValueError, match="backend"):
         _validate(checkpoint)
-
-
-@pytest.mark.parametrize(
-    "variant,weight,match",
-    [("original", 4.0, "variant"), ("nail_progress", 2.0, "weight")],
-)
-def test_hammer_manifest_settings_must_match(tmp_path, variant, weight, match) -> None:
-    checkpoint = _write_expert(
-        tmp_path,
-        task="kuka-hammer-v3",
-        backend="kuka-v3",
-        hammer_reward_variant=variant,
-        hammer_nail_progress_weight=weight,
-    )
-    with pytest.raises(ValueError, match=match):
-        _validate(
-            checkpoint,
-            task="kuka-hammer-v3",
-            expected_hammer_reward_variant="nail_progress",
-            expected_hammer_nail_progress_weight=4.0,
-        )
 
 
 def test_canonical_kuka_manifests_match_checkpoints() -> None:

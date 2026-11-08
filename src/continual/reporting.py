@@ -6,6 +6,7 @@ import sys
 from typing import TYPE_CHECKING, TextIO
 
 from src.continual.bc_policy import BC_CLAMP_EPSILON
+from src.config import REPLAY_PRIORITY_STRATEGY
 from src.continual.metrics import average_performance, forgetting
 from src.continual.replay_allocation import replay_counts
 
@@ -35,8 +36,8 @@ def build_diffcrl_stage_report(
     return {
         "stage": context.index,
         "task": context.task.task_name,
-        "bc_normalization_mode": config.bc.normalization_mode,
-        "bc_use_layer_norm": config.bc.use_layer_norm,
+        "bc_normalization_mode": "layer-norm",
+        "bc_use_layer_norm": True,
         "bc_loss": config.bc.loss,
         "bc_clamp_epsilon": BC_CLAMP_EPSILON,
         "diffusion_action_space": config.diffusion.action_space,
@@ -60,7 +61,7 @@ def build_diffcrl_stage_report(
         **(
             {
                 "replay_budget": config.continual.replay_budget,
-                "replay_priority_strategy": config.continual.replay_priority_strategy,
+                "replay_priority_strategy": REPLAY_PRIORITY_STRATEGY,
                 "replay_allocation_mode": getattr(
                     config.continual, "replay_allocation", "generator-default"
                 ),
@@ -86,7 +87,7 @@ def build_diffcrl_stage_report(
                         total_budget=(
                             config.continual.replay_budget if context.index else 0
                         ),
-                        strategy=config.continual.replay_priority_strategy,
+                        strategy=REPLAY_PRIORITY_STRATEGY,
                     ).items()
                 },
             }

@@ -106,15 +106,6 @@ def verify_disjoint_task_banks(
 
 def training_bank(task_name, seed, *, backend="metaworld-v3"):
     """Record identities needed to verify and reconstruct replay goals."""
-    if backend == "kuka-v2":
-        return {
-            "backend": backend,
-            "task_name": task_name,
-            "bank_seed": seed,
-            "ordered_task_hashes": [],
-            "reset_seeds": [],
-            "goals": [],
-        }
     if backend == "kuka-v3":
         tasks = backend_tasks(task_name, seed, backend=backend)
         return {
@@ -141,28 +132,6 @@ def training_bank(task_name, seed, *, backend="metaworld-v3"):
 
 def selected_configuration(env, bank, observation, episode_id):
     """Read the already selected frozen rand_vec; never draw from wrapper RNG."""
-    if bank.get("backend", "metaworld-v3") == "kuka-v2":
-        goal = np.asarray(observation)[GOAL_SLICE].astype(np.float32, copy=True)
-        backend = bank["backend"]
-        target = target_position(env, backend)
-        if not np.allclose(goal, target, rtol=1e-6, atol=1e-7):
-            raise ValueError("Collection goal disagrees with environment target.")
-        reset_seed = bank["bank_seed"] + episode_id
-        configuration = task_configuration(env, backend)
-        identity = goal if configuration is None else configuration
-        digest = hashlib.sha256(identity.tobytes()).hexdigest()
-        bank["ordered_task_hashes"].append(digest)
-        bank["reset_seeds"].append(reset_seed)
-        bank["goals"].append(goal.tolist())
-        return {
-            "configuration_index": episode_id,
-            "task_data_sha256": digest,
-            "task_name": bank["task_name"],
-            "env_name": bank["task_name"],
-            "bank_seed": bank["bank_seed"],
-            "reset_seed": reset_seed,
-            "episode_id": episode_id,
-        }
     if bank.get("backend") == "kuka-v3":
         wrapper = _task_wrapper(env)
         hashes = bank_hashes(wrapper.tasks)
@@ -263,42 +232,8 @@ def reconstruct_goals(
     *,
     backend="metaworld-v3",
     reward_function_version="v2",
-    hammer_reward_variant="original",
-    hammer_nail_progress_weight=0.0,
 ):
     """Only task identities are read; no expert trajectory archive is opened."""
-    if backend == "kuka-v2":
-        if bank.get("backend") != backend:
-            raise ValueError("Replay bank backend differs from requested backend.")
-        env = make_env(
-            backend,
-            bank["task_name"],
-            bank["bank_seed"],
-            reward_function_version=reward_function_version,
-            hammer_reward_variant=hammer_reward_variant,
-            hammer_nail_progress_weight=hammer_nail_progress_weight,
-        )
-        try:
-            goals = []
-            for index in indices:
-                if index < 0 or index >= len(bank["reset_seeds"]):
-                    raise ValueError("Invalid replay configuration index.")
-                observation, _ = env.reset(seed=bank["reset_seeds"][index])
-                goal = np.asarray(observation[GOAL_SLICE], dtype=np.float32).copy()
-                target = target_position(env, backend)
-                if not np.allclose(goal, target, rtol=1e-6, atol=1e-7):
-                    raise ValueError("Recreated KUKA goal disagrees with target.")
-                configuration = task_configuration(env, backend)
-                identity = goal if configuration is None else configuration
-                if (
-                    hashlib.sha256(identity.tobytes()).hexdigest()
-                    != bank["ordered_task_hashes"][index]
-                ):
-                    raise ValueError("Recreated KUKA goal differs from training bank.")
-                goals.append(goal)
-            return np.stack(goals)
-        finally:
-            env.close()
     if backend == "kuka-v3":
         if bank.get("backend") != backend:
             raise ValueError("Replay bank backend differs from requested backend.")
@@ -320,8 +255,6 @@ def reconstruct_goals(
             bank["task_name"],
             bank["bank_seed"],
             reward_function_version=reward_function_version,
-            hammer_reward_variant=hammer_reward_variant,
-            hammer_nail_progress_weight=hammer_nail_progress_weight,
         )
         try:
             wrapper = _task_wrapper(env)

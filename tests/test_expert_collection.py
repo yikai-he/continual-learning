@@ -30,19 +30,19 @@ KUKA_EXPERT_CHECKPOINT = os.environ.get("KUKA_EXPERT_CHECKPOINT")
 
 
 def trajectory(*, success: bool, final_success: bool) -> Trajectory:
-    observations = np.zeros((300, 39), dtype=np.float32)
+    observations = np.zeros((200, 39), dtype=np.float32)
     observations[:, 36:39] = np.array([0.1, 0.2, 0.3], dtype=np.float32)
-    actions = np.zeros((300, 4), dtype=np.float32)
-    rewards = np.ones(300, dtype=np.float64)
+    actions = np.zeros((200, 4), dtype=np.float32)
+    rewards = np.ones(200, dtype=np.float64)
     return Trajectory(
         observations=observations,
         actions=actions,
         rewards=rewards,
-        task_id="kuka-reach-v2",
-        episode_return=300.0,
+        task_id="kuka-reach-v3",
+        episode_return=200.0,
         success=success,
         final_success=final_success,
-        length=300,
+        length=200,
     )
 
 
@@ -57,7 +57,7 @@ def test_success_filtered_collection_keeps_attempt_ledger_and_transient_success(
         accepted, attempts = collect_successful_trajectories(
             object(),
             object(),
-            "kuka-reach-v2",
+            "kuka-reach-v3",
             target_successes=2,
             initial_seed=40000,
         )
@@ -66,7 +66,7 @@ def test_success_filtered_collection_keeps_attempt_ledger_and_transient_success(
     assert [seed for seed, _, _ in attempts] == [40000, 40001, 40002]
     assert [accepted for _, _, accepted in attempts] == [False, True, True]
     assert accepted[0].final_success is False
-    assert all(item.length == 300 for item in accepted)
+    assert all(item.length == 200 for item in accepted)
     assert collect.call_count == 3
     assert [call.kwargs["seed"] for call in collect.call_args_list] == [
         40000,
@@ -90,16 +90,16 @@ def test_collection_configs_preserve_fixed_mode_and_define_full_contract(
                 {
                     "experiment": "trajectory_collection",
                     "environment": {
-                        "backend": "kuka-v2",
+                        "backend": "kuka-v3",
                         "reward_function_version": "v2",
                     },
                     "continual": {
-                        "tasks": ["kuka-reach-v2"],
-                        "experts": {"kuka-reach-v2": str(expert)},
+                        "tasks": ["kuka-reach-v3"],
+                        "experts": {"kuka-reach-v3": str(expert)},
                         "trajectories_per_task": trajectories,
                     },
                     "collection": {
-                        "horizon": 300,
+                        "horizon": 200,
                         "deterministic": True,
                         "successful_only": successful_only,
                     },
@@ -127,7 +127,7 @@ def test_collection_configs_preserve_fixed_mode_and_define_full_contract(
     assert full.trajectories == 200
     assert full.successful_only is True
     assert full.initial_seed == 40000
-    assert full.horizon == 300
+    assert full.horizon == 200
     assert full.output == (tmp_path / "full.yaml-output").resolve()
     assert full.expert == expert.resolve()
 
@@ -147,7 +147,7 @@ def test_saved_dataset_excludes_failure_but_ledger_retains_attempt(
     env = SimpleNamespace(
         observation_space=observation_space,
         action_space=action_space,
-        spec=SimpleNamespace(max_episode_steps=300),
+        spec=SimpleNamespace(max_episode_steps=200),
         close=lambda: None,
     )
     attempts = [
@@ -157,13 +157,13 @@ def test_saved_dataset_excludes_failure_but_ledger_retains_attempt(
     ]
     output = tmp_path / "dataset"
     config = CollectionConfig(
-        task="kuka-reach-v2",
-        backend="kuka-v2",
+        task="kuka-reach-v3",
+        backend="kuka-v3",
         reward_function_version="v2",
         expert=tmp_path / "expert.zip",
         trajectories=2,
         initial_seed=40000,
-        horizon=300,
+        horizon=200,
         deterministic=True,
         successful_only=True,
         device="cpu",
@@ -179,9 +179,9 @@ def test_saved_dataset_excludes_failure_but_ledger_retains_attempt(
     ):
         report = collect_expert_dataset(config)
 
-    assert np.load(output / "observations.npy").shape == (2, 300, 39)
-    assert np.load(output / "actions.npy").shape == (2, 300, 4)
-    assert np.load(output / "rewards.npy").shape == (2, 300)
+    assert np.load(output / "observations.npy").shape == (2, 200, 39)
+    assert np.load(output / "actions.npy").shape == (2, 200, 4)
+    assert np.load(output / "rewards.npy").shape == (2, 200)
     with np.load(output / "real_trajectories.npz") as archive:
         assert "episode_0_observations" in archive.files
         assert "episode_1_observations" in archive.files
@@ -202,17 +202,17 @@ def test_saved_dataset_excludes_failure_but_ledger_retains_attempt(
 def test_kuka_expert_collects_one_complete_valid_trajectory() -> None:
     model = SAC.load(Path(KUKA_EXPERT_CHECKPOINT), device="cpu")
     policy = SB3SACPolicy(model)
-    env = make_env("kuka-v2", "kuka-reach-v2", 30000, reward_function_version="v2")
+    env = make_env("kuka-v3", "kuka-reach-v3", 30000, reward_function_version="v2")
     try:
         assert model.observation_space == env.observation_space
         assert model.action_space == env.action_space
         trajectory = collect_trajectory(
-            env, policy, "kuka-reach-v2", seed=30000, deterministic=True
+            env, policy, "kuka-reach-v3", seed=30000, deterministic=True
         )
-        validate_trajectory(trajectory, horizon=300)
-        assert trajectory.length == 300
-        assert trajectory.observations.shape == (300, 39)
-        assert trajectory.actions.shape == (300, 4)
+        validate_trajectory(trajectory, horizon=200)
+        assert trajectory.length == 200
+        assert trajectory.observations.shape == (200, 39)
+        assert trajectory.actions.shape == (200, 4)
         assert trajectory.observations.dtype == np.float32
         assert np.isfinite(trajectory.observations).all()
         assert np.isfinite(trajectory.actions).all()
@@ -221,7 +221,7 @@ def test_kuka_expert_collects_one_complete_valid_trajectory() -> None:
         assert np.any(trajectory.observations[0, GOAL_SLICE])
         assert np.array_equal(
             trajectory.observations[:, GOAL_SLICE],
-            np.broadcast_to(trajectory.observations[0, GOAL_SLICE], (300, 3)),
+            np.broadcast_to(trajectory.observations[0, GOAL_SLICE], (200, 3)),
         )
         assert isinstance(trajectory.success, (bool, np.bool_))
         assert isinstance(trajectory.final_success, (bool, np.bool_))

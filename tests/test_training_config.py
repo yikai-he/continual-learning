@@ -21,6 +21,13 @@ from src.continual.trajectory_diffusion import DiffusionConfig, TrajectoryDiffus
 
 
 class TrainingConfigTests(unittest.TestCase):
+    def test_sac_defaults_to_low_disk_with_separate_final_banks(self):
+        config = default_config("sac")
+        self.assertEqual(config.sac.checkpoint_mode, "low_disk")
+        self.assertEqual(config.evaluation.task_set_seed, 10_000)
+        self.assertEqual(config.evaluation.final_task_set_seeds, [20_000, 20_001])
+        self.assertEqual(config.evaluation.final_reset_seed, 30_000)
+
     def test_sac_early_stopping_defaults_disabled_and_parses_optional_block(self):
         default = default_config("sac")
         self.assertFalse(default.sac.early_stopping.enabled)
@@ -83,8 +90,8 @@ class TrainingConfigTests(unittest.TestCase):
                     learning_rate=0.002,
                     gamma=0.95,
                     batch_size=17,
-                    net_arch=[256, 256, 256, 256],
                     checkpoint_freq=3,
+                    checkpoint_mode="full",
                 ),
                 evaluation=replace(
                     c.evaluation, frequency=4, episodes=2, seed_offset=123
@@ -171,8 +178,7 @@ class TrainingConfigTests(unittest.TestCase):
             c = replace(
                 c,
                 sac=replace(
-                    c.sac, learning_rate=0.002, gamma=0.9, batch_size=7,
-                    net_arch=[256, 256, 256, 256]
+                    c.sac, learning_rate=0.002, gamma=0.9, batch_size=7
                 ),
                 continual=replace(c.continual, tasks=["reach-v3"], steps_per_task=3),
                 evaluation=replace(c.evaluation, episodes=1),

@@ -2,7 +2,8 @@
 
 from pathlib import Path
 
-from src.config import load_config
+from src.config import REPLAY_PRIORITY_STRATEGY, load_config
+from src.continual.bc_policy import GENERAL_POLICY_HIDDEN_SIZES
 from src.continual.replay_allocation import replay_counts
 
 
@@ -24,7 +25,7 @@ TASKS = [
 
 def test_resolved_architecture_is_four_layers() -> None:
     four = load_config(FOUR, expected_experiment="diffcrl")
-    assert four.bc.hidden_sizes == [256, 256, 256, 256]
+    assert GENERAL_POLICY_HIDDEN_SIZES == (256, 256, 256, 256)
     assert four.runtime.output == "runs/formal/kuka_10task_15plus15_4layer/"
 
 
@@ -32,14 +33,6 @@ def test_kuka_ten_task_protocol_and_experts_are_exact() -> None:
     for config in (load_config(FOUR),):
         assert config.environment.backend == "kuka-v3"
         assert config.environment.reward_function_version == "v2"
-        assert config.environment.hammer_reward_variant == "nail_progress"
-        assert config.environment.hammer_nail_progress_weight == 4.0
-        assert (
-            config.environment.peg_unplug_reward_variant
-            == "peg_unplug_progress_v1"
-        )
-        assert config.environment.peg_unplug_progress_weight == 2.0
-        assert config.environment.peg_unplug_progress_gamma == 0.99
         assert config.continual.tasks == TASKS
         assert set(config.continual.experts) == set(TASKS)
         assert all(
@@ -50,7 +43,7 @@ def test_kuka_ten_task_protocol_and_experts_are_exact() -> None:
         assert config.continual.replay_mode == "diffusion"
         assert config.continual.replay_allocation == "fixed-total"
         assert config.continual.replay_budget == 15
-        assert config.continual.replay_priority_strategy == "uniform"
+        assert REPLAY_PRIORITY_STRATEGY == "uniform"
         assert config.evaluation.episodes == 50
         assert config.evaluation.seed == 10_000
         assert config.evaluation.mode == "fixed-tasks"

@@ -25,7 +25,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--task", required=True)
     parser.add_argument(
         "--env-backend",
-        choices=("metaworld-v3", "kuka-v2"),
+        choices=("metaworld-v3", "kuka-v3"),
         default="metaworld-v3",
     )
     parser.add_argument("--model", type=Path, required=True)
@@ -56,8 +56,6 @@ def main() -> None:
     if args.episodes <= 0:
         raise ValueError("--episodes must be greater than zero.")
     model_path = resolve_model_path(args.model)
-    if args.env_backend != "metaworld-v3" and args.evaluation_mode == "fixed-tasks":
-        raise ValueError("fixed-tasks evaluation is specific to MetaWorld-v3.")
     try:
         model = SAC.load(model_path, device="auto")
     except Exception as exc:

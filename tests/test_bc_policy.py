@@ -10,7 +10,6 @@ import torch
 from torch import nn
 from torch.utils.data import TensorDataset
 
-from src.config import load_config
 from src.continual.bc_policy import GeneralPolicy, fit_bc
 from src.continual.trajectory_diffusion import FeatureNormalizer
 
@@ -28,18 +27,8 @@ def dataset(offset=0.0):
 
 
 class GeneralPolicyTests(unittest.TestCase):
-    def test_layer_norm_is_required(self):
-        with self.assertRaisesRegex(ValueError, "requires LayerNorm"):
-            GeneralPolicy(-np.ones(4), np.ones(4), use_layer_norm=False)
-
-    def test_two_layer_architecture_is_rejected(self):
-        with self.assertRaisesRegex(ValueError, "only hidden_sizes"):
-            GeneralPolicy(-np.ones(4), np.ones(4), hidden_sizes=(256, 256))
-
     def test_four_layer_architecture_forward_shape_and_bounds(self):
-        model = GeneralPolicy(
-            -np.ones(4), np.ones(4), hidden_sizes=(256, 256, 256, 256)
-        )
+        model = GeneralPolicy(-np.ones(4), np.ones(4))
         self.assertEqual(
             [type(module) for module in model.network],
             [
@@ -60,17 +49,6 @@ class GeneralPolicyTests(unittest.TestCase):
         self.assertEqual(actions.shape, (7, 4))
         self.assertTrue(torch.all(actions >= model.action_low))
         self.assertTrue(torch.all(actions <= model.action_high))
-
-    def test_diffusion_and_no_replay_select_same_policy_preprocessing(self):
-        root = Path(__file__).resolve().parents[1]
-        modes = {
-            load_config(root / name).bc.normalization_mode
-            for name in (
-                "configs/diffcrl/diffcrl.yaml",
-                "configs/diffcrl/diffcrl_no_replay.yaml",
-            )
-        }
-        self.assertEqual(modes, {"layer-norm"})
 
     def test_raw_single_and_batched_observations_and_layer_norm_order(self):
         model = policy()
@@ -143,42 +121,14 @@ class GeneralPolicyTests(unittest.TestCase):
     def test_checkpoint_round_trip_and_architecture_validation_for_both_modes(self):
         raw = torch.randn(3, 39)
         with tempfile.TemporaryDirectory() as tmp:
-            for use_layer_norm in (True, False):
-                with self.subTest(use_layer_norm=use_layer_norm):
-                    if not use_layer_norm:
-                        with self.assertRaisesRegex(ValueError, "requires LayerNorm"):
-                            GeneralPolicy(-np.ones(4), np.ones(4), use_layer_norm=False)
-                        continue
-                    model = GeneralPolicy(-np.ones(4), np.ones(4)).eval()
-                    path = Path(tmp) / f"policy_{use_layer_norm}.pt"
-                    model.save(path)
-                    restored = GeneralPolicy.load(
-                        path, expected_use_layer_norm=use_layer_norm
-                    )
-                    self.assertEqual(restored.use_layer_norm, use_layer_norm)
-                    torch.testing.assert_close(restored(raw), model(raw))
-                    with self.assertRaisesRegex(ValueError, "does not match"):
-                        GeneralPolicy.load(
-                            path,
-                            expected_use_layer_norm=not use_layer_norm,
-                        )
-
-    def test_legacy_layer_norm_checkpoint_is_rejected(self):
-        model = policy().eval()
-        raw = torch.randn(3, 39)
-        with tempfile.TemporaryDirectory() as tmp:
-            path = Path(tmp) / "legacy.pt"
-            torch.save(
-                {
-                    "kind": "general_policy_layer_norm_v1",
-                    "hidden_sizes": model.hidden_sizes,
-                    "state_dict": model.state_dict(),
-                    "metadata": None,
-                },
-                path,
-            )
-            with self.assertRaisesRegex(ValueError, "incompatible"):
-                GeneralPolicy.load(path, expected_use_layer_norm=True)
+            model = GeneralPolicy(-np.ones(4), np.ones(4)).eval()
+            path = Path(tmp) / "policy.pt"
+            model.save(path)
+            restored = GeneralPolicy.load(path, expected_use_layer_norm=True)
+            self.assertTrue(restored.use_layer_norm)
+            torch.testing.assert_close(restored(raw), model(raw))
+            with self.assertRaisesRegex(ValueError, "does not match"):
+                GeneralPolicy.load(path, expected_use_layer_norm=False)
 
     def test_four_layer_save_reload_and_training_resume_equivalence(self):
         torch.manual_seed(13)
@@ -205,21 +155,9 @@ class GeneralPolicyTests(unittest.TestCase):
             path = Path(tmp) / "policy.pt"
             model.save(path)
             data = torch.load(path, map_location="cpu", weights_only=True)
-            data["hidden_sizes"] = (256, 256)
+            data["hidden_sizes"] = (256, 256, 256)
             torch.save(data, path)
             with self.assertRaisesRegex(ValueError, "stored GeneralPolicy architecture"):
-                GeneralPolicy.load(path)
-
-    def test_two_layer_v2_checkpoint_is_explicitly_rejected(self):
-        model = policy()
-        with tempfile.TemporaryDirectory() as tmp:
-            path = Path(tmp) / "policy.pt"
-            model.save(path)
-            data = torch.load(path, map_location="cpu", weights_only=True)
-            data["hidden_sizes"] = (256, 256)
-            data["architecture"]["hidden_sizes"] = [256, 256]
-            torch.save(data, path)
-            with self.assertRaisesRegex(ValueError, "unsupported architecture"):
                 GeneralPolicy.load(path)
 
     def test_diffusion_feature_normalizer_is_unchanged(self):

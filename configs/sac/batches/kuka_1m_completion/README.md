@@ -1,3 +1,9 @@
+---
+status: current
+last_verified: 2026-11-07
+applies_to: continual-learning
+---
+
 # KUKA 1M-step completion batch
 
 These configurations run the twelve KUKA-v3 tasks with validated retained SAC

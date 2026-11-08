@@ -1,0 +1,32 @@
+# Engineering smoke test for the canonical low-disk SAC lifecycle.
+# This is not a learning-performance benchmark.
+experiment: sac
+environment:
+  backend: metaworld-v3
+  reward_function_version: v2
+sac:
+  steps: 400
+  learning_rate: 0.001
+  buffer_size: 10000
+  learning_starts: 50
+  batch_size: 32
+  gamma: 0.99
+  tau: 0.005
+  train_freq: 1
+  gradient_steps: 1
+  checkpoint_freq: 100
+  checkpoint_mode: low_disk
+continual:
+  tasks: [reach-v3]
+evaluation:
+  episodes: 2
+  frequency: 100
+  seed_offset: 10000
+  mode: fixed-tasks
+  task_set_seed: 10000
+  final_task_set_seeds: [20000, 20001]
+  final_reset_seed: 30000
+runtime:
+  seed: 0
+  device: cpu
+  output: runs/smoke/sac_low_disk

@@ -29,6 +29,7 @@ class FakeDenoiser:
 class FakeDiffusion:
     def __init__(self):
         self.denoiser = FakeDenoiser()
+        self.config = type("Config", (), {"steps": 100})()
         self.calls = []
 
     def sample(self, count, *, seed, task_ids, goals, execution_mode="legacy"):
@@ -155,6 +156,10 @@ class DiffCRLReplayTests(unittest.TestCase):
             self.assertEqual(source["sampling_seed"], 102023 + old_index)
             self.assertEqual(source["condition"], old_index)
             self.assertEqual(source["checkpoint_sha256"], "checkpoint-sha")
+            self.assertEqual(source["diffusion_steps"], model.config.steps)
+            self.assertEqual(
+                source["neural_function_evaluations"], model.config.steps
+            )
             self.assertIsNone(source["generated_latent_abs_gt_bc_cap_fraction"])
             self.assertEqual(source["pre_projection_oob_component_fraction"], 1.0)
             self.assertEqual(source["post_projection_oob_component_fraction"], 0.0)

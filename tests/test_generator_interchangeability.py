@@ -5,10 +5,10 @@ from pathlib import Path
 
 import torch
 
-from src.config import default_config, load_config
+from src.config import REPLAY_PRIORITY_STRATEGY, default_config, load_config
 from src.continual.bc_policy import GeneralPolicy
 from src.continual.replay_allocation import replay_counts
-from src.support.dataset import (
+from src.continual.stage_dataset import (
     bc_dataset,
     concatenate_trajectory_groups,
     prepare_trajectory_group,
@@ -45,7 +45,6 @@ def shared_config(generator: str):
             trajectories_per_task=50,
             replay_allocation="fixed-total",
             replay_budget=50,
-            replay_priority_strategy="uniform",
         ),
     )
 
@@ -55,7 +54,7 @@ def test_generator_switch_preserves_shared_pipeline_configuration():
     flow = shared_config("flow-matching")
     assert ddpm.continual.trajectories_per_task == flow.continual.trajectories_per_task
     assert ddpm.continual.replay_budget == flow.continual.replay_budget
-    assert ddpm.continual.replay_priority_strategy == flow.continual.replay_priority_strategy
+    assert REPLAY_PRIORITY_STRATEGY == "uniform"
     assert ddpm.bc == flow.bc
     assert ddpm.evaluation == flow.evaluation
 
@@ -156,8 +155,7 @@ def test_paired_five_stage_smoke_configs_are_small_and_isolated():
     assert ddpm.continual.replay_allocation == "fixed-total"
     assert flow.continual.replay_allocation == "fixed-total"
     assert ddpm.continual.replay_budget == flow.continual.replay_budget == 4
-    assert ddpm.continual.replay_priority_strategy == "uniform"
-    assert flow.continual.replay_priority_strategy == "uniform"
+    assert REPLAY_PRIORITY_STRATEGY == "uniform"
     assert ddpm.diffusion.epochs == flow.flow_matching.epochs == 2
     assert ddpm.bc == flow.bc
     assert ddpm.evaluation == flow.evaluation

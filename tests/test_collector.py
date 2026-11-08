@@ -121,8 +121,6 @@ class TrainerCollectionCleanupTests(unittest.TestCase):
                 observation_shape=(39,),
                 action_shape=(4,),
                 horizon=200,
-                hammer_reward_variant=None,
-                hammer_nail_progress_weight=None,
                 qualification=None,
                 manifest_path=None,
                 legacy=True,

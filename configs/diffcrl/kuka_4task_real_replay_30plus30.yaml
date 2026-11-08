@@ -1,0 +1,40 @@
+# Controlled KUKA-v3 stored-real replay baseline.
+experiment: diffcrl
+environment:
+  backend: kuka-v3
+  reward_function_version: v2
+bc:
+  epochs: 100
+  batch_size: 256
+  learning_rate: 0.001
+  loss: post-tanh-mse
+diffusion:
+  epochs: 300
+  batch_size: 8
+  learning_rate: 0.001
+  steps: 100
+  width: 64
+  action_space: raw
+  action_clamp_epsilon: 0.0001
+  generated_action_projection: none
+continual:
+  tasks: [kuka-drawer-close-v3, kuka-window-close-v3, kuka-door-open-v3, kuka-peg-unplug-side-v3]
+  experts:
+    kuka-drawer-close-v3: runs/sac_kuka_remaining_4task_1m/drawer-close-v3/seed_0/best_model.zip
+    kuka-window-close-v3: runs/sac_kuka_remaining_4task_1m/window-close-v3/seed_0/best_model.zip
+    kuka-door-open-v3: runs/sac_kuka_remaining_4task_1m/door-open-v3/seed_0/best_model.zip
+    kuka-peg-unplug-side-v3: runs/sac_kuka_remaining_4task_1m/peg-unplug-side-v3/seed_0/best_model.zip
+  trajectories_per_task: 30
+  replay_mode: real
+  replay_allocation: fixed-total
+  replay_budget: 30
+evaluation:
+  episodes: 50
+  seed: 10000
+  mode: fixed-tasks
+  task_set_seed: 10000
+runtime:
+  seed: 0
+  device: cpu
+  output: runs/kuka_4task_replay_comparison_30plus30/real_replay
+  run_name: seed_0

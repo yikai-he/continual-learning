@@ -10,6 +10,8 @@ import torch
 from torch import nn
 from tqdm.auto import tqdm
 
+from src.config import GENERATOR_GRADIENT_CLIP_NORM, GENERATOR_VALIDATION_DRAWS
+
 
 def run_cpu_inputs_on_module_device(module: nn.Module, *inputs):
     """Run one module on its device and restore the established CPU output contract."""
@@ -28,9 +30,9 @@ def _assess_generator_loss(model, data, goals, task_ids, noise_seed: int) -> flo
     return (
         sum(
             model.loss(data, generator=local, task_ids=task_ids, goals=goals).item()
-            for _ in range(4)
+            for _ in range(GENERATOR_VALIDATION_DRAWS)
         )
-        / 4
+        / GENERATOR_VALIDATION_DRAWS
     )
 
 
@@ -83,7 +85,7 @@ def train_generator_epoch(
         if not torch.isfinite(loss):
             raise ValueError(nonfinite_error)
         loss.backward()
-        nn.utils.clip_grad_norm_(model.parameters(), 1.0)
+        nn.utils.clip_grad_norm_(model.parameters(), GENERATOR_GRADIENT_CLIP_NORM)
         optimizer.step()
     model.eval()
 

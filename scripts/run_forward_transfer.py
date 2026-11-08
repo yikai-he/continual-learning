@@ -14,6 +14,7 @@ from stable_baselines3 import SAC
 from stable_baselines3.common.callbacks import CallbackList
 from stable_baselines3.common.monitor import Monitor
 
+from src.config import SAC_ENT_COEF, SAC_NET_ARCH
 from src.continual.evaluation import disable_task_sampling
 from src.continual.task_bank import verify_disjoint_task_banks
 from src.envs import make_env
@@ -125,7 +126,9 @@ def main(argv=None) -> None:
             raise ValueError("Resume requires an existing incomplete RUNNING directory.")
         if (run_dir / "RUN_COMPLETE").exists():
             raise ValueError("Completed forward-transfer runs cannot be resumed.")
-        saved = load_forward_transfer_config(run_dir / "config.yaml")
+        saved = load_forward_transfer_config(
+            run_dir / "config.yaml", allow_legacy_fixed_fields=True
+        )
         if asdict(saved) != asdict(config):
             raise ValueError("Resume configuration differs from the saved run.")
         checkpoints = sorted(
@@ -172,7 +175,7 @@ def main(argv=None) -> None:
             "initialization": config.condition,
             "actor_architecture": {
                 "policy": "TransferableSACPolicy",
-                "net_arch": list(config.sac.net_arch),
+                "net_arch": list(SAC_NET_ARCH),
                 "layer_norm_after_hidden": [0],
             },
         }
@@ -241,9 +244,9 @@ def main(argv=None) -> None:
                 tau=config.sac.tau,
                 train_freq=config.sac.train_freq,
                 gradient_steps=config.sac.gradient_steps,
-                ent_coef=config.sac.ent_coef,
+                ent_coef=SAC_ENT_COEF,
                 policy_kwargs={
-                    "net_arch": config.sac.net_arch,
+                    "net_arch": list(SAC_NET_ARCH),
                     "log_std_init": config.sac.log_std_init,
                 },
                 tensorboard_log=str(run_dir / "tensorboard"),

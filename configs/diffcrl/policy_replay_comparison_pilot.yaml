@@ -5,8 +5,6 @@ bc:
   epochs: 100
   batch_size: 256
   learning_rate: 0.001
-  hidden_sizes: [256, 256, 256, 256]
-  normalization_mode: layer-norm
   loss: post-tanh-mse
 diffusion:
   epochs: 300
@@ -29,7 +27,6 @@ continual:
   replay_mode: diffusion
   replay_allocation: fixed-total
   replay_budget: 50
-  replay_priority_strategy: uniform
   historical_replay_training_only: true
 evaluation:
   episodes: 50

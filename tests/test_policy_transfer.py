@@ -65,8 +65,6 @@ def make_general_policy(env):
     return GeneralPolicy(
         env.action_space.low,
         env.action_space.high,
-        hidden_sizes=(256, 256, 256, 256),
-        use_layer_norm=True,
     )
 
 
@@ -186,10 +184,6 @@ def test_sac_save_reload_preserves_deterministic_predictions():
 
 def test_incompatible_general_policy_has_clear_error():
     env = ContinuousTestEnv()
-    with pytest.raises(ValueError, match="only hidden_sizes"):
-        GeneralPolicy(env.action_space.low, env.action_space.high, hidden_sizes=(256, 256))
-    with pytest.raises(ValueError, match="requires LayerNorm"):
-        GeneralPolicy(env.action_space.low, env.action_space.high, use_layer_norm=False)
     with pytest.raises(ValueError, match="only net_arch"):
         SAC(
             TransferableSACPolicy,

@@ -11,7 +11,6 @@ from stable_baselines3.sac.policies import (
 )
 from torch import nn
 
-
 GENERAL_POLICY_HIDDEN_SIZES = (256, 256, 256, 256)
 
 

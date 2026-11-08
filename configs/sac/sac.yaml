@@ -13,13 +13,10 @@ sac:
   tau: 0.005
   train_freq: 1
   gradient_steps: 1
-  ent_coef: auto
-  net_arch:
-  - 256
-  - 256
-  - 256
-  - 256
   checkpoint_freq: 50000
+  # low_disk (default): root-level best_model.zip + latest_model.zip, no replay.
+  # full: periodic model/replay pairs plus legacy best-return/best-success outputs.
+  checkpoint_mode: low_disk
 continual:
   tasks:
   - reach-v3
@@ -29,6 +26,8 @@ evaluation:
   seed_offset: 10000
   mode: fixed-tasks
   task_set_seed: 10000
+  final_task_set_seeds: [20000, 20001]
+  final_reset_seed: 30000
 runtime:
   seed: 0
   device: auto
