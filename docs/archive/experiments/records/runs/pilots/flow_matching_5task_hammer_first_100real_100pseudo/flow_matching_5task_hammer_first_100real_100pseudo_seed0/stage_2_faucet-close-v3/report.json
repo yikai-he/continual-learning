@@ -1,0 +1,3353 @@
+{
+  "stage": 2,
+  "task": "faucet-close-v3",
+  "bc_normalization_mode": "layer-norm",
+  "bc_loss": "post-tanh-mse",
+  "bc_clamp_epsilon": 0.0001,
+  "diffusion_action_space": "raw",
+  "diffusion_action_clamp_epsilon": 0.0001,
+  "generated_action_projection": "none",
+  "real_diffusion_encode_clip_fraction": 0.0,
+  "sources": {
+    "hammer-v3": {
+      "kind": "generated",
+      "generator": "flow_matching",
+      "checkpoint_kind": "trajectory_flow_matching_22_v1",
+      "checkpoint": "/home/yikai/Documents/Code/Thesis/continual-learning/runs/pilots/flow_matching_5task_hammer_first_100real_100pseudo/flow_matching_5task_hammer_first_100real_100pseudo_seed0/flow_matching_after_task_1_button-press-v3.pt",
+      "checkpoint_sha256": "4b24aead6c729c650f01b1d1f1a8e089aaf928155cc41a80f3f9557908b10f48",
+      "sampling_seed": 102000,
+      "condition": 0,
+      "trajectory_count": 50,
+      "integration_steps": 10,
+      "neural_function_evaluations": 10,
+      "generation_seconds": 0.38737868599855574,
+      "success": null,
+      "return": null,
+      "generated_latent_abs_gt_bc_cap_fraction": null,
+      "training_configuration_indices": [
+        25,
+        38,
+        27,
+        34,
+        38,
+        42,
+        27,
+        18,
+        0,
+        38,
+        21,
+        4,
+        1,
+        28,
+        1,
+        33,
+        33,
+        49,
+        26,
+        28,
+        19,
+        38,
+        30,
+        4,
+        28,
+        18,
+        34,
+        35,
+        26,
+        46,
+        43,
+        36,
+        43,
+        32,
+        29,
+        30,
+        32,
+        34,
+        34,
+        16,
+        15,
+        36,
+        3,
+        6,
+        31,
+        8,
+        33,
+        12,
+        36,
+        27
+      ],
+      "training_configuration_hashes": [
+        "6e0650a8124435aaa716ce5c8ce6ad0b9a6710306b43e02799f01281434df05c",
+        "bce64478d801daf6487259eb6d4d610ff51b8a6c106cacf5d557f968d4ad90b8",
+        "ca886ac6f8c64f849bc6443dd70a7ee3267bb0ff7d0750f0ec403891ac8a109b",
+        "d41b35aa4c817be67f5ceec9bb2f72ef6e4b8d0772b9c25786dd2407841e328c",
+        "bce64478d801daf6487259eb6d4d610ff51b8a6c106cacf5d557f968d4ad90b8",
+        "1268f904e7f45fbbbbd12066d143d09fa436981d3eaa49c8679020f76ef44064",
+        "ca886ac6f8c64f849bc6443dd70a7ee3267bb0ff7d0750f0ec403891ac8a109b",
+        "0ba8444db7ccbdb19518946882be0059ec9fa72582d17b75e3427b13905e1b27",
+        "7c5d96e615254afde902b1cee003fe11c10419d83663cc4273022e7cac661dfe",
+        "bce64478d801daf6487259eb6d4d610ff51b8a6c106cacf5d557f968d4ad90b8",
+        "6c36552779c8473a43c192534ba4f23c1d8e145cf8d19d2dc614fecc7ee37b20",
+        "28b5bcecd499f5e5315515836f0fbb97db85f2b44dac7d17292adc005bce7eec",
+        "e6d8d66472ba51137ecf91c86c07bb0b80cb82b3ee2b2868405d8d925c95e401",
+        "0f31afb076bfc5fab39f2c7af302413e444141e5c083ae79b319410a3ebab431",
+        "e6d8d66472ba51137ecf91c86c07bb0b80cb82b3ee2b2868405d8d925c95e401",
+        "66c813c3725c5c496a99f59b96a72a21c5c8f04ce22cccc5f94cedc53a78177f",
+        "66c813c3725c5c496a99f59b96a72a21c5c8f04ce22cccc5f94cedc53a78177f",
+        "fe038bfb81cd076610d72eb4d6cb6a93fd8d14f2178577a13b35ec5cb5faa766",
+        "c607af2731d0438f3a4c53efa8e77471a147803327d64321696541a5f1d96288",
+        "0f31afb076bfc5fab39f2c7af302413e444141e5c083ae79b319410a3ebab431",
+        "3c71d28e6a5832fc723b41f8b6bab4af049d3ef9d96ca8ca5333449940ccc807",
+        "bce64478d801daf6487259eb6d4d610ff51b8a6c106cacf5d557f968d4ad90b8",
+        "e36d0e3f29129a2b57f92146073c98c2fc76651241123f6f9f4aea9e46363d49",
+        "28b5bcecd499f5e5315515836f0fbb97db85f2b44dac7d17292adc005bce7eec",
+        "0f31afb076bfc5fab39f2c7af302413e444141e5c083ae79b319410a3ebab431",
+        "0ba8444db7ccbdb19518946882be0059ec9fa72582d17b75e3427b13905e1b27",
+        "d41b35aa4c817be67f5ceec9bb2f72ef6e4b8d0772b9c25786dd2407841e328c",
+        "24a7771b29b13218460c00026b8631eeae0830d9b859dbd6e9e7f7c837289a15",
+        "c607af2731d0438f3a4c53efa8e77471a147803327d64321696541a5f1d96288",
+        "72701d1b2636f7566e27eb4a33964a8bb31913d6080e3041ae4bb004131830dd",
+        "2ee63f83935ce44fbcbc0c5ff61749b61b73fc85e8a83e6efedee52117633276",
+        "7893e0bb54aa94f311565a315efa88d3d8de5f5c7f47f15331f39a0d44b1309b",
+        "2ee63f83935ce44fbcbc0c5ff61749b61b73fc85e8a83e6efedee52117633276",
+        "f4cc367b0cfc95ac904c6b21ae92e0acf503b3dd2d12b815df3640e3c527f997",
+        "41573a6011649e38bab39051c5aff921fc3b2e360e2f110835cdfa01eb50185a",
+        "e36d0e3f29129a2b57f92146073c98c2fc76651241123f6f9f4aea9e46363d49",
+        "f4cc367b0cfc95ac904c6b21ae92e0acf503b3dd2d12b815df3640e3c527f997",
+        "d41b35aa4c817be67f5ceec9bb2f72ef6e4b8d0772b9c25786dd2407841e328c",
+        "d41b35aa4c817be67f5ceec9bb2f72ef6e4b8d0772b9c25786dd2407841e328c",
+        "9dc2507e7d232ee489773eda93d67d09abfbffd259f953d5214af3dff0066ad3",
+        "495f7ddd98ff336efac836bfbcf3d63641a1533ab5c41014f875d1e82e5b709d",
+        "7893e0bb54aa94f311565a315efa88d3d8de5f5c7f47f15331f39a0d44b1309b",
+        "d82b6a79a0d7b336d7f1d5b65590ffce1fca786609062bd940ec486f533b9d47",
+        "ca5a1da298a2b1b64de55593d028b7ab2f01275a2c8d8b325132ab5f3674c07e",
+        "50967f6c93f562d2da94e13012aefee90b28f38305bb5d1b1cfe2b90d97ad550",
+        "4fe4333442d4ab5347bcc5706dc6a3844dd1dd638afb03846cfcffb345e9e4da",
+        "66c813c3725c5c496a99f59b96a72a21c5c8f04ce22cccc5f94cedc53a78177f",
+        "73351d6ea0ddfa7ff5024b1c984d7aa5a0f073f6ddb3f0f30098c0dfe27335b9",
+        "7893e0bb54aa94f311565a315efa88d3d8de5f5c7f47f15331f39a0d44b1309b",
+        "ca886ac6f8c64f849bc6443dd70a7ee3267bb0ff7d0750f0ec403891ac8a109b"
+      ],
+      "generated_action_projection": "none",
+      "pre_projection_oob_component_fraction": 0.018324999138712883,
+      "pre_projection_oob_timestep_fraction": 0.06360000371932983,
+      "post_projection_oob_component_fraction": 0.018324999138712883,
+      "clipped_component_fraction": 0.0,
+      "post_projection_abs_eq_1_fraction": 0.0,
+      "post_projection_abs_gt_0_99_fraction": 0.019899999722838402,
+      "post_projection_abs_eq_1_fraction_by_action_coordinate": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "post_projection_abs_gt_0_99_fraction_by_action_coordinate": [
+        0.003700000001117587,
+        0.014800000004470348,
+        0.04650000110268593,
+        0.014600000344216824
+      ],
+      "data_path": "/home/yikai/Documents/Code/Thesis/continual-learning/runs/pilots/flow_matching_5task_hammer_first_100real_100pseudo/flow_matching_5task_hammer_first_100real_100pseudo_seed0/stage_2_faucet-close-v3/data_task_0.npy",
+      "data_sha256": "18584ca46f704e9e636644064cb19759e66791fdb9863f04a87fcdaccdb5367c",
+      "bc_target_clip_fraction": 0.018324999138712883
+    },
+    "button-press-v3": {
+      "kind": "generated",
+      "generator": "flow_matching",
+      "checkpoint_kind": "trajectory_flow_matching_22_v1",
+      "checkpoint": "/home/yikai/Documents/Code/Thesis/continual-learning/runs/pilots/flow_matching_5task_hammer_first_100real_100pseudo/flow_matching_5task_hammer_first_100real_100pseudo_seed0/flow_matching_after_task_1_button-press-v3.pt",
+      "checkpoint_sha256": "4b24aead6c729c650f01b1d1f1a8e089aaf928155cc41a80f3f9557908b10f48",
+      "sampling_seed": 102001,
+      "condition": 1,
+      "trajectory_count": 50,
+      "integration_steps": 10,
+      "neural_function_evaluations": 10,
+      "generation_seconds": 0.3923931659955997,
+      "success": null,
+      "return": null,
+      "generated_latent_abs_gt_bc_cap_fraction": null,
+      "training_configuration_indices": [
+        41,
+        40,
+        44,
+        15,
+        36,
+        27,
+        17,
+        24,
+        8,
+        44,
+        32,
+        32,
+        0,
+        35,
+        47,
+        46,
+        18,
+        42,
+        42,
+        47,
+        24,
+        1,
+        35,
+        40,
+        29,
+        38,
+        40,
+        19,
+        3,
+        45,
+        3,
+        44,
+        41,
+        26,
+        44,
+        27,
+        30,
+        23,
+        42,
+        42,
+        8,
+        42,
+        31,
+        30,
+        47,
+        0,
+        36,
+        18,
+        38,
+        18
+      ],
+      "training_configuration_hashes": [
+        "7e4a392caf5b186d3b18a895686d55cadb0a9131d03d833deeacc585dd9bef15",
+        "116d37723836d3049ab8f8ec5a3c345022f032ca1cb2d562e146ac917efc8dd6",
+        "a68092b7a06ea8f2eda60872b57c65db4baf17e5dbdb8a2dbdc1c4ed9bc6568f",
+        "65155ee57f31b09c57d0242550ebab3ad19996f6527a7c34ca2a692ffcdf5c08",
+        "30659f37d164e5cae2b1160750ff5320d54ba50ebe6ca97c5bd0c9a15229ba36",
+        "d6dbbe4f5a5c0a7b0f367bf712ab4f96168e9b1f6582ea764ef14a15fe5cc2bd",
+        "dfad8dd91dcc20469b679781f4dfb59fb42d521dcb5917ac1e4a79db20e95e77",
+        "dad798a6ea427cc40ae0cbed65f66446606f7bfd3b94b2e8da18723439dc5c75",
+        "05d11abfae8746cb9519cfa22b3af20c7044388f144ed44030c3a8a4635e5776",
+        "a68092b7a06ea8f2eda60872b57c65db4baf17e5dbdb8a2dbdc1c4ed9bc6568f",
+        "637c435a9738b8c55ef39eb6f5eb0a0a71d413f6a339ee7b480bc24b5f1e6c67",
+        "637c435a9738b8c55ef39eb6f5eb0a0a71d413f6a339ee7b480bc24b5f1e6c67",
+        "dcd68941a3f912ffe5dbbf67dded0ef4f53d37f9f9c4b38d45d1ab67cd5d209f",
+        "0c017489c759e007c5db9e8c712ea9e9645a916bf7a4816cacf55ca11375639b",
+        "c61a88bfac0c250b8d7fc4ecd5589170940e587bff595e1e2ed8e71ed94dc267",
+        "554fc3792e2a27e75262dfe881773754be5d070370b70f574ebe5f6eba2743a6",
+        "fa6e6f635dbf7c7472a00e6d4217112d9ccbcaedeacdd3a90efc1903ca8adac5",
+        "c3c7bc34e0f4f8b5cdb3669d9e8adb486e14461902f719cf4786cbfd4e43349b",
+        "c3c7bc34e0f4f8b5cdb3669d9e8adb486e14461902f719cf4786cbfd4e43349b",
+        "c61a88bfac0c250b8d7fc4ecd5589170940e587bff595e1e2ed8e71ed94dc267",
+        "dad798a6ea427cc40ae0cbed65f66446606f7bfd3b94b2e8da18723439dc5c75",
+        "4e58b4f4920ed20377d719c9fe3f7036f79747be95aa40900d0bcab433a58395",
+        "0c017489c759e007c5db9e8c712ea9e9645a916bf7a4816cacf55ca11375639b",
+        "116d37723836d3049ab8f8ec5a3c345022f032ca1cb2d562e146ac917efc8dd6",
+        "e4be01e08f977fcff30765ae6a91d4bd2cc34779933bcf77d94adf2f24c0d579",
+        "d823202512a7aefbcc35d9ed79b91f4bd9da95e48d4b533c0a6920a274d1310b",
+        "116d37723836d3049ab8f8ec5a3c345022f032ca1cb2d562e146ac917efc8dd6",
+        "b8b3398bd083e07b4e34412862511970461a4f0242ba1c0a55117e22eb77d20d",
+        "8a3ff1cca5c80be4bfdda6ebbc1c6e20133004cec0f466920d277736c06c6fff",
+        "2730f46df86c3b9f3b2cfed3eed1f23f1a074b4449a9b6973cab682a5a3bd3ba",
+        "8a3ff1cca5c80be4bfdda6ebbc1c6e20133004cec0f466920d277736c06c6fff",
+        "a68092b7a06ea8f2eda60872b57c65db4baf17e5dbdb8a2dbdc1c4ed9bc6568f",
+        "7e4a392caf5b186d3b18a895686d55cadb0a9131d03d833deeacc585dd9bef15",
+        "4f1724fb948381b9b327d9e15995e0365fa6f92eb8884ca51702ed3b026f6d32",
+        "a68092b7a06ea8f2eda60872b57c65db4baf17e5dbdb8a2dbdc1c4ed9bc6568f",
+        "d6dbbe4f5a5c0a7b0f367bf712ab4f96168e9b1f6582ea764ef14a15fe5cc2bd",
+        "7568e6206daf3abf64aac6948f199feff4571f5d6bcc217d12a695b85a199542",
+        "7651ab968309fdab575c5ff3bc2b8a61e6f805786ed484a6d2668c834588feb0",
+        "c3c7bc34e0f4f8b5cdb3669d9e8adb486e14461902f719cf4786cbfd4e43349b",
+        "c3c7bc34e0f4f8b5cdb3669d9e8adb486e14461902f719cf4786cbfd4e43349b",
+        "05d11abfae8746cb9519cfa22b3af20c7044388f144ed44030c3a8a4635e5776",
+        "c3c7bc34e0f4f8b5cdb3669d9e8adb486e14461902f719cf4786cbfd4e43349b",
+        "a8038a8c0b18b04818fbfe1b9ab4e6db9e1b027335f6a5cd5a0fa36d44a77e80",
+        "7568e6206daf3abf64aac6948f199feff4571f5d6bcc217d12a695b85a199542",
+        "c61a88bfac0c250b8d7fc4ecd5589170940e587bff595e1e2ed8e71ed94dc267",
+        "dcd68941a3f912ffe5dbbf67dded0ef4f53d37f9f9c4b38d45d1ab67cd5d209f",
+        "30659f37d164e5cae2b1160750ff5320d54ba50ebe6ca97c5bd0c9a15229ba36",
+        "fa6e6f635dbf7c7472a00e6d4217112d9ccbcaedeacdd3a90efc1903ca8adac5",
+        "d823202512a7aefbcc35d9ed79b91f4bd9da95e48d4b533c0a6920a274d1310b",
+        "fa6e6f635dbf7c7472a00e6d4217112d9ccbcaedeacdd3a90efc1903ca8adac5"
+      ],
+      "generated_action_projection": "none",
+      "pre_projection_oob_component_fraction": 0.07352499663829803,
+      "pre_projection_oob_timestep_fraction": 0.23989999294281006,
+      "post_projection_oob_component_fraction": 0.07352499663829803,
+      "clipped_component_fraction": 0.0,
+      "post_projection_abs_eq_1_fraction": 0.0,
+      "post_projection_abs_gt_0_99_fraction": 0.08367499709129333,
+      "post_projection_abs_eq_1_fraction_by_action_coordinate": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "post_projection_abs_gt_0_99_fraction_by_action_coordinate": [
+        0.034699998795986176,
+        0.16130000352859497,
+        0.02239999920129776,
+        0.11630000174045563
+      ],
+      "data_path": "/home/yikai/Documents/Code/Thesis/continual-learning/runs/pilots/flow_matching_5task_hammer_first_100real_100pseudo/flow_matching_5task_hammer_first_100real_100pseudo_seed0/stage_2_faucet-close-v3/data_task_1.npy",
+      "data_sha256": "8ece7c4f495ad58ecaa5f9611fe8ee844d92bf595681a1757855d0f49767cc4b",
+      "bc_target_clip_fraction": 0.07357499748468399
+    },
+    "faucet-close-v3": {
+      "kind": "real_expert",
+      "checkpoint": "/home/yikai/Documents/Code/Thesis/continual-learning/runs/reward_v2/faucet-close-v3/seed_0/best_model/best_model.zip",
+      "checkpoint_sha256": "7adf6b40f7f658dc862abafc7aa3e3a85a30f3304a7fb97829f98d9727d80ab6",
+      "seeds": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31,
+        32,
+        33,
+        34,
+        35,
+        36,
+        37,
+        38,
+        39,
+        40,
+        41,
+        42,
+        43,
+        44,
+        45,
+        46,
+        47,
+        48,
+        49,
+        50,
+        51,
+        52,
+        53,
+        54,
+        55,
+        56,
+        57,
+        58,
+        59,
+        60,
+        61,
+        62,
+        63,
+        64,
+        65,
+        66,
+        67,
+        68,
+        69,
+        70,
+        71,
+        72,
+        73,
+        74,
+        75,
+        76,
+        77,
+        78,
+        79,
+        80,
+        81,
+        82,
+        83,
+        84,
+        85,
+        86,
+        87,
+        88,
+        89,
+        90,
+        91,
+        92,
+        93,
+        94,
+        95,
+        96,
+        97,
+        98,
+        99
+      ],
+      "success_count": 100,
+      "success_rate": 1.0,
+      "episode_returns": [
+        1756.9209318311766,
+        1777.9421563221208,
+        1790.1346604783587,
+        1793.1346582581918,
+        1785.2392439535408,
+        1771.3309103680194,
+        1777.6035802880692,
+        1769.0606329546122,
+        1757.2939578095957,
+        1753.9864193999351,
+        1789.1727821063205,
+        1771.601102722677,
+        1790.1346604783587,
+        1748.1004252087112,
+        1751.349477706452,
+        1771.306453712955,
+        1777.9421563221208,
+        1783.5090639871241,
+        1783.5090639871241,
+        1776.2419119902825,
+        1793.1346582581918,
+        1753.9864193999351,
+        1783.9791118151848,
+        1769.0606329546122,
+        1747.4475574413268,
+        1756.9209318311766,
+        1783.5090639871241,
+        1762.9749777908683,
+        1763.0598993340323,
+        1771.306453712955,
+        1756.9209318311766,
+        1757.2939578095957,
+        1766.4685913983703,
+        1771.5391907415674,
+        1762.9749777908683,
+        1783.5090639871241,
+        1766.4685913983703,
+        1755.94341616457,
+        1763.8580031171052,
+        1763.7557009448497,
+        1783.5087841154213,
+        1762.9749777908683,
+        1769.0606329546122,
+        1784.6574987593026,
+        1769.0606329546122,
+        1783.9791118151848,
+        1752.2577561195471,
+        1789.1727821063205,
+        1763.7155192390105,
+        1748.1004252087112,
+        1763.0598993340323,
+        1747.4475574413268,
+        1765.8846538414978,
+        1761.9785890714188,
+        1753.9864193999351,
+        1761.9785890714188,
+        1769.4007294710955,
+        1761.8916104205541,
+        1747.8238641820494,
+        1789.1727821063205,
+        1756.9209318311766,
+        1761.8916104205541,
+        1787.4430898739165,
+        1747.4475574413268,
+        1771.5391907415674,
+        1784.6574987593026,
+        1766.2157314440326,
+        1771.306453712955,
+        1756.9209318311766,
+        1752.2577561195471,
+        1769.4007294710955,
+        1785.2392439535408,
+        1763.7557009448497,
+        1763.8580031171052,
+        1787.4430898739165,
+        1791.6529066793134,
+        1777.6035802880692,
+        1776.2419119902825,
+        1752.2577561195471,
+        1759.6784960566767,
+        1783.9791118151848,
+        1766.2157314440326,
+        1763.7155192390105,
+        1752.5643775538233,
+        1787.4430898739165,
+        1763.6914024453206,
+        1790.1346604783587,
+        1752.5643775538233,
+        1763.0598993340323,
+        1747.4475574413268,
+        1752.5643775538233,
+        1791.6529066793134,
+        1793.1346582581918,
+        1744.6389542877437,
+        1787.4430898739165,
+        1777.9421563221208,
+        1771.3309103680194,
+        1766.4685913983703,
+        1769.4007294710955,
+        1770.5025841952229
+      ],
+      "mean_return": 1769.1836605325461,
+      "std_return": 13.528331691546231,
+      "real_diffusion_encode_clip_fraction": 0.0,
+      "collection_configurations": [
+        {
+          "configuration_index": 42,
+          "task_data_sha256": "ec6c13000ee913e1bb14ff0c32a45a776a5c7e335ad76f887090ce4c5fce162d",
+          "task_name": "faucet-close-v3",
+          "env_name": "faucet-close-v3",
+          "bank_seed": 0,
+          "episode_id": 0
+        },
+        {
+          "configuration_index": 31,
+          "task_data_sha256": "e976911145c3d8285f6ddc4cd7b7eb840a82b8d060d48737eb73285c26c02074",
+          "task_name": "faucet-close-v3",
+          "env_name": "faucet-close-v3",
+          "bank_seed": 0,
+          "episode_id": 1
+        },
+        {
+          "configuration_index": 25,
+          "task_data_sha256": "d4aa6f8736b91c8b7756f254792a9f25b36383f8cd3d606d20860f6ae3a21976",
+          "task_name": "faucet-close-v3",
+          "env_name": "faucet-close-v3",
+          "bank_seed": 0,
+          "episode_id": 2
+        },
+        {
+          "configuration_index": 13,
+          "task_data_sha256": "6e202b0c4e73466f4c520fcb872d0927581755bb071e1da153ef2debc545033b",
+          "task_name": "faucet-close-v3",
+          "env_name": "faucet-close-v3",
+          "bank_seed": 0,
+          "episode_id": 3
+        },
+        {
+          "configuration_index": 15,
+          "task_data_sha256": "aa0afc911ca07a130e3d0ffc958bb3adb9ae5e0a3ac6874c5f0f06813a069c2d",
+          "task_name": "faucet-close-v3",
+          "env_name": "faucet-close-v3",
+          "bank_seed": 0,
+          "episode_id": 4
+        },
+        {
+          "configuration_index": 2,
+          "task_data_sha256": "34fbc83e9534101da6d727b99d2c909edf95f8620c466f3ea7f217c5021f41d2",
+          "task_name": "faucet-close-v3",
+          "env_name": "faucet-close-v3",
+          "bank_seed": 0,
+          "episode_id": 5
+        },
+        {
+          "configuration_index": 3,
+          "task_data_sha256": "666abf3d4d7b665fa56ee76c1b3f896cf80b722005b492544ce3d10118e298b0",
+          "task_name": "faucet-close-v3",
+          "env_name": "faucet-close-v3",
+          "bank_seed": 0,
+          "episode_id": 6
+        },
+        {
+          "configuration_index": 0,
+          "task_data_sha256": "dc07374ef0eaa3ee1d8b87397fcd1501bee267e63efbcf7d1d74cf2ef9c60c0c",
+          "task_name": "faucet-close-v3",
+          "env_name": "faucet-close-v3",
+          "bank_seed": 0,
+          "episode_id": 7
+        },
+        {
+          "configuration_index": 8,
+          "task_data_sha256": "04b85cdcd3e0ff678c4fc38d7214e19a0017bb6154cb3fb98e8a59e6f93fd771",
+          "task_name": "faucet-close-v3",
+          "env_name": "faucet-close-v3",
+          "bank_seed": 0,
+          "episode_id": 8
+        },
+        {
+          "configuration_index": 40,
+          "task_data_sha256": "741700e7fffbc9318c41efc838e2392c8719ce765668fb3aeeeea489695b8ff4",
+          "task_name": "faucet-close-v3",
+          "env_name": "faucet-close-v3",
+          "bank_seed": 0,
+          "episode_id": 9
+        },
+        {
+          "configuration_index": 32,
+          "task_data_sha256": "90fa9661e4b591ff95be335c603d4d98b50f2629065ea06016fb23d0cbb03f1b",
+          "task_name": "faucet-close-v3",
+          "env_name": "faucet-close-v3",
+          "bank_seed": 0,
+          "episode_id": 10
+        },
+        {
+          "configuration_index": 45,
+          "task_data_sha256": "fe7550e75d8c56dc83f18db6b53d34daf4dae16d193565f5e89667902e642073",
+          "task_name": "faucet-close-v3",
+          "env_name": "faucet-close-v3",
+          "bank_seed": 0,
+          "episode_id": 11
+        },
+        {
+          "configuration_index": 25,
+          "task_data_sha256": "d4aa6f8736b91c8b7756f254792a9f25b36383f8cd3d606d20860f6ae3a21976",
+          "task_name": "faucet-close-v3",
+          "env_name": "faucet-close-v3",
+          "bank_seed": 0,
+          "episode_id": 12
+        },
+        {
+          "configuration_index": 30,
+          "task_data_sha256": "fd35224695cf6a52b0313a58d30b73bdcb63a82ab327c06d327769d9c144655f",
+          "task_name": "faucet-close-v3",
+          "env_name": "faucet-close-v3",
+          "bank_seed": 0,
+          "episode_id": 13
+        },
+        {
+          "configuration_index": 48,
+          "task_data_sha256": "abc0fcdb0bdf773f947320539523170bbfb3e16972bc797135bf29ac6677ee9c",
+          "task_name": "faucet-close-v3",
+          "env_name": "faucet-close-v3",
+          "bank_seed": 0,
+          "episode_id": 14
+        },
+        {
+          "configuration_index": 36,
+          "task_data_sha256": "58a56086f36ebd81ce021d4a248dbe8f7af2e784d642494103f75682a38fff90",
+          "task_name": "faucet-close-v3",
+          "env_name": "faucet-close-v3",
+          "bank_seed": 0,
+          "episode_id": 15
+        },
+        {
+          "configuration_index": 31,
+          "task_data_sha256": "e976911145c3d8285f6ddc4cd7b7eb840a82b8d060d48737eb73285c26c02074",
+          "task_name": "faucet-close-v3",
+          "env_name": "faucet-close-v3",
+          "bank_seed": 0,
+          "episode_id": 16
+        },
+        {
+          "configuration_index": 27,
+          "task_data_sha256": "b66ac3c032a4a8dff070409e7259e1c5198318f0c1f7d7bfb9998453544ef1ab",
+          "task_name": "faucet-close-v3",
+          "env_name": "faucet-close-v3",
+          "bank_seed": 0,
+          "episode_id": 17
+        },
+        {
+          "configuration_index": 27,
+          "task_data_sha256": "b66ac3c032a4a8dff070409e7259e1c5198318f0c1f7d7bfb9998453544ef1ab",
+          "task_name": "faucet-close-v3",
+          "env_name": "faucet-close-v3",
+          "bank_seed": 0,
+          "episode_id": 18
+        },
+        {
+          "configuration_index": 46,
+          "task_data_sha256": "c3de4b8bb482d8c85ca816655715dc10ec2c3500bf2833f681b1c55d3dde9956",
+          "task_name": "faucet-close-v3",
+          "env_name": "faucet-close-v3",
+          "bank_seed": 0,
+          "episode_id": 19
+        },
+        {
+          "configuration_index": 13,
+          "task_data_sha256": "6e202b0c4e73466f4c520fcb872d0927581755bb071e1da153ef2debc545033b",
+          "task_name": "faucet-close-v3",
+          "env_name": "faucet-close-v3",
+          "bank_seed": 0,
+          "episode_id": 20
+        },
+        {
+          "configuration_index": 40,
+          "task_data_sha256": "741700e7fffbc9318c41efc838e2392c8719ce765668fb3aeeeea489695b8ff4",
+          "task_name": "faucet-close-v3",
+          "env_name": "faucet-close-v3",
+          "bank_seed": 0,
+          "episode_id": 21
+        },
+        {
+          "configuration_index": 33,
+          "task_data_sha256": "949a3e195e5130b9fa6e0193696bc72edc4fe259f72dbe6d55bf12aa3cd20bf9",
+          "task_name": "faucet-close-v3",
+          "env_name": "faucet-close-v3",
+          "bank_seed": 0,
+          "episode_id": 22
+        },
+        {
+          "configuration_index": 0,
+          "task_data_sha256": "dc07374ef0eaa3ee1d8b87397fcd1501bee267e63efbcf7d1d74cf2ef9c60c0c",
+          "task_name": "faucet-close-v3",
+          "env_name": "faucet-close-v3",
+          "bank_seed": 0,
+          "episode_id": 23
+        },
+        {
+          "configuration_index": 19,
+          "task_data_sha256": "2d17445bf490b09bc1cea593df56abf135a70617dad5d75af6bf613ab25b01d3",
+          "task_name": "faucet-close-v3",
+          "env_name": "faucet-close-v3",
+          "bank_seed": 0,
+          "episode_id": 24
+        },
+        {
+          "configuration_index": 42,
+          "task_data_sha256": "ec6c13000ee913e1bb14ff0c32a45a776a5c7e335ad76f887090ce4c5fce162d",
+          "task_name": "faucet-close-v3",
+          "env_name": "faucet-close-v3",
+          "bank_seed": 0,
+          "episode_id": 25
+        },
+        {
+          "configuration_index": 27,
+          "task_data_sha256": "b66ac3c032a4a8dff070409e7259e1c5198318f0c1f7d7bfb9998453544ef1ab",
+          "task_name": "faucet-close-v3",
+          "env_name": "faucet-close-v3",
+          "bank_seed": 0,
+          "episode_id": 26
+        },
+        {
+          "configuration_index": 1,
+          "task_data_sha256": "f834ee64ce2bd09c9bb4694a7eda3249bb8d6720d64652a5a804f9ade2fb2c69",
+          "task_name": "faucet-close-v3",
+          "env_name": "faucet-close-v3",
+          "bank_seed": 0,
+          "episode_id": 27
+        },
+        {
+          "configuration_index": 38,
+          "task_data_sha256": "cf64773ce68662200ce0fed352870b67755279c150c533bf4fe316af2bdc3647",
+          "task_name": "faucet-close-v3",
+          "env_name": "faucet-close-v3",
+          "bank_seed": 0,
+          "episode_id": 28
+        },
+        {
+          "configuration_index": 36,
+          "task_data_sha256": "58a56086f36ebd81ce021d4a248dbe8f7af2e784d642494103f75682a38fff90",
+          "task_name": "faucet-close-v3",
+          "env_name": "faucet-close-v3",
+          "bank_seed": 0,
+          "episode_id": 29
+        },
+        {
+          "configuration_index": 42,
+          "task_data_sha256": "ec6c13000ee913e1bb14ff0c32a45a776a5c7e335ad76f887090ce4c5fce162d",
+          "task_name": "faucet-close-v3",
+          "env_name": "faucet-close-v3",
+          "bank_seed": 0,
+          "episode_id": 30
+        },
+        {
+          "configuration_index": 8,
+          "task_data_sha256": "04b85cdcd3e0ff678c4fc38d7214e19a0017bb6154cb3fb98e8a59e6f93fd771",
+          "task_name": "faucet-close-v3",
+          "env_name": "faucet-close-v3",
+          "bank_seed": 0,
+          "episode_id": 31
+        },
+        {
+          "configuration_index": 4,
+          "task_data_sha256": "de2c673fbdd772941a9cc8018f3da614ef0eecca849fbdbb4c6d4084144ddf52",
+          "task_name": "faucet-close-v3",
+          "env_name": "faucet-close-v3",
+          "bank_seed": 0,
+          "episode_id": 32
+        },
+        {
+          "configuration_index": 43,
+          "task_data_sha256": "2eff52168b8fb304a28c936dce1ced7628186e3f880f41da905cefe70443269a",
+          "task_name": "faucet-close-v3",
+          "env_name": "faucet-close-v3",
+          "bank_seed": 0,
+          "episode_id": 33
+        },
+        {
+          "configuration_index": 1,
+          "task_data_sha256": "f834ee64ce2bd09c9bb4694a7eda3249bb8d6720d64652a5a804f9ade2fb2c69",
+          "task_name": "faucet-close-v3",
+          "env_name": "faucet-close-v3",
+          "bank_seed": 0,
+          "episode_id": 34
+        },
+        {
+          "configuration_index": 27,
+          "task_data_sha256": "b66ac3c032a4a8dff070409e7259e1c5198318f0c1f7d7bfb9998453544ef1ab",
+          "task_name": "faucet-close-v3",
+          "env_name": "faucet-close-v3",
+          "bank_seed": 0,
+          "episode_id": 35
+        },
+        {
+          "configuration_index": 4,
+          "task_data_sha256": "de2c673fbdd772941a9cc8018f3da614ef0eecca849fbdbb4c6d4084144ddf52",
+          "task_name": "faucet-close-v3",
+          "env_name": "faucet-close-v3",
+          "bank_seed": 0,
+          "episode_id": 36
+        },
+        {
+          "configuration_index": 14,
+          "task_data_sha256": "ca81091e0cdcacce497d301e4222ae5a70a889294eddccae293bd6cd6b147c1e",
+          "task_name": "faucet-close-v3",
+          "env_name": "faucet-close-v3",
+          "bank_seed": 0,
+          "episode_id": 37
+        },
+        {
+          "configuration_index": 24,
+          "task_data_sha256": "a3fd158bc0ee222066a2881fdb8d94ebf7a51e264a3ab6731329ca430dc1780d",
+          "task_name": "faucet-close-v3",
+          "env_name": "faucet-close-v3",
+          "bank_seed": 0,
+          "episode_id": 38
+        },
+        {
+          "configuration_index": 21,
+          "task_data_sha256": "1eaa73dfbf7887f4688b73bcd4459b4ad5707e167822c1e627561eefbd6fcbfd",
+          "task_name": "faucet-close-v3",
+          "env_name": "faucet-close-v3",
+          "bank_seed": 0,
+          "episode_id": 39
+        },
+        {
+          "configuration_index": 20,
+          "task_data_sha256": "4d4ba704b9b36e792e0d90d44dd7e9f8362b7a23f59396f211f5d80fcf027664",
+          "task_name": "faucet-close-v3",
+          "env_name": "faucet-close-v3",
+          "bank_seed": 0,
+          "episode_id": 40
+        },
+        {
+          "configuration_index": 1,
+          "task_data_sha256": "f834ee64ce2bd09c9bb4694a7eda3249bb8d6720d64652a5a804f9ade2fb2c69",
+          "task_name": "faucet-close-v3",
+          "env_name": "faucet-close-v3",
+          "bank_seed": 0,
+          "episode_id": 41
+        },
+        {
+          "configuration_index": 0,
+          "task_data_sha256": "dc07374ef0eaa3ee1d8b87397fcd1501bee267e63efbcf7d1d74cf2ef9c60c0c",
+          "task_name": "faucet-close-v3",
+          "env_name": "faucet-close-v3",
+          "bank_seed": 0,
+          "episode_id": 42
+        },
+        {
+          "configuration_index": 6,
+          "task_data_sha256": "79b78e54cdb7cd6a4f2937b18aa4102611d5e22b2eb367d109373b664297bc71",
+          "task_name": "faucet-close-v3",
+          "env_name": "faucet-close-v3",
+          "bank_seed": 0,
+          "episode_id": 43
+        },
+        {
+          "configuration_index": 0,
+          "task_data_sha256": "dc07374ef0eaa3ee1d8b87397fcd1501bee267e63efbcf7d1d74cf2ef9c60c0c",
+          "task_name": "faucet-close-v3",
+          "env_name": "faucet-close-v3",
+          "bank_seed": 0,
+          "episode_id": 44
+        },
+        {
+          "configuration_index": 33,
+          "task_data_sha256": "949a3e195e5130b9fa6e0193696bc72edc4fe259f72dbe6d55bf12aa3cd20bf9",
+          "task_name": "faucet-close-v3",
+          "env_name": "faucet-close-v3",
+          "bank_seed": 0,
+          "episode_id": 45
+        },
+        {
+          "configuration_index": 26,
+          "task_data_sha256": "3e9f443b3e4f1899e35a7fccece2bbb37ce74d4d79cd47c7d9a58a6809f51ad6",
+          "task_name": "faucet-close-v3",
+          "env_name": "faucet-close-v3",
+          "bank_seed": 0,
+          "episode_id": 46
+        },
+        {
+          "configuration_index": 32,
+          "task_data_sha256": "90fa9661e4b591ff95be335c603d4d98b50f2629065ea06016fb23d0cbb03f1b",
+          "task_name": "faucet-close-v3",
+          "env_name": "faucet-close-v3",
+          "bank_seed": 0,
+          "episode_id": 47
+        },
+        {
+          "configuration_index": 12,
+          "task_data_sha256": "3b0638f36a84df8c47a25f0a63909d2130c38de3fbad6f21bc7016da2fd5f61b",
+          "task_name": "faucet-close-v3",
+          "env_name": "faucet-close-v3",
+          "bank_seed": 0,
+          "episode_id": 48
+        },
+        {
+          "configuration_index": 30,
+          "task_data_sha256": "fd35224695cf6a52b0313a58d30b73bdcb63a82ab327c06d327769d9c144655f",
+          "task_name": "faucet-close-v3",
+          "env_name": "faucet-close-v3",
+          "bank_seed": 0,
+          "episode_id": 49
+        },
+        {
+          "configuration_index": 38,
+          "task_data_sha256": "cf64773ce68662200ce0fed352870b67755279c150c533bf4fe316af2bdc3647",
+          "task_name": "faucet-close-v3",
+          "env_name": "faucet-close-v3",
+          "bank_seed": 0,
+          "episode_id": 50
+        },
+        {
+          "configuration_index": 19,
+          "task_data_sha256": "2d17445bf490b09bc1cea593df56abf135a70617dad5d75af6bf613ab25b01d3",
+          "task_name": "faucet-close-v3",
+          "env_name": "faucet-close-v3",
+          "bank_seed": 0,
+          "episode_id": 51
+        },
+        {
+          "configuration_index": 23,
+          "task_data_sha256": "83540bf89770a3ee585a26fd5d6833c199e315b31418f3608c9254d480bbc348",
+          "task_name": "faucet-close-v3",
+          "env_name": "faucet-close-v3",
+          "bank_seed": 0,
+          "episode_id": 52
+        },
+        {
+          "configuration_index": 49,
+          "task_data_sha256": "1ef396c39215a3eec56510da4d0e48a1c6f0b55cd0eaba5f5b8f4e604492ebc0",
+          "task_name": "faucet-close-v3",
+          "env_name": "faucet-close-v3",
+          "bank_seed": 0,
+          "episode_id": 53
+        },
+        {
+          "configuration_index": 40,
+          "task_data_sha256": "741700e7fffbc9318c41efc838e2392c8719ce765668fb3aeeeea489695b8ff4",
+          "task_name": "faucet-close-v3",
+          "env_name": "faucet-close-v3",
+          "bank_seed": 0,
+          "episode_id": 54
+        },
+        {
+          "configuration_index": 49,
+          "task_data_sha256": "1ef396c39215a3eec56510da4d0e48a1c6f0b55cd0eaba5f5b8f4e604492ebc0",
+          "task_name": "faucet-close-v3",
+          "env_name": "faucet-close-v3",
+          "bank_seed": 0,
+          "episode_id": 55
+        },
+        {
+          "configuration_index": 18,
+          "task_data_sha256": "a72ea3056215d3a85de362f85b9ac9a81bfd661e2ade1fb4e81f5bfe39464b6e",
+          "task_name": "faucet-close-v3",
+          "env_name": "faucet-close-v3",
+          "bank_seed": 0,
+          "episode_id": 56
+        },
+        {
+          "configuration_index": 34,
+          "task_data_sha256": "4f587ef6943b49649187680d90ab4a3345fc3a5189a32e9536889d4213afa0d9",
+          "task_name": "faucet-close-v3",
+          "env_name": "faucet-close-v3",
+          "bank_seed": 0,
+          "episode_id": 57
+        },
+        {
+          "configuration_index": 47,
+          "task_data_sha256": "51af64437ccde83dd3b6b663b4d42f407a941ab7d9f44785c63352e1a07ac8dc",
+          "task_name": "faucet-close-v3",
+          "env_name": "faucet-close-v3",
+          "bank_seed": 0,
+          "episode_id": 58
+        },
+        {
+          "configuration_index": 32,
+          "task_data_sha256": "90fa9661e4b591ff95be335c603d4d98b50f2629065ea06016fb23d0cbb03f1b",
+          "task_name": "faucet-close-v3",
+          "env_name": "faucet-close-v3",
+          "bank_seed": 0,
+          "episode_id": 59
+        },
+        {
+          "configuration_index": 42,
+          "task_data_sha256": "ec6c13000ee913e1bb14ff0c32a45a776a5c7e335ad76f887090ce4c5fce162d",
+          "task_name": "faucet-close-v3",
+          "env_name": "faucet-close-v3",
+          "bank_seed": 0,
+          "episode_id": 60
+        },
+        {
+          "configuration_index": 34,
+          "task_data_sha256": "4f587ef6943b49649187680d90ab4a3345fc3a5189a32e9536889d4213afa0d9",
+          "task_name": "faucet-close-v3",
+          "env_name": "faucet-close-v3",
+          "bank_seed": 0,
+          "episode_id": 61
+        },
+        {
+          "configuration_index": 35,
+          "task_data_sha256": "a15f97a35495e1dd89fe1f560c428c9012a8aaf8de2620a165087d621cd3d340",
+          "task_name": "faucet-close-v3",
+          "env_name": "faucet-close-v3",
+          "bank_seed": 0,
+          "episode_id": 62
+        },
+        {
+          "configuration_index": 19,
+          "task_data_sha256": "2d17445bf490b09bc1cea593df56abf135a70617dad5d75af6bf613ab25b01d3",
+          "task_name": "faucet-close-v3",
+          "env_name": "faucet-close-v3",
+          "bank_seed": 0,
+          "episode_id": 63
+        },
+        {
+          "configuration_index": 43,
+          "task_data_sha256": "2eff52168b8fb304a28c936dce1ced7628186e3f880f41da905cefe70443269a",
+          "task_name": "faucet-close-v3",
+          "env_name": "faucet-close-v3",
+          "bank_seed": 0,
+          "episode_id": 64
+        },
+        {
+          "configuration_index": 6,
+          "task_data_sha256": "79b78e54cdb7cd6a4f2937b18aa4102611d5e22b2eb367d109373b664297bc71",
+          "task_name": "faucet-close-v3",
+          "env_name": "faucet-close-v3",
+          "bank_seed": 0,
+          "episode_id": 65
+        },
+        {
+          "configuration_index": 28,
+          "task_data_sha256": "258b019311ce9b3e0e4f01c2fe9f9becde7e7851a451c92a0dbdc2eca6e06e93",
+          "task_name": "faucet-close-v3",
+          "env_name": "faucet-close-v3",
+          "bank_seed": 0,
+          "episode_id": 66
+        },
+        {
+          "configuration_index": 36,
+          "task_data_sha256": "58a56086f36ebd81ce021d4a248dbe8f7af2e784d642494103f75682a38fff90",
+          "task_name": "faucet-close-v3",
+          "env_name": "faucet-close-v3",
+          "bank_seed": 0,
+          "episode_id": 67
+        },
+        {
+          "configuration_index": 42,
+          "task_data_sha256": "ec6c13000ee913e1bb14ff0c32a45a776a5c7e335ad76f887090ce4c5fce162d",
+          "task_name": "faucet-close-v3",
+          "env_name": "faucet-close-v3",
+          "bank_seed": 0,
+          "episode_id": 68
+        },
+        {
+          "configuration_index": 26,
+          "task_data_sha256": "3e9f443b3e4f1899e35a7fccece2bbb37ce74d4d79cd47c7d9a58a6809f51ad6",
+          "task_name": "faucet-close-v3",
+          "env_name": "faucet-close-v3",
+          "bank_seed": 0,
+          "episode_id": 69
+        },
+        {
+          "configuration_index": 18,
+          "task_data_sha256": "a72ea3056215d3a85de362f85b9ac9a81bfd661e2ade1fb4e81f5bfe39464b6e",
+          "task_name": "faucet-close-v3",
+          "env_name": "faucet-close-v3",
+          "bank_seed": 0,
+          "episode_id": 70
+        },
+        {
+          "configuration_index": 15,
+          "task_data_sha256": "aa0afc911ca07a130e3d0ffc958bb3adb9ae5e0a3ac6874c5f0f06813a069c2d",
+          "task_name": "faucet-close-v3",
+          "env_name": "faucet-close-v3",
+          "bank_seed": 0,
+          "episode_id": 71
+        },
+        {
+          "configuration_index": 21,
+          "task_data_sha256": "1eaa73dfbf7887f4688b73bcd4459b4ad5707e167822c1e627561eefbd6fcbfd",
+          "task_name": "faucet-close-v3",
+          "env_name": "faucet-close-v3",
+          "bank_seed": 0,
+          "episode_id": 72
+        },
+        {
+          "configuration_index": 24,
+          "task_data_sha256": "a3fd158bc0ee222066a2881fdb8d94ebf7a51e264a3ab6731329ca430dc1780d",
+          "task_name": "faucet-close-v3",
+          "env_name": "faucet-close-v3",
+          "bank_seed": 0,
+          "episode_id": 73
+        },
+        {
+          "configuration_index": 35,
+          "task_data_sha256": "a15f97a35495e1dd89fe1f560c428c9012a8aaf8de2620a165087d621cd3d340",
+          "task_name": "faucet-close-v3",
+          "env_name": "faucet-close-v3",
+          "bank_seed": 0,
+          "episode_id": 74
+        },
+        {
+          "configuration_index": 44,
+          "task_data_sha256": "fdda6ff88603727e005e368688e13105ee9604726f11e65880997d64fe3f4c7f",
+          "task_name": "faucet-close-v3",
+          "env_name": "faucet-close-v3",
+          "bank_seed": 0,
+          "episode_id": 75
+        },
+        {
+          "configuration_index": 3,
+          "task_data_sha256": "666abf3d4d7b665fa56ee76c1b3f896cf80b722005b492544ce3d10118e298b0",
+          "task_name": "faucet-close-v3",
+          "env_name": "faucet-close-v3",
+          "bank_seed": 0,
+          "episode_id": 76
+        },
+        {
+          "configuration_index": 46,
+          "task_data_sha256": "c3de4b8bb482d8c85ca816655715dc10ec2c3500bf2833f681b1c55d3dde9956",
+          "task_name": "faucet-close-v3",
+          "env_name": "faucet-close-v3",
+          "bank_seed": 0,
+          "episode_id": 77
+        },
+        {
+          "configuration_index": 26,
+          "task_data_sha256": "3e9f443b3e4f1899e35a7fccece2bbb37ce74d4d79cd47c7d9a58a6809f51ad6",
+          "task_name": "faucet-close-v3",
+          "env_name": "faucet-close-v3",
+          "bank_seed": 0,
+          "episode_id": 78
+        },
+        {
+          "configuration_index": 17,
+          "task_data_sha256": "32d2eab2298c9c0c011834743a6c464da1ca2f3dbd4cb83e09fb63378561b5e0",
+          "task_name": "faucet-close-v3",
+          "env_name": "faucet-close-v3",
+          "bank_seed": 0,
+          "episode_id": 79
+        },
+        {
+          "configuration_index": 33,
+          "task_data_sha256": "949a3e195e5130b9fa6e0193696bc72edc4fe259f72dbe6d55bf12aa3cd20bf9",
+          "task_name": "faucet-close-v3",
+          "env_name": "faucet-close-v3",
+          "bank_seed": 0,
+          "episode_id": 80
+        },
+        {
+          "configuration_index": 28,
+          "task_data_sha256": "258b019311ce9b3e0e4f01c2fe9f9becde7e7851a451c92a0dbdc2eca6e06e93",
+          "task_name": "faucet-close-v3",
+          "env_name": "faucet-close-v3",
+          "bank_seed": 0,
+          "episode_id": 81
+        },
+        {
+          "configuration_index": 12,
+          "task_data_sha256": "3b0638f36a84df8c47a25f0a63909d2130c38de3fbad6f21bc7016da2fd5f61b",
+          "task_name": "faucet-close-v3",
+          "env_name": "faucet-close-v3",
+          "bank_seed": 0,
+          "episode_id": 82
+        },
+        {
+          "configuration_index": 16,
+          "task_data_sha256": "dc38d359e206c93d700f07f56424d61573b342c6072b50f241859664900be545",
+          "task_name": "faucet-close-v3",
+          "env_name": "faucet-close-v3",
+          "bank_seed": 0,
+          "episode_id": 83
+        },
+        {
+          "configuration_index": 35,
+          "task_data_sha256": "a15f97a35495e1dd89fe1f560c428c9012a8aaf8de2620a165087d621cd3d340",
+          "task_name": "faucet-close-v3",
+          "env_name": "faucet-close-v3",
+          "bank_seed": 0,
+          "episode_id": 84
+        },
+        {
+          "configuration_index": 29,
+          "task_data_sha256": "15805b054917cdd735bd251ebed0b9f91955f501550d49cdb99c3dc76b8f63ff",
+          "task_name": "faucet-close-v3",
+          "env_name": "faucet-close-v3",
+          "bank_seed": 0,
+          "episode_id": 85
+        },
+        {
+          "configuration_index": 25,
+          "task_data_sha256": "d4aa6f8736b91c8b7756f254792a9f25b36383f8cd3d606d20860f6ae3a21976",
+          "task_name": "faucet-close-v3",
+          "env_name": "faucet-close-v3",
+          "bank_seed": 0,
+          "episode_id": 86
+        },
+        {
+          "configuration_index": 16,
+          "task_data_sha256": "dc38d359e206c93d700f07f56424d61573b342c6072b50f241859664900be545",
+          "task_name": "faucet-close-v3",
+          "env_name": "faucet-close-v3",
+          "bank_seed": 0,
+          "episode_id": 87
+        },
+        {
+          "configuration_index": 38,
+          "task_data_sha256": "cf64773ce68662200ce0fed352870b67755279c150c533bf4fe316af2bdc3647",
+          "task_name": "faucet-close-v3",
+          "env_name": "faucet-close-v3",
+          "bank_seed": 0,
+          "episode_id": 88
+        },
+        {
+          "configuration_index": 19,
+          "task_data_sha256": "2d17445bf490b09bc1cea593df56abf135a70617dad5d75af6bf613ab25b01d3",
+          "task_name": "faucet-close-v3",
+          "env_name": "faucet-close-v3",
+          "bank_seed": 0,
+          "episode_id": 89
+        },
+        {
+          "configuration_index": 16,
+          "task_data_sha256": "dc38d359e206c93d700f07f56424d61573b342c6072b50f241859664900be545",
+          "task_name": "faucet-close-v3",
+          "env_name": "faucet-close-v3",
+          "bank_seed": 0,
+          "episode_id": 90
+        },
+        {
+          "configuration_index": 44,
+          "task_data_sha256": "fdda6ff88603727e005e368688e13105ee9604726f11e65880997d64fe3f4c7f",
+          "task_name": "faucet-close-v3",
+          "env_name": "faucet-close-v3",
+          "bank_seed": 0,
+          "episode_id": 91
+        },
+        {
+          "configuration_index": 13,
+          "task_data_sha256": "6e202b0c4e73466f4c520fcb872d0927581755bb071e1da153ef2debc545033b",
+          "task_name": "faucet-close-v3",
+          "env_name": "faucet-close-v3",
+          "bank_seed": 0,
+          "episode_id": 92
+        },
+        {
+          "configuration_index": 11,
+          "task_data_sha256": "41badc041f12a409fa43f53eca89b20ee61fb1172e27d27293a07d4f6f4b6046",
+          "task_name": "faucet-close-v3",
+          "env_name": "faucet-close-v3",
+          "bank_seed": 0,
+          "episode_id": 93
+        },
+        {
+          "configuration_index": 35,
+          "task_data_sha256": "a15f97a35495e1dd89fe1f560c428c9012a8aaf8de2620a165087d621cd3d340",
+          "task_name": "faucet-close-v3",
+          "env_name": "faucet-close-v3",
+          "bank_seed": 0,
+          "episode_id": 94
+        },
+        {
+          "configuration_index": 31,
+          "task_data_sha256": "e976911145c3d8285f6ddc4cd7b7eb840a82b8d060d48737eb73285c26c02074",
+          "task_name": "faucet-close-v3",
+          "env_name": "faucet-close-v3",
+          "bank_seed": 0,
+          "episode_id": 95
+        },
+        {
+          "configuration_index": 2,
+          "task_data_sha256": "34fbc83e9534101da6d727b99d2c909edf95f8620c466f3ea7f217c5021f41d2",
+          "task_name": "faucet-close-v3",
+          "env_name": "faucet-close-v3",
+          "bank_seed": 0,
+          "episode_id": 96
+        },
+        {
+          "configuration_index": 4,
+          "task_data_sha256": "de2c673fbdd772941a9cc8018f3da614ef0eecca849fbdbb4c6d4084144ddf52",
+          "task_name": "faucet-close-v3",
+          "env_name": "faucet-close-v3",
+          "bank_seed": 0,
+          "episode_id": 97
+        },
+        {
+          "configuration_index": 18,
+          "task_data_sha256": "a72ea3056215d3a85de362f85b9ac9a81bfd661e2ade1fb4e81f5bfe39464b6e",
+          "task_name": "faucet-close-v3",
+          "env_name": "faucet-close-v3",
+          "bank_seed": 0,
+          "episode_id": 98
+        },
+        {
+          "configuration_index": 41,
+          "task_data_sha256": "de3ee1182ebd5693abb0999600b1da368b2f7802947f286ea0fac3b9071cd8d0",
+          "task_name": "faucet-close-v3",
+          "env_name": "faucet-close-v3",
+          "bank_seed": 0,
+          "episode_id": 99
+        }
+      ],
+      "data_path": "/home/yikai/Documents/Code/Thesis/continual-learning/runs/pilots/flow_matching_5task_hammer_first_100real_100pseudo/flow_matching_5task_hammer_first_100real_100pseudo_seed0/stage_2_faucet-close-v3/data_task_2.npy",
+      "data_sha256": "b56b93222202e37c9feafcfd9fd332999314c5fe598747f86e44ce200e858a6e",
+      "bc_target_clip_fraction": 0.0
+    }
+  },
+  "splits": {
+    "hammer-v3": {
+      "train_ids": [
+        2,
+        21,
+        17,
+        29,
+        49,
+        48,
+        16,
+        15,
+        41,
+        5,
+        33,
+        39,
+        40,
+        1,
+        31,
+        26,
+        36,
+        11,
+        35,
+        6,
+        27,
+        24,
+        34,
+        23,
+        43,
+        19,
+        47,
+        45,
+        25,
+        30,
+        4,
+        13,
+        12,
+        14,
+        9,
+        10,
+        38,
+        32,
+        0,
+        20
+      ],
+      "validation_ids": [
+        37,
+        42,
+        3,
+        8,
+        22,
+        46,
+        44,
+        18,
+        7,
+        28
+      ],
+      "trajectories": 50,
+      "train_samples": 8000,
+      "validation_samples": 2000
+    },
+    "button-press-v3": {
+      "train_ids": [
+        8,
+        2,
+        47,
+        20,
+        37,
+        42,
+        5,
+        19,
+        1,
+        17,
+        6,
+        13,
+        7,
+        25,
+        45,
+        28,
+        40,
+        43,
+        29,
+        9,
+        14,
+        23,
+        12,
+        31,
+        11,
+        3,
+        41,
+        38,
+        32,
+        48,
+        21,
+        39,
+        4,
+        33,
+        24,
+        26,
+        16,
+        46,
+        49,
+        10
+      ],
+      "validation_ids": [
+        15,
+        35,
+        0,
+        44,
+        36,
+        34,
+        27,
+        18,
+        30,
+        22
+      ],
+      "trajectories": 50,
+      "train_samples": 8000,
+      "validation_samples": 2000
+    },
+    "faucet-close-v3": {
+      "train_ids": [
+        11,
+        10,
+        74,
+        1,
+        84,
+        64,
+        8,
+        86,
+        95,
+        80,
+        29,
+        90,
+        55,
+        73,
+        41,
+        61,
+        26,
+        51,
+        97,
+        31,
+        33,
+        15,
+        78,
+        59,
+        69,
+        12,
+        83,
+        4,
+        91,
+        87,
+        13,
+        27,
+        34,
+        36,
+        20,
+        3,
+        24,
+        81,
+        0,
+        89,
+        18,
+        9,
+        37,
+        96,
+        92,
+        21,
+        77,
+        79,
+        48,
+        45,
+        98,
+        28,
+        16,
+        43,
+        99,
+        30,
+        63,
+        57,
+        85,
+        65,
+        19,
+        47,
+        60,
+        35,
+        93,
+        39,
+        17,
+        5,
+        6,
+        32,
+        2,
+        38,
+        76,
+        56,
+        46,
+        7,
+        71,
+        44,
+        53,
+        70
+      ],
+      "validation_ids": [
+        25,
+        94,
+        49,
+        67,
+        82,
+        23,
+        68,
+        75,
+        50,
+        72,
+        14,
+        52,
+        42,
+        62,
+        66,
+        40,
+        54,
+        88,
+        22,
+        58
+      ],
+      "trajectories": 100,
+      "train_samples": 16000,
+      "validation_samples": 4000
+    }
+  },
+  "diffusion_before_state_sha256": null,
+  "flow_matching_before_state_sha256": "b161aad70e09a43fd98889c523760cddad2d69569417f985a8f67818af12d556",
+  "policy_before_state_sha256": "76e78d13ff1e5cbd9fc1eb62f10e158392c9af18651c9d05c6f3fa76eac7b103",
+  "policy_after_state_sha256": "f25e52f283daad8082b65688c98cd42dcf3356d7961f0696c314f7042289f563",
+  "diffusion_checkpoint": null,
+  "diffusion_sha256": null,
+  "flow_matching_checkpoint": "/home/yikai/Documents/Code/Thesis/continual-learning/runs/pilots/flow_matching_5task_hammer_first_100real_100pseudo/flow_matching_5task_hammer_first_100real_100pseudo_seed0/flow_matching_after_task_2_faucet-close-v3.pt",
+  "flow_matching_sha256": "5570e1f7360ff72ee644eb36c8b6562363c5fbac25dfb27e88b634f9b63f9029",
+  "replay_budget": 100,
+  "replay_priority_strategy": "uniform",
+  "replay_allocation": {
+    "hammer-v3": 50,
+    "button-press-v3": 50
+  },
+  "generator_mode": "flow-matching",
+  "generator_checkpoint": "/home/yikai/Documents/Code/Thesis/continual-learning/runs/pilots/flow_matching_5task_hammer_first_100real_100pseudo/flow_matching_5task_hammer_first_100real_100pseudo_seed0/flow_matching_after_task_2_faucet-close-v3.pt",
+  "policy_checkpoint": "/home/yikai/Documents/Code/Thesis/continual-learning/runs/pilots/flow_matching_5task_hammer_first_100real_100pseudo/flow_matching_5task_hammer_first_100real_100pseudo_seed0/general_policy_after_task_2_faucet-close-v3.pt",
+  "policy_sha256": "31f4eb465b6638421d02021c3d08412329104534e8fb5516cb661f09552e3c36",
+  "normalization_mean": [
+    -0.042735613882541656,
+    0.6667332649230957,
+    0.126045823097229,
+    0.8269830346107483,
+    -0.058088820427656174,
+    0.7270330786705017,
+    0.10141979157924652,
+    0.9998682141304016,
+    -0.0006398282712325454,
+    0.0022342600859701633,
+    -0.0001578038209117949,
+    0.06048145145177841,
+    0.1784573644399643,
+    0.027226777747273445,
+    0.24865953624248505,
+    -1.8477347111911513e-05,
+    1.3275039236759767e-06,
+    -1.5540757885901257e-05,
+    -0.03543440252542496,
+    0.2791777551174164,
+    -0.06812228262424469,
+    -0.42566829919815063
+  ],
+  "normalization_scale": [
+    0.09066678583621979,
+    0.08672773838043213,
+    0.024078845977783203,
+    0.21088778972625732,
+    0.11358034610748291,
+    0.08612238615751266,
+    0.02382413111627102,
+    0.0010000000474974513,
+    0.003752823919057846,
+    0.013045057654380798,
+    0.0058471146039664745,
+    0.10350557416677475,
+    0.3061542510986328,
+    0.047658875584602356,
+    0.4369840621948242,
+    0.0010000000474974513,
+    0.0010000000474974513,
+    0.0010000000474974513,
+    0.49837422370910645,
+    0.5478366017341614,
+    0.4633692800998688,
+    0.7440419793128967
+  ],
+  "goal_normalization_mean": [
+    -0.029043108224868774,
+    0.7909590601921082,
+    0.11874999850988388
+  ],
+  "goal_normalization_scale": [
+    0.178272545337677,
+    0.03718436136841774,
+    0.006495190318673849
+  ],
+  "diffusion_losses": null,
+  "flow_matching_losses": {
+    "initial": {
+      "train_loss": 0.9187071025371552,
+      "validation_loss": 0.8856196701526642
+    },
+    "best_epoch": 193,
+    "history": [
+      {
+        "epoch": 1,
+        "train_loss": 0.29178933054208755,
+        "validation_loss": 0.2709802836179733
+      },
+      {
+        "epoch": 2,
+        "train_loss": 0.23742196336388588,
+        "validation_loss": 0.21841062605381012
+      },
+      {
+        "epoch": 3,
+        "train_loss": 0.22363848611712456,
+        "validation_loss": 0.20694426074624062
+      },
+      {
+        "epoch": 4,
+        "train_loss": 0.21275480836629868,
+        "validation_loss": 0.1945246160030365
+      },
+      {
+        "epoch": 5,
+        "train_loss": 0.20171182975172997,
+        "validation_loss": 0.18468856438994408
+      },
+      {
+        "epoch": 6,
+        "train_loss": 0.1974530927836895,
+        "validation_loss": 0.18085500970482826
+      },
+      {
+        "epoch": 7,
+        "train_loss": 0.1903655007481575,
+        "validation_loss": 0.17442124336957932
+      },
+      {
+        "epoch": 8,
+        "train_loss": 0.19049177318811417,
+        "validation_loss": 0.17378728836774826
+      },
+      {
+        "epoch": 9,
+        "train_loss": 0.19329561665654182,
+        "validation_loss": 0.17633892968297005
+      },
+      {
+        "epoch": 10,
+        "train_loss": 0.18325357884168625,
+        "validation_loss": 0.16779746860265732
+      },
+      {
+        "epoch": 11,
+        "train_loss": 0.18071869760751724,
+        "validation_loss": 0.1657199114561081
+      },
+      {
+        "epoch": 12,
+        "train_loss": 0.18200650438666344,
+        "validation_loss": 0.16592992842197418
+      },
+      {
+        "epoch": 13,
+        "train_loss": 0.19018574431538582,
+        "validation_loss": 0.17585884779691696
+      },
+      {
+        "epoch": 14,
+        "train_loss": 0.18467892333865166,
+        "validation_loss": 0.16883763298392296
+      },
+      {
+        "epoch": 15,
+        "train_loss": 0.17790735512971878,
+        "validation_loss": 0.16357510164380074
+      },
+      {
+        "epoch": 16,
+        "train_loss": 0.18058472126722336,
+        "validation_loss": 0.1652124710381031
+      },
+      {
+        "epoch": 17,
+        "train_loss": 0.18088816851377487,
+        "validation_loss": 0.16650184243917465
+      },
+      {
+        "epoch": 18,
+        "train_loss": 0.17701911181211472,
+        "validation_loss": 0.16276638582348824
+      },
+      {
+        "epoch": 19,
+        "train_loss": 0.17236753553152084,
+        "validation_loss": 0.1563175916671753
+      },
+      {
+        "epoch": 20,
+        "train_loss": 0.17430128529667854,
+        "validation_loss": 0.15990212932229042
+      },
+      {
+        "epoch": 21,
+        "train_loss": 0.18047161027789116,
+        "validation_loss": 0.16369860246777534
+      },
+      {
+        "epoch": 22,
+        "train_loss": 0.16945553570985794,
+        "validation_loss": 0.15446148067712784
+      },
+      {
+        "epoch": 23,
+        "train_loss": 0.1737663708627224,
+        "validation_loss": 0.1587514951825142
+      },
+      {
+        "epoch": 24,
+        "train_loss": 0.17055988684296608,
+        "validation_loss": 0.15569235011935234
+      },
+      {
+        "epoch": 25,
+        "train_loss": 0.1758437231183052,
+        "validation_loss": 0.1610882580280304
+      },
+      {
+        "epoch": 26,
+        "train_loss": 0.1722041629254818,
+        "validation_loss": 0.1562800370156765
+      },
+      {
+        "epoch": 27,
+        "train_loss": 0.16982465982437134,
+        "validation_loss": 0.1558319739997387
+      },
+      {
+        "epoch": 28,
+        "train_loss": 0.17431223392486572,
+        "validation_loss": 0.15963232517242432
+      },
+      {
+        "epoch": 29,
+        "train_loss": 0.1647210344672203,
+        "validation_loss": 0.15067357942461967
+      },
+      {
+        "epoch": 30,
+        "train_loss": 0.16808756068348885,
+        "validation_loss": 0.1533013992011547
+      },
+      {
+        "epoch": 31,
+        "train_loss": 0.1669987216591835,
+        "validation_loss": 0.153163131326437
+      },
+      {
+        "epoch": 32,
+        "train_loss": 0.16350916773080826,
+        "validation_loss": 0.15022045373916626
+      },
+      {
+        "epoch": 33,
+        "train_loss": 0.16892927139997482,
+        "validation_loss": 0.15365691483020782
+      },
+      {
+        "epoch": 34,
+        "train_loss": 0.16233838349580765,
+        "validation_loss": 0.14877264574170113
+      },
+      {
+        "epoch": 35,
+        "train_loss": 0.1680179499089718,
+        "validation_loss": 0.155050341039896
+      },
+      {
+        "epoch": 36,
+        "train_loss": 0.1649179384112358,
+        "validation_loss": 0.1519092135131359
+      },
+      {
+        "epoch": 37,
+        "train_loss": 0.16547100245952606,
+        "validation_loss": 0.15110329166054726
+      },
+      {
+        "epoch": 38,
+        "train_loss": 0.16035810112953186,
+        "validation_loss": 0.14620014280080795
+      },
+      {
+        "epoch": 39,
+        "train_loss": 0.16303786635398865,
+        "validation_loss": 0.14905495569109917
+      },
+      {
+        "epoch": 40,
+        "train_loss": 0.1748596802353859,
+        "validation_loss": 0.1618352010846138
+      },
+      {
+        "epoch": 41,
+        "train_loss": 0.163100004196167,
+        "validation_loss": 0.1489197425544262
+      },
+      {
+        "epoch": 42,
+        "train_loss": 0.16546382009983063,
+        "validation_loss": 0.1520482674241066
+      },
+      {
+        "epoch": 43,
+        "train_loss": 0.16506985947489738,
+        "validation_loss": 0.15114518254995346
+      },
+      {
+        "epoch": 44,
+        "train_loss": 0.1592356450855732,
+        "validation_loss": 0.14546546339988708
+      },
+      {
+        "epoch": 45,
+        "train_loss": 0.1610093005001545,
+        "validation_loss": 0.1472008153796196
+      },
+      {
+        "epoch": 46,
+        "train_loss": 0.15966538712382317,
+        "validation_loss": 0.14577702060341835
+      },
+      {
+        "epoch": 47,
+        "train_loss": 0.15677696093916893,
+        "validation_loss": 0.14448678120970726
+      },
+      {
+        "epoch": 48,
+        "train_loss": 0.16633578017354012,
+        "validation_loss": 0.1525377295911312
+      },
+      {
+        "epoch": 49,
+        "train_loss": 0.166567612439394,
+        "validation_loss": 0.15279215201735497
+      },
+      {
+        "epoch": 50,
+        "train_loss": 0.15824395790696144,
+        "validation_loss": 0.1452440731227398
+      },
+      {
+        "epoch": 51,
+        "train_loss": 0.1585630141198635,
+        "validation_loss": 0.14425301179289818
+      },
+      {
+        "epoch": 52,
+        "train_loss": 0.16065063327550888,
+        "validation_loss": 0.14741479977965355
+      },
+      {
+        "epoch": 53,
+        "train_loss": 0.1586618758738041,
+        "validation_loss": 0.1442783996462822
+      },
+      {
+        "epoch": 54,
+        "train_loss": 0.16117742657661438,
+        "validation_loss": 0.14885307848453522
+      },
+      {
+        "epoch": 55,
+        "train_loss": 0.15797559171915054,
+        "validation_loss": 0.1450115330517292
+      },
+      {
+        "epoch": 56,
+        "train_loss": 0.16104957461357117,
+        "validation_loss": 0.1481894552707672
+      },
+      {
+        "epoch": 57,
+        "train_loss": 0.1592944636940956,
+        "validation_loss": 0.14717211201786995
+      },
+      {
+        "epoch": 58,
+        "train_loss": 0.15676119923591614,
+        "validation_loss": 0.14515341073274612
+      },
+      {
+        "epoch": 59,
+        "train_loss": 0.15819324925541878,
+        "validation_loss": 0.14587502926588058
+      },
+      {
+        "epoch": 60,
+        "train_loss": 0.1578703112900257,
+        "validation_loss": 0.14396843314170837
+      },
+      {
+        "epoch": 61,
+        "train_loss": 0.1570398472249508,
+        "validation_loss": 0.14411239326000214
+      },
+      {
+        "epoch": 62,
+        "train_loss": 0.163521870970726,
+        "validation_loss": 0.15105755999684334
+      },
+      {
+        "epoch": 63,
+        "train_loss": 0.1736764945089817,
+        "validation_loss": 0.15939829126000404
+      },
+      {
+        "epoch": 64,
+        "train_loss": 0.16192753612995148,
+        "validation_loss": 0.14755049720406532
+      },
+      {
+        "epoch": 65,
+        "train_loss": 0.1586115024983883,
+        "validation_loss": 0.14519094675779343
+      },
+      {
+        "epoch": 66,
+        "train_loss": 0.15481561422348022,
+        "validation_loss": 0.14156805723905563
+      },
+      {
+        "epoch": 67,
+        "train_loss": 0.1593545414507389,
+        "validation_loss": 0.1456613950431347
+      },
+      {
+        "epoch": 68,
+        "train_loss": 0.15507188066840172,
+        "validation_loss": 0.14165136963129044
+      },
+      {
+        "epoch": 69,
+        "train_loss": 0.15227093920111656,
+        "validation_loss": 0.13954272866249084
+      },
+      {
+        "epoch": 70,
+        "train_loss": 0.15041057020425797,
+        "validation_loss": 0.13751697167754173
+      },
+      {
+        "epoch": 71,
+        "train_loss": 0.1493113674223423,
+        "validation_loss": 0.13694089651107788
+      },
+      {
+        "epoch": 72,
+        "train_loss": 0.15036261826753616,
+        "validation_loss": 0.13693039678037167
+      },
+      {
+        "epoch": 73,
+        "train_loss": 0.154213048517704,
+        "validation_loss": 0.14054163545370102
+      },
+      {
+        "epoch": 74,
+        "train_loss": 0.1556614488363266,
+        "validation_loss": 0.1425347849726677
+      },
+      {
+        "epoch": 75,
+        "train_loss": 0.15527506172657013,
+        "validation_loss": 0.14304852113127708
+      },
+      {
+        "epoch": 76,
+        "train_loss": 0.15024347975850105,
+        "validation_loss": 0.13744479417800903
+      },
+      {
+        "epoch": 77,
+        "train_loss": 0.1531970165669918,
+        "validation_loss": 0.14064383879303932
+      },
+      {
+        "epoch": 78,
+        "train_loss": 0.15701154619455338,
+        "validation_loss": 0.14387347549200058
+      },
+      {
+        "epoch": 79,
+        "train_loss": 0.15245245397090912,
+        "validation_loss": 0.14136729016900063
+      },
+      {
+        "epoch": 80,
+        "train_loss": 0.15268589556217194,
+        "validation_loss": 0.14059795439243317
+      },
+      {
+        "epoch": 81,
+        "train_loss": 0.15234532207250595,
+        "validation_loss": 0.13989000022411346
+      },
+      {
+        "epoch": 82,
+        "train_loss": 0.15435466170310974,
+        "validation_loss": 0.14254392683506012
+      },
+      {
+        "epoch": 83,
+        "train_loss": 0.15223494544625282,
+        "validation_loss": 0.13966376334428787
+      },
+      {
+        "epoch": 84,
+        "train_loss": 0.14678896963596344,
+        "validation_loss": 0.13537722453474998
+      },
+      {
+        "epoch": 85,
+        "train_loss": 0.15803098306059837,
+        "validation_loss": 0.14479127898812294
+      },
+      {
+        "epoch": 86,
+        "train_loss": 0.15830811113119125,
+        "validation_loss": 0.14449628815054893
+      },
+      {
+        "epoch": 87,
+        "train_loss": 0.15476403012871742,
+        "validation_loss": 0.1410306729376316
+      },
+      {
+        "epoch": 88,
+        "train_loss": 0.1527460515499115,
+        "validation_loss": 0.1401612013578415
+      },
+      {
+        "epoch": 89,
+        "train_loss": 0.15376698970794678,
+        "validation_loss": 0.141755111515522
+      },
+      {
+        "epoch": 90,
+        "train_loss": 0.1525067463517189,
+        "validation_loss": 0.14037707448005676
+      },
+      {
+        "epoch": 91,
+        "train_loss": 0.15141216665506363,
+        "validation_loss": 0.1387004852294922
+      },
+      {
+        "epoch": 92,
+        "train_loss": 0.14964623376727104,
+        "validation_loss": 0.1372983157634735
+      },
+      {
+        "epoch": 93,
+        "train_loss": 0.14942244812846184,
+        "validation_loss": 0.13789097592234612
+      },
+      {
+        "epoch": 94,
+        "train_loss": 0.14835036545991898,
+        "validation_loss": 0.13531446270644665
+      },
+      {
+        "epoch": 95,
+        "train_loss": 0.14914709329605103,
+        "validation_loss": 0.13706908002495766
+      },
+      {
+        "epoch": 96,
+        "train_loss": 0.1482957899570465,
+        "validation_loss": 0.13570413179695606
+      },
+      {
+        "epoch": 97,
+        "train_loss": 0.15318573266267776,
+        "validation_loss": 0.1401379257440567
+      },
+      {
+        "epoch": 98,
+        "train_loss": 0.1514250747859478,
+        "validation_loss": 0.13745533302426338
+      },
+      {
+        "epoch": 99,
+        "train_loss": 0.15034816786646843,
+        "validation_loss": 0.13844944164156914
+      },
+      {
+        "epoch": 100,
+        "train_loss": 0.14774642884731293,
+        "validation_loss": 0.13586686551570892
+      },
+      {
+        "epoch": 101,
+        "train_loss": 0.14848992973566055,
+        "validation_loss": 0.13629604503512383
+      },
+      {
+        "epoch": 102,
+        "train_loss": 0.14523470029234886,
+        "validation_loss": 0.1340107750147581
+      },
+      {
+        "epoch": 103,
+        "train_loss": 0.14774365350604057,
+        "validation_loss": 0.1357580590993166
+      },
+      {
+        "epoch": 104,
+        "train_loss": 0.15360979735851288,
+        "validation_loss": 0.14099837839603424
+      },
+      {
+        "epoch": 105,
+        "train_loss": 0.15168052911758423,
+        "validation_loss": 0.13887610286474228
+      },
+      {
+        "epoch": 106,
+        "train_loss": 0.14896991103887558,
+        "validation_loss": 0.1360492743551731
+      },
+      {
+        "epoch": 107,
+        "train_loss": 0.15189533680677414,
+        "validation_loss": 0.14015141129493713
+      },
+      {
+        "epoch": 108,
+        "train_loss": 0.14784932509064674,
+        "validation_loss": 0.13604298792779446
+      },
+      {
+        "epoch": 109,
+        "train_loss": 0.1462029218673706,
+        "validation_loss": 0.13462326675653458
+      },
+      {
+        "epoch": 110,
+        "train_loss": 0.14818449318408966,
+        "validation_loss": 0.1370040774345398
+      },
+      {
+        "epoch": 111,
+        "train_loss": 0.1448543444275856,
+        "validation_loss": 0.13365965895354748
+      },
+      {
+        "epoch": 112,
+        "train_loss": 0.1435701809823513,
+        "validation_loss": 0.1310156174004078
+      },
+      {
+        "epoch": 113,
+        "train_loss": 0.14717333018779755,
+        "validation_loss": 0.13480865024030209
+      },
+      {
+        "epoch": 114,
+        "train_loss": 0.15171777084469795,
+        "validation_loss": 0.13883986696600914
+      },
+      {
+        "epoch": 115,
+        "train_loss": 0.1445319838821888,
+        "validation_loss": 0.13412744365632534
+      },
+      {
+        "epoch": 116,
+        "train_loss": 0.14642343297600746,
+        "validation_loss": 0.13342093862593174
+      },
+      {
+        "epoch": 117,
+        "train_loss": 0.1477329209446907,
+        "validation_loss": 0.13582303561270237
+      },
+      {
+        "epoch": 118,
+        "train_loss": 0.15788425877690315,
+        "validation_loss": 0.14496061950922012
+      },
+      {
+        "epoch": 119,
+        "train_loss": 0.14371655881404877,
+        "validation_loss": 0.13172930106520653
+      },
+      {
+        "epoch": 120,
+        "train_loss": 0.14434385672211647,
+        "validation_loss": 0.1319409217685461
+      },
+      {
+        "epoch": 121,
+        "train_loss": 0.14880595728754997,
+        "validation_loss": 0.13604162447154522
+      },
+      {
+        "epoch": 122,
+        "train_loss": 0.14615780860185623,
+        "validation_loss": 0.1326553374528885
+      },
+      {
+        "epoch": 123,
+        "train_loss": 0.1496131345629692,
+        "validation_loss": 0.13717884197831154
+      },
+      {
+        "epoch": 124,
+        "train_loss": 0.14402003586292267,
+        "validation_loss": 0.1329688485711813
+      },
+      {
+        "epoch": 125,
+        "train_loss": 0.14385421201586723,
+        "validation_loss": 0.13219935819506645
+      },
+      {
+        "epoch": 126,
+        "train_loss": 0.14081041142344475,
+        "validation_loss": 0.12841813825070858
+      },
+      {
+        "epoch": 127,
+        "train_loss": 0.1463441401720047,
+        "validation_loss": 0.13392720557749271
+      },
+      {
+        "epoch": 128,
+        "train_loss": 0.1445435881614685,
+        "validation_loss": 0.13311473466455936
+      },
+      {
+        "epoch": 129,
+        "train_loss": 0.142155010253191,
+        "validation_loss": 0.13002902455627918
+      },
+      {
+        "epoch": 130,
+        "train_loss": 0.1448664292693138,
+        "validation_loss": 0.13387220911681652
+      },
+      {
+        "epoch": 131,
+        "train_loss": 0.1489698402583599,
+        "validation_loss": 0.13615870848298073
+      },
+      {
+        "epoch": 132,
+        "train_loss": 0.14331713691353798,
+        "validation_loss": 0.13089297898113728
+      },
+      {
+        "epoch": 133,
+        "train_loss": 0.14470070973038673,
+        "validation_loss": 0.13256915472447872
+      },
+      {
+        "epoch": 134,
+        "train_loss": 0.14295681938529015,
+        "validation_loss": 0.1316439900547266
+      },
+      {
+        "epoch": 135,
+        "train_loss": 0.14160596579313278,
+        "validation_loss": 0.12958571687340736
+      },
+      {
+        "epoch": 136,
+        "train_loss": 0.1426536738872528,
+        "validation_loss": 0.13061732985079288
+      },
+      {
+        "epoch": 137,
+        "train_loss": 0.14349501207470894,
+        "validation_loss": 0.13252517767250538
+      },
+      {
+        "epoch": 138,
+        "train_loss": 0.14328904449939728,
+        "validation_loss": 0.13194664940238
+      },
+      {
+        "epoch": 139,
+        "train_loss": 0.14295068383216858,
+        "validation_loss": 0.13141214475035667
+      },
+      {
+        "epoch": 140,
+        "train_loss": 0.14425082877278328,
+        "validation_loss": 0.13165821693837643
+      },
+      {
+        "epoch": 141,
+        "train_loss": 0.1441468559205532,
+        "validation_loss": 0.13220661506056786
+      },
+      {
+        "epoch": 142,
+        "train_loss": 0.1442788541316986,
+        "validation_loss": 0.133973253890872
+      },
+      {
+        "epoch": 143,
+        "train_loss": 0.14136066287755966,
+        "validation_loss": 0.1299463901668787
+      },
+      {
+        "epoch": 144,
+        "train_loss": 0.14103912189602852,
+        "validation_loss": 0.12999974936246872
+      },
+      {
+        "epoch": 145,
+        "train_loss": 0.14251795038580894,
+        "validation_loss": 0.13051199913024902
+      },
+      {
+        "epoch": 146,
+        "train_loss": 0.14559650793671608,
+        "validation_loss": 0.1340159084647894
+      },
+      {
+        "epoch": 147,
+        "train_loss": 0.14253341779112816,
+        "validation_loss": 0.13118906877934933
+      },
+      {
+        "epoch": 148,
+        "train_loss": 0.14133576303720474,
+        "validation_loss": 0.12984999269247055
+      },
+      {
+        "epoch": 149,
+        "train_loss": 0.14384330809116364,
+        "validation_loss": 0.13143949955701828
+      },
+      {
+        "epoch": 150,
+        "train_loss": 0.14758893102407455,
+        "validation_loss": 0.13575866632163525
+      },
+      {
+        "epoch": 151,
+        "train_loss": 0.14032447710633278,
+        "validation_loss": 0.1286824867129326
+      },
+      {
+        "epoch": 152,
+        "train_loss": 0.14549441263079643,
+        "validation_loss": 0.132942708209157
+      },
+      {
+        "epoch": 153,
+        "train_loss": 0.142560675740242,
+        "validation_loss": 0.13047689013183117
+      },
+      {
+        "epoch": 154,
+        "train_loss": 0.14615915715694427,
+        "validation_loss": 0.13311313465237617
+      },
+      {
+        "epoch": 155,
+        "train_loss": 0.14217165485024452,
+        "validation_loss": 0.130259208381176
+      },
+      {
+        "epoch": 156,
+        "train_loss": 0.14095434918999672,
+        "validation_loss": 0.13062965869903564
+      },
+      {
+        "epoch": 157,
+        "train_loss": 0.14660786464810371,
+        "validation_loss": 0.13362095318734646
+      },
+      {
+        "epoch": 158,
+        "train_loss": 0.1405760645866394,
+        "validation_loss": 0.12804715894162655
+      },
+      {
+        "epoch": 159,
+        "train_loss": 0.14102691039443016,
+        "validation_loss": 0.12918393313884735
+      },
+      {
+        "epoch": 160,
+        "train_loss": 0.14365006983280182,
+        "validation_loss": 0.13225872442126274
+      },
+      {
+        "epoch": 161,
+        "train_loss": 0.14518487825989723,
+        "validation_loss": 0.1328481137752533
+      },
+      {
+        "epoch": 162,
+        "train_loss": 0.14370707795023918,
+        "validation_loss": 0.13135984912514687
+      },
+      {
+        "epoch": 163,
+        "train_loss": 0.145646620541811,
+        "validation_loss": 0.13517373986542225
+      },
+      {
+        "epoch": 164,
+        "train_loss": 0.1375112496316433,
+        "validation_loss": 0.12615606002509594
+      },
+      {
+        "epoch": 165,
+        "train_loss": 0.14251737296581268,
+        "validation_loss": 0.1304081343114376
+      },
+      {
+        "epoch": 166,
+        "train_loss": 0.138530395925045,
+        "validation_loss": 0.1272364053875208
+      },
+      {
+        "epoch": 167,
+        "train_loss": 0.13766825944185257,
+        "validation_loss": 0.12652691639959812
+      },
+      {
+        "epoch": 168,
+        "train_loss": 0.14771966263651848,
+        "validation_loss": 0.1347763705998659
+      },
+      {
+        "epoch": 169,
+        "train_loss": 0.13848427310585976,
+        "validation_loss": 0.1266357023268938
+      },
+      {
+        "epoch": 170,
+        "train_loss": 0.13984988257288933,
+        "validation_loss": 0.12904129922389984
+      },
+      {
+        "epoch": 171,
+        "train_loss": 0.1390371099114418,
+        "validation_loss": 0.12869280762970448
+      },
+      {
+        "epoch": 172,
+        "train_loss": 0.14665129035711288,
+        "validation_loss": 0.13587083108723164
+      },
+      {
+        "epoch": 173,
+        "train_loss": 0.13927308842539787,
+        "validation_loss": 0.12757998332381248
+      },
+      {
+        "epoch": 174,
+        "train_loss": 0.13865185901522636,
+        "validation_loss": 0.12675275467336178
+      },
+      {
+        "epoch": 175,
+        "train_loss": 0.14649080857634544,
+        "validation_loss": 0.13319678977131844
+      },
+      {
+        "epoch": 176,
+        "train_loss": 0.14431658759713173,
+        "validation_loss": 0.13397692702710629
+      },
+      {
+        "epoch": 177,
+        "train_loss": 0.1377466917037964,
+        "validation_loss": 0.12631303258240223
+      },
+      {
+        "epoch": 178,
+        "train_loss": 0.13777084276080132,
+        "validation_loss": 0.12657282687723637
+      },
+      {
+        "epoch": 179,
+        "train_loss": 0.13626478239893913,
+        "validation_loss": 0.12584528140723705
+      },
+      {
+        "epoch": 180,
+        "train_loss": 0.13685305044054985,
+        "validation_loss": 0.12567522749304771
+      },
+      {
+        "epoch": 181,
+        "train_loss": 0.1367150843143463,
+        "validation_loss": 0.12659753672778606
+      },
+      {
+        "epoch": 182,
+        "train_loss": 0.13955459743738174,
+        "validation_loss": 0.1276385672390461
+      },
+      {
+        "epoch": 183,
+        "train_loss": 0.1410266011953354,
+        "validation_loss": 0.12983055226504803
+      },
+      {
+        "epoch": 184,
+        "train_loss": 0.14000369235873222,
+        "validation_loss": 0.12884024158120155
+      },
+      {
+        "epoch": 185,
+        "train_loss": 0.142787154763937,
+        "validation_loss": 0.13038129918277264
+      },
+      {
+        "epoch": 186,
+        "train_loss": 0.1368439421057701,
+        "validation_loss": 0.1262932363897562
+      },
+      {
+        "epoch": 187,
+        "train_loss": 0.13806384056806564,
+        "validation_loss": 0.12660020776093006
+      },
+      {
+        "epoch": 188,
+        "train_loss": 0.13843099400401115,
+        "validation_loss": 0.12719651125371456
+      },
+      {
+        "epoch": 189,
+        "train_loss": 0.1389586143195629,
+        "validation_loss": 0.12806658260524273
+      },
+      {
+        "epoch": 190,
+        "train_loss": 0.13732505589723587,
+        "validation_loss": 0.1260410025715828
+      },
+      {
+        "epoch": 191,
+        "train_loss": 0.13848545029759407,
+        "validation_loss": 0.12753468193113804
+      },
+      {
+        "epoch": 192,
+        "train_loss": 0.1355016827583313,
+        "validation_loss": 0.12483139336109161
+      },
+      {
+        "epoch": 193,
+        "train_loss": 0.13390725664794445,
+        "validation_loss": 0.12360892444849014
+      },
+      {
+        "epoch": 194,
+        "train_loss": 0.13418718799948692,
+        "validation_loss": 0.12372961267828941
+      },
+      {
+        "epoch": 195,
+        "train_loss": 0.13660475984215736,
+        "validation_loss": 0.12514393590390682
+      },
+      {
+        "epoch": 196,
+        "train_loss": 0.13538355007767677,
+        "validation_loss": 0.12450655363500118
+      },
+      {
+        "epoch": 197,
+        "train_loss": 0.1401161141693592,
+        "validation_loss": 0.1284858025610447
+      },
+      {
+        "epoch": 198,
+        "train_loss": 0.14347518980503082,
+        "validation_loss": 0.12981987372040749
+      },
+      {
+        "epoch": 199,
+        "train_loss": 0.140934806317091,
+        "validation_loss": 0.13041465170681477
+      },
+      {
+        "epoch": 200,
+        "train_loss": 0.1459716260433197,
+        "validation_loss": 0.13241913355886936
+      }
+    ],
+    "train_loss": 0.13390725664794445,
+    "validation_loss": 0.12360892444849014
+  },
+  "bc_losses": {
+    "initial": {
+      "train_loss": 0.7135390639305115,
+      "validation_loss": 0.6875826120376587,
+      "train_action_mse": 0.7135390639305115,
+      "validation_action_mse": 0.6875826120376587
+    },
+    "best_epoch": 77,
+    "train_loss": 0.013999133370816708,
+    "validation_loss": 0.018664037808775902,
+    "train_action_mse": 0.013999133370816708,
+    "validation_action_mse": 0.018664037808775902,
+    "history": [
+      {
+        "epoch": 1,
+        "train_loss": 0.051006726920604706,
+        "validation_loss": 0.05846979096531868,
+        "train_action_mse": 0.051006726920604706,
+        "validation_action_mse": 0.05846979096531868
+      },
+      {
+        "epoch": 2,
+        "train_loss": 0.037407923489809036,
+        "validation_loss": 0.04137115180492401,
+        "train_action_mse": 0.037407923489809036,
+        "validation_action_mse": 0.04137115180492401
+      },
+      {
+        "epoch": 3,
+        "train_loss": 0.032768476754426956,
+        "validation_loss": 0.039136115461587906,
+        "train_action_mse": 0.032768476754426956,
+        "validation_action_mse": 0.039136115461587906
+      },
+      {
+        "epoch": 4,
+        "train_loss": 0.03161822259426117,
+        "validation_loss": 0.03680621087551117,
+        "train_action_mse": 0.03161822259426117,
+        "validation_action_mse": 0.03680621087551117
+      },
+      {
+        "epoch": 5,
+        "train_loss": 0.027335599064826965,
+        "validation_loss": 0.03365767002105713,
+        "train_action_mse": 0.027335599064826965,
+        "validation_action_mse": 0.03365767002105713
+      },
+      {
+        "epoch": 6,
+        "train_loss": 0.02582969330251217,
+        "validation_loss": 0.030484484508633614,
+        "train_action_mse": 0.02582969330251217,
+        "validation_action_mse": 0.030484484508633614
+      },
+      {
+        "epoch": 7,
+        "train_loss": 0.038156867027282715,
+        "validation_loss": 0.043321989476680756,
+        "train_action_mse": 0.038156867027282715,
+        "validation_action_mse": 0.043321989476680756
+      },
+      {
+        "epoch": 8,
+        "train_loss": 0.02379736304283142,
+        "validation_loss": 0.029513968154788017,
+        "train_action_mse": 0.02379736304283142,
+        "validation_action_mse": 0.029513968154788017
+      },
+      {
+        "epoch": 9,
+        "train_loss": 0.026295173913240433,
+        "validation_loss": 0.03249409794807434,
+        "train_action_mse": 0.026295173913240433,
+        "validation_action_mse": 0.03249409794807434
+      },
+      {
+        "epoch": 10,
+        "train_loss": 0.022785229608416557,
+        "validation_loss": 0.028123315423727036,
+        "train_action_mse": 0.022785229608416557,
+        "validation_action_mse": 0.028123315423727036
+      },
+      {
+        "epoch": 11,
+        "train_loss": 0.022220490500330925,
+        "validation_loss": 0.02752373367547989,
+        "train_action_mse": 0.022220490500330925,
+        "validation_action_mse": 0.02752373367547989
+      },
+      {
+        "epoch": 12,
+        "train_loss": 0.025048671290278435,
+        "validation_loss": 0.02919122204184532,
+        "train_action_mse": 0.025048671290278435,
+        "validation_action_mse": 0.02919122204184532
+      },
+      {
+        "epoch": 13,
+        "train_loss": 0.021944906562566757,
+        "validation_loss": 0.02745066024363041,
+        "train_action_mse": 0.021944906562566757,
+        "validation_action_mse": 0.02745066024363041
+      },
+      {
+        "epoch": 14,
+        "train_loss": 0.023979898542165756,
+        "validation_loss": 0.02792995795607567,
+        "train_action_mse": 0.023979898542165756,
+        "validation_action_mse": 0.02792995795607567
+      },
+      {
+        "epoch": 15,
+        "train_loss": 0.024437084794044495,
+        "validation_loss": 0.03018874116241932,
+        "train_action_mse": 0.024437084794044495,
+        "validation_action_mse": 0.03018874116241932
+      },
+      {
+        "epoch": 16,
+        "train_loss": 0.02121085301041603,
+        "validation_loss": 0.025131577625870705,
+        "train_action_mse": 0.02121085301041603,
+        "validation_action_mse": 0.025131577625870705
+      },
+      {
+        "epoch": 17,
+        "train_loss": 0.0209847092628479,
+        "validation_loss": 0.0255262590944767,
+        "train_action_mse": 0.0209847092628479,
+        "validation_action_mse": 0.0255262590944767
+      },
+      {
+        "epoch": 18,
+        "train_loss": 0.020414136350154877,
+        "validation_loss": 0.02606058679521084,
+        "train_action_mse": 0.020414136350154877,
+        "validation_action_mse": 0.02606058679521084
+      },
+      {
+        "epoch": 19,
+        "train_loss": 0.01917976513504982,
+        "validation_loss": 0.023933373391628265,
+        "train_action_mse": 0.01917976513504982,
+        "validation_action_mse": 0.023933373391628265
+      },
+      {
+        "epoch": 20,
+        "train_loss": 0.0198275875300169,
+        "validation_loss": 0.025091780349612236,
+        "train_action_mse": 0.0198275875300169,
+        "validation_action_mse": 0.025091780349612236
+      },
+      {
+        "epoch": 21,
+        "train_loss": 0.019324447959661484,
+        "validation_loss": 0.023991713300347328,
+        "train_action_mse": 0.019324447959661484,
+        "validation_action_mse": 0.023991713300347328
+      },
+      {
+        "epoch": 22,
+        "train_loss": 0.01982152834534645,
+        "validation_loss": 0.02610516920685768,
+        "train_action_mse": 0.01982152834534645,
+        "validation_action_mse": 0.02610516920685768
+      },
+      {
+        "epoch": 23,
+        "train_loss": 0.020727725699543953,
+        "validation_loss": 0.026304764673113823,
+        "train_action_mse": 0.020727725699543953,
+        "validation_action_mse": 0.026304764673113823
+      },
+      {
+        "epoch": 24,
+        "train_loss": 0.01773933693766594,
+        "validation_loss": 0.02296302653849125,
+        "train_action_mse": 0.01773933693766594,
+        "validation_action_mse": 0.02296302653849125
+      },
+      {
+        "epoch": 25,
+        "train_loss": 0.019774094223976135,
+        "validation_loss": 0.025174010545015335,
+        "train_action_mse": 0.019774094223976135,
+        "validation_action_mse": 0.025174010545015335
+      },
+      {
+        "epoch": 26,
+        "train_loss": 0.0225861556828022,
+        "validation_loss": 0.027033276855945587,
+        "train_action_mse": 0.0225861556828022,
+        "validation_action_mse": 0.027033276855945587
+      },
+      {
+        "epoch": 27,
+        "train_loss": 0.0183927733451128,
+        "validation_loss": 0.024012694135308266,
+        "train_action_mse": 0.0183927733451128,
+        "validation_action_mse": 0.024012694135308266
+      },
+      {
+        "epoch": 28,
+        "train_loss": 0.02009280025959015,
+        "validation_loss": 0.02574487030506134,
+        "train_action_mse": 0.02009280025959015,
+        "validation_action_mse": 0.02574487030506134
+      },
+      {
+        "epoch": 29,
+        "train_loss": 0.018458357080817223,
+        "validation_loss": 0.023826928809285164,
+        "train_action_mse": 0.018458357080817223,
+        "validation_action_mse": 0.023826928809285164
+      },
+      {
+        "epoch": 30,
+        "train_loss": 0.017985034734010696,
+        "validation_loss": 0.023963183164596558,
+        "train_action_mse": 0.017985034734010696,
+        "validation_action_mse": 0.023963183164596558
+      },
+      {
+        "epoch": 31,
+        "train_loss": 0.017794910818338394,
+        "validation_loss": 0.02354172058403492,
+        "train_action_mse": 0.017794910818338394,
+        "validation_action_mse": 0.02354172058403492
+      },
+      {
+        "epoch": 32,
+        "train_loss": 0.01831205189228058,
+        "validation_loss": 0.023535357788205147,
+        "train_action_mse": 0.01831205189228058,
+        "validation_action_mse": 0.023535357788205147
+      },
+      {
+        "epoch": 33,
+        "train_loss": 0.0177517831325531,
+        "validation_loss": 0.023056214675307274,
+        "train_action_mse": 0.0177517831325531,
+        "validation_action_mse": 0.023056214675307274
+      },
+      {
+        "epoch": 34,
+        "train_loss": 0.01768234558403492,
+        "validation_loss": 0.021835140883922577,
+        "train_action_mse": 0.01768234558403492,
+        "validation_action_mse": 0.021835140883922577
+      },
+      {
+        "epoch": 35,
+        "train_loss": 0.016463246196508408,
+        "validation_loss": 0.021239811554551125,
+        "train_action_mse": 0.016463246196508408,
+        "validation_action_mse": 0.021239811554551125
+      },
+      {
+        "epoch": 36,
+        "train_loss": 0.018238721415400505,
+        "validation_loss": 0.02206088975071907,
+        "train_action_mse": 0.018238721415400505,
+        "validation_action_mse": 0.02206088975071907
+      },
+      {
+        "epoch": 37,
+        "train_loss": 0.01756882295012474,
+        "validation_loss": 0.02307124435901642,
+        "train_action_mse": 0.01756882295012474,
+        "validation_action_mse": 0.02307124435901642
+      },
+      {
+        "epoch": 38,
+        "train_loss": 0.017295924946665764,
+        "validation_loss": 0.022395698353648186,
+        "train_action_mse": 0.017295924946665764,
+        "validation_action_mse": 0.022395698353648186
+      },
+      {
+        "epoch": 39,
+        "train_loss": 0.017920048907399178,
+        "validation_loss": 0.023448731750249863,
+        "train_action_mse": 0.017920048907399178,
+        "validation_action_mse": 0.023448731750249863
+      },
+      {
+        "epoch": 40,
+        "train_loss": 0.015921223908662796,
+        "validation_loss": 0.02137913927435875,
+        "train_action_mse": 0.015921223908662796,
+        "validation_action_mse": 0.02137913927435875
+      },
+      {
+        "epoch": 41,
+        "train_loss": 0.016514012590050697,
+        "validation_loss": 0.02090447023510933,
+        "train_action_mse": 0.016514012590050697,
+        "validation_action_mse": 0.02090447023510933
+      },
+      {
+        "epoch": 42,
+        "train_loss": 0.018565373495221138,
+        "validation_loss": 0.02399837225675583,
+        "train_action_mse": 0.018565373495221138,
+        "validation_action_mse": 0.02399837225675583
+      },
+      {
+        "epoch": 43,
+        "train_loss": 0.016706543043255806,
+        "validation_loss": 0.021080881357192993,
+        "train_action_mse": 0.016706543043255806,
+        "validation_action_mse": 0.021080881357192993
+      },
+      {
+        "epoch": 44,
+        "train_loss": 0.016507526859641075,
+        "validation_loss": 0.022296937182545662,
+        "train_action_mse": 0.016507526859641075,
+        "validation_action_mse": 0.022296937182545662
+      },
+      {
+        "epoch": 45,
+        "train_loss": 0.016125036403536797,
+        "validation_loss": 0.020694220438599586,
+        "train_action_mse": 0.016125036403536797,
+        "validation_action_mse": 0.020694220438599586
+      },
+      {
+        "epoch": 46,
+        "train_loss": 0.01613258756697178,
+        "validation_loss": 0.021148711442947388,
+        "train_action_mse": 0.01613258756697178,
+        "validation_action_mse": 0.021148711442947388
+      },
+      {
+        "epoch": 47,
+        "train_loss": 0.01727437414228916,
+        "validation_loss": 0.023243047297000885,
+        "train_action_mse": 0.01727437414228916,
+        "validation_action_mse": 0.023243047297000885
+      },
+      {
+        "epoch": 48,
+        "train_loss": 0.01636909507215023,
+        "validation_loss": 0.020364437252283096,
+        "train_action_mse": 0.01636909507215023,
+        "validation_action_mse": 0.020364437252283096
+      },
+      {
+        "epoch": 49,
+        "train_loss": 0.017248371616005898,
+        "validation_loss": 0.0222550667822361,
+        "train_action_mse": 0.017248371616005898,
+        "validation_action_mse": 0.0222550667822361
+      },
+      {
+        "epoch": 50,
+        "train_loss": 0.01764686033129692,
+        "validation_loss": 0.022644128650426865,
+        "train_action_mse": 0.01764686033129692,
+        "validation_action_mse": 0.022644128650426865
+      },
+      {
+        "epoch": 51,
+        "train_loss": 0.01613100804388523,
+        "validation_loss": 0.02121839113533497,
+        "train_action_mse": 0.01613100804388523,
+        "validation_action_mse": 0.02121839113533497
+      },
+      {
+        "epoch": 52,
+        "train_loss": 0.016308939084410667,
+        "validation_loss": 0.020794358104467392,
+        "train_action_mse": 0.016308939084410667,
+        "validation_action_mse": 0.020794358104467392
+      },
+      {
+        "epoch": 53,
+        "train_loss": 0.017200132831931114,
+        "validation_loss": 0.023280473425984383,
+        "train_action_mse": 0.017200132831931114,
+        "validation_action_mse": 0.023280473425984383
+      },
+      {
+        "epoch": 54,
+        "train_loss": 0.01612459309399128,
+        "validation_loss": 0.02173398807644844,
+        "train_action_mse": 0.01612459309399128,
+        "validation_action_mse": 0.02173398807644844
+      },
+      {
+        "epoch": 55,
+        "train_loss": 0.016947003081440926,
+        "validation_loss": 0.022312168031930923,
+        "train_action_mse": 0.016947003081440926,
+        "validation_action_mse": 0.022312168031930923
+      },
+      {
+        "epoch": 56,
+        "train_loss": 0.015773223713040352,
+        "validation_loss": 0.02032669074833393,
+        "train_action_mse": 0.015773223713040352,
+        "validation_action_mse": 0.02032669074833393
+      },
+      {
+        "epoch": 57,
+        "train_loss": 0.015914222225546837,
+        "validation_loss": 0.021447183564305305,
+        "train_action_mse": 0.015914222225546837,
+        "validation_action_mse": 0.021447183564305305
+      },
+      {
+        "epoch": 58,
+        "train_loss": 0.015062370337545872,
+        "validation_loss": 0.020705269649624825,
+        "train_action_mse": 0.015062370337545872,
+        "validation_action_mse": 0.020705269649624825
+      },
+      {
+        "epoch": 59,
+        "train_loss": 0.015094025991857052,
+        "validation_loss": 0.019933493807911873,
+        "train_action_mse": 0.015094025991857052,
+        "validation_action_mse": 0.019933493807911873
+      },
+      {
+        "epoch": 60,
+        "train_loss": 0.014589371159672737,
+        "validation_loss": 0.020103314891457558,
+        "train_action_mse": 0.014589371159672737,
+        "validation_action_mse": 0.020103314891457558
+      },
+      {
+        "epoch": 61,
+        "train_loss": 0.018203694373369217,
+        "validation_loss": 0.02099829912185669,
+        "train_action_mse": 0.018203694373369217,
+        "validation_action_mse": 0.02099829912185669
+      },
+      {
+        "epoch": 62,
+        "train_loss": 0.01479366421699524,
+        "validation_loss": 0.019630515947937965,
+        "train_action_mse": 0.01479366421699524,
+        "validation_action_mse": 0.019630515947937965
+      },
+      {
+        "epoch": 63,
+        "train_loss": 0.014568168669939041,
+        "validation_loss": 0.02031291462481022,
+        "train_action_mse": 0.014568168669939041,
+        "validation_action_mse": 0.02031291462481022
+      },
+      {
+        "epoch": 64,
+        "train_loss": 0.015019923448562622,
+        "validation_loss": 0.020150961354374886,
+        "train_action_mse": 0.015019923448562622,
+        "validation_action_mse": 0.020150961354374886
+      },
+      {
+        "epoch": 65,
+        "train_loss": 0.016160426661372185,
+        "validation_loss": 0.021843742579221725,
+        "train_action_mse": 0.016160426661372185,
+        "validation_action_mse": 0.021843742579221725
+      },
+      {
+        "epoch": 66,
+        "train_loss": 0.017470773309469223,
+        "validation_loss": 0.024371139705181122,
+        "train_action_mse": 0.017470773309469223,
+        "validation_action_mse": 0.024371139705181122
+      },
+      {
+        "epoch": 67,
+        "train_loss": 0.015378172509372234,
+        "validation_loss": 0.021170882508158684,
+        "train_action_mse": 0.015378172509372234,
+        "validation_action_mse": 0.021170882508158684
+      },
+      {
+        "epoch": 68,
+        "train_loss": 0.014668518677353859,
+        "validation_loss": 0.019341979175806046,
+        "train_action_mse": 0.014668518677353859,
+        "validation_action_mse": 0.019341979175806046
+      },
+      {
+        "epoch": 69,
+        "train_loss": 0.017517784610390663,
+        "validation_loss": 0.024500876665115356,
+        "train_action_mse": 0.017517784610390663,
+        "validation_action_mse": 0.024500876665115356
+      },
+      {
+        "epoch": 70,
+        "train_loss": 0.015178736299276352,
+        "validation_loss": 0.020793143659830093,
+        "train_action_mse": 0.015178736299276352,
+        "validation_action_mse": 0.020793143659830093
+      },
+      {
+        "epoch": 71,
+        "train_loss": 0.014583381824195385,
+        "validation_loss": 0.02047714777290821,
+        "train_action_mse": 0.014583381824195385,
+        "validation_action_mse": 0.02047714777290821
+      },
+      {
+        "epoch": 72,
+        "train_loss": 0.014750288799405098,
+        "validation_loss": 0.02050323225557804,
+        "train_action_mse": 0.014750288799405098,
+        "validation_action_mse": 0.02050323225557804
+      },
+      {
+        "epoch": 73,
+        "train_loss": 0.0149679658934474,
+        "validation_loss": 0.02042568288743496,
+        "train_action_mse": 0.0149679658934474,
+        "validation_action_mse": 0.02042568288743496
+      },
+      {
+        "epoch": 74,
+        "train_loss": 0.014585945755243301,
+        "validation_loss": 0.02019350603222847,
+        "train_action_mse": 0.014585945755243301,
+        "validation_action_mse": 0.02019350603222847
+      },
+      {
+        "epoch": 75,
+        "train_loss": 0.014039162546396255,
+        "validation_loss": 0.019498851150274277,
+        "train_action_mse": 0.014039162546396255,
+        "validation_action_mse": 0.019498851150274277
+      },
+      {
+        "epoch": 76,
+        "train_loss": 0.014908391050994396,
+        "validation_loss": 0.019775593653321266,
+        "train_action_mse": 0.014908391050994396,
+        "validation_action_mse": 0.019775593653321266
+      },
+      {
+        "epoch": 77,
+        "train_loss": 0.013999133370816708,
+        "validation_loss": 0.018664037808775902,
+        "train_action_mse": 0.013999133370816708,
+        "validation_action_mse": 0.018664037808775902
+      },
+      {
+        "epoch": 78,
+        "train_loss": 0.014678931795060635,
+        "validation_loss": 0.01976490393280983,
+        "train_action_mse": 0.014678931795060635,
+        "validation_action_mse": 0.01976490393280983
+      },
+      {
+        "epoch": 79,
+        "train_loss": 0.01387949287891388,
+        "validation_loss": 0.02014860138297081,
+        "train_action_mse": 0.01387949287891388,
+        "validation_action_mse": 0.02014860138297081
+      },
+      {
+        "epoch": 80,
+        "train_loss": 0.016680102795362473,
+        "validation_loss": 0.021675409749150276,
+        "train_action_mse": 0.016680102795362473,
+        "validation_action_mse": 0.021675409749150276
+      },
+      {
+        "epoch": 81,
+        "train_loss": 0.014774764887988567,
+        "validation_loss": 0.020445790141820908,
+        "train_action_mse": 0.014774764887988567,
+        "validation_action_mse": 0.020445790141820908
+      },
+      {
+        "epoch": 82,
+        "train_loss": 0.01540633849799633,
+        "validation_loss": 0.02093341015279293,
+        "train_action_mse": 0.01540633849799633,
+        "validation_action_mse": 0.02093341015279293
+      },
+      {
+        "epoch": 83,
+        "train_loss": 0.015054658055305481,
+        "validation_loss": 0.01977544091641903,
+        "train_action_mse": 0.015054658055305481,
+        "validation_action_mse": 0.01977544091641903
+      },
+      {
+        "epoch": 84,
+        "train_loss": 0.013949285261332989,
+        "validation_loss": 0.018794964998960495,
+        "train_action_mse": 0.013949285261332989,
+        "validation_action_mse": 0.018794964998960495
+      },
+      {
+        "epoch": 85,
+        "train_loss": 0.015271804295480251,
+        "validation_loss": 0.019333491101861,
+        "train_action_mse": 0.015271804295480251,
+        "validation_action_mse": 0.019333491101861
+      },
+      {
+        "epoch": 86,
+        "train_loss": 0.013842197135090828,
+        "validation_loss": 0.018698198720812798,
+        "train_action_mse": 0.013842197135090828,
+        "validation_action_mse": 0.018698198720812798
+      },
+      {
+        "epoch": 87,
+        "train_loss": 0.013988652266561985,
+        "validation_loss": 0.019297834485769272,
+        "train_action_mse": 0.013988652266561985,
+        "validation_action_mse": 0.019297834485769272
+      },
+      {
+        "epoch": 88,
+        "train_loss": 0.01540977880358696,
+        "validation_loss": 0.02158481813967228,
+        "train_action_mse": 0.01540977880358696,
+        "validation_action_mse": 0.02158481813967228
+      },
+      {
+        "epoch": 89,
+        "train_loss": 0.01370110921561718,
+        "validation_loss": 0.019239114597439766,
+        "train_action_mse": 0.01370110921561718,
+        "validation_action_mse": 0.019239114597439766
+      },
+      {
+        "epoch": 90,
+        "train_loss": 0.014157220721244812,
+        "validation_loss": 0.02025417983531952,
+        "train_action_mse": 0.014157220721244812,
+        "validation_action_mse": 0.02025417983531952
+      },
+      {
+        "epoch": 91,
+        "train_loss": 0.014046875759959221,
+        "validation_loss": 0.0201274361461401,
+        "train_action_mse": 0.014046875759959221,
+        "validation_action_mse": 0.0201274361461401
+      },
+      {
+        "epoch": 92,
+        "train_loss": 0.01454143412411213,
+        "validation_loss": 0.019112499430775642,
+        "train_action_mse": 0.01454143412411213,
+        "validation_action_mse": 0.019112499430775642
+      },
+      {
+        "epoch": 93,
+        "train_loss": 0.013976053334772587,
+        "validation_loss": 0.019800791516900063,
+        "train_action_mse": 0.013976053334772587,
+        "validation_action_mse": 0.019800791516900063
+      },
+      {
+        "epoch": 94,
+        "train_loss": 0.014269298873841763,
+        "validation_loss": 0.019198691472411156,
+        "train_action_mse": 0.014269298873841763,
+        "validation_action_mse": 0.019198691472411156
+      },
+      {
+        "epoch": 95,
+        "train_loss": 0.015772417187690735,
+        "validation_loss": 0.02088535763323307,
+        "train_action_mse": 0.015772417187690735,
+        "validation_action_mse": 0.02088535763323307
+      },
+      {
+        "epoch": 96,
+        "train_loss": 0.014038406312465668,
+        "validation_loss": 0.01969422958791256,
+        "train_action_mse": 0.014038406312465668,
+        "validation_action_mse": 0.01969422958791256
+      },
+      {
+        "epoch": 97,
+        "train_loss": 0.01578795164823532,
+        "validation_loss": 0.019429169595241547,
+        "train_action_mse": 0.01578795164823532,
+        "validation_action_mse": 0.019429169595241547
+      },
+      {
+        "epoch": 98,
+        "train_loss": 0.014253311790525913,
+        "validation_loss": 0.01934347115457058,
+        "train_action_mse": 0.014253311790525913,
+        "validation_action_mse": 0.01934347115457058
+      },
+      {
+        "epoch": 99,
+        "train_loss": 0.0139048146083951,
+        "validation_loss": 0.018968898802995682,
+        "train_action_mse": 0.0139048146083951,
+        "validation_action_mse": 0.018968898802995682
+      },
+      {
+        "epoch": 100,
+        "train_loss": 0.013999785296618938,
+        "validation_loss": 0.01937219686806202,
+        "train_action_mse": 0.013999785296618938,
+        "validation_action_mse": 0.01937219686806202
+      }
+    ]
+  },
+  "generator_training_seconds": 226.0498981339988,
+  "nan_count": 0,
+  "inf_count": 0,
+  "generated_success": null,
+  "action_targets_modified": false
+}

@@ -1,0 +1,27 @@
+{
+  "schema_version": 1,
+  "stage": 2,
+  "task": "faucet-close-v3",
+  "artifacts": {
+    "policy": {
+      "path": "general_policy_after_task_2_faucet-close-v3.pt",
+      "sha256": "7b375112917e0707d1567147744803af70c424713eb39e974488927b5e0ef388"
+    },
+    "stage_state": {
+      "path": "stage_state_after_task_2_faucet-close-v3.pt",
+      "sha256": "5ce6d9dcfc05965224509cb909758fbd2b8c6d1f7a6c05c3c3b3aca3ac2c9fb9"
+    },
+    "report": {
+      "path": "stage_2_faucet-close-v3/report.json",
+      "sha256": "6d01fbe370ee69ca1d9851623c5b576467040534147568dc66285da406878f56"
+    },
+    "evaluation_matrix": {
+      "path": "stage_2_faucet-close-v3/evaluation_matrix.json",
+      "sha256": "7d5d70abd1e943f0ed29704c1e0083919de34a68aec08d38b54fe2f8f510bc07"
+    },
+    "flow_matching": {
+      "path": "flow_matching_after_task_2_faucet-close-v3.pt",
+      "sha256": "5b02f78400124a050000dd3ca8cd92ea7ff5ed7e33e89409a46119f89f38b4cf"
+    }
+  }
+}

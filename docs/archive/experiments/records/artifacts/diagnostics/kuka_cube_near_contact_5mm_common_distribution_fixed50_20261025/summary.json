@@ -1,0 +1,16 @@
+{
+  "tasks": 50,
+  "valid": 50,
+  "gap_m": {
+    "min": 0.004988388146323305,
+    "mean": 0.004996346502009737,
+    "max": 0.005003488837260304
+  },
+  "contact_acquisition": 50,
+  "mean_steps_to_contact": 38.6,
+  "maximum_cube_displacement_m": 0.00014499761164188385,
+  "maximum_cube_tilt_rad": 0.004048800712483693,
+  "workspace_clips": 0,
+  "minimum_y_margin_m": 0.0029296875,
+  "minimum_z_margin_m": 0.0
+}

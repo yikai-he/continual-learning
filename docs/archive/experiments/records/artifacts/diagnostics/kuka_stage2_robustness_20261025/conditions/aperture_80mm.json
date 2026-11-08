@@ -1,0 +1,2288 @@
+{
+  "episodes": [
+    {
+      "initial": {
+        "aperture": 0.08161688717626822,
+        "contact_alignment": 0.999998631957497,
+        "contact_height": 0.01249397305739041,
+        "cube_angular_speed": 0.0,
+        "cube_angular_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "cube_linear_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "cube_planar_speed": 0.0,
+        "cube_table_contact": true,
+        "cube_tilt": 0.002388535089253105,
+        "finite": true,
+        "gripper_table_contact": false,
+        "history_max_abs_difference": 0.02925419807434082,
+        "joint_limit_violations": [],
+        "joint_limits_valid": true,
+        "max_penetration": 0.0009560604973399761,
+        "tcp_forward_offset": -0.06884649781140023,
+        "tcp_lateral_offset": -0.00015280485412846303,
+        "tcp_mocap_error": 0.012102207291517645,
+        "tcp_speed": 0.0,
+        "tcp_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "tcp_vertical_offset": 0.03118317946791649,
+        "tcp_world_z": 0.05109855532646179,
+        "valid_rear_contact": true
+      },
+      "invalid_reasons": [
+        "penetration_above_0.5mm"
+      ],
+      "physical_valid": false,
+      "reset_seed": 10000,
+      "task_index": 0
+    },
+    {
+      "initial": {
+        "aperture": 0.08162898610062796,
+        "contact_alignment": 0.9999979876827201,
+        "contact_height": 0.012571697114161923,
+        "cube_angular_speed": 0.0,
+        "cube_angular_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "cube_linear_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "cube_planar_speed": 0.0,
+        "cube_table_contact": true,
+        "cube_tilt": 0.001910464063000041,
+        "finite": true,
+        "gripper_table_contact": false,
+        "history_max_abs_difference": 0.029459118843078613,
+        "joint_limit_violations": [],
+        "joint_limits_valid": true,
+        "max_penetration": 0.0008844818983561813,
+        "tcp_forward_offset": -0.06887018145824918,
+        "tcp_lateral_offset": -6.97009141492052e-05,
+        "tcp_mocap_error": 0.012166758129791863,
+        "tcp_speed": 0.0,
+        "tcp_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "tcp_vertical_offset": 0.03125824220478535,
+        "tcp_world_z": 0.05116322264075279,
+        "valid_rear_contact": true
+      },
+      "invalid_reasons": [
+        "penetration_above_0.5mm"
+      ],
+      "physical_valid": false,
+      "reset_seed": 10001,
+      "task_index": 1
+    },
+    {
+      "initial": {
+        "aperture": 0.08159396649347607,
+        "contact_alignment": 0.9999972108381887,
+        "contact_height": 0.012526814326777526,
+        "cube_angular_speed": 0.0,
+        "cube_angular_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "cube_linear_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "cube_planar_speed": 0.0,
+        "cube_table_contact": true,
+        "cube_tilt": 0.002151587316596449,
+        "finite": true,
+        "gripper_table_contact": false,
+        "history_max_abs_difference": 0.029578447341918945,
+        "joint_limit_violations": [],
+        "joint_limits_valid": true,
+        "max_penetration": 0.0009273683869152202,
+        "tcp_forward_offset": -0.0688569251549227,
+        "tcp_lateral_offset": -6.399409481937473e-05,
+        "tcp_mocap_error": 0.012122211226237961,
+        "tcp_speed": 0.0,
+        "tcp_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "tcp_vertical_offset": 0.03121146559715271,
+        "tcp_world_z": 0.051118407398462296,
+        "valid_rear_contact": true
+      },
+      "invalid_reasons": [
+        "penetration_above_0.5mm"
+      ],
+      "physical_valid": false,
+      "reset_seed": 10002,
+      "task_index": 2
+    },
+    {
+      "initial": {
+        "aperture": 0.08157364618317801,
+        "contact_alignment": 0.0,
+        "contact_height": 0.0,
+        "cube_angular_speed": 0.0,
+        "cube_angular_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "cube_linear_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "cube_planar_speed": 0.0,
+        "cube_table_contact": true,
+        "cube_tilt": 0.003986058199495323,
+        "finite": true,
+        "gripper_table_contact": false,
+        "history_max_abs_difference": 0.030156314373016357,
+        "joint_limit_violations": [],
+        "joint_limits_valid": true,
+        "max_penetration": 0.0009293570521400796,
+        "tcp_forward_offset": -0.0688504278751524,
+        "tcp_lateral_offset": -0.00022614430601518125,
+        "tcp_mocap_error": 0.012120168119352962,
+        "tcp_speed": 0.0,
+        "tcp_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "tcp_vertical_offset": 0.031190544366836548,
+        "tcp_world_z": 0.05111680179834366,
+        "valid_rear_contact": false
+      },
+      "invalid_reasons": [
+        "penetration_above_0.5mm"
+      ],
+      "physical_valid": false,
+      "reset_seed": 10003,
+      "task_index": 3
+    },
+    {
+      "initial": {
+        "aperture": 0.08157011793112182,
+        "contact_alignment": 0.0,
+        "contact_height": 0.0,
+        "cube_angular_speed": 0.0,
+        "cube_angular_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "cube_linear_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "cube_planar_speed": 0.0,
+        "cube_table_contact": true,
+        "cube_tilt": 0.0034384021157717825,
+        "finite": true,
+        "gripper_table_contact": false,
+        "history_max_abs_difference": 0.030175864696502686,
+        "joint_limit_violations": [],
+        "joint_limits_valid": true,
+        "max_penetration": 0.000914878828244644,
+        "tcp_forward_offset": -0.06883763984837103,
+        "tcp_lateral_offset": -0.0002036377561402524,
+        "tcp_mocap_error": 0.012154657151730357,
+        "tcp_speed": 0.0,
+        "tcp_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "tcp_vertical_offset": 0.03121122159063816,
+        "tcp_world_z": 0.05115141719579697,
+        "valid_rear_contact": false
+      },
+      "invalid_reasons": [
+        "penetration_above_0.5mm"
+      ],
+      "physical_valid": false,
+      "reset_seed": 10004,
+      "task_index": 4
+    },
+    {
+      "initial": {
+        "aperture": 0.08162208810610738,
+        "contact_alignment": 0.9999969988436958,
+        "contact_height": 0.012558736600101643,
+        "cube_angular_speed": 0.0,
+        "cube_angular_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "cube_linear_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "cube_planar_speed": 0.0,
+        "cube_table_contact": true,
+        "cube_tilt": 0.001947842804549208,
+        "finite": true,
+        "gripper_table_contact": false,
+        "history_max_abs_difference": 0.02956557273864746,
+        "joint_limit_violations": [],
+        "joint_limits_valid": true,
+        "max_penetration": 0.000899868658812058,
+        "tcp_forward_offset": -0.06885487221702995,
+        "tcp_lateral_offset": 0.0001512551027313957,
+        "tcp_mocap_error": 0.012154294443658294,
+        "tcp_speed": 0.0,
+        "tcp_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "tcp_vertical_offset": 0.03124399110674858,
+        "tcp_world_z": 0.05115044116973877,
+        "valid_rear_contact": true
+      },
+      "invalid_reasons": [
+        "penetration_above_0.5mm"
+      ],
+      "physical_valid": false,
+      "reset_seed": 10005,
+      "task_index": 5
+    },
+    {
+      "initial": {
+        "aperture": 0.08159346628750762,
+        "contact_alignment": 0.0,
+        "contact_height": 0.0,
+        "cube_angular_speed": 0.0,
+        "cube_angular_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "cube_linear_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "cube_planar_speed": 0.0,
+        "cube_table_contact": true,
+        "cube_tilt": 0.0012400440386648463,
+        "finite": true,
+        "gripper_table_contact": false,
+        "history_max_abs_difference": 0.030406415462493896,
+        "joint_limit_violations": [],
+        "joint_limits_valid": true,
+        "max_penetration": 0.0009151230363257434,
+        "tcp_forward_offset": -0.06886301705512382,
+        "tcp_lateral_offset": 0.00012259903676523017,
+        "tcp_mocap_error": 0.012119718422843604,
+        "tcp_speed": 0.0,
+        "tcp_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "tcp_vertical_offset": 0.031241832301020622,
+        "tcp_world_z": 0.05111619830131531,
+        "valid_rear_contact": false
+      },
+      "invalid_reasons": [
+        "penetration_above_0.5mm"
+      ],
+      "physical_valid": false,
+      "reset_seed": 10006,
+      "task_index": 6
+    },
+    {
+      "initial": {
+        "aperture": 0.08160808607372624,
+        "contact_alignment": 0.0,
+        "contact_height": 0.0,
+        "cube_angular_speed": 0.0,
+        "cube_angular_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "cube_linear_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "cube_planar_speed": 0.0,
+        "cube_table_contact": true,
+        "cube_tilt": 0.0023669081288428804,
+        "finite": true,
+        "gripper_table_contact": false,
+        "history_max_abs_difference": 0.028816521167755127,
+        "joint_limit_violations": [],
+        "joint_limits_valid": true,
+        "max_penetration": 0.0009242563785550284,
+        "tcp_forward_offset": -0.06885886539696115,
+        "tcp_lateral_offset": -0.00017164950784456087,
+        "tcp_mocap_error": 0.012166790897504581,
+        "tcp_speed": 0.0,
+        "tcp_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "tcp_vertical_offset": 0.03121829777956009,
+        "tcp_world_z": 0.05116339027881622,
+        "valid_rear_contact": false
+      },
+      "invalid_reasons": [
+        "penetration_above_0.5mm"
+      ],
+      "physical_valid": false,
+      "reset_seed": 10007,
+      "task_index": 7
+    },
+    {
+      "initial": {
+        "aperture": 0.08158310968174089,
+        "contact_alignment": 0.0,
+        "contact_height": 0.0,
+        "cube_angular_speed": 0.0,
+        "cube_angular_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "cube_linear_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "cube_planar_speed": 0.0,
+        "cube_table_contact": true,
+        "cube_tilt": 0.00407484347613213,
+        "finite": true,
+        "gripper_table_contact": false,
+        "history_max_abs_difference": 0.02958613634109497,
+        "joint_limit_violations": [],
+        "joint_limits_valid": true,
+        "max_penetration": 0.0009320037636803335,
+        "tcp_forward_offset": -0.0688599156589638,
+        "tcp_lateral_offset": 0.0001538641634134781,
+        "tcp_mocap_error": 0.01210926505135961,
+        "tcp_speed": 0.0,
+        "tcp_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "tcp_vertical_offset": 0.0311856921762228,
+        "tcp_world_z": 0.05110599845647812,
+        "valid_rear_contact": false
+      },
+      "invalid_reasons": [
+        "penetration_above_0.5mm"
+      ],
+      "physical_valid": false,
+      "reset_seed": 10008,
+      "task_index": 8
+    },
+    {
+      "initial": {
+        "aperture": 0.0815878101515652,
+        "contact_alignment": 0.0,
+        "contact_height": 0.0,
+        "cube_angular_speed": 0.0,
+        "cube_angular_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "cube_linear_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "cube_planar_speed": 0.0,
+        "cube_table_contact": true,
+        "cube_tilt": 0.0026312449400237273,
+        "finite": true,
+        "gripper_table_contact": false,
+        "history_max_abs_difference": 0.029887378215789795,
+        "joint_limit_violations": [],
+        "joint_limits_valid": true,
+        "max_penetration": 0.0009246943356069815,
+        "tcp_forward_offset": -0.06883919209407631,
+        "tcp_lateral_offset": -0.0001895877745995706,
+        "tcp_mocap_error": 0.012160911994865693,
+        "tcp_speed": 0.0,
+        "tcp_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "tcp_vertical_offset": 0.031217843294143677,
+        "tcp_world_z": 0.05115750804543495,
+        "valid_rear_contact": false
+      },
+      "invalid_reasons": [
+        "penetration_above_0.5mm"
+      ],
+      "physical_valid": false,
+      "reset_seed": 10009,
+      "task_index": 9
+    },
+    {
+      "initial": {
+        "aperture": 0.08160836919549615,
+        "contact_alignment": 0.0,
+        "contact_height": 0.0,
+        "cube_angular_speed": 0.0,
+        "cube_angular_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "cube_linear_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "cube_planar_speed": 0.0,
+        "cube_table_contact": true,
+        "cube_tilt": 0.002010999971311781,
+        "finite": true,
+        "gripper_table_contact": false,
+        "history_max_abs_difference": 0.028670549392700195,
+        "joint_limit_violations": [],
+        "joint_limits_valid": true,
+        "max_penetration": 0.0009334249282419122,
+        "tcp_forward_offset": -0.06887332705811941,
+        "tcp_lateral_offset": 0.00025246241731883456,
+        "tcp_mocap_error": 0.012097773930685172,
+        "tcp_speed": 0.0,
+        "tcp_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "tcp_vertical_offset": 0.031209083274006844,
+        "tcp_world_z": 0.051094360649585724,
+        "valid_rear_contact": false
+      },
+      "invalid_reasons": [
+        "penetration_above_0.5mm"
+      ],
+      "physical_valid": false,
+      "reset_seed": 10010,
+      "task_index": 10
+    },
+    {
+      "initial": {
+        "aperture": 0.08163262480236798,
+        "contact_alignment": 0.9999987737278935,
+        "contact_height": 0.0125279923619293,
+        "cube_angular_speed": 0.0,
+        "cube_angular_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "cube_linear_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "cube_planar_speed": 0.0,
+        "cube_table_contact": true,
+        "cube_tilt": 0.0009069721460836906,
+        "finite": true,
+        "gripper_table_contact": false,
+        "history_max_abs_difference": 0.02855062484741211,
+        "joint_limit_violations": [],
+        "joint_limits_valid": true,
+        "max_penetration": 0.0009512798273808307,
+        "tcp_forward_offset": -0.06886245892039045,
+        "tcp_lateral_offset": 0.00014659664362000238,
+        "tcp_mocap_error": 0.01210029824037701,
+        "tcp_speed": 0.0,
+        "tcp_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "tcp_vertical_offset": 0.03121343068778515,
+        "tcp_world_z": 0.05109664052724838,
+        "valid_rear_contact": true
+      },
+      "invalid_reasons": [
+        "penetration_above_0.5mm"
+      ],
+      "physical_valid": false,
+      "reset_seed": 10011,
+      "task_index": 11
+    },
+    {
+      "initial": {
+        "aperture": 0.08161079396524992,
+        "contact_alignment": 0.0,
+        "contact_height": 0.0,
+        "cube_angular_speed": 0.0,
+        "cube_angular_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "cube_linear_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "cube_planar_speed": 0.0,
+        "cube_table_contact": true,
+        "cube_tilt": 0.002838932222198314,
+        "finite": true,
+        "gripper_table_contact": false,
+        "history_max_abs_difference": 0.030066847801208496,
+        "joint_limit_violations": [],
+        "joint_limits_valid": true,
+        "max_penetration": 0.0009537041240165556,
+        "tcp_forward_offset": -0.06886074162586817,
+        "tcp_lateral_offset": 0.0001459832461534891,
+        "tcp_mocap_error": 0.012128935408960205,
+        "tcp_speed": 0.0,
+        "tcp_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "tcp_vertical_offset": 0.031182290986180305,
+        "tcp_world_z": 0.051125504076480865,
+        "valid_rear_contact": false
+      },
+      "invalid_reasons": [
+        "penetration_above_0.5mm"
+      ],
+      "physical_valid": false,
+      "reset_seed": 10012,
+      "task_index": 12
+    },
+    {
+      "initial": {
+        "aperture": 0.08157810375182538,
+        "contact_alignment": 0.0,
+        "contact_height": 0.0,
+        "cube_angular_speed": 0.0,
+        "cube_angular_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "cube_linear_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "cube_planar_speed": 0.0,
+        "cube_table_contact": true,
+        "cube_tilt": 0.0027859630374811777,
+        "finite": true,
+        "gripper_table_contact": false,
+        "history_max_abs_difference": 0.02909684181213379,
+        "joint_limit_violations": [],
+        "joint_limits_valid": true,
+        "max_penetration": 0.0009337513404886383,
+        "tcp_forward_offset": -0.06883808309774667,
+        "tcp_lateral_offset": -9.563371722020738e-05,
+        "tcp_mocap_error": 0.01211773193036477,
+        "tcp_speed": 0.0,
+        "tcp_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "tcp_vertical_offset": 0.0311997402459383,
+        "tcp_world_z": 0.051114387810230255,
+        "valid_rear_contact": false
+      },
+      "invalid_reasons": [
+        "penetration_above_0.5mm"
+      ],
+      "physical_valid": false,
+      "reset_seed": 10013,
+      "task_index": 13
+    },
+    {
+      "initial": {
+        "aperture": 0.08158776247343544,
+        "contact_alignment": 0.0,
+        "contact_height": 0.0,
+        "cube_angular_speed": 0.0,
+        "cube_angular_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "cube_linear_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "cube_planar_speed": 0.0,
+        "cube_table_contact": true,
+        "cube_tilt": 0.003936744296147709,
+        "finite": true,
+        "gripper_table_contact": false,
+        "history_max_abs_difference": 0.029047667980194092,
+        "joint_limit_violations": [],
+        "joint_limits_valid": true,
+        "max_penetration": 0.0008994165569020784,
+        "tcp_forward_offset": -0.06886360193869424,
+        "tcp_lateral_offset": 0.00018655305208674052,
+        "tcp_mocap_error": 0.012153025100229085,
+        "tcp_speed": 0.0,
+        "tcp_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "tcp_vertical_offset": 0.03122161515057087,
+        "tcp_world_z": 0.05114980787038803,
+        "valid_rear_contact": false
+      },
+      "invalid_reasons": [
+        "penetration_above_0.5mm"
+      ],
+      "physical_valid": false,
+      "reset_seed": 10014,
+      "task_index": 14
+    },
+    {
+      "initial": {
+        "aperture": 0.08162998769310649,
+        "contact_alignment": 0.9999974808255623,
+        "contact_height": 0.012521662549806606,
+        "cube_angular_speed": 0.0,
+        "cube_angular_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "cube_linear_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "cube_planar_speed": 0.0,
+        "cube_table_contact": true,
+        "cube_tilt": 0.0024802694646748804,
+        "finite": true,
+        "gripper_table_contact": false,
+        "history_max_abs_difference": 0.02927100658416748,
+        "joint_limit_violations": [],
+        "joint_limits_valid": true,
+        "max_penetration": 0.0009245781106746099,
+        "tcp_forward_offset": -0.06887267631828517,
+        "tcp_lateral_offset": -0.00017339019695930828,
+        "tcp_mocap_error": 0.012107808045026397,
+        "tcp_speed": 0.0,
+        "tcp_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "tcp_vertical_offset": 0.031207453459501266,
+        "tcp_world_z": 0.05110430344939232,
+        "valid_rear_contact": true
+      },
+      "invalid_reasons": [
+        "penetration_above_0.5mm"
+      ],
+      "physical_valid": false,
+      "reset_seed": 10015,
+      "task_index": 15
+    },
+    {
+      "initial": {
+        "aperture": 0.08163194839903518,
+        "contact_alignment": 0.9999972372972106,
+        "contact_height": 0.012518288633328815,
+        "cube_angular_speed": 0.0,
+        "cube_angular_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "cube_linear_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "cube_planar_speed": 0.0,
+        "cube_table_contact": true,
+        "cube_tilt": 0.0015838381008152894,
+        "finite": true,
+        "gripper_table_contact": false,
+        "history_max_abs_difference": 0.030065298080444336,
+        "joint_limit_violations": [],
+        "joint_limits_valid": true,
+        "max_penetration": 0.0009478298008180228,
+        "tcp_forward_offset": -0.06886862278365379,
+        "tcp_lateral_offset": -0.00023599742097183074,
+        "tcp_mocap_error": 0.012107821607447658,
+        "tcp_speed": 0.0,
+        "tcp_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "tcp_vertical_offset": 0.03120032511651516,
+        "tcp_world_z": 0.051104143261909485,
+        "valid_rear_contact": true
+      },
+      "invalid_reasons": [
+        "penetration_above_0.5mm"
+      ],
+      "physical_valid": false,
+      "reset_seed": 10016,
+      "task_index": 16
+    },
+    {
+      "initial": {
+        "aperture": 0.0815884327398887,
+        "contact_alignment": 0.9999983775874477,
+        "contact_height": 0.012498909827732302,
+        "cube_angular_speed": 0.0,
+        "cube_angular_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "cube_linear_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "cube_planar_speed": 0.0,
+        "cube_table_contact": true,
+        "cube_tilt": 0.002744031441559292,
+        "finite": true,
+        "gripper_table_contact": false,
+        "history_max_abs_difference": 0.030015170574188232,
+        "joint_limit_violations": [],
+        "joint_limits_valid": true,
+        "max_penetration": 0.0009541118737520873,
+        "tcp_forward_offset": -0.06882893166079057,
+        "tcp_lateral_offset": 0.00016730717119927503,
+        "tcp_mocap_error": 0.012123237167389308,
+        "tcp_speed": 0.0,
+        "tcp_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "tcp_vertical_offset": 0.031185602769255638,
+        "tcp_world_z": 0.051119860261678696,
+        "valid_rear_contact": true
+      },
+      "invalid_reasons": [
+        "penetration_above_0.5mm"
+      ],
+      "physical_valid": false,
+      "reset_seed": 10017,
+      "task_index": 17
+    },
+    {
+      "initial": {
+        "aperture": 0.08160043607521025,
+        "contact_alignment": 0.0,
+        "contact_height": 0.0,
+        "cube_angular_speed": 0.0,
+        "cube_angular_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "cube_linear_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "cube_planar_speed": 0.0,
+        "cube_table_contact": true,
+        "cube_tilt": 0.0022598787303181518,
+        "finite": true,
+        "gripper_table_contact": false,
+        "history_max_abs_difference": 0.029933452606201172,
+        "joint_limit_violations": [],
+        "joint_limits_valid": true,
+        "max_penetration": 0.000933302723897348,
+        "tcp_forward_offset": -0.0688560469137433,
+        "tcp_lateral_offset": -0.000174415818914408,
+        "tcp_mocap_error": 0.012113553972129966,
+        "tcp_speed": 0.0,
+        "tcp_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "tcp_vertical_offset": 0.031204432249069214,
+        "tcp_world_z": 0.05111022666096687,
+        "valid_rear_contact": false
+      },
+      "invalid_reasons": [
+        "penetration_above_0.5mm"
+      ],
+      "physical_valid": false,
+      "reset_seed": 10018,
+      "task_index": 18
+    },
+    {
+      "initial": {
+        "aperture": 0.08160027388634616,
+        "contact_alignment": 0.0,
+        "contact_height": 0.0,
+        "cube_angular_speed": 0.0,
+        "cube_angular_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "cube_linear_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "cube_planar_speed": 0.0,
+        "cube_table_contact": true,
+        "cube_tilt": 0.002617392739456517,
+        "finite": true,
+        "gripper_table_contact": false,
+        "history_max_abs_difference": 0.02830129861831665,
+        "joint_limit_violations": [],
+        "joint_limits_valid": true,
+        "max_penetration": 0.0009381953446734707,
+        "tcp_forward_offset": -0.06886349638855445,
+        "tcp_lateral_offset": 0.0003198164293223184,
+        "tcp_mocap_error": 0.01210082086035132,
+        "tcp_speed": 0.0,
+        "tcp_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "tcp_vertical_offset": 0.0311947762966156,
+        "tcp_world_z": 0.051097236573696136,
+        "valid_rear_contact": false
+      },
+      "invalid_reasons": [
+        "penetration_above_0.5mm"
+      ],
+      "physical_valid": false,
+      "reset_seed": 10019,
+      "task_index": 19
+    },
+    {
+      "initial": {
+        "aperture": 0.08160751504285252,
+        "contact_alignment": 0.9999986567747654,
+        "contact_height": 0.0125531049925788,
+        "cube_angular_speed": 0.0,
+        "cube_angular_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "cube_linear_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "cube_planar_speed": 0.0,
+        "cube_table_contact": true,
+        "cube_tilt": 0.0012417366503016147,
+        "finite": true,
+        "gripper_table_contact": false,
+        "history_max_abs_difference": 0.030246973037719727,
+        "joint_limit_violations": [],
+        "joint_limits_valid": true,
+        "max_penetration": 0.0009196097479816968,
+        "tcp_forward_offset": -0.06886706102456504,
+        "tcp_lateral_offset": -0.0001157088938751684,
+        "tcp_mocap_error": 0.012107566013163427,
+        "tcp_speed": 0.0,
+        "tcp_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "tcp_vertical_offset": 0.031237643212080002,
+        "tcp_world_z": 0.05110403522849083,
+        "valid_rear_contact": true
+      },
+      "invalid_reasons": [
+        "penetration_above_0.5mm"
+      ],
+      "physical_valid": false,
+      "reset_seed": 10020,
+      "task_index": 20
+    },
+    {
+      "initial": {
+        "aperture": 0.0816168877211513,
+        "contact_alignment": 0.9999980795238965,
+        "contact_height": 0.012497952603090792,
+        "cube_angular_speed": 0.0,
+        "cube_angular_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "cube_linear_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "cube_planar_speed": 0.0,
+        "cube_table_contact": true,
+        "cube_tilt": 0.0012442318583352951,
+        "finite": true,
+        "gripper_table_contact": false,
+        "history_max_abs_difference": 0.02965080738067627,
+        "joint_limit_violations": [],
+        "joint_limits_valid": true,
+        "max_penetration": 0.000974890788169104,
+        "tcp_forward_offset": -0.06886899136569374,
+        "tcp_lateral_offset": 0.00021584934909425047,
+        "tcp_mocap_error": 0.012089094251180531,
+        "tcp_speed": 0.0,
+        "tcp_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "tcp_vertical_offset": 0.03118067979812622,
+        "tcp_world_z": 0.05108525976538658,
+        "valid_rear_contact": true
+      },
+      "invalid_reasons": [
+        "penetration_above_0.5mm"
+      ],
+      "physical_valid": false,
+      "reset_seed": 10021,
+      "task_index": 21
+    },
+    {
+      "initial": {
+        "aperture": 0.08161961321682865,
+        "contact_alignment": 0.9999980677930954,
+        "contact_height": 0.012545838031744132,
+        "cube_angular_speed": 0.0,
+        "cube_angular_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "cube_linear_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "cube_planar_speed": 0.0,
+        "cube_table_contact": true,
+        "cube_tilt": 0.0013898534384702357,
+        "finite": true,
+        "gripper_table_contact": false,
+        "history_max_abs_difference": 0.0284920334815979,
+        "joint_limit_violations": [],
+        "joint_limits_valid": true,
+        "max_penetration": 0.0009239536832980179,
+        "tcp_forward_offset": -0.06886496208914261,
+        "tcp_lateral_offset": -0.00013857549415862653,
+        "tcp_mocap_error": 0.012140602276271506,
+        "tcp_speed": 0.0,
+        "tcp_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "tcp_vertical_offset": 0.031230174005031586,
+        "tcp_world_z": 0.05113702639937401,
+        "valid_rear_contact": true
+      },
+      "invalid_reasons": [
+        "penetration_above_0.5mm"
+      ],
+      "physical_valid": false,
+      "reset_seed": 10022,
+      "task_index": 22
+    },
+    {
+      "initial": {
+        "aperture": 0.08159266726499835,
+        "contact_alignment": 0.0,
+        "contact_height": 0.0,
+        "cube_angular_speed": 0.0,
+        "cube_angular_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "cube_linear_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "cube_planar_speed": 0.0,
+        "cube_table_contact": true,
+        "cube_tilt": 0.002527113161469197,
+        "finite": true,
+        "gripper_table_contact": false,
+        "history_max_abs_difference": 0.030421674251556396,
+        "joint_limit_violations": [],
+        "joint_limits_valid": true,
+        "max_penetration": 0.0009338335988862593,
+        "tcp_forward_offset": -0.06884562529640799,
+        "tcp_lateral_offset": -6.878232452990152e-05,
+        "tcp_mocap_error": 0.01213566669217038,
+        "tcp_speed": 0.0,
+        "tcp_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "tcp_vertical_offset": 0.03120550885796547,
+        "tcp_world_z": 0.05113235488533974,
+        "valid_rear_contact": false
+      },
+      "invalid_reasons": [
+        "penetration_above_0.5mm"
+      ],
+      "physical_valid": false,
+      "reset_seed": 10023,
+      "task_index": 23
+    },
+    {
+      "initial": {
+        "aperture": 0.08160332123450342,
+        "contact_alignment": 0.9999972510799651,
+        "contact_height": 0.012550627176036305,
+        "cube_angular_speed": 0.0,
+        "cube_angular_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "cube_linear_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "cube_planar_speed": 0.0,
+        "cube_table_contact": true,
+        "cube_tilt": 0.002111472342195301,
+        "finite": true,
+        "gripper_table_contact": false,
+        "history_max_abs_difference": 0.0297548770904541,
+        "joint_limit_violations": [],
+        "joint_limits_valid": true,
+        "max_penetration": 0.0009009260991400217,
+        "tcp_forward_offset": -0.06884515900776189,
+        "tcp_lateral_offset": -0.00016643734372569577,
+        "tcp_mocap_error": 0.012145722549431161,
+        "tcp_speed": 0.0,
+        "tcp_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "tcp_vertical_offset": 0.031245214864611626,
+        "tcp_world_z": 0.05114223062992096,
+        "valid_rear_contact": true
+      },
+      "invalid_reasons": [
+        "penetration_above_0.5mm"
+      ],
+      "physical_valid": false,
+      "reset_seed": 10024,
+      "task_index": 24
+    },
+    {
+      "initial": {
+        "aperture": 0.08161386899263276,
+        "contact_alignment": 0.9999963478466433,
+        "contact_height": 0.012532976798688512,
+        "cube_angular_speed": 0.0,
+        "cube_angular_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "cube_linear_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "cube_planar_speed": 0.0,
+        "cube_table_contact": true,
+        "cube_tilt": 0.0026581141350360106,
+        "finite": true,
+        "gripper_table_contact": false,
+        "history_max_abs_difference": 0.028659462928771973,
+        "joint_limit_violations": [],
+        "joint_limits_valid": true,
+        "max_penetration": 0.0009088732905149662,
+        "tcp_forward_offset": -0.06886778378922971,
+        "tcp_lateral_offset": -0.00018991042911432144,
+        "tcp_mocap_error": 0.012115840703724949,
+        "tcp_speed": 0.0,
+        "tcp_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "tcp_vertical_offset": 0.03121909685432911,
+        "tcp_world_z": 0.05111221596598625,
+        "valid_rear_contact": true
+      },
+      "invalid_reasons": [
+        "penetration_above_0.5mm"
+      ],
+      "physical_valid": false,
+      "reset_seed": 10025,
+      "task_index": 25
+    },
+    {
+      "initial": {
+        "aperture": 0.08160864258237828,
+        "contact_alignment": 0.0,
+        "contact_height": 0.0,
+        "cube_angular_speed": 0.0,
+        "cube_angular_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "cube_linear_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "cube_planar_speed": 0.0,
+        "cube_table_contact": true,
+        "cube_tilt": 0.00201736197627345,
+        "finite": true,
+        "gripper_table_contact": false,
+        "history_max_abs_difference": 0.02986729145050049,
+        "joint_limit_violations": [],
+        "joint_limits_valid": true,
+        "max_penetration": 0.0009178184850773761,
+        "tcp_forward_offset": -0.06885491341744958,
+        "tcp_lateral_offset": -0.00010140687412892531,
+        "tcp_mocap_error": 0.012146402923549258,
+        "tcp_speed": 0.0,
+        "tcp_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "tcp_vertical_offset": 0.031230274587869644,
+        "tcp_world_z": 0.05114321783185005,
+        "valid_rear_contact": false
+      },
+      "invalid_reasons": [
+        "penetration_above_0.5mm"
+      ],
+      "physical_valid": false,
+      "reset_seed": 10026,
+      "task_index": 26
+    },
+    {
+      "initial": {
+        "aperture": 0.0815555415092879,
+        "contact_alignment": 0.0,
+        "contact_height": 0.0,
+        "cube_angular_speed": 0.0,
+        "cube_angular_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "cube_linear_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "cube_planar_speed": 0.0,
+        "cube_table_contact": true,
+        "cube_tilt": 0.0030957560232683316,
+        "finite": true,
+        "gripper_table_contact": false,
+        "history_max_abs_difference": 0.030777573585510254,
+        "joint_limit_violations": [],
+        "joint_limits_valid": true,
+        "max_penetration": 0.0009202729307874843,
+        "tcp_forward_offset": -0.06882918170685111,
+        "tcp_lateral_offset": 0.00015741840998244165,
+        "tcp_mocap_error": 0.012130606272812382,
+        "tcp_speed": 0.0,
+        "tcp_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "tcp_vertical_offset": 0.031214766204357147,
+        "tcp_world_z": 0.0511271134018898,
+        "valid_rear_contact": false
+      },
+      "invalid_reasons": [
+        "penetration_above_0.5mm"
+      ],
+      "physical_valid": false,
+      "reset_seed": 10027,
+      "task_index": 27
+    },
+    {
+      "initial": {
+        "aperture": 0.08163100546235043,
+        "contact_alignment": 0.9999979772230322,
+        "contact_height": 0.012557346596911545,
+        "cube_angular_speed": 0.0,
+        "cube_angular_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "cube_linear_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "cube_planar_speed": 0.0,
+        "cube_table_contact": true,
+        "cube_tilt": 0.0009909864768426848,
+        "finite": true,
+        "gripper_table_contact": false,
+        "history_max_abs_difference": 0.02849632501602173,
+        "joint_limit_violations": [],
+        "joint_limits_valid": true,
+        "max_penetration": 0.0009200102405506701,
+        "tcp_forward_offset": -0.06886171436649191,
+        "tcp_lateral_offset": 0.00013470514053792623,
+        "tcp_mocap_error": 0.012161031244962607,
+        "tcp_speed": 0.0,
+        "tcp_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "tcp_vertical_offset": 0.03124096989631653,
+        "tcp_world_z": 0.05115736275911331,
+        "valid_rear_contact": true
+      },
+      "invalid_reasons": [
+        "penetration_above_0.5mm"
+      ],
+      "physical_valid": false,
+      "reset_seed": 10028,
+      "task_index": 28
+    },
+    {
+      "initial": {
+        "aperture": 0.08161360889523056,
+        "contact_alignment": 0.9999982747224806,
+        "contact_height": 0.012508027147682052,
+        "cube_angular_speed": 0.0,
+        "cube_angular_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "cube_linear_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "cube_planar_speed": 0.0,
+        "cube_table_contact": true,
+        "cube_tilt": 0.002642341781931676,
+        "finite": true,
+        "gripper_table_contact": false,
+        "history_max_abs_difference": 0.029430627822875977,
+        "joint_limit_violations": [],
+        "joint_limits_valid": true,
+        "max_penetration": 0.0009419627052015954,
+        "tcp_forward_offset": -0.06885364123412774,
+        "tcp_lateral_offset": 0.0001570903034061094,
+        "tcp_mocap_error": 0.012113813323759126,
+        "tcp_speed": 0.0,
+        "tcp_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "tcp_vertical_offset": 0.031192228198051453,
+        "tcp_world_z": 0.051110319793224335,
+        "valid_rear_contact": true
+      },
+      "invalid_reasons": [
+        "penetration_above_0.5mm"
+      ],
+      "physical_valid": false,
+      "reset_seed": 10029,
+      "task_index": 29
+    },
+    {
+      "initial": {
+        "aperture": 0.0816128846368006,
+        "contact_alignment": 0.9999975383579003,
+        "contact_height": 0.012516278281909085,
+        "cube_angular_speed": 0.0,
+        "cube_angular_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "cube_linear_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "cube_planar_speed": 0.0,
+        "cube_table_contact": true,
+        "cube_tilt": 0.0021243572420738856,
+        "finite": true,
+        "gripper_table_contact": false,
+        "history_max_abs_difference": 0.0296747088432312,
+        "joint_limit_violations": [],
+        "joint_limits_valid": true,
+        "max_penetration": 0.0009359617420597697,
+        "tcp_forward_offset": -0.06885625180371512,
+        "tcp_lateral_offset": -0.00014216726237534715,
+        "tcp_mocap_error": 0.012111184560380846,
+        "tcp_speed": 0.0,
+        "tcp_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "tcp_vertical_offset": 0.031200719997286797,
+        "tcp_world_z": 0.05110772326588631,
+        "valid_rear_contact": true
+      },
+      "invalid_reasons": [
+        "penetration_above_0.5mm"
+      ],
+      "physical_valid": false,
+      "reset_seed": 10030,
+      "task_index": 30
+    },
+    {
+      "initial": {
+        "aperture": 0.0816070255979876,
+        "contact_alignment": 0.0,
+        "contact_height": 0.0,
+        "cube_angular_speed": 0.0,
+        "cube_angular_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "cube_linear_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "cube_planar_speed": 0.0,
+        "cube_table_contact": true,
+        "cube_tilt": 0.00188997026168205,
+        "finite": true,
+        "gripper_table_contact": false,
+        "history_max_abs_difference": 0.028776228427886963,
+        "joint_limit_violations": [],
+        "joint_limits_valid": true,
+        "max_penetration": 0.0009341804628325053,
+        "tcp_forward_offset": -0.06885663040778453,
+        "tcp_lateral_offset": 0.00020375649178242894,
+        "tcp_mocap_error": 0.012129321606307183,
+        "tcp_speed": 0.0,
+        "tcp_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "tcp_vertical_offset": 0.031211191788315773,
+        "tcp_world_z": 0.05112602189183235,
+        "valid_rear_contact": false
+      },
+      "invalid_reasons": [
+        "penetration_above_0.5mm"
+      ],
+      "physical_valid": false,
+      "reset_seed": 10031,
+      "task_index": 31
+    },
+    {
+      "initial": {
+        "aperture": 0.08164565044955047,
+        "contact_alignment": 0.9999974564480139,
+        "contact_height": 0.01257356123370601,
+        "cube_angular_speed": 0.0,
+        "cube_angular_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "cube_linear_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "cube_planar_speed": 0.0,
+        "cube_table_contact": true,
+        "cube_tilt": 0.001387594964163313,
+        "finite": true,
+        "gripper_table_contact": false,
+        "history_max_abs_difference": 0.02838665246963501,
+        "joint_limit_violations": [],
+        "joint_limits_valid": true,
+        "max_penetration": 0.000895672407670765,
+        "tcp_forward_offset": -0.06887801222891878,
+        "tcp_lateral_offset": -0.000167851441922467,
+        "tcp_mocap_error": 0.012129520119653674,
+        "tcp_speed": 0.0,
+        "tcp_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "tcp_vertical_offset": 0.03125494718551636,
+        "tcp_world_z": 0.05112602189183235,
+        "valid_rear_contact": true
+      },
+      "invalid_reasons": [
+        "penetration_above_0.5mm"
+      ],
+      "physical_valid": false,
+      "reset_seed": 10032,
+      "task_index": 32
+    },
+    {
+      "initial": {
+        "aperture": 0.08157489171611826,
+        "contact_alignment": 0.0,
+        "contact_height": 0.0,
+        "cube_angular_speed": 0.0,
+        "cube_angular_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "cube_linear_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "cube_planar_speed": 0.0,
+        "cube_table_contact": true,
+        "cube_tilt": 0.0037483985812020323,
+        "finite": true,
+        "gripper_table_contact": false,
+        "history_max_abs_difference": 0.02920323610305786,
+        "joint_limit_violations": [],
+        "joint_limits_valid": true,
+        "max_penetration": 0.0009206841189563145,
+        "tcp_forward_offset": -0.0688443983028101,
+        "tcp_lateral_offset": -0.0002326957523589321,
+        "tcp_mocap_error": 0.012131428450233041,
+        "tcp_speed": 0.0,
+        "tcp_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "tcp_vertical_offset": 0.03120512329041958,
+        "tcp_world_z": 0.05112813785672188,
+        "valid_rear_contact": false
+      },
+      "invalid_reasons": [
+        "penetration_above_0.5mm"
+      ],
+      "physical_valid": false,
+      "reset_seed": 10033,
+      "task_index": 33
+    },
+    {
+      "initial": {
+        "aperture": 0.0816019307984242,
+        "contact_alignment": 0.0,
+        "contact_height": 0.0,
+        "cube_angular_speed": 0.0,
+        "cube_angular_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "cube_linear_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "cube_planar_speed": 0.0,
+        "cube_table_contact": true,
+        "cube_tilt": 0.003163077853074619,
+        "finite": true,
+        "gripper_table_contact": false,
+        "history_max_abs_difference": 0.030255913734436035,
+        "joint_limit_violations": [],
+        "joint_limits_valid": true,
+        "max_penetration": 0.0009122625590502879,
+        "tcp_forward_offset": -0.06885391981426074,
+        "tcp_lateral_offset": 0.00017156068271468206,
+        "tcp_mocap_error": 0.012157606722157916,
+        "tcp_speed": 0.0,
+        "tcp_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "tcp_vertical_offset": 0.031218793243169785,
+        "tcp_world_z": 0.05115402117371559,
+        "valid_rear_contact": false
+      },
+      "invalid_reasons": [
+        "penetration_above_0.5mm"
+      ],
+      "physical_valid": false,
+      "reset_seed": 10034,
+      "task_index": 34
+    },
+    {
+      "initial": {
+        "aperture": 0.08159074830646146,
+        "contact_alignment": 0.0,
+        "contact_height": 0.0,
+        "cube_angular_speed": 0.0,
+        "cube_angular_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "cube_linear_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "cube_planar_speed": 0.0,
+        "cube_table_contact": true,
+        "cube_tilt": 0.0025201022104221994,
+        "finite": true,
+        "gripper_table_contact": false,
+        "history_max_abs_difference": 0.028964579105377197,
+        "joint_limit_violations": [],
+        "joint_limits_valid": true,
+        "max_penetration": 0.0009309183810134689,
+        "tcp_forward_offset": -0.06884452985962845,
+        "tcp_lateral_offset": -0.0001112979192573215,
+        "tcp_mocap_error": 0.012155556307589504,
+        "tcp_speed": 0.0,
+        "tcp_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "tcp_vertical_offset": 0.03120928443968296,
+        "tcp_world_z": 0.051152270287275314,
+        "valid_rear_contact": false
+      },
+      "invalid_reasons": [
+        "penetration_above_0.5mm"
+      ],
+      "physical_valid": false,
+      "reset_seed": 10035,
+      "task_index": 35
+    },
+    {
+      "initial": {
+        "aperture": 0.08155818358728108,
+        "contact_alignment": 0.9999991143750732,
+        "contact_height": 0.012513399317250984,
+        "cube_angular_speed": 0.0,
+        "cube_angular_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "cube_linear_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "cube_planar_speed": 0.0,
+        "cube_table_contact": true,
+        "cube_tilt": 0.004154524875288992,
+        "finite": true,
+        "gripper_table_contact": false,
+        "history_max_abs_difference": 0.02943938970565796,
+        "joint_limit_violations": [],
+        "joint_limits_valid": true,
+        "max_penetration": 0.0009164823881304508,
+        "tcp_forward_offset": -0.06882061455518833,
+        "tcp_lateral_offset": 0.00014600032936152267,
+        "tcp_mocap_error": 0.012125170740666704,
+        "tcp_speed": 0.0,
+        "tcp_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "tcp_vertical_offset": 0.03119482286274433,
+        "tcp_world_z": 0.051121946424245834,
+        "valid_rear_contact": true
+      },
+      "invalid_reasons": [
+        "penetration_above_0.5mm"
+      ],
+      "physical_valid": false,
+      "reset_seed": 10036,
+      "task_index": 36
+    },
+    {
+      "initial": {
+        "aperture": 0.08162811423276534,
+        "contact_alignment": 0.9999981182791039,
+        "contact_height": 0.012557415750939951,
+        "cube_angular_speed": 0.0,
+        "cube_angular_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "cube_linear_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "cube_planar_speed": 0.0,
+        "cube_table_contact": true,
+        "cube_tilt": 0.0013730001816757407,
+        "finite": true,
+        "gripper_table_contact": false,
+        "history_max_abs_difference": 0.028590381145477295,
+        "joint_limit_violations": [],
+        "joint_limits_valid": true,
+        "max_penetration": 0.0009122662304527969,
+        "tcp_forward_offset": -0.06885732181245408,
+        "tcp_lateral_offset": 8.320655598694316e-05,
+        "tcp_mocap_error": 0.012143562380792759,
+        "tcp_speed": 0.0,
+        "tcp_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "tcp_vertical_offset": 0.03124179132282734,
+        "tcp_world_z": 0.05113996937870979,
+        "valid_rear_contact": true
+      },
+      "invalid_reasons": [
+        "penetration_above_0.5mm"
+      ],
+      "physical_valid": false,
+      "reset_seed": 10037,
+      "task_index": 37
+    },
+    {
+      "initial": {
+        "aperture": 0.08161504696481509,
+        "contact_alignment": 0.0,
+        "contact_height": 0.0,
+        "cube_angular_speed": 0.0,
+        "cube_angular_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "cube_linear_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "cube_planar_speed": 0.0,
+        "cube_table_contact": true,
+        "cube_tilt": 0.0027219513315015096,
+        "finite": true,
+        "gripper_table_contact": false,
+        "history_max_abs_difference": 0.029630959033966064,
+        "joint_limit_violations": [],
+        "joint_limits_valid": true,
+        "max_penetration": 0.000919000917392505,
+        "tcp_forward_offset": -0.0688617200446639,
+        "tcp_lateral_offset": -0.00011491956411639187,
+        "tcp_mocap_error": 0.012158378404223727,
+        "tcp_speed": 0.0,
+        "tcp_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "tcp_vertical_offset": 0.031218932941555977,
+        "tcp_world_z": 0.05115479975938797,
+        "valid_rear_contact": false
+      },
+      "invalid_reasons": [
+        "penetration_above_0.5mm"
+      ],
+      "physical_valid": false,
+      "reset_seed": 10038,
+      "task_index": 38
+    },
+    {
+      "initial": {
+        "aperture": 0.0815802475883806,
+        "contact_alignment": 0.0,
+        "contact_height": 0.0,
+        "cube_angular_speed": 0.0,
+        "cube_angular_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "cube_linear_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "cube_planar_speed": 0.0,
+        "cube_table_contact": true,
+        "cube_tilt": 0.002714687201414014,
+        "finite": true,
+        "gripper_table_contact": false,
+        "history_max_abs_difference": 0.02945655584335327,
+        "joint_limit_violations": [],
+        "joint_limits_valid": true,
+        "max_penetration": 0.0009037319227706836,
+        "tcp_forward_offset": -0.06883741826919004,
+        "tcp_lateral_offset": 7.925984364295772e-05,
+        "tcp_mocap_error": 0.012155259673649615,
+        "tcp_speed": 0.0,
+        "tcp_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "tcp_vertical_offset": 0.03123217448592186,
+        "tcp_world_z": 0.05115160346031189,
+        "valid_rear_contact": false
+      },
+      "invalid_reasons": [
+        "penetration_above_0.5mm"
+      ],
+      "physical_valid": false,
+      "reset_seed": 10039,
+      "task_index": 39
+    },
+    {
+      "initial": {
+        "aperture": 0.08159616030911974,
+        "contact_alignment": 0.0,
+        "contact_height": 0.0,
+        "cube_angular_speed": 0.0,
+        "cube_angular_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "cube_linear_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "cube_planar_speed": 0.0,
+        "cube_table_contact": true,
+        "cube_tilt": 0.002904834628866326,
+        "finite": true,
+        "gripper_table_contact": false,
+        "history_max_abs_difference": 0.029785871505737305,
+        "joint_limit_violations": [],
+        "joint_limits_valid": true,
+        "max_penetration": 0.0009351745832673782,
+        "tcp_forward_offset": -0.06885913210634159,
+        "tcp_lateral_offset": 0.00011331051372469912,
+        "tcp_mocap_error": 0.012134419958073659,
+        "tcp_speed": 0.0,
+        "tcp_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "tcp_vertical_offset": 0.031197572126984596,
+        "tcp_world_z": 0.05113111808896065,
+        "valid_rear_contact": false
+      },
+      "invalid_reasons": [
+        "penetration_above_0.5mm"
+      ],
+      "physical_valid": false,
+      "reset_seed": 10040,
+      "task_index": 40
+    },
+    {
+      "initial": {
+        "aperture": 0.08157225402482678,
+        "contact_alignment": 0.0,
+        "contact_height": 0.0,
+        "cube_angular_speed": 0.0,
+        "cube_angular_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "cube_linear_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "cube_planar_speed": 0.0,
+        "cube_table_contact": true,
+        "cube_tilt": 0.003045335487560349,
+        "finite": true,
+        "gripper_table_contact": false,
+        "history_max_abs_difference": 0.029159724712371826,
+        "joint_limit_violations": [],
+        "joint_limits_valid": true,
+        "max_penetration": 0.0009107700826583209,
+        "tcp_forward_offset": -0.06883513310319289,
+        "tcp_lateral_offset": 7.069780769353553e-05,
+        "tcp_mocap_error": 0.012158362936823371,
+        "tcp_speed": 0.0,
+        "tcp_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "tcp_vertical_offset": 0.031223097816109657,
+        "tcp_world_z": 0.05115509778261185,
+        "valid_rear_contact": false
+      },
+      "invalid_reasons": [
+        "penetration_above_0.5mm"
+      ],
+      "physical_valid": false,
+      "reset_seed": 10041,
+      "task_index": 41
+    },
+    {
+      "initial": {
+        "aperture": 0.08164369249261623,
+        "contact_alignment": 0.9999980083485105,
+        "contact_height": 0.01253704589008009,
+        "cube_angular_speed": 0.0,
+        "cube_angular_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "cube_linear_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "cube_planar_speed": 0.0,
+        "cube_table_contact": true,
+        "cube_tilt": 0.0009958916167424007,
+        "finite": true,
+        "gripper_table_contact": false,
+        "history_max_abs_difference": 0.029824435710906982,
+        "joint_limit_violations": [],
+        "joint_limits_valid": true,
+        "max_penetration": 0.0009419936801065371,
+        "tcp_forward_offset": -0.06886032260293601,
+        "tcp_lateral_offset": 0.00016409268025728587,
+        "tcp_mocap_error": 0.012122708631344974,
+        "tcp_speed": 0.0,
+        "tcp_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "tcp_vertical_offset": 0.031219175085425377,
+        "tcp_world_z": 0.051119111478328705,
+        "valid_rear_contact": true
+      },
+      "invalid_reasons": [
+        "penetration_above_0.5mm"
+      ],
+      "physical_valid": false,
+      "reset_seed": 10042,
+      "task_index": 42
+    },
+    {
+      "initial": {
+        "aperture": 0.08161008999550728,
+        "contact_alignment": 0.999997322014348,
+        "contact_height": 0.012522395308585864,
+        "cube_angular_speed": 0.0,
+        "cube_angular_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "cube_linear_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "cube_planar_speed": 0.0,
+        "cube_table_contact": true,
+        "cube_tilt": 0.0027219187836933115,
+        "finite": true,
+        "gripper_table_contact": false,
+        "history_max_abs_difference": 0.028225183486938477,
+        "joint_limit_violations": [],
+        "joint_limits_valid": true,
+        "max_penetration": 0.0009263824587883095,
+        "tcp_forward_offset": -0.06885394269009718,
+        "tcp_lateral_offset": 0.0002678797344191436,
+        "tcp_mocap_error": 0.01211030417687898,
+        "tcp_speed": 0.0,
+        "tcp_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "tcp_vertical_offset": 0.031207099556922913,
+        "tcp_world_z": 0.05110656097531319,
+        "valid_rear_contact": true
+      },
+      "invalid_reasons": [
+        "penetration_above_0.5mm"
+      ],
+      "physical_valid": false,
+      "reset_seed": 10043,
+      "task_index": 43
+    },
+    {
+      "initial": {
+        "aperture": 0.08156107213926075,
+        "contact_alignment": 0.0,
+        "contact_height": 0.0,
+        "cube_angular_speed": 0.0,
+        "cube_angular_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "cube_linear_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "cube_planar_speed": 0.0,
+        "cube_table_contact": true,
+        "cube_tilt": 0.004086795561347014,
+        "finite": true,
+        "gripper_table_contact": false,
+        "history_max_abs_difference": 0.0306549072265625,
+        "joint_limit_violations": [],
+        "joint_limits_valid": true,
+        "max_penetration": 0.0009255531643976679,
+        "tcp_forward_offset": -0.06885078364522579,
+        "tcp_lateral_offset": -0.0001656463908901855,
+        "tcp_mocap_error": 0.01211050698142065,
+        "tcp_speed": 0.0,
+        "tcp_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "tcp_vertical_offset": 0.031193306669592857,
+        "tcp_world_z": 0.05110715329647064,
+        "valid_rear_contact": false
+      },
+      "invalid_reasons": [
+        "penetration_above_0.5mm"
+      ],
+      "physical_valid": false,
+      "reset_seed": 10044,
+      "task_index": 44
+    },
+    {
+      "initial": {
+        "aperture": 0.08160236240476994,
+        "contact_alignment": 0.0,
+        "contact_height": 0.0,
+        "cube_angular_speed": 0.0,
+        "cube_angular_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "cube_linear_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "cube_planar_speed": 0.0,
+        "cube_table_contact": true,
+        "cube_tilt": 0.0028356954633495454,
+        "finite": true,
+        "gripper_table_contact": false,
+        "history_max_abs_difference": 0.028830289840698242,
+        "joint_limit_violations": [],
+        "joint_limits_valid": true,
+        "max_penetration": 0.0009410125241137236,
+        "tcp_forward_offset": -0.0688607886718783,
+        "tcp_lateral_offset": 0.00022105067872359922,
+        "tcp_mocap_error": 0.012128800043304857,
+        "tcp_speed": 0.0,
+        "tcp_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "tcp_vertical_offset": 0.031194204464554787,
+        "tcp_world_z": 0.05112561956048012,
+        "valid_rear_contact": false
+      },
+      "invalid_reasons": [
+        "penetration_above_0.5mm"
+      ],
+      "physical_valid": false,
+      "reset_seed": 10045,
+      "task_index": 45
+    },
+    {
+      "initial": {
+        "aperture": 0.08160276027987133,
+        "contact_alignment": 0.0,
+        "contact_height": 0.0,
+        "cube_angular_speed": 0.0,
+        "cube_angular_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "cube_linear_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "cube_planar_speed": 0.0,
+        "cube_table_contact": true,
+        "cube_tilt": 0.0034347574345266326,
+        "finite": true,
+        "gripper_table_contact": false,
+        "history_max_abs_difference": 0.03022843599319458,
+        "joint_limit_violations": [],
+        "joint_limits_valid": true,
+        "max_penetration": 0.0009153130862000276,
+        "tcp_forward_offset": -0.06886058105122665,
+        "tcp_lateral_offset": -0.00016788626663538414,
+        "tcp_mocap_error": 0.012120346739629393,
+        "tcp_speed": 0.0,
+        "tcp_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "tcp_vertical_offset": 0.031206538900732994,
+        "tcp_world_z": 0.05111711099743843,
+        "valid_rear_contact": false
+      },
+      "invalid_reasons": [
+        "penetration_above_0.5mm"
+      ],
+      "physical_valid": false,
+      "reset_seed": 10046,
+      "task_index": 46
+    },
+    {
+      "initial": {
+        "aperture": 0.08163773028330787,
+        "contact_alignment": 0.9999982435758532,
+        "contact_height": 0.012530025659041662,
+        "cube_angular_speed": 0.0,
+        "cube_angular_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "cube_linear_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "cube_planar_speed": 0.0,
+        "cube_table_contact": true,
+        "cube_tilt": 0.0012542382097322604,
+        "finite": true,
+        "gripper_table_contact": false,
+        "history_max_abs_difference": 0.029780983924865723,
+        "joint_limit_violations": [],
+        "joint_limits_valid": true,
+        "max_penetration": 0.0009423027467456793,
+        "tcp_forward_offset": -0.06887404200921542,
+        "tcp_lateral_offset": 0.00014983242281087385,
+        "tcp_mocap_error": 0.012097028899503757,
+        "tcp_speed": 0.0,
+        "tcp_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "tcp_vertical_offset": 0.031209973618388176,
+        "tcp_world_z": 0.05109340324997902,
+        "valid_rear_contact": true
+      },
+      "invalid_reasons": [
+        "penetration_above_0.5mm"
+      ],
+      "physical_valid": false,
+      "reset_seed": 10047,
+      "task_index": 47
+    },
+    {
+      "initial": {
+        "aperture": 0.08160987695285588,
+        "contact_alignment": 0.9999989465674759,
+        "contact_height": 0.012528834031846556,
+        "cube_angular_speed": 0.0,
+        "cube_angular_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "cube_linear_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "cube_planar_speed": 0.0,
+        "cube_table_contact": true,
+        "cube_tilt": 0.0004447722900035469,
+        "finite": true,
+        "gripper_table_contact": false,
+        "history_max_abs_difference": 0.02875494956970215,
+        "joint_limit_violations": [],
+        "joint_limits_valid": true,
+        "max_penetration": 0.0009571001206672741,
+        "tcp_forward_offset": -0.06885354490312083,
+        "tcp_lateral_offset": 0.00012268879390738935,
+        "tcp_mocap_error": 0.012133143656463433,
+        "tcp_speed": 0.0,
+        "tcp_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "tcp_vertical_offset": 0.031217068433761597,
+        "tcp_world_z": 0.05112961307168007,
+        "valid_rear_contact": true
+      },
+      "invalid_reasons": [
+        "penetration_above_0.5mm"
+      ],
+      "physical_valid": false,
+      "reset_seed": 10048,
+      "task_index": 48
+    },
+    {
+      "initial": {
+        "aperture": 0.08158379851802929,
+        "contact_alignment": 0.0,
+        "contact_height": 0.0,
+        "cube_angular_speed": 0.0,
+        "cube_angular_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "cube_linear_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "cube_planar_speed": 0.0,
+        "cube_table_contact": true,
+        "cube_tilt": 0.0035289539214273863,
+        "finite": true,
+        "gripper_table_contact": false,
+        "history_max_abs_difference": 0.028798460960388184,
+        "joint_limit_violations": [],
+        "joint_limits_valid": true,
+        "max_penetration": 0.0009302843278082386,
+        "tcp_forward_offset": -0.06885378642637308,
+        "tcp_lateral_offset": 0.00021233611361450776,
+        "tcp_mocap_error": 0.012125914172850097,
+        "tcp_speed": 0.0,
+        "tcp_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "tcp_vertical_offset": 0.031199133023619652,
+        "tcp_world_z": 0.05112239345908165,
+        "valid_rear_contact": false
+      },
+      "invalid_reasons": [
+        "penetration_above_0.5mm"
+      ],
+      "physical_valid": false,
+      "reset_seed": 10049,
+      "task_index": 49
+    }
+  ],
+  "summary": {
+    "any_step_success": null,
+    "condition": {
+      "direction": 0,
+      "family": "aperture",
+      "kind": "aperture",
+      "name": "aperture_80mm",
+      "value": 0.08
+    },
+    "contact_loss_rate": null,
+    "final_step_success": null,
+    "initial_valid_rear_contact_rate": null,
+    "invalid_reasons": {
+      "penetration_above_0.5mm": 50
+    },
+    "mean_final_goal_distance": null,
+    "mean_final_goal_progress": null,
+    "mean_first_contact_loss_step": null,
+    "mean_initial_aperture": null,
+    "mean_initial_cube_angular_speed": null,
+    "mean_initial_cube_planar_speed": null,
+    "mean_initial_forward_offset": null,
+    "mean_initial_lateral_offset": null,
+    "mean_initial_penetration": null,
+    "mean_initial_tcp_speed": null,
+    "mean_maximum_goal_progress": null,
+    "mean_reacquisitions": null,
+    "mean_rear_contact_fraction": null,
+    "mean_return": null,
+    "mean_workspace_clipped_steps": null,
+    "tasks": 50,
+    "tipping_rate": null,
+    "valid_initial_states": 0
+  }
+}

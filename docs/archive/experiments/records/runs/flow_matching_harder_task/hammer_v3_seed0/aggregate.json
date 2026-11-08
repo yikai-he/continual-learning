@@ -1,0 +1,50 @@
+[
+  {
+    "source": "real",
+    "bc_validation_action_mse": 0.006298130843788385,
+    "success_rate": 1.0,
+    "mean_return": 1592.039967150176
+  },
+  {
+    "source": "flow-10",
+    "bc_validation_action_mse": 0.017595816403627396,
+    "success_rate": 0.94,
+    "mean_return": 1604.1950606906512,
+    "generation_seconds": 2.7245272709988058,
+    "nfe": 10,
+    "expert_action_mse": 0.05795864388346672,
+    "action_oob_rate": 0.034225,
+    "state_delta_mean": 0.011911455541849136,
+    "state_delta_above_real_p95": 0.04376884422110553,
+    "state_mean_discrepancy": 0.0019165478629980094,
+    "action_mean_discrepancy": 0.027311427053064108
+  },
+  {
+    "source": "flow-50",
+    "bc_validation_action_mse": 0.020231172442436218,
+    "success_rate": 0.98,
+    "mean_return": 1604.475556436054,
+    "generation_seconds": 13.86633226199774,
+    "nfe": 50,
+    "expert_action_mse": 0.061164531856775284,
+    "action_oob_rate": 0.03819375,
+    "state_delta_mean": 0.011944195255637169,
+    "state_delta_above_real_p95": 0.04829145728643216,
+    "state_mean_discrepancy": 0.0018875256875819308,
+    "action_mean_discrepancy": 0.026281715836375952
+  },
+  {
+    "source": "diffusion",
+    "bc_validation_action_mse": 0.006010116543620825,
+    "success_rate": 0.96,
+    "mean_return": 1618.7924591220053,
+    "generation_seconds": 26.72260400000232,
+    "nfe": 100,
+    "expert_action_mse": 0.032142072916030884,
+    "action_oob_rate": 0.0332125,
+    "state_delta_mean": 0.009472064673900604,
+    "state_delta_above_real_p95": 0.048969849246231156,
+    "state_mean_discrepancy": 0.001574736938993013,
+    "action_mean_discrepancy": 0.010656870901584625
+  }
+]

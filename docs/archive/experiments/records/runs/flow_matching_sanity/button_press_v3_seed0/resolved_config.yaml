@@ -1,0 +1,42 @@
+kind: flow_matching_single_task_sanity_v1
+task: button-press-v3
+backend: metaworld-v3
+reward_function_version: v2
+seed: 0
+device: cpu
+assets:
+  expert_dataset: runs/formal/diffcrl_5task_200traj/diffcrl_5task_200traj_seed0/stage_0_button-press-v3/data_task_0.npy
+  source_report: runs/formal/diffcrl_5task_200traj/diffcrl_5task_200traj_seed0/stage_0_button-press-v3/report.json
+  expert_checkpoint: runs/reward_v2/button-press-v3/seed_0/best_model/best_model.zip
+  diffusion_checkpoint: runs/formal/diffcrl_5task_200traj/diffcrl_5task_200traj_seed0/diffusion_after_task_0_button-press-v3.pt
+output_dir: runs/flow_matching_sanity/button_press_v3_seed0
+flow:
+  epochs: 50
+  batch_size: 8
+  learning_rate: 0.001
+  width: 64
+  integration_steps: 50
+  time_embedding_scale: 100.0
+  generated_trajectories: 200
+  generation_seed: 100000
+bc:
+  epochs: 100
+  batch_size: 256
+  learning_rate: 0.001
+  hidden_sizes:
+  - 256
+  - 256
+  loss: post-tanh-mse
+  initialization_seed: 17
+  shuffle_seed: 0
+evaluation:
+  episodes: 50
+  seed: 10000
+  mode: fixed-tasks
+  task_set_seed: 10000
+debug:
+  flow_epochs: 2
+  bc_epochs: 2
+  generated_trajectories: 8
+  integration_steps: 10
+  evaluation_episodes: 2

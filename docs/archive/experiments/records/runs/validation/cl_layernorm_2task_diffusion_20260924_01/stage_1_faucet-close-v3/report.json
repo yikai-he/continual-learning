@@ -1,0 +1,628 @@
+{
+  "stage": 1,
+  "task": "faucet-close-v3",
+  "bc_normalization_mode": "layer-norm",
+  "bc_loss": "post-tanh-mse",
+  "bc_clamp_epsilon": 0.0001,
+  "diffusion_action_space": "raw",
+  "diffusion_action_clamp_epsilon": 0.0001,
+  "generated_action_projection": "none",
+  "real_diffusion_encode_clip_fraction": 0.0,
+  "sources": {
+    "button-press-v3": {
+      "kind": "generated",
+      "checkpoint": "/home/yikai/Documents/Code/Metaworld/runs/validation/cl_layernorm_2task_diffusion_20260924_01/diffusion_after_task_0_button-press-v3.pt",
+      "checkpoint_sha256": "f3243cccd41b22a62813ff8c67af4edcd590f0375c161cdb375bf1ecf5062ba8",
+      "sampling_seed": 101000,
+      "condition": 0,
+      "success": null,
+      "return": null,
+      "generated_latent_abs_gt_bc_cap_fraction": null,
+      "generated_action_projection": "none",
+      "pre_projection_oob_component_fraction": 0.004625000059604645,
+      "pre_projection_oob_timestep_fraction": 0.01850000023841858,
+      "post_projection_oob_component_fraction": 0.004625000059604645,
+      "clipped_component_fraction": 0.0,
+      "post_projection_abs_eq_1_fraction": 0.0,
+      "post_projection_abs_gt_0_99_fraction": 0.008812500163912773,
+      "post_projection_abs_eq_1_fraction_by_action_coordinate": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "post_projection_abs_gt_0_99_fraction_by_action_coordinate": [
+        0.0,
+        0.03525000065565109,
+        0.0,
+        0.0
+      ],
+      "training_configuration_indices": [
+        36,
+        40,
+        13,
+        13,
+        13,
+        32,
+        31,
+        31,
+        25,
+        27,
+        31,
+        27,
+        27,
+        31,
+        13,
+        2,
+        13,
+        31,
+        42,
+        40
+      ],
+      "training_configuration_hashes": [
+        "30659f37d164e5cae2b1160750ff5320d54ba50ebe6ca97c5bd0c9a15229ba36",
+        "116d37723836d3049ab8f8ec5a3c345022f032ca1cb2d562e146ac917efc8dd6",
+        "7007aba31785d11527aa77963a3bb20091d198a93d248f93b8be51cfab25c9db",
+        "7007aba31785d11527aa77963a3bb20091d198a93d248f93b8be51cfab25c9db",
+        "7007aba31785d11527aa77963a3bb20091d198a93d248f93b8be51cfab25c9db",
+        "637c435a9738b8c55ef39eb6f5eb0a0a71d413f6a339ee7b480bc24b5f1e6c67",
+        "a8038a8c0b18b04818fbfe1b9ab4e6db9e1b027335f6a5cd5a0fa36d44a77e80",
+        "a8038a8c0b18b04818fbfe1b9ab4e6db9e1b027335f6a5cd5a0fa36d44a77e80",
+        "52f110f111062d8721afd2803a335902d1e47f8973abd70b4f896ca0e2ee3d07",
+        "d6dbbe4f5a5c0a7b0f367bf712ab4f96168e9b1f6582ea764ef14a15fe5cc2bd",
+        "a8038a8c0b18b04818fbfe1b9ab4e6db9e1b027335f6a5cd5a0fa36d44a77e80",
+        "d6dbbe4f5a5c0a7b0f367bf712ab4f96168e9b1f6582ea764ef14a15fe5cc2bd",
+        "d6dbbe4f5a5c0a7b0f367bf712ab4f96168e9b1f6582ea764ef14a15fe5cc2bd",
+        "a8038a8c0b18b04818fbfe1b9ab4e6db9e1b027335f6a5cd5a0fa36d44a77e80",
+        "7007aba31785d11527aa77963a3bb20091d198a93d248f93b8be51cfab25c9db",
+        "f0c263b5454cdd1078097152bec900d4d3ada639e6e2b094f5b5a2e09b3cad55",
+        "7007aba31785d11527aa77963a3bb20091d198a93d248f93b8be51cfab25c9db",
+        "a8038a8c0b18b04818fbfe1b9ab4e6db9e1b027335f6a5cd5a0fa36d44a77e80",
+        "c3c7bc34e0f4f8b5cdb3669d9e8adb486e14461902f719cf4786cbfd4e43349b",
+        "116d37723836d3049ab8f8ec5a3c345022f032ca1cb2d562e146ac917efc8dd6"
+      ],
+      "data_path": "/home/yikai/Documents/Code/Metaworld/runs/validation/cl_layernorm_2task_diffusion_20260924_01/stage_1_faucet-close-v3/data_task_0.npy",
+      "data_sha256": "31d9abafe6a05fe6abd8cd587f905d57d3a344408f3590fc5197f23653e510bc",
+      "bc_target_clip_fraction": 0.004687500186264515
+    },
+    "faucet-close-v3": {
+      "kind": "real_expert",
+      "checkpoint": "/home/yikai/Documents/Code/Metaworld/runs/reward_v2/faucet-close-v3/seed_0/best_model/best_model.zip",
+      "checkpoint_sha256": "7adf6b40f7f658dc862abafc7aa3e3a85a30f3304a7fb97829f98d9727d80ab6",
+      "seeds": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19
+      ],
+      "success_count": 20,
+      "success_rate": 1.0,
+      "episode_returns": [
+        1756.9209318311766,
+        1777.9421563221208,
+        1790.1346604783587,
+        1793.1346582581918,
+        1785.2392439535408,
+        1771.3309103680194,
+        1777.6035802880692,
+        1769.0606329546122,
+        1757.2939578095957,
+        1753.9864193999351,
+        1789.1727821063205,
+        1771.601102722677,
+        1790.1346604783587,
+        1748.1004252087112,
+        1751.349477706452,
+        1771.306453712955,
+        1777.9421563221208,
+        1783.5090639871241,
+        1783.5090639871241,
+        1776.2419119902825
+      ],
+      "mean_return": 1773.7757124942877,
+      "std_return": 13.549816421546145,
+      "real_diffusion_encode_clip_fraction": 0.0,
+      "collection_configurations": [
+        {
+          "configuration_index": 42,
+          "task_data_sha256": "ec6c13000ee913e1bb14ff0c32a45a776a5c7e335ad76f887090ce4c5fce162d",
+          "task_name": "faucet-close-v3",
+          "env_name": "faucet-close-v3",
+          "bank_seed": 0,
+          "episode_id": 0
+        },
+        {
+          "configuration_index": 31,
+          "task_data_sha256": "e976911145c3d8285f6ddc4cd7b7eb840a82b8d060d48737eb73285c26c02074",
+          "task_name": "faucet-close-v3",
+          "env_name": "faucet-close-v3",
+          "bank_seed": 0,
+          "episode_id": 1
+        },
+        {
+          "configuration_index": 25,
+          "task_data_sha256": "d4aa6f8736b91c8b7756f254792a9f25b36383f8cd3d606d20860f6ae3a21976",
+          "task_name": "faucet-close-v3",
+          "env_name": "faucet-close-v3",
+          "bank_seed": 0,
+          "episode_id": 2
+        },
+        {
+          "configuration_index": 13,
+          "task_data_sha256": "6e202b0c4e73466f4c520fcb872d0927581755bb071e1da153ef2debc545033b",
+          "task_name": "faucet-close-v3",
+          "env_name": "faucet-close-v3",
+          "bank_seed": 0,
+          "episode_id": 3
+        },
+        {
+          "configuration_index": 15,
+          "task_data_sha256": "aa0afc911ca07a130e3d0ffc958bb3adb9ae5e0a3ac6874c5f0f06813a069c2d",
+          "task_name": "faucet-close-v3",
+          "env_name": "faucet-close-v3",
+          "bank_seed": 0,
+          "episode_id": 4
+        },
+        {
+          "configuration_index": 2,
+          "task_data_sha256": "34fbc83e9534101da6d727b99d2c909edf95f8620c466f3ea7f217c5021f41d2",
+          "task_name": "faucet-close-v3",
+          "env_name": "faucet-close-v3",
+          "bank_seed": 0,
+          "episode_id": 5
+        },
+        {
+          "configuration_index": 3,
+          "task_data_sha256": "666abf3d4d7b665fa56ee76c1b3f896cf80b722005b492544ce3d10118e298b0",
+          "task_name": "faucet-close-v3",
+          "env_name": "faucet-close-v3",
+          "bank_seed": 0,
+          "episode_id": 6
+        },
+        {
+          "configuration_index": 0,
+          "task_data_sha256": "dc07374ef0eaa3ee1d8b87397fcd1501bee267e63efbcf7d1d74cf2ef9c60c0c",
+          "task_name": "faucet-close-v3",
+          "env_name": "faucet-close-v3",
+          "bank_seed": 0,
+          "episode_id": 7
+        },
+        {
+          "configuration_index": 8,
+          "task_data_sha256": "04b85cdcd3e0ff678c4fc38d7214e19a0017bb6154cb3fb98e8a59e6f93fd771",
+          "task_name": "faucet-close-v3",
+          "env_name": "faucet-close-v3",
+          "bank_seed": 0,
+          "episode_id": 8
+        },
+        {
+          "configuration_index": 40,
+          "task_data_sha256": "741700e7fffbc9318c41efc838e2392c8719ce765668fb3aeeeea489695b8ff4",
+          "task_name": "faucet-close-v3",
+          "env_name": "faucet-close-v3",
+          "bank_seed": 0,
+          "episode_id": 9
+        },
+        {
+          "configuration_index": 32,
+          "task_data_sha256": "90fa9661e4b591ff95be335c603d4d98b50f2629065ea06016fb23d0cbb03f1b",
+          "task_name": "faucet-close-v3",
+          "env_name": "faucet-close-v3",
+          "bank_seed": 0,
+          "episode_id": 10
+        },
+        {
+          "configuration_index": 45,
+          "task_data_sha256": "fe7550e75d8c56dc83f18db6b53d34daf4dae16d193565f5e89667902e642073",
+          "task_name": "faucet-close-v3",
+          "env_name": "faucet-close-v3",
+          "bank_seed": 0,
+          "episode_id": 11
+        },
+        {
+          "configuration_index": 25,
+          "task_data_sha256": "d4aa6f8736b91c8b7756f254792a9f25b36383f8cd3d606d20860f6ae3a21976",
+          "task_name": "faucet-close-v3",
+          "env_name": "faucet-close-v3",
+          "bank_seed": 0,
+          "episode_id": 12
+        },
+        {
+          "configuration_index": 30,
+          "task_data_sha256": "fd35224695cf6a52b0313a58d30b73bdcb63a82ab327c06d327769d9c144655f",
+          "task_name": "faucet-close-v3",
+          "env_name": "faucet-close-v3",
+          "bank_seed": 0,
+          "episode_id": 13
+        },
+        {
+          "configuration_index": 48,
+          "task_data_sha256": "abc0fcdb0bdf773f947320539523170bbfb3e16972bc797135bf29ac6677ee9c",
+          "task_name": "faucet-close-v3",
+          "env_name": "faucet-close-v3",
+          "bank_seed": 0,
+          "episode_id": 14
+        },
+        {
+          "configuration_index": 36,
+          "task_data_sha256": "58a56086f36ebd81ce021d4a248dbe8f7af2e784d642494103f75682a38fff90",
+          "task_name": "faucet-close-v3",
+          "env_name": "faucet-close-v3",
+          "bank_seed": 0,
+          "episode_id": 15
+        },
+        {
+          "configuration_index": 31,
+          "task_data_sha256": "e976911145c3d8285f6ddc4cd7b7eb840a82b8d060d48737eb73285c26c02074",
+          "task_name": "faucet-close-v3",
+          "env_name": "faucet-close-v3",
+          "bank_seed": 0,
+          "episode_id": 16
+        },
+        {
+          "configuration_index": 27,
+          "task_data_sha256": "b66ac3c032a4a8dff070409e7259e1c5198318f0c1f7d7bfb9998453544ef1ab",
+          "task_name": "faucet-close-v3",
+          "env_name": "faucet-close-v3",
+          "bank_seed": 0,
+          "episode_id": 17
+        },
+        {
+          "configuration_index": 27,
+          "task_data_sha256": "b66ac3c032a4a8dff070409e7259e1c5198318f0c1f7d7bfb9998453544ef1ab",
+          "task_name": "faucet-close-v3",
+          "env_name": "faucet-close-v3",
+          "bank_seed": 0,
+          "episode_id": 18
+        },
+        {
+          "configuration_index": 46,
+          "task_data_sha256": "c3de4b8bb482d8c85ca816655715dc10ec2c3500bf2833f681b1c55d3dde9956",
+          "task_name": "faucet-close-v3",
+          "env_name": "faucet-close-v3",
+          "bank_seed": 0,
+          "episode_id": 19
+        }
+      ],
+      "data_path": "/home/yikai/Documents/Code/Metaworld/runs/validation/cl_layernorm_2task_diffusion_20260924_01/stage_1_faucet-close-v3/data_task_1.npy",
+      "data_sha256": "b8e6e31f7ec8972119cd650a9c5c6f6908a0fd98640f726ba8893b2058533408",
+      "bc_target_clip_fraction": 0.0
+    }
+  },
+  "splits": {
+    "button-press-v3": {
+      "train_ids": [
+        9,
+        4,
+        18,
+        8,
+        10,
+        0,
+        14,
+        17,
+        3,
+        2,
+        11,
+        1,
+        16,
+        13,
+        5,
+        15
+      ],
+      "validation_ids": [
+        7,
+        12,
+        6,
+        19
+      ],
+      "trajectories": 20,
+      "train_samples": 3200,
+      "validation_samples": 800
+    },
+    "faucet-close-v3": {
+      "train_ids": [
+        5,
+        13,
+        9,
+        19,
+        11,
+        4,
+        18,
+        1,
+        7,
+        2,
+        6,
+        10,
+        12,
+        16,
+        3,
+        15
+      ],
+      "validation_ids": [
+        8,
+        0,
+        17,
+        14
+      ],
+      "trajectories": 20,
+      "train_samples": 3200,
+      "validation_samples": 800
+    }
+  },
+  "diffusion_before_state_sha256": "4a607b4de2fc29a80153a1252f95ed54cb56e3237bb7a571a6dfbc23b3b35865",
+  "policy_before_state_sha256": "f4e42b8c5a2732864f397fd095e25a12353d3491cbad3fcbea70568c14f11368",
+  "policy_after_state_sha256": "7222fd622b8b1fe837ce29448ee367231d2359d1565215c13a11b764d46b5360",
+  "diffusion_checkpoint": "/home/yikai/Documents/Code/Metaworld/runs/validation/cl_layernorm_2task_diffusion_20260924_01/diffusion_after_task_1_faucet-close-v3.pt",
+  "diffusion_sha256": "c26c23d22f77c84fe20d3f7b2158181f15542ffeccb07f764890c6267b8d8cb6",
+  "policy_checkpoint": "/home/yikai/Documents/Code/Metaworld/runs/validation/cl_layernorm_2task_diffusion_20260924_01/general_policy_after_task_1_faucet-close-v3.pt",
+  "policy_sha256": "d0a4fcd6a097cf0685b90cc1da635eb0fbe34552aeb4b55038b956d14344d1ba",
+  "normalization_mean": [
+    -0.05033472925424576,
+    0.6802258491516113,
+    0.13346384465694427,
+    0.9041359424591064,
+    -0.06933310627937317,
+    0.7535503506660461,
+    0.11452598869800568,
+    1.000013828277588,
+    -3.991249286627863e-06,
+    -5.958600013400428e-06,
+    -2.1888185074203648e-05,
+    1.8558805550128454e-06,
+    -2.5066256057471037e-05,
+    -1.672660255280789e-05,
+    2.252811100333929e-05,
+    3.2915686460910365e-05,
+    -2.55515769822523e-05,
+    3.584328442229889e-05,
+    0.006265244912356138,
+    0.49634498357772827,
+    -0.03745826706290245,
+    -0.7701044678688049
+  ],
+  "normalization_scale": [
+    0.07387196272611618,
+    0.07128093391656876,
+    0.02044379897415638,
+    0.10839197784662247,
+    0.0922553762793541,
+    0.049790773540735245,
+    0.0010000000474974513,
+    0.0010000000474974513,
+    0.0010000000474974513,
+    0.0010000000474974513,
+    0.0010000000474974513,
+    0.0010000000474974513,
+    0.0010000000474974513,
+    0.0010000000474974513,
+    0.0010000000474974513,
+    0.0010000000474974513,
+    0.0010000000474974513,
+    0.0010000000474974513,
+    0.4383518099784851,
+    0.5628190040588379,
+    0.3517780601978302,
+    0.15593351423740387
+  ],
+  "goal_normalization_mean": [
+    -0.08901035785675049,
+    0.7893049716949463,
+    0.12000000476837158
+  ],
+  "goal_normalization_scale": [
+    0.09163379669189453,
+    0.02997388318181038,
+    0.004999998956918716
+  ],
+  "diffusion_losses": {
+    "initial": {
+      "train_loss": 0.39426272362470627,
+      "validation_loss": 0.44598791748285294
+    },
+    "best_epoch": 5,
+    "history": [
+      {
+        "epoch": 1,
+        "train_loss": 0.22797677665948868,
+        "validation_loss": 0.25511524081230164
+      },
+      {
+        "epoch": 2,
+        "train_loss": 0.1812238022685051,
+        "validation_loss": 0.19708897173404694
+      },
+      {
+        "epoch": 3,
+        "train_loss": 0.15968576818704605,
+        "validation_loss": 0.16620875149965286
+      },
+      {
+        "epoch": 4,
+        "train_loss": 0.14601199701428413,
+        "validation_loss": 0.1533336080610752
+      },
+      {
+        "epoch": 5,
+        "train_loss": 0.13066624104976654,
+        "validation_loss": 0.13598957657814026
+      }
+    ],
+    "train_loss": 0.13066624104976654,
+    "validation_loss": 0.13598957657814026
+  },
+  "bc_losses": {
+    "initial": {
+      "train_loss": 0.6234857439994812,
+      "validation_loss": 0.6231300234794617,
+      "train_action_mse": 0.6234857439994812,
+      "validation_action_mse": 0.6231300234794617
+    },
+    "best_epoch": 17,
+    "train_loss": 0.0119238356128335,
+    "validation_loss": 0.0178670734167099,
+    "train_action_mse": 0.0119238356128335,
+    "validation_action_mse": 0.0178670734167099,
+    "history": [
+      {
+        "epoch": 1,
+        "train_loss": 0.10314124077558517,
+        "validation_loss": 0.11765063554048538,
+        "train_action_mse": 0.10314124077558517,
+        "validation_action_mse": 0.11765063554048538
+      },
+      {
+        "epoch": 2,
+        "train_loss": 0.07202769815921783,
+        "validation_loss": 0.08154694736003876,
+        "train_action_mse": 0.07202769815921783,
+        "validation_action_mse": 0.08154694736003876
+      },
+      {
+        "epoch": 3,
+        "train_loss": 0.052482686936855316,
+        "validation_loss": 0.060009051114320755,
+        "train_action_mse": 0.052482686936855316,
+        "validation_action_mse": 0.060009051114320755
+      },
+      {
+        "epoch": 4,
+        "train_loss": 0.03807482868432999,
+        "validation_loss": 0.04665541648864746,
+        "train_action_mse": 0.03807482868432999,
+        "validation_action_mse": 0.04665541648864746
+      },
+      {
+        "epoch": 5,
+        "train_loss": 0.033691324293613434,
+        "validation_loss": 0.03845885023474693,
+        "train_action_mse": 0.033691324293613434,
+        "validation_action_mse": 0.03845885023474693
+      },
+      {
+        "epoch": 6,
+        "train_loss": 0.027184348553419113,
+        "validation_loss": 0.03809494897723198,
+        "train_action_mse": 0.027184348553419113,
+        "validation_action_mse": 0.03809494897723198
+      },
+      {
+        "epoch": 7,
+        "train_loss": 0.025635652244091034,
+        "validation_loss": 0.03141479566693306,
+        "train_action_mse": 0.025635652244091034,
+        "validation_action_mse": 0.03141479566693306
+      },
+      {
+        "epoch": 8,
+        "train_loss": 0.0205013919621706,
+        "validation_loss": 0.029605479910969734,
+        "train_action_mse": 0.0205013919621706,
+        "validation_action_mse": 0.029605479910969734
+      },
+      {
+        "epoch": 9,
+        "train_loss": 0.01912725530564785,
+        "validation_loss": 0.026727670803666115,
+        "train_action_mse": 0.01912725530564785,
+        "validation_action_mse": 0.026727670803666115
+      },
+      {
+        "epoch": 10,
+        "train_loss": 0.018512824550271034,
+        "validation_loss": 0.027676215395331383,
+        "train_action_mse": 0.018512824550271034,
+        "validation_action_mse": 0.027676215395331383
+      },
+      {
+        "epoch": 11,
+        "train_loss": 0.017543531954288483,
+        "validation_loss": 0.024386610835790634,
+        "train_action_mse": 0.017543531954288483,
+        "validation_action_mse": 0.024386610835790634
+      },
+      {
+        "epoch": 12,
+        "train_loss": 0.017263436689972878,
+        "validation_loss": 0.02197091653943062,
+        "train_action_mse": 0.017263436689972878,
+        "validation_action_mse": 0.02197091653943062
+      },
+      {
+        "epoch": 13,
+        "train_loss": 0.018085690215229988,
+        "validation_loss": 0.02616908587515354,
+        "train_action_mse": 0.018085690215229988,
+        "validation_action_mse": 0.02616908587515354
+      },
+      {
+        "epoch": 14,
+        "train_loss": 0.014578688889741898,
+        "validation_loss": 0.023338669911026955,
+        "train_action_mse": 0.014578688889741898,
+        "validation_action_mse": 0.023338669911026955
+      },
+      {
+        "epoch": 15,
+        "train_loss": 0.012960311956703663,
+        "validation_loss": 0.019379084929823875,
+        "train_action_mse": 0.012960311956703663,
+        "validation_action_mse": 0.019379084929823875
+      },
+      {
+        "epoch": 16,
+        "train_loss": 0.01334377657622099,
+        "validation_loss": 0.02163858152925968,
+        "train_action_mse": 0.01334377657622099,
+        "validation_action_mse": 0.02163858152925968
+      },
+      {
+        "epoch": 17,
+        "train_loss": 0.0119238356128335,
+        "validation_loss": 0.0178670734167099,
+        "train_action_mse": 0.0119238356128335,
+        "validation_action_mse": 0.0178670734167099
+      },
+      {
+        "epoch": 18,
+        "train_loss": 0.012351075187325478,
+        "validation_loss": 0.01802203617990017,
+        "train_action_mse": 0.012351075187325478,
+        "validation_action_mse": 0.01802203617990017
+      },
+      {
+        "epoch": 19,
+        "train_loss": 0.012302330695092678,
+        "validation_loss": 0.01950886845588684,
+        "train_action_mse": 0.012302330695092678,
+        "validation_action_mse": 0.01950886845588684
+      },
+      {
+        "epoch": 20,
+        "train_loss": 0.01927972212433815,
+        "validation_loss": 0.02918725460767746,
+        "train_action_mse": 0.01927972212433815,
+        "validation_action_mse": 0.02918725460767746
+      }
+    ]
+  },
+  "nan_count": 0,
+  "inf_count": 0,
+  "generated_success": null,
+  "action_targets_modified": false
+}

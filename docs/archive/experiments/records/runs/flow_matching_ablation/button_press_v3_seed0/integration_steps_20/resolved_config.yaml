@@ -1,0 +1,85 @@
+kind: flow_matching_generation_quality_ablation_v1
+task: button-press-v3
+backend: metaworld-v3
+reward_function_version: v2
+seed: 0
+device: cpu
+output_root: runs/flow_matching_ablation/button_press_v3_seed0
+assets:
+  expert_dataset: runs/formal/diffcrl_5task_200traj/diffcrl_5task_200traj_seed0/stage_0_button-press-v3/data_task_0.npy
+  source_report: runs/formal/diffcrl_5task_200traj/diffcrl_5task_200traj_seed0/stage_0_button-press-v3/report.json
+  expert_checkpoint: runs/reward_v2/button-press-v3/seed_0/best_model/best_model.zip
+  baseline_flow_checkpoint: runs/flow_matching_sanity/button_press_v3_seed0/flow_matching.pt
+  phase7a_summary: runs/flow_matching_sanity/button_press_v3_seed0/summary.json
+flow:
+  batch_size: 8
+  learning_rate: 0.001
+  width: 64
+  time_embedding_scale: 100.0
+  generation_seed: 100000
+  generated_trajectories: 200
+  default_integration_steps: 50
+bc:
+  epochs: 100
+  batch_size: 256
+  learning_rate: 0.001
+  hidden_sizes:
+  - 256
+  - 256
+  loss: post-tanh-mse
+  initialization_seed: 17
+  shuffle_seed: 0
+evaluation:
+  episodes: 50
+  seed: 10000
+  mode: fixed-tasks
+  task_set_seed: 10000
+experiments:
+  integration_steps_10:
+    family: integration_steps
+    integration_steps: 10
+    training_epochs: 50
+    reuse_baseline: true
+  integration_steps_20:
+    family: integration_steps
+    integration_steps: 20
+    training_epochs: 50
+    reuse_baseline: true
+  integration_steps_50:
+    family: integration_steps
+    integration_steps: 50
+    training_epochs: 50
+    reuse_baseline: true
+  integration_steps_100:
+    family: integration_steps
+    integration_steps: 100
+    training_epochs: 50
+    reuse_baseline: true
+  training_epochs_50:
+    family: training_budget
+    integration_steps: 50
+    training_epochs: 50
+    reuse_baseline: true
+  training_epochs_100:
+    family: training_budget
+    integration_steps: 50
+    training_epochs: 100
+    reuse_baseline: false
+  training_epochs_200:
+    family: training_budget
+    integration_steps: 50
+    training_epochs: 200
+    reuse_baseline: false
+debug:
+  training_epochs: 2
+  generated_trajectories: 8
+  integration_steps: 2
+  bc_epochs: 2
+  evaluation_episodes: 2
+experiment_id: integration_steps_20
+selected:
+  family: integration_steps
+  integration_steps: 20
+  training_epochs: 50
+  reuse_baseline: true
+output_dir: runs/flow_matching_ablation/button_press_v3_seed0/integration_steps_20

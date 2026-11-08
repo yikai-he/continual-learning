@@ -1,0 +1,27 @@
+{
+  "schema_version": 1,
+  "stage": 0,
+  "task": "hammer-v3",
+  "artifacts": {
+    "policy": {
+      "path": "general_policy_after_task_0_hammer-v3.pt",
+      "sha256": "7094339de7184f3fef8799f89d028f1c45c33120de8fb56b406533da3851869b"
+    },
+    "stage_state": {
+      "path": "stage_state_after_task_0_hammer-v3.pt",
+      "sha256": "05961eb452246b7ac81bcae3a7d0a9a0c7c226d628994e938d24f1c947132719"
+    },
+    "report": {
+      "path": "stage_0_hammer-v3/report.json",
+      "sha256": "1d6dbde62c6c7d69dede995a6fe8a4303ee01bfe738375ef3e3aa2ebeb959e6c"
+    },
+    "evaluation_matrix": {
+      "path": "stage_0_hammer-v3/evaluation_matrix.json",
+      "sha256": "002a2e3646c4d2818458a3876caa0788e4abec6c5ee417e86fdd441d55790af1"
+    },
+    "flow_matching": {
+      "path": "flow_matching_after_task_0_hammer-v3.pt",
+      "sha256": "b4caddd2cfd79756c77f8b1265d19c9eb9efd91a4fcfe8bf335b4be6242d4667"
+    }
+  }
+}

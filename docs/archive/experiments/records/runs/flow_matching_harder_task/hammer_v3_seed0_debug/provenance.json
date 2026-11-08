@@ -1,0 +1,17 @@
+{
+  "config_sha256": "315a64295149be8786358719e2b57aa20a3340e26a631c18ecd9e3d041579849",
+  "assets": {
+    "expert_dataset": {
+      "path": "/home/yikai/Documents/Code/Thesis/continual-learning/runs/formal/diffcrl_5task_200traj/diffcrl_5task_200traj_seed0/stage_2_hammer-v3/data_task_2.npy",
+      "sha256": "c602c23afdb204d0929b0e90bc2c1a6b5cdaf450c9d590f62ceb84f40511e2d4"
+    },
+    "source_report": {
+      "path": "/home/yikai/Documents/Code/Thesis/continual-learning/runs/formal/diffcrl_5task_200traj/diffcrl_5task_200traj_seed0/stage_2_hammer-v3/report.json",
+      "sha256": "2c8a434c82089ac06e081e13b3ccf2619731922aaf193fc87a136d3ad5e2abce"
+    },
+    "expert_checkpoint": {
+      "path": "/home/yikai/Documents/Code/Thesis/continual-learning/runs/reward_v2/hammer-v3/seed_0/best_model/best_model.zip",
+      "sha256": "4322881959f1dd3f03a3d4be8db83b28c433dc68a66cfd869bb1cd85eba23349"
+    }
+  }
+}

@@ -1,0 +1,130 @@
+{
+  "schema_version": 1,
+  "status": "complete",
+  "run_started_at": "2026-10-11T00:18:42.554410+00:00",
+  "run_completed_at": "2026-10-11T01:31:53.123538+00:00",
+  "repository": {
+    "path": "/home/yikai/Documents/Code/Final/continual-learning",
+    "commit": "598f526984a8379babc8ff64f0fdcda89cdd1aa8",
+    "branch": "main",
+    "dirty": true,
+    "changed_files": [
+      "M scripts/render_kuka_push_policy.py",
+      " M src/config.py",
+      " M src/env_adapters/kuka_v3.py",
+      " M tests/test_kuka_v3_sac.py",
+      "?? artifacts/",
+      "?? configs/sac/kuka_button_press_topdown_v3_1m.yaml",
+      "?? configs/sac/kuka_peg_unplug_side_v3_1m.yaml",
+      "?? rendered_videos/",
+      "?? scripts/render_kuka_10_tasks.py"
+    ],
+    "diff_sha256": "789cba4cc906eedb7b1bb2011c6093fde0815ac8e7c926c919cb7039167b34df"
+  },
+  "environment": {
+    "python_version": "3.10.20",
+    "platform": "Linux-7.0.0-34-generic-x86_64-with-glibc2.39",
+    "machine": "x86_64",
+    "processor": "x86_64",
+    "cpu_count": 20,
+    "torch_version": "2.13.0+cu130",
+    "stable_baselines3_version": "2.9.0",
+    "gymnasium_version": "1.3.0",
+    "mujoco_version": "3.3.0",
+    "metaworld_version": "3.1.1",
+    "metaworld_checkout": "/home/yikai/Documents/Code/Final/metaworld-kuka-v3",
+    "metaworld_git": {
+      "path": "/home/yikai/Documents/Code/Final/metaworld-kuka-v3",
+      "commit": "2ed78a08c7bf0ce0fd7aac4e44fd0ee3f9dd76ea",
+      "branch": "main",
+      "dirty": true,
+      "changed_files": [
+        "M metaworld_kuka/__init__.py",
+        " M metaworld_kuka/envs/__init__.py",
+        " M metaworld_kuka/registration.py",
+        "?? metaworld_kuka/assets/kuka_xyz/kuka_button_press_topdown_v3.xml",
+        "?? metaworld_kuka/assets/kuka_xyz/kuka_peg_unplug_side_v3.xml",
+        "?? metaworld_kuka/envs/kuka_button_press_topdown_v3.py",
+        "?? metaworld_kuka/envs/kuka_peg_unplug_side_v3.py",
+        "?? tests/metaworld_kuka/test_kuka_new_tasks_v3.py"
+      ],
+      "diff_sha256": "f6c427f2222ffdaf4aa97154f7321faa4eb3480cbb6f6dda891e7402a1ca6e0e"
+    },
+    "resolved_device": "cpu",
+    "cuda_available": false,
+    "cuda_version": "13.0",
+    "cuda_device_count": 0,
+    "cuda_devices": []
+  },
+  "experiment": {
+    "name": "sac",
+    "resolved_config": {
+      "experiment": "sac",
+      "environment": {
+        "backend": "kuka-v3",
+        "reward_function_version": "v2",
+        "hammer_reward_variant": "original",
+        "hammer_nail_progress_weight": 0.0
+      },
+      "sac": {
+        "steps": 1000000,
+        "learning_rate": 0.001,
+        "buffer_size": 1000000,
+        "learning_starts": 10000,
+        "batch_size": 128,
+        "gamma": 0.99,
+        "tau": 0.005,
+        "train_freq": 1,
+        "gradient_steps": 1,
+        "ent_coef": "auto",
+        "net_arch": [
+          256,
+          256,
+          256,
+          256
+        ],
+        "checkpoint_freq": 50000,
+        "early_stopping": {
+          "enabled": true,
+          "min_steps": 100000,
+          "success_threshold": 0.95,
+          "patience": 3
+        }
+      },
+      "continual": {
+        "tasks": [
+          "kuka-button-press-topdown-v3"
+        ]
+      },
+      "evaluation": {
+        "episodes": 20,
+        "frequency": 20000,
+        "seed_offset": 10000,
+        "mode": "sampled",
+        "task_set_seed": 10000
+      },
+      "runtime": {
+        "seed": 0,
+        "device": "cpu",
+        "output": "runs/reward_v2/kuka-button-press-topdown-v3",
+        "run_name": "seed_0_1m"
+      }
+    },
+    "canonical_config_sha256": "0419f9aa2b47040e3f588249174c07fe3f67a594e28f109d46c310ccf096a1a8",
+    "task_sequence": [
+      "kuka-button-press-topdown-v3"
+    ],
+    "runtime_seed": 0,
+    "evaluation_seed": 10000,
+    "task_set_seed": 10000,
+    "replay_mode": "diffusion",
+    "trajectory_count": 200,
+    "bc": null,
+    "diffusion": null,
+    "normalization": "layer-norm",
+    "action_representation": "raw",
+    "action_projection": "none"
+  },
+  "experts": {},
+  "task_banks": {}
+}

@@ -1,0 +1,38 @@
+{
+  "task": "kuka-drawer-close-v3",
+  "backend": "kuka-v3",
+  "seed": 0,
+  "total_timesteps": 500000,
+  "reward_function_version": "v2",
+  "horizon": 200,
+  "initial": {
+    "success_rate": 0.0,
+    "mean_return": 0.0,
+    "return_std": 0.0
+  },
+  "final": {
+    "step": 100000,
+    "success_rate": 1.0,
+    "mean_return": 1608.5156664848328,
+    "return_std": 305.44358313458594
+  },
+  "best_success": {
+    "step": 80000,
+    "success_rate": 1.0,
+    "mean_return": 1746.0,
+    "return_std": 22.891046284519195,
+    "model_path": "best_success_model/best_success_model.zip"
+  },
+  "best_return": {
+    "step": 80000,
+    "success_rate": 1.0,
+    "mean_return": 1746.0,
+    "return_std": 22.891046284519195,
+    "model_path": "best_model/best_model.zip"
+  },
+  "artifacts": {
+    "final_model": "final_model.zip",
+    "evaluations_npz": "evaluations/evaluations.npz",
+    "tensorboard": "tensorboard"
+  }
+}

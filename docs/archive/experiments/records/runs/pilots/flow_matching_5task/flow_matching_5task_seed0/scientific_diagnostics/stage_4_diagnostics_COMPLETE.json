@@ -1,0 +1,14 @@
+{
+  "kind": "flow_matching_continual_stage_diagnostics_v1",
+  "stage": 4,
+  "artifacts": {
+    "diagnostics": {
+      "path": "/home/yikai/Documents/Code/Thesis/continual-learning/runs/pilots/flow_matching_5task/flow_matching_5task_seed0/scientific_diagnostics/stage_4_window-close-v3.json",
+      "sha256": "c38d0218df7e8bc37716e736c16499e00f7bedaf117da217e4037f99c62d0add"
+    },
+    "stage_completion": {
+      "path": "/home/yikai/Documents/Code/Thesis/continual-learning/runs/pilots/flow_matching_5task/flow_matching_5task_seed0/stage_4_COMPLETE.json",
+      "sha256": "013ca27fecc229f08ce45c37d52a5d77724d16db31ca4a5bae5faf0db6a21b81"
+    }
+  }
+}

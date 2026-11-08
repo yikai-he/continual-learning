@@ -1,3 +1,9 @@
+---
+status: current
+last_verified: 2026-11-07
+applies_to: continual-learning
+---
+
 # Fixed-budget Flow Matching replay
 
 This is the authoritative architecture contract for Flow Matching replay in
@@ -27,7 +33,9 @@ continual:
   trajectories_per_task: 200
   replay_mode: flow-matching
   replay_budget: 200
-  replay_priority_strategy: uniform
+flow_matching:
+  ode_solver: euler
+  integration_steps: 100
 ```
 
 `trajectories_per_task` is the current expert collection count.
@@ -38,6 +46,11 @@ order: 200 across three tasks is `67, 67, 66`. If the budget is smaller than
 the number of historical tasks, later task IDs receive zero. Allocations are
 recorded in stage reports. Unsupported strategies fail validation; there is no
 silent fallback.
+
+The sampler supports the solver names accepted by `FlowMatchingConfig`;
+canonical fixed-budget configurations use fixed-step Euler integration. Solver,
+step count, tolerances, and neural-function-evaluation metadata are recorded in
+replay provenance.
 
 `allocate_replay` is independent of environments, models, generation, and
 training. A future prioritization method can extend its strategy input once a

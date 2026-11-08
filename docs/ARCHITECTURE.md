@@ -1,3 +1,9 @@
+---
+status: current
+last_verified: 2026-11-07
+applies_to: continual-learning
+---
+
 # Project Architecture
 
 This document describes the architecture implemented in this repository. It is
@@ -5,6 +11,14 @@ not a proposal for a future framework. The main research pipeline is DiffCRL: a
 persistent behavior-cloning (BC) policy learns an ordered task sequence from
 current-task trajectories produced by frozen SAC experts and, depending on the
 experiment, historical real or generated replay.
+
+DiffCRL is inspired by DISTR, but the training architecture is materially
+different. The original DISTR method continually trains an Immediate Policy
+and uses generated trajectories to stabilize that online continual-RL process.
+This repository instead trains SAC experts independently, freezes them, and
+uses their rollouts as supervision for a persistent `GeneralPolicy`. Its DDPM
+trajectory replay is therefore an adaptation of the generative-replay idea,
+not an exact reproduction of the DISTR algorithm or protocol.
 
 ## 1. Repository overview
 
@@ -23,16 +37,14 @@ continual-learning/
 ├── src/
 │   ├── config.py                # typed configuration, validation, CLI overrides
 │   ├── envs.py                  # public environment factory and shared settings
-│   ├── env_adapters/            # MetaWorld, KUKA-v2, and KUKA-v3 adapters
+│   ├── env_adapters/            # MetaWorld-v3 and KUKA-v3 adapters
 │   ├── continual/               # data, replay, BC, generators, evaluation, resume
-│   ├── sac/                     # SAC checkpoint ranking and KUKA diagnostics
+│   ├── sac/                     # SAC checkpoint ranking and policy transfer
 │   └── support/                 # persistence, manifests, hashes, stage sync
 ├── scripts/
 │   ├── collection/              # standalone expert trajectory collection
 │   ├── evaluation/              # SAC and continual-policy evaluation
-│   ├── diagnostics/             # task- and trajectory-specific diagnostics
-│   ├── flow_matching/           # Flow experiment analysis/validation utilities
-│   └── visualization/           # policy rendering
+│   └── evaluation/              # SAC and continual-policy evaluation
 ├── tests/                       # unit, regression, smoke, and integration tests
 ├── docs/                        # architecture, audits, inventories, experiment notes
 └── runs/                        # configured outputs when runtime.output selects it
@@ -47,7 +59,7 @@ Important modules under `src/continual/` are:
 | `diffusion_data.py`, `stage_dataset.py` | Physical trajectory packing, generative encoding, episode splits and BC flattening |
 | `bc_policy.py` | Persistent deterministic `GeneralPolicy` and BC training |
 | `trajectory_diffusion.py` | Conditional DDPM network, objective, sampler and checkpoint loader |
-| `trajectory_flow_matching.py` | Conditional Flow Matching network, objective, Euler sampler and checkpoint loader |
+| `trajectory_flow_matching.py` | Conditional Flow Matching network, objective, ODE sampler and checkpoint loader |
 | `generator_training.py`, `generator_normalization.py` | Shared fitting lifecycle, device boundary, checkpoint payload and feature normalization |
 | `diffcrl_replay.py`, `flow_matching_replay.py`, `real_replay.py` | Historical replay providers |
 | `replay_common.py`, `replay_allocation.py` | Shared replay decoding/provenance and deterministic budget allocation |
@@ -105,13 +117,15 @@ For stage `k`, `DiffCRLTrainer.train_task()` performs the following order:
 The implemented DiffCRL replay modes are `none`, `diffusion`, `flow-matching`,
 and `real`. `train_continual_sac.py` is a different baseline: one SAC learner is
 carried across tasks, its replay buffer is reset at boundaries, and it does not
-use experts, BC, or generative replay.
+use experts, BC, or generative replay. That baseline currently constructs
+MetaWorld-v3 environments directly; KUKA-v3 DiffCRL is implemented, but KUKA
+sequential SAC is not.
 
 ## 3. Environment integration
 
 `src/envs.py` exposes `make_env(backend, task, seed, ...)` and immutable
-`EnvironmentSettings`. Supported backends are `metaworld-v3`, `kuka-v2`, and
-`kuka-v3`; their current horizons are all obtained through
+`EnvironmentSettings`. Supported backends are `metaworld-v3` and `kuka-v3`;
+their horizons are obtained through
 `horizon_for_backend()` rather than assumed by callers.
 
 The shared policy-facing contract is defined in `src/env_adapters/__init__.py`:
@@ -125,9 +139,12 @@ The shared policy-facing contract is defined in `src/env_adapters/__init__.py`:
 MetaWorld-v3 environments are created through Gymnasium registration
 `Meta-World/MT1`, with `use_one_hot=False`, a 200-step limit,
 `terminate_on_success=False`, and a 39D observation wrapper. KUKA-v3 uses the
-registered `Meta-World-KUKA/MT1` interface and validates task-specific reward and
-initialization options. `EpisodeSuccessWrapper` accumulates success across the
-episode and exposes it as terminal `info["is_success"]`.
+registered `Meta-World-KUKA/MT1` interface and validates the shared
+`reward_function_version`. Hammer and Peg Unplug keep their fixed reward
+definitions inside their KUKA-v3 task implementations; task-specific reward
+variants and progress coefficients are not public environment or experiment
+configuration. `EpisodeSuccessWrapper` accumulates success across the episode
+and exposes it as terminal `info["is_success"]`.
 
 The workspace-local KUKA fork is expected beside this repository:
 
@@ -179,6 +196,31 @@ The unpadded `Trajectory` schema is:
 | `final_success` | success on the final step |
 | `length` | common `T`, `1 <= T <= horizon` |
 
+### Optional task-conditioned behavioral cloning
+
+`bc.task_conditioning` defaults to `none`, preserving the original 39D
+GeneralPolicy input, parameters, calls, and checkpoint compatibility. Setting it
+to `one_hot` appends a one-hot vector whose ordering is exactly
+`continual.tasks`; its width is fixed from the full sequence at stage zero. The
+result remains one persistent shared network with the same hidden layers,
+LayerNorm, activations, and bounded action output—there are no per-task heads.
+
+Whole-episode stage labels already used by the conditional generators are
+repeated across timesteps when constructing the BC dataset. Consequently,
+current expert data and historical diffusion, Flow Matching, or real replay
+retain their known group identity without changing the physical `(39 + 4)`
+trajectory representation or inferring identity from observations. During
+evaluation, the known evaluation-task index is passed explicitly to the policy.
+
+Task-conditioned checkpoints record the conditioning mode, full ordered task
+list, task count, and resulting input dimension. Loading validates mode and
+ordering. Older task-agnostic `general_policy_v2` checkpoints omit these fields
+and are interpreted as `none`, while conditioned checkpoints cannot silently
+load under that mode. This option is a Task-Incremental Learning protocol: it
+provides true task identity at inference and therefore uses a different
+information setting from task-agnostic evaluation; it does not expose old
+environments or expert policies.
+
 DiffCRL formal packing accepts only full-horizon trajectories. It packs
 observation and action into `(N,T,43)` float32 tensors. The standalone
 collection entry point is
@@ -189,15 +231,16 @@ arrays and a provenance report through `expert_collection.py`.
 
 ### 5.1 Shared infrastructure
 
-There is no formal generator protocol. Both models implement the effective
-interface used by shared code:
+There is no formal generator protocol. Both models implement the common core
+used by shared code:
 
 ```python
 model.loss(clean, *, generator, task_ids=None, goals=None)
-model.sample(count, *, seed=0, task_ids=None, goals=None, execution_mode="legacy")
+model.sample(count, *, seed=0, task_ids=None, goals=None, ...)
 ```
 
-Flow sampling additionally accepts `integration_steps` and `progress`.
+DDPM sampling accepts `execution_mode`. Flow sampling instead accepts
+`integration_steps`, `solver`, `rtol`, and `atol`.
 
 `generator_training.py` owns deterministic loss assessment, shuffled minibatch
 training, gradient clipping at 1.0, Adam construction, lowest-validation-loss
@@ -262,23 +305,26 @@ u_t=x_1-x_0,
 L=\|v_\theta(x_t,t,c)-u_t\|_2^2.
 ```
 
-Sampling integrates from `t=0` to `t=1` with fixed-step explicit Euler. The
-configured integration step count is also the neural-function-evaluation count.
+Sampling integrates from `t=0` to `t=1` through `torchdiffeq.odeint`. Supported
+methods are fixed-step `euler`, `midpoint`, `heun2`, and `rk4`, plus adaptive
+`dopri5`. `integration_steps` supplies the fixed step size for fixed-step
+methods; neural-function evaluations are measured rather than inferred because
+higher-order and adaptive solvers evaluate the velocity field multiple times.
 Flow checkpoints use kind `trajectory_flow_matching_22_v1` and include model
 configuration, state, both normalizers, and replay provenance.
 
-### 5.4 Execution modes
+### 5.4 DDPM execution modes
 
-Both samplers support:
+The DDPM sampler supports:
 
 - `execution_mode="legacy"` (default): sampling state and CPU generator remain
   on CPU; each neural evaluation moves inputs to the network device and returns
   its output to CPU. This preserves historical random streams.
 - `execution_mode="device-native"`: conditions move once, noise is created by an
   explicit generator on the network device, all sampling steps remain there,
-  and the final result returns to CPU. Replay request objects can forward this
-  mode programmatically; current experiment configurations do not add a YAML
-  field for it.
+  and the final result returns to CPU. Diffusion replay requests can forward
+  this mode programmatically; current experiment configurations do not add a
+  YAML field for it.
 
 CPU tests establish exact equality between both modes. CUDA uses a CUDA RNG and
 is not promised bitwise-equivalent to CPU. CUDA execution has not yet been
@@ -305,13 +351,23 @@ Replay allocation supports:
   tasks, assigning any remainder in curriculum order.
 
 The `none` mode trains BC only from the current expert group. All methods use
-the same persistent `GeneralPolicy`: an MLP over raw 39D observations with
-exactly four 256-unit hidden layers, LayerNorm after the first Linear layer,
-ReLU activations, and a final `tanh` mapped to environment action bounds. This
-is the only supported GeneralPolicy and transferable SAC architecture;
-incompatible checkpoints and `net_arch` values are rejected. BC supports
-physical post-`tanh` MSE and pre-`tanh` latent MSE;
-checkpoint selection always uses held-out physical action MSE.
+the same persistent `GeneralPolicy`: an MLP over a raw 39D observation and,
+optionally, the fixed-width task one-hot vector. It has exactly four 256-unit
+hidden layers, LayerNorm after the first Linear layer, ReLU activations, and a
+final `tanh` mapped to environment action bounds. This is the only supported
+GeneralPolicy architecture; incompatible checkpoints and configured hidden
+sizes are rejected. Its architecture and LayerNorm policy are implementation
+constants rather than experiment settings. Historical two-hidden-layer checkpoints remain unchanged
+under `runs/`, but the current loader does not support them.
+
+The standard SB3 SAC actor shares the four 256-unit hidden dimensions and ReLU
+activations, but it is not structurally identical: it has no LayerNorm and has
+separate mean and log-standard-deviation heads for its squashed-Gaussian
+policy. `TransferableActor` is a specialized SAC actor whose deterministic
+mean-action pathway matches the task-agnostic GeneralPolicy, including the
+first-layer LayerNorm; its exploration head and SAC critics remain separate.
+BC supports physical post-`tanh` MSE and pre-`tanh` latent MSE, and checkpoint
+selection always uses held-out physical action MSE.
 
 ## 7. Data contracts
 
@@ -324,7 +380,7 @@ checkpoint selection always uses held-out physical action MSE.
 | Generator dynamic input | `(N,T,22)` | `encode_trajectory` | DDPM/Flow `_validate` |
 | Generator goal condition | `(N,3)` float32 | `encode_trajectory` or task-bank reconstruction | generator condition validation |
 | Generator task condition | `(N,)` `torch.long` | stage labels/replay provider | embedding range validation |
-| BC dataset | observations `(N*T,39)`, actions `(N*T,4)` | `bc_dataset` | `fit_bc` |
+| BC dataset | observations `(N*T,39)`, actions `(N*T,4)`, plus optional task IDs `(N*T,)` | `bc_dataset` | `fit_bc` |
 | Evaluation cell | returns, success rate, lengths, seeds and provenance | `evaluate_task` | `EvaluationMatrix.record` |
 
 Within every physical episode, previous state at reset equals current state;
@@ -340,6 +396,16 @@ strictly for the selected entry point. CLI overrides include `--seed`,
 `--device`, output/run naming, plus entry-point-specific options such as
 `--resume-from` for DiffCRL. Defaults in code are fallback defaults; formal,
 smoke, local, and archived YAML files intentionally override them.
+
+Scientifically fixed choices are intentionally absent from active YAML: SAC
+uses automatic entropy tuning with four 256-unit hidden layers; GeneralPolicy
+uses the architecture and LayerNorm placement described above; generator
+training clips gradients at norm 1 and averages four validation draws; Flow
+Matching uses six residual blocks, sinusoidal time embedding, a linear path,
+standard-normal source noise, and validation-loss checkpoint selection; replay
+allocation priority is uniform. Completed DiffCRL runs can still load legacy
+resolved configurations containing exactly these values, while new configs
+reject the obsolete keys.
 
 Reproducibility mechanisms include:
 
@@ -435,7 +501,7 @@ PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 \
   tests/test_kuka_diffcrl_phase1.py tests/test_kuka_v3_sac.py
 ```
 
-Current confirmed limitations are that CUDA device-native sampling has not been
+Current confirmed limitations are that CUDA device-native DDPM sampling has not been
 tested on a CUDA-capable host, and the larger KUKA evaluation group can be
 resource-intensive. Tests do not replace full thesis experiment runs.
 
@@ -475,7 +541,7 @@ To add another generative replay method without duplicating infrastructure:
   reproducibility.
 - KUKA-v3 depends on the separately maintained editable sibling checkout; a
   public `metaworld` wheel alone does not provide `metaworld_kuka`.
-- Fixed-task evaluation is implemented for MetaWorld-v3 and KUKA-v3, not KUKA-v2.
+- Fixed-task evaluation is implemented for MetaWorld-v3 and KUKA-v3.
 - Forward transfer requires aligned external learning/reference curves and is
   not derivable from the endpoint matrix alone.
 - The repository implements simulated MetaWorld/KUKA environments; no real-robot

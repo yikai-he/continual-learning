@@ -1,0 +1,38 @@
+{
+  "task": "kuka-faucet-open-v3",
+  "backend": "kuka-v3",
+  "seed": 0,
+  "total_timesteps": 500000,
+  "reward_function_version": "v2",
+  "horizon": 200,
+  "initial": {
+    "success_rate": 0.0,
+    "mean_return": 670.6690700476252,
+    "return_std": 75.06489096482406
+  },
+  "final": {
+    "step": 120000,
+    "success_rate": 1.0,
+    "mean_return": 1870.312239111685,
+    "return_std": 36.23532842272838
+  },
+  "best_success": {
+    "step": 120000,
+    "success_rate": 1.0,
+    "mean_return": 1870.312239111685,
+    "return_std": 36.23532842272838,
+    "model_path": "best_success_model/best_success_model.zip"
+  },
+  "best_return": {
+    "step": 120000,
+    "success_rate": 1.0,
+    "mean_return": 1870.312239111685,
+    "return_std": 36.23532842272838,
+    "model_path": "best_model/best_model.zip"
+  },
+  "artifacts": {
+    "final_model": "final_model.zip",
+    "evaluations_npz": "evaluations/evaluations.npz",
+    "tensorboard": "tensorboard"
+  }
+}

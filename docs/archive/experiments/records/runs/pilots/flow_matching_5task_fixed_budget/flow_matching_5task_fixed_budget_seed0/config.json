@@ -1,0 +1,89 @@
+{
+  "trajectories_per_task": 200,
+  "replay_budget": 200,
+  "replay_priority_strategy": "uniform",
+  "diffusion_epochs": 300,
+  "bc_epochs": 100,
+  "eval_episodes": 50,
+  "seed": 0,
+  "eval_seed": 10000,
+  "diffusion_steps": 100,
+  "diffusion_width": 64,
+  "bc_normalization_mode": "layer-norm",
+  "replay_mode": "flow-matching",
+  "bc_loss": "post-tanh-mse",
+  "diffusion_action_space": "raw",
+  "diffusion_action_clamp_epsilon": 0.0001,
+  "generated_action_projection": "none",
+  "evaluation_mode": "fixed-tasks",
+  "tasks": [
+    "button-press-v3",
+    "faucet-close-v3",
+    "hammer-v3",
+    "handle-press-side-v3",
+    "window-close-v3"
+  ],
+  "environment_backend": "metaworld-v3",
+  "horizon": 200,
+  "task_set_seed": 10000,
+  "diffusion": null,
+  "flow_matching": {
+    "horizon": 200,
+    "features": 22,
+    "width": 64,
+    "num_tasks": 5,
+    "integration_steps": 10,
+    "time_embedding_scale": 100.0
+  },
+  "experts": {
+    "button-press-v3": {
+      "path": "/home/yikai/Documents/Code/Thesis/continual-learning/runs/reward_v2/button-press-v3/seed_0/best_model/best_model.zip",
+      "sha256": "219352eba6e5e925fa74198f848de2b900244011c157bb4e6579c23926b1eb31"
+    },
+    "faucet-close-v3": {
+      "path": "/home/yikai/Documents/Code/Thesis/continual-learning/runs/reward_v2/faucet-close-v3/seed_0/best_model/best_model.zip",
+      "sha256": "7adf6b40f7f658dc862abafc7aa3e3a85a30f3304a7fb97829f98d9727d80ab6"
+    },
+    "hammer-v3": {
+      "path": "/home/yikai/Documents/Code/Thesis/continual-learning/runs/reward_v2/hammer-v3/seed_0/best_model/best_model.zip",
+      "sha256": "4322881959f1dd3f03a3d4be8db83b28c433dc68a66cfd869bb1cd85eba23349"
+    },
+    "handle-press-side-v3": {
+      "path": "/home/yikai/Documents/Code/Thesis/continual-learning/runs/reward_v2/handle-press-side-v3/seed_0/best_model/best_model.zip",
+      "sha256": "65de03b10d86fff3d493657a39601d09c6ece1e7d72df8a5369d9010b0dbbd1c"
+    },
+    "window-close-v3": {
+      "path": "/home/yikai/Documents/Code/Thesis/continual-learning/runs/reward_v2/window-close-v3/seed_0/final_model.zip",
+      "sha256": "51b6eeaa4ed54fcb08af64e8ed4a832371dd4ed324a84c59c9213eed025eb39a"
+    }
+  },
+  "historical_replay_budget": 200,
+  "split": "per-task whole episodes; rounded 20% validation",
+  "bc": {
+    "hidden_sizes": [
+      256,
+      256
+    ],
+    "epochs": 100,
+    "batch_size": 256,
+    "learning_rate": 0.001,
+    "objective": "post-tanh-mse",
+    "clamp_epsilon": 0.0001
+  },
+  "diffusion_fit": {
+    "batch_size": 8,
+    "learning_rate": 0.001,
+    "prediction": "x0"
+  },
+  "flow_matching_fit": {
+    "epochs": 200,
+    "batch_size": 8,
+    "learning_rate": 0.001,
+    "gradient_clip_norm": 1.0,
+    "validation_samples": 4,
+    "checkpoint_selection": "validation-loss"
+  },
+  "normalization": "stage training split only, feature std floor .001; no normalization clipping",
+  "optimizers": "BC Adam fresh per stage with paired best-epoch restoration; Flow Matching Adam fresh per fit",
+  "collection": "deterministic; all episodes retained; any-step success recorded"
+}

@@ -1,0 +1,27 @@
+{
+  "schema_version": 1,
+  "stage": 3,
+  "task": "handle-press-side-v3",
+  "artifacts": {
+    "policy": {
+      "path": "general_policy_after_task_3_handle-press-side-v3.pt",
+      "sha256": "75bdfe4dad2d0144384f0987b34ce1a0bc0366c5e2506186944c8c4046f980df"
+    },
+    "stage_state": {
+      "path": "stage_state_after_task_3_handle-press-side-v3.pt",
+      "sha256": "323556f2a51c46f3b13b0bb365338058694a228b8fc4c48b46a1445dcbdac3b0"
+    },
+    "report": {
+      "path": "stage_3_handle-press-side-v3/report.json",
+      "sha256": "37604310377b175a9c8dcd10b42f96cfd93739e04161b26bb44d9ed23a3f8287"
+    },
+    "evaluation_matrix": {
+      "path": "stage_3_handle-press-side-v3/evaluation_matrix.json",
+      "sha256": "bacdb67a94b013d3b8b386450410307326f09650c82668e426634c57626a620e"
+    },
+    "flow_matching": {
+      "path": "flow_matching_after_task_3_handle-press-side-v3.pt",
+      "sha256": "38505d258cde9c6a5200e232c063c58c271da5c1c6578de097b814448e67546c"
+    }
+  }
+}

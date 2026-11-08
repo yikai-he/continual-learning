@@ -1,0 +1,101 @@
+{
+  "raw_original_center_z_m": 0.02,
+  "variants": {
+    "cube_40": {
+      "dimensions_m": [
+        0.04,
+        0.04,
+        0.04
+      ],
+      "raw_bottom_z_m": 0.0,
+      "raw_placement_feasible": true,
+      "evaluation_center_and_goal_z_m": 0.02,
+      "explicit_vertical_adjustment_m": 0.0,
+      "initial_success_precluded_by_sampling_minimum_m": 0.15,
+      "tcp_workspace_m": {
+        "low": [
+          -0.25,
+          0.42,
+          0.04
+        ],
+        "high": [
+          0.25,
+          0.75,
+          0.5
+        ]
+      }
+    },
+    "cube_60": {
+      "dimensions_m": [
+        0.06,
+        0.06,
+        0.06
+      ],
+      "raw_bottom_z_m": -0.009999999999999998,
+      "raw_placement_feasible": false,
+      "evaluation_center_and_goal_z_m": 0.03,
+      "explicit_vertical_adjustment_m": 0.009999999999999998,
+      "initial_success_precluded_by_sampling_minimum_m": 0.15,
+      "tcp_workspace_m": {
+        "low": [
+          -0.25,
+          0.42,
+          0.04
+        ],
+        "high": [
+          0.25,
+          0.75,
+          0.5
+        ]
+      }
+    },
+    "cube_80": {
+      "dimensions_m": [
+        0.08,
+        0.08,
+        0.08
+      ],
+      "raw_bottom_z_m": -0.02,
+      "raw_placement_feasible": false,
+      "evaluation_center_and_goal_z_m": 0.04,
+      "explicit_vertical_adjustment_m": 0.02,
+      "initial_success_precluded_by_sampling_minimum_m": 0.15,
+      "tcp_workspace_m": {
+        "low": [
+          -0.25,
+          0.42,
+          0.04
+        ],
+        "high": [
+          0.25,
+          0.75,
+          0.5
+        ]
+      }
+    },
+    "box_60x60x30": {
+      "dimensions_m": [
+        0.06,
+        0.06,
+        0.03
+      ],
+      "raw_bottom_z_m": 0.005000000000000001,
+      "raw_placement_feasible": false,
+      "evaluation_center_and_goal_z_m": 0.015,
+      "explicit_vertical_adjustment_m": -0.005000000000000001,
+      "initial_success_precluded_by_sampling_minimum_m": 0.15,
+      "tcp_workspace_m": {
+        "low": [
+          -0.25,
+          0.42,
+          0.04
+        ],
+        "high": [
+          0.25,
+          0.75,
+          0.5
+        ]
+      }
+    }
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "kind": "flow_matching_ablation_completion_v1",
+  "stage": "training",
+  "config_sha256": "8038e801428080b5cd0d20f7e705382fc5f1ff97b5dfff8c0f3cfe4a842d33b5",
+  "artifacts": {
+    "checkpoint": {
+      "path": "/home/yikai/Documents/Code/Thesis/continual-learning/runs/flow_matching_ablation/button_press_v3_seed0/training_epochs_200/training_attempt_1793287499808048750/flow_matching.pt",
+      "sha256": "f01af1c768421630f44e246541af46fefd3480becbfcdba9dbbe8e840b3afa16"
+    },
+    "curve": {
+      "path": "/home/yikai/Documents/Code/Thesis/continual-learning/runs/flow_matching_ablation/button_press_v3_seed0/training_epochs_200/training_attempt_1793287499808048750/flow_training_curve.json",
+      "sha256": "821220e005404447bd74927fd0ec39fb6361b8e7d51f618c31bf6c76eb429e00"
+    }
+  }
+}

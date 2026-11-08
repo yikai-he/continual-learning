@@ -1,3 +1,9 @@
+---
+status: current
+last_verified: 2026-11-07
+applies_to: continual-learning
+---
+
 # Immediate SAC Forward Transfer Experiment
 
 This standalone experiment compares random and GeneralPolicy-transferred

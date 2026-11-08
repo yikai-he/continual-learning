@@ -1,0 +1,21 @@
+condition,task,mean_success_pct,sample_sd_pct,seed_0_success_pct,seed_1_success_pct,seed_2_success_pct
+No Replay + None,button-press-v3,14.000000000000002,13.114877048604,0.0,16.0,26.0
+No Replay + None,faucet-close-v3,23.333333333333332,20.816659994661325,0.0,30.0,40.0
+No Replay + None,hammer-v3,10.000000000000002,8.717797887081348,14.000000000000002,0.0,16.0
+No Replay + None,handle-press-side-v3,1.3333333333333335,2.3094010767585034,0.0,0.0,4.0
+No Replay + None,window-close-v3,100.0,0.0,100.0,100.0,100.0
+No Replay + One-hot,button-press-v3,14.666666666666666,25.403411844343537,0.0,44.0,0.0
+No Replay + One-hot,faucet-close-v3,0.0,0.0,0.0,0.0,0.0
+No Replay + One-hot,hammer-v3,0.0,0.0,0.0,0.0,0.0
+No Replay + One-hot,handle-press-side-v3,7.333333333333333,11.015141094572204,20.0,2.0,0.0
+No Replay + One-hot,window-close-v3,100.0,0.0,100.0,100.0,100.0
+DiffCRL + None,button-press-v3,100.0,0.0,100.0,100.0,100.0
+DiffCRL + None,faucet-close-v3,100.0,0.0,100.0,100.0,100.0
+DiffCRL + None,hammer-v3,88.0,7.9999999999999964,80.0,96.0,88.0
+DiffCRL + None,handle-press-side-v3,96.0,3.9999999999999982,96.0,92.0,100.0
+DiffCRL + None,window-close-v3,100.0,0.0,100.0,100.0,100.0
+DiffCRL + One-hot,button-press-v3,100.0,0.0,100.0,100.0,100.0
+DiffCRL + One-hot,faucet-close-v3,100.0,0.0,100.0,100.0,100.0
+DiffCRL + One-hot,hammer-v3,82.0,5.2915026221291805,78.0,80.0,88.0
+DiffCRL + One-hot,handle-press-side-v3,99.33333333333333,1.1547005383792524,98.0,100.0,100.0
+DiffCRL + One-hot,window-close-v3,100.0,0.0,100.0,100.0,100.0

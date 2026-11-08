@@ -1,0 +1,522 @@
+{
+  "stage": 1,
+  "task": "faucet-close-v3",
+  "bc_normalization_mode": "layer-norm",
+  "bc_loss": "post-tanh-mse",
+  "bc_clamp_epsilon": 0.0001,
+  "diffusion_action_space": "raw",
+  "diffusion_action_clamp_epsilon": 0.0001,
+  "generated_action_projection": "none",
+  "real_diffusion_encode_clip_fraction": 0.0,
+  "sources": {
+    "faucet-close-v3": {
+      "kind": "real_expert",
+      "checkpoint": "/home/yikai/Documents/Code/Metaworld/runs/reward_v2/faucet-close-v3/seed_0/best_model/best_model.zip",
+      "checkpoint_sha256": "7adf6b40f7f658dc862abafc7aa3e3a85a30f3304a7fb97829f98d9727d80ab6",
+      "seeds": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19
+      ],
+      "success_count": 20,
+      "success_rate": 1.0,
+      "episode_returns": [
+        1756.9209318311766,
+        1777.9421563221208,
+        1790.1346604783587,
+        1793.1346582581918,
+        1785.2392439535408,
+        1771.3309103680194,
+        1777.6035802880692,
+        1769.0606329546122,
+        1757.2939578095957,
+        1753.9864193999351,
+        1789.1727821063205,
+        1771.601102722677,
+        1790.1346604783587,
+        1748.1004252087112,
+        1751.349477706452,
+        1771.306453712955,
+        1777.9421563221208,
+        1783.5090639871241,
+        1783.5090639871241,
+        1776.2419119902825
+      ],
+      "mean_return": 1773.7757124942877,
+      "std_return": 13.549816421546145,
+      "real_diffusion_encode_clip_fraction": 0.0,
+      "collection_configurations": [
+        {
+          "configuration_index": 42,
+          "task_data_sha256": "ec6c13000ee913e1bb14ff0c32a45a776a5c7e335ad76f887090ce4c5fce162d",
+          "task_name": "faucet-close-v3",
+          "env_name": "faucet-close-v3",
+          "bank_seed": 0,
+          "episode_id": 0
+        },
+        {
+          "configuration_index": 31,
+          "task_data_sha256": "e976911145c3d8285f6ddc4cd7b7eb840a82b8d060d48737eb73285c26c02074",
+          "task_name": "faucet-close-v3",
+          "env_name": "faucet-close-v3",
+          "bank_seed": 0,
+          "episode_id": 1
+        },
+        {
+          "configuration_index": 25,
+          "task_data_sha256": "d4aa6f8736b91c8b7756f254792a9f25b36383f8cd3d606d20860f6ae3a21976",
+          "task_name": "faucet-close-v3",
+          "env_name": "faucet-close-v3",
+          "bank_seed": 0,
+          "episode_id": 2
+        },
+        {
+          "configuration_index": 13,
+          "task_data_sha256": "6e202b0c4e73466f4c520fcb872d0927581755bb071e1da153ef2debc545033b",
+          "task_name": "faucet-close-v3",
+          "env_name": "faucet-close-v3",
+          "bank_seed": 0,
+          "episode_id": 3
+        },
+        {
+          "configuration_index": 15,
+          "task_data_sha256": "aa0afc911ca07a130e3d0ffc958bb3adb9ae5e0a3ac6874c5f0f06813a069c2d",
+          "task_name": "faucet-close-v3",
+          "env_name": "faucet-close-v3",
+          "bank_seed": 0,
+          "episode_id": 4
+        },
+        {
+          "configuration_index": 2,
+          "task_data_sha256": "34fbc83e9534101da6d727b99d2c909edf95f8620c466f3ea7f217c5021f41d2",
+          "task_name": "faucet-close-v3",
+          "env_name": "faucet-close-v3",
+          "bank_seed": 0,
+          "episode_id": 5
+        },
+        {
+          "configuration_index": 3,
+          "task_data_sha256": "666abf3d4d7b665fa56ee76c1b3f896cf80b722005b492544ce3d10118e298b0",
+          "task_name": "faucet-close-v3",
+          "env_name": "faucet-close-v3",
+          "bank_seed": 0,
+          "episode_id": 6
+        },
+        {
+          "configuration_index": 0,
+          "task_data_sha256": "dc07374ef0eaa3ee1d8b87397fcd1501bee267e63efbcf7d1d74cf2ef9c60c0c",
+          "task_name": "faucet-close-v3",
+          "env_name": "faucet-close-v3",
+          "bank_seed": 0,
+          "episode_id": 7
+        },
+        {
+          "configuration_index": 8,
+          "task_data_sha256": "04b85cdcd3e0ff678c4fc38d7214e19a0017bb6154cb3fb98e8a59e6f93fd771",
+          "task_name": "faucet-close-v3",
+          "env_name": "faucet-close-v3",
+          "bank_seed": 0,
+          "episode_id": 8
+        },
+        {
+          "configuration_index": 40,
+          "task_data_sha256": "741700e7fffbc9318c41efc838e2392c8719ce765668fb3aeeeea489695b8ff4",
+          "task_name": "faucet-close-v3",
+          "env_name": "faucet-close-v3",
+          "bank_seed": 0,
+          "episode_id": 9
+        },
+        {
+          "configuration_index": 32,
+          "task_data_sha256": "90fa9661e4b591ff95be335c603d4d98b50f2629065ea06016fb23d0cbb03f1b",
+          "task_name": "faucet-close-v3",
+          "env_name": "faucet-close-v3",
+          "bank_seed": 0,
+          "episode_id": 10
+        },
+        {
+          "configuration_index": 45,
+          "task_data_sha256": "fe7550e75d8c56dc83f18db6b53d34daf4dae16d193565f5e89667902e642073",
+          "task_name": "faucet-close-v3",
+          "env_name": "faucet-close-v3",
+          "bank_seed": 0,
+          "episode_id": 11
+        },
+        {
+          "configuration_index": 25,
+          "task_data_sha256": "d4aa6f8736b91c8b7756f254792a9f25b36383f8cd3d606d20860f6ae3a21976",
+          "task_name": "faucet-close-v3",
+          "env_name": "faucet-close-v3",
+          "bank_seed": 0,
+          "episode_id": 12
+        },
+        {
+          "configuration_index": 30,
+          "task_data_sha256": "fd35224695cf6a52b0313a58d30b73bdcb63a82ab327c06d327769d9c144655f",
+          "task_name": "faucet-close-v3",
+          "env_name": "faucet-close-v3",
+          "bank_seed": 0,
+          "episode_id": 13
+        },
+        {
+          "configuration_index": 48,
+          "task_data_sha256": "abc0fcdb0bdf773f947320539523170bbfb3e16972bc797135bf29ac6677ee9c",
+          "task_name": "faucet-close-v3",
+          "env_name": "faucet-close-v3",
+          "bank_seed": 0,
+          "episode_id": 14
+        },
+        {
+          "configuration_index": 36,
+          "task_data_sha256": "58a56086f36ebd81ce021d4a248dbe8f7af2e784d642494103f75682a38fff90",
+          "task_name": "faucet-close-v3",
+          "env_name": "faucet-close-v3",
+          "bank_seed": 0,
+          "episode_id": 15
+        },
+        {
+          "configuration_index": 31,
+          "task_data_sha256": "e976911145c3d8285f6ddc4cd7b7eb840a82b8d060d48737eb73285c26c02074",
+          "task_name": "faucet-close-v3",
+          "env_name": "faucet-close-v3",
+          "bank_seed": 0,
+          "episode_id": 16
+        },
+        {
+          "configuration_index": 27,
+          "task_data_sha256": "b66ac3c032a4a8dff070409e7259e1c5198318f0c1f7d7bfb9998453544ef1ab",
+          "task_name": "faucet-close-v3",
+          "env_name": "faucet-close-v3",
+          "bank_seed": 0,
+          "episode_id": 17
+        },
+        {
+          "configuration_index": 27,
+          "task_data_sha256": "b66ac3c032a4a8dff070409e7259e1c5198318f0c1f7d7bfb9998453544ef1ab",
+          "task_name": "faucet-close-v3",
+          "env_name": "faucet-close-v3",
+          "bank_seed": 0,
+          "episode_id": 18
+        },
+        {
+          "configuration_index": 46,
+          "task_data_sha256": "c3de4b8bb482d8c85ca816655715dc10ec2c3500bf2833f681b1c55d3dde9956",
+          "task_name": "faucet-close-v3",
+          "env_name": "faucet-close-v3",
+          "bank_seed": 0,
+          "episode_id": 19
+        }
+      ],
+      "data_path": "/home/yikai/Documents/Code/Metaworld/runs/validation/cl_layernorm_2task_noreplay_20260924_01/stage_1_faucet-close-v3/data_task_1.npy",
+      "data_sha256": "b8e6e31f7ec8972119cd650a9c5c6f6908a0fd98640f726ba8893b2058533408",
+      "bc_target_clip_fraction": 0.0
+    }
+  },
+  "splits": {
+    "faucet-close-v3": {
+      "train_ids": [
+        5,
+        13,
+        9,
+        19,
+        11,
+        4,
+        18,
+        1,
+        7,
+        2,
+        6,
+        10,
+        12,
+        16,
+        3,
+        15
+      ],
+      "validation_ids": [
+        8,
+        0,
+        17,
+        14
+      ],
+      "trajectories": 20,
+      "train_samples": 3200,
+      "validation_samples": 800
+    }
+  },
+  "diffusion_before_state_sha256": null,
+  "policy_before_state_sha256": "f4e42b8c5a2732864f397fd095e25a12353d3491cbad3fcbea70568c14f11368",
+  "policy_after_state_sha256": "119b4e0f82fb4035bb2287251efbbe10f7793dc06aec7d35a4caf72120176e20",
+  "diffusion_checkpoint": null,
+  "diffusion_sha256": null,
+  "policy_checkpoint": "/home/yikai/Documents/Code/Metaworld/runs/validation/cl_layernorm_2task_noreplay_20260924_01/general_policy_after_task_1_faucet-close-v3.pt",
+  "policy_sha256": "4c502ab1f5d29e2bdc5d617f1a73430002c9550287c8888cd3efdec8e3fb149f",
+  "normalization_mean": [
+    -0.08684655278921127,
+    0.6658445000648499,
+    0.12293586879968643,
+    0.9976646304130554,
+    -0.1337282806634903,
+    0.767957329750061,
+    0.11399997770786285,
+    1.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    -0.08630912005901337,
+    0.6644557118415833,
+    0.12335734069347382,
+    0.9976646304130554,
+    -0.13278134167194366,
+    0.767183244228363,
+    0.11399997770786285,
+    1.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    -0.1650012582540512,
+    0.8167091608047485,
+    0.125,
+    -0.05318671837449074,
+    0.13707004487514496,
+    -0.041219841688871384,
+    -0.8786812424659729
+  ],
+  "normalization_scale": [
+    0.08274292945861816,
+    0.07745684683322906,
+    0.0238964706659317,
+    0.021092642098665237,
+    0.0855572298169136,
+    0.05908006802201271,
+    0.0010000000474974513,
+    0.0010000000474974513,
+    0.0010000000474974513,
+    0.0010000000474974513,
+    0.0010000000474974513,
+    0.0010000000474974513,
+    0.0010000000474974513,
+    0.0010000000474974513,
+    0.0010000000474974513,
+    0.0010000000474974513,
+    0.0010000000474974513,
+    0.0010000000474974513,
+    0.08287473767995834,
+    0.07966479659080505,
+    0.02439405396580696,
+    0.021092642098665237,
+    0.0862569585442543,
+    0.059712234884500504,
+    0.0010000000474974513,
+    0.0010000000474974513,
+    0.0010000000474974513,
+    0.0010000000474974513,
+    0.0010000000474974513,
+    0.0010000000474974513,
+    0.0010000000474974513,
+    0.0010000000474974513,
+    0.0010000000474974513,
+    0.0010000000474974513,
+    0.0010000000474974513,
+    0.0010000000474974513,
+    0.05401529744267464,
+    0.012595764361321926,
+    0.0010000000474974513,
+    0.595940887928009,
+    0.6078118681907654,
+    0.48181822896003723,
+    0.1162773072719574
+  ],
+  "goal_normalization_mean": null,
+  "goal_normalization_scale": null,
+  "diffusion_losses": null,
+  "bc_losses": {
+    "initial": {
+      "train_loss": 1.156070590019226,
+      "validation_loss": 1.141539454460144,
+      "train_action_mse": 1.156070590019226,
+      "validation_action_mse": 1.141539454460144
+    },
+    "best_epoch": 19,
+    "train_loss": 0.04294964671134949,
+    "validation_loss": 0.05427859351038933,
+    "train_action_mse": 0.04294964671134949,
+    "validation_action_mse": 0.05427859351038933,
+    "history": [
+      {
+        "epoch": 1,
+        "train_loss": 0.18377692997455597,
+        "validation_loss": 0.20286725461483002,
+        "train_action_mse": 0.18377692997455597,
+        "validation_action_mse": 0.20286725461483002
+      },
+      {
+        "epoch": 2,
+        "train_loss": 0.14047491550445557,
+        "validation_loss": 0.15716183185577393,
+        "train_action_mse": 0.14047491550445557,
+        "validation_action_mse": 0.15716183185577393
+      },
+      {
+        "epoch": 3,
+        "train_loss": 0.11168942600488663,
+        "validation_loss": 0.1244407445192337,
+        "train_action_mse": 0.11168942600488663,
+        "validation_action_mse": 0.1244407445192337
+      },
+      {
+        "epoch": 4,
+        "train_loss": 0.09802569448947906,
+        "validation_loss": 0.10791491717100143,
+        "train_action_mse": 0.09802569448947906,
+        "validation_action_mse": 0.10791491717100143
+      },
+      {
+        "epoch": 5,
+        "train_loss": 0.08381611108779907,
+        "validation_loss": 0.09368102997541428,
+        "train_action_mse": 0.08381611108779907,
+        "validation_action_mse": 0.09368102997541428
+      },
+      {
+        "epoch": 6,
+        "train_loss": 0.07382949441671371,
+        "validation_loss": 0.09046291559934616,
+        "train_action_mse": 0.07382949441671371,
+        "validation_action_mse": 0.09046291559934616
+      },
+      {
+        "epoch": 7,
+        "train_loss": 0.07281359285116196,
+        "validation_loss": 0.08162079751491547,
+        "train_action_mse": 0.07281359285116196,
+        "validation_action_mse": 0.08162079751491547
+      },
+      {
+        "epoch": 8,
+        "train_loss": 0.062369342893362045,
+        "validation_loss": 0.07693753391504288,
+        "train_action_mse": 0.062369342893362045,
+        "validation_action_mse": 0.07693753391504288
+      },
+      {
+        "epoch": 9,
+        "train_loss": 0.06150267645716667,
+        "validation_loss": 0.0765615701675415,
+        "train_action_mse": 0.06150267645716667,
+        "validation_action_mse": 0.0765615701675415
+      },
+      {
+        "epoch": 10,
+        "train_loss": 0.060440488159656525,
+        "validation_loss": 0.08963508903980255,
+        "train_action_mse": 0.060440488159656525,
+        "validation_action_mse": 0.08963508903980255
+      },
+      {
+        "epoch": 11,
+        "train_loss": 0.059317585080862045,
+        "validation_loss": 0.07082017511129379,
+        "train_action_mse": 0.059317585080862045,
+        "validation_action_mse": 0.07082017511129379
+      },
+      {
+        "epoch": 12,
+        "train_loss": 0.05359840765595436,
+        "validation_loss": 0.06899835169315338,
+        "train_action_mse": 0.05359840765595436,
+        "validation_action_mse": 0.06899835169315338
+      },
+      {
+        "epoch": 13,
+        "train_loss": 0.0534285306930542,
+        "validation_loss": 0.07918419688940048,
+        "train_action_mse": 0.0534285306930542,
+        "validation_action_mse": 0.07918419688940048
+      },
+      {
+        "epoch": 14,
+        "train_loss": 0.049402154982089996,
+        "validation_loss": 0.06752791255712509,
+        "train_action_mse": 0.049402154982089996,
+        "validation_action_mse": 0.06752791255712509
+      },
+      {
+        "epoch": 15,
+        "train_loss": 0.04730759933590889,
+        "validation_loss": 0.06113260239362717,
+        "train_action_mse": 0.04730759933590889,
+        "validation_action_mse": 0.06113260239362717
+      },
+      {
+        "epoch": 16,
+        "train_loss": 0.0499214306473732,
+        "validation_loss": 0.07304992526769638,
+        "train_action_mse": 0.0499214306473732,
+        "validation_action_mse": 0.07304992526769638
+      },
+      {
+        "epoch": 17,
+        "train_loss": 0.0440840870141983,
+        "validation_loss": 0.059378061443567276,
+        "train_action_mse": 0.0440840870141983,
+        "validation_action_mse": 0.059378061443567276
+      },
+      {
+        "epoch": 18,
+        "train_loss": 0.04225487634539604,
+        "validation_loss": 0.06132671236991882,
+        "train_action_mse": 0.04225487634539604,
+        "validation_action_mse": 0.06132671236991882
+      },
+      {
+        "epoch": 19,
+        "train_loss": 0.04294964671134949,
+        "validation_loss": 0.05427859351038933,
+        "train_action_mse": 0.04294964671134949,
+        "validation_action_mse": 0.05427859351038933
+      },
+      {
+        "epoch": 20,
+        "train_loss": 0.040900565683841705,
+        "validation_loss": 0.05819851532578468,
+        "train_action_mse": 0.040900565683841705,
+        "validation_action_mse": 0.05819851532578468
+      }
+    ]
+  },
+  "nan_count": 0,
+  "inf_count": 0,
+  "generated_success": null,
+  "action_targets_modified": false
+}

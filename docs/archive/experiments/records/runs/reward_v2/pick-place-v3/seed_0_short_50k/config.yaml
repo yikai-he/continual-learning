@@ -1,0 +1,34 @@
+experiment: sac
+environment:
+  backend: metaworld-v3
+  reward_function_version: v2
+sac:
+  steps: 50000
+  learning_rate: 0.001
+  buffer_size: 1000000
+  learning_starts: 10000
+  batch_size: 128
+  gamma: 0.99
+  tau: 0.005
+  train_freq: 1
+  gradient_steps: 1
+  ent_coef: auto
+  net_arch:
+  - 256
+  - 256
+  - 256
+  - 256
+  checkpoint_freq: 10000
+continual:
+  tasks:
+  - pick-place-v3
+evaluation:
+  episodes: 20
+  frequency: 5000
+  seed_offset: 10000
+runtime:
+  seed: 0
+  device: cpu
+  output: runs/reward_v2/pick-place-v3
+  run_name: seed_0_short_50k
+  run_dir: /home/yikai/Documents/Code/Final/continual-learning/runs/reward_v2/pick-place-v3/seed_0_short_50k

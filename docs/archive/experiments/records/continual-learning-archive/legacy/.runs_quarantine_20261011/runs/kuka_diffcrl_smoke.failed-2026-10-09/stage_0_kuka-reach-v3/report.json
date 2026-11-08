@@ -1,0 +1,210 @@
+{
+  "stage": 0,
+  "task": "kuka-reach-v3",
+  "bc_normalization_mode": "layer-norm",
+  "bc_loss": "post-tanh-mse",
+  "bc_clamp_epsilon": 0.0001,
+  "diffusion_action_space": "raw",
+  "diffusion_action_clamp_epsilon": 0.0001,
+  "generated_action_projection": "none",
+  "real_diffusion_encode_clip_fraction": 0.0,
+  "sources": {
+    "kuka-reach-v3": {
+      "kind": "real_expert",
+      "checkpoint": "/home/yikai/Documents/Code/Final/continual-learning/runs/experts/kuka-v3/reach-v3/expert_model.zip",
+      "checkpoint_sha256": "2be77e7884b1fdf0b29d364ec0a5dcfdae51b0abb34b56f7ecaded5e6be32792",
+      "seeds": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "success_count": 4,
+      "success_rate": 1.0,
+      "episode_returns": [
+        1866.4021190126405,
+        1922.3883880695432,
+        1850.1570613866916,
+        1874.5371770615175
+      ],
+      "mean_return": 1878.3711863825981,
+      "std_return": 26.88637710260793,
+      "real_diffusion_encode_clip_fraction": 0.0,
+      "collection_configurations": [
+        {
+          "configuration_index": 0,
+          "task_data_sha256": "7d9bcc05e15bf32f1c4fdaea21f93d09e9f317fb7f245b974269bf257f1baae4",
+          "task_name": "kuka-reach-v3",
+          "env_name": "kuka-reach-v3",
+          "bank_seed": 0,
+          "reset_seed": 0,
+          "episode_id": 0
+        },
+        {
+          "configuration_index": 1,
+          "task_data_sha256": "48e7d8a8e5f4982364409f1904d14075f1f27393e06e3998bdc152788c7b1f78",
+          "task_name": "kuka-reach-v3",
+          "env_name": "kuka-reach-v3",
+          "bank_seed": 0,
+          "reset_seed": 1,
+          "episode_id": 1
+        },
+        {
+          "configuration_index": 2,
+          "task_data_sha256": "68d115b8eb1149e5a2dff7e36fb6b629d81d69616f93a2a7769988f4b6c448db",
+          "task_name": "kuka-reach-v3",
+          "env_name": "kuka-reach-v3",
+          "bank_seed": 0,
+          "reset_seed": 2,
+          "episode_id": 2
+        },
+        {
+          "configuration_index": 3,
+          "task_data_sha256": "11259045ec70466e62eb62b771ce262b0e4b4956f56e6046f657636b021b971c",
+          "task_name": "kuka-reach-v3",
+          "env_name": "kuka-reach-v3",
+          "bank_seed": 0,
+          "reset_seed": 3,
+          "episode_id": 3
+        }
+      ],
+      "data_path": "/home/yikai/Documents/Code/Final/continual-learning/runs/kuka_diffcrl_smoke/stage_0_kuka-reach-v3/data_task_0.npy",
+      "data_sha256": "e2a61f763292a182ed9d0f15d69df319af93cffe68f09431998f6606977c8abd",
+      "bc_target_clip_fraction": 0.0
+    }
+  },
+  "splits": {
+    "kuka-reach-v3": {
+      "train_ids": [
+        0,
+        1,
+        3
+      ],
+      "validation_ids": [
+        2
+      ],
+      "trajectories": 4,
+      "train_samples": 600,
+      "validation_samples": 200
+    }
+  },
+  "diffusion_before_state_sha256": "25eabee776580890fc628bd06886d7883e786b6bca19168abb3b8930f0e9cdb2",
+  "policy_before_state_sha256": null,
+  "policy_after_state_sha256": "ae5ce2700272391be521521e6fc26bcb1b8671c8c6b4668b077d82a2c8417e48",
+  "diffusion_checkpoint": "/home/yikai/Documents/Code/Final/continual-learning/runs/kuka_diffcrl_smoke/diffusion_after_task_0_kuka-reach-v3.pt",
+  "diffusion_sha256": "3eed8b8af57237bb7551ea944a1a18192ae4f3d2e0de9bdca5235988a292dbab",
+  "policy_checkpoint": "/home/yikai/Documents/Code/Final/continual-learning/runs/kuka_diffcrl_smoke/general_policy_after_task_0_kuka-reach-v3.pt",
+  "policy_sha256": "7f8f4dd2d3180ed312083e23b0f25b5b2814a2f43f54b0a7872d3116406b208a",
+  "normalization_mean": [
+    0.04197311028838158,
+    0.6720671057701111,
+    0.29119637608528137,
+    0.3924558460712433,
+    0.011148489080369473,
+    0.5270146131515503,
+    0.019955920055508614,
+    1.2784225921261792e-16,
+    2.1065419885000056e-18,
+    2.298314156935755e-34,
+    1.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.02596559375524521,
+    0.37454113364219666,
+    0.049732405692338943,
+    0.25586771965026855
+  ],
+  "normalization_scale": [
+    0.10997160524129868,
+    0.08166687190532684,
+    0.04517197981476784,
+    0.3334648907184601,
+    0.06998524069786072,
+    0.021111637353897095,
+    0.0010000000474974513,
+    0.0010000000474974513,
+    0.0010000000474974513,
+    0.0010000000474974513,
+    0.0010000000474974513,
+    0.0010000000474974513,
+    0.0010000000474974513,
+    0.0010000000474974513,
+    0.0010000000474974513,
+    0.0010000000474974513,
+    0.0010000000474974513,
+    0.0010000000474974513,
+    0.4596446454524994,
+    0.4968956708908081,
+    0.27399560809135437,
+    0.6525022387504578
+  ],
+  "goal_normalization_mean": [
+    0.03750443458557129,
+    0.6850396990776062,
+    0.28071653842926025
+  ],
+  "goal_normalization_scale": [
+    0.11545892059803009,
+    0.04255884140729904,
+    0.03187798336148262
+  ],
+  "diffusion_losses": {
+    "initial": {
+      "train_loss": 0.5135894268751144,
+      "validation_loss": 0.9834263771772385
+    },
+    "best_epoch": 2,
+    "history": [
+      {
+        "epoch": 1,
+        "train_loss": 0.41387514770030975,
+        "validation_loss": 0.9272655248641968
+      },
+      {
+        "epoch": 2,
+        "train_loss": 0.3539966568350792,
+        "validation_loss": 0.896131843328476
+      }
+    ],
+    "train_loss": 0.3539966568350792,
+    "validation_loss": 0.896131843328476
+  },
+  "bc_losses": {
+    "initial": {
+      "train_loss": 0.408202588558197,
+      "validation_loss": 0.32573196291923523,
+      "train_action_mse": 0.408202588558197,
+      "validation_action_mse": 0.32573196291923523
+    },
+    "best_epoch": 2,
+    "train_loss": 0.15820589661598206,
+    "validation_loss": 0.4542771875858307,
+    "train_action_mse": 0.15820589661598206,
+    "validation_action_mse": 0.4542771875858307,
+    "history": [
+      {
+        "epoch": 1,
+        "train_loss": 0.19904835522174835,
+        "validation_loss": 0.5057269334793091,
+        "train_action_mse": 0.19904835522174835,
+        "validation_action_mse": 0.5057269334793091
+      },
+      {
+        "epoch": 2,
+        "train_loss": 0.15820589661598206,
+        "validation_loss": 0.4542771875858307,
+        "train_action_mse": 0.15820589661598206,
+        "validation_action_mse": 0.4542771875858307
+      }
+    ]
+  },
+  "nan_count": 0,
+  "inf_count": 0,
+  "generated_success": null,
+  "action_targets_modified": false
+}

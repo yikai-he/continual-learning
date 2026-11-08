@@ -1,0 +1,5 @@
+condition,replay_mode,task_conditioning,seeds,final_ap_mean_pct,final_ap_sample_sd_pct,average_forgetting_mean_pp,average_forgetting_sample_sd_pp
+No Replay + None,none,none,3,29.733333333333334,7.214799604516629,69.86666666666666,7.6140221521435985
+No Replay + One-hot,none,one_hot,3,24.4,4.613025037868317,75.46666666666667,4.82217101867337
+DiffCRL + None,diffusion,none,3,96.8,1.3856406460551034,2.133333333333333,2.343786110832926
+DiffCRL + One-hot,diffusion,one_hot,3,96.26666666666667,1.2220201853215584,3.1999999999999993,1.4422205101855958

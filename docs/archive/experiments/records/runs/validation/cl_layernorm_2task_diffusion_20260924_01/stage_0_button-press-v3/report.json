@@ -1,0 +1,523 @@
+{
+  "stage": 0,
+  "task": "button-press-v3",
+  "bc_normalization_mode": "layer-norm",
+  "bc_loss": "post-tanh-mse",
+  "bc_clamp_epsilon": 0.0001,
+  "diffusion_action_space": "raw",
+  "diffusion_action_clamp_epsilon": 0.0001,
+  "generated_action_projection": "none",
+  "real_diffusion_encode_clip_fraction": 0.0,
+  "sources": {
+    "button-press-v3": {
+      "kind": "real_expert",
+      "checkpoint": "/home/yikai/Documents/Code/Metaworld/runs/reward_v2/button-press-v3/seed_0/best_model/best_model.zip",
+      "checkpoint_sha256": "219352eba6e5e925fa74198f848de2b900244011c157bb4e6579c23926b1eb31",
+      "seeds": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19
+      ],
+      "success_count": 20,
+      "success_rate": 1.0,
+      "episode_returns": [
+        1357.4211644339719,
+        1594.2215758270872,
+        1592.488551460537,
+        1574.7378218000804,
+        1579.5429901896186,
+        1459.1985280628592,
+        1572.485695763166,
+        1578.7676081999707,
+        1545.120093896374,
+        1012.5989969535883,
+        1573.926573395344,
+        1572.7683339517728,
+        1592.488551460537,
+        1559.5645999925566,
+        1131.5986566251188,
+        1564.876678884839,
+        1594.2215758270872,
+        1526.7682546202648,
+        1526.7682546202648,
+        1577.5217124837952
+      ],
+      "mean_return": 1504.3543109224415,
+      "std_return": 155.10067689426762,
+      "real_diffusion_encode_clip_fraction": 0.0,
+      "collection_configurations": [
+        {
+          "configuration_index": 42,
+          "task_data_sha256": "c3c7bc34e0f4f8b5cdb3669d9e8adb486e14461902f719cf4786cbfd4e43349b",
+          "task_name": "button-press-v3",
+          "env_name": "button-press-v3",
+          "bank_seed": 0,
+          "episode_id": 0
+        },
+        {
+          "configuration_index": 31,
+          "task_data_sha256": "a8038a8c0b18b04818fbfe1b9ab4e6db9e1b027335f6a5cd5a0fa36d44a77e80",
+          "task_name": "button-press-v3",
+          "env_name": "button-press-v3",
+          "bank_seed": 0,
+          "episode_id": 1
+        },
+        {
+          "configuration_index": 25,
+          "task_data_sha256": "52f110f111062d8721afd2803a335902d1e47f8973abd70b4f896ca0e2ee3d07",
+          "task_name": "button-press-v3",
+          "env_name": "button-press-v3",
+          "bank_seed": 0,
+          "episode_id": 2
+        },
+        {
+          "configuration_index": 13,
+          "task_data_sha256": "7007aba31785d11527aa77963a3bb20091d198a93d248f93b8be51cfab25c9db",
+          "task_name": "button-press-v3",
+          "env_name": "button-press-v3",
+          "bank_seed": 0,
+          "episode_id": 3
+        },
+        {
+          "configuration_index": 15,
+          "task_data_sha256": "65155ee57f31b09c57d0242550ebab3ad19996f6527a7c34ca2a692ffcdf5c08",
+          "task_name": "button-press-v3",
+          "env_name": "button-press-v3",
+          "bank_seed": 0,
+          "episode_id": 4
+        },
+        {
+          "configuration_index": 2,
+          "task_data_sha256": "f0c263b5454cdd1078097152bec900d4d3ada639e6e2b094f5b5a2e09b3cad55",
+          "task_name": "button-press-v3",
+          "env_name": "button-press-v3",
+          "bank_seed": 0,
+          "episode_id": 5
+        },
+        {
+          "configuration_index": 3,
+          "task_data_sha256": "8a3ff1cca5c80be4bfdda6ebbc1c6e20133004cec0f466920d277736c06c6fff",
+          "task_name": "button-press-v3",
+          "env_name": "button-press-v3",
+          "bank_seed": 0,
+          "episode_id": 6
+        },
+        {
+          "configuration_index": 0,
+          "task_data_sha256": "dcd68941a3f912ffe5dbbf67dded0ef4f53d37f9f9c4b38d45d1ab67cd5d209f",
+          "task_name": "button-press-v3",
+          "env_name": "button-press-v3",
+          "bank_seed": 0,
+          "episode_id": 7
+        },
+        {
+          "configuration_index": 8,
+          "task_data_sha256": "05d11abfae8746cb9519cfa22b3af20c7044388f144ed44030c3a8a4635e5776",
+          "task_name": "button-press-v3",
+          "env_name": "button-press-v3",
+          "bank_seed": 0,
+          "episode_id": 8
+        },
+        {
+          "configuration_index": 40,
+          "task_data_sha256": "116d37723836d3049ab8f8ec5a3c345022f032ca1cb2d562e146ac917efc8dd6",
+          "task_name": "button-press-v3",
+          "env_name": "button-press-v3",
+          "bank_seed": 0,
+          "episode_id": 9
+        },
+        {
+          "configuration_index": 32,
+          "task_data_sha256": "637c435a9738b8c55ef39eb6f5eb0a0a71d413f6a339ee7b480bc24b5f1e6c67",
+          "task_name": "button-press-v3",
+          "env_name": "button-press-v3",
+          "bank_seed": 0,
+          "episode_id": 10
+        },
+        {
+          "configuration_index": 45,
+          "task_data_sha256": "2730f46df86c3b9f3b2cfed3eed1f23f1a074b4449a9b6973cab682a5a3bd3ba",
+          "task_name": "button-press-v3",
+          "env_name": "button-press-v3",
+          "bank_seed": 0,
+          "episode_id": 11
+        },
+        {
+          "configuration_index": 25,
+          "task_data_sha256": "52f110f111062d8721afd2803a335902d1e47f8973abd70b4f896ca0e2ee3d07",
+          "task_name": "button-press-v3",
+          "env_name": "button-press-v3",
+          "bank_seed": 0,
+          "episode_id": 12
+        },
+        {
+          "configuration_index": 30,
+          "task_data_sha256": "7568e6206daf3abf64aac6948f199feff4571f5d6bcc217d12a695b85a199542",
+          "task_name": "button-press-v3",
+          "env_name": "button-press-v3",
+          "bank_seed": 0,
+          "episode_id": 13
+        },
+        {
+          "configuration_index": 48,
+          "task_data_sha256": "239b83c4d6449cc47437307fb459f619b16f973d54e65845eed2df3ab0959b31",
+          "task_name": "button-press-v3",
+          "env_name": "button-press-v3",
+          "bank_seed": 0,
+          "episode_id": 14
+        },
+        {
+          "configuration_index": 36,
+          "task_data_sha256": "30659f37d164e5cae2b1160750ff5320d54ba50ebe6ca97c5bd0c9a15229ba36",
+          "task_name": "button-press-v3",
+          "env_name": "button-press-v3",
+          "bank_seed": 0,
+          "episode_id": 15
+        },
+        {
+          "configuration_index": 31,
+          "task_data_sha256": "a8038a8c0b18b04818fbfe1b9ab4e6db9e1b027335f6a5cd5a0fa36d44a77e80",
+          "task_name": "button-press-v3",
+          "env_name": "button-press-v3",
+          "bank_seed": 0,
+          "episode_id": 16
+        },
+        {
+          "configuration_index": 27,
+          "task_data_sha256": "d6dbbe4f5a5c0a7b0f367bf712ab4f96168e9b1f6582ea764ef14a15fe5cc2bd",
+          "task_name": "button-press-v3",
+          "env_name": "button-press-v3",
+          "bank_seed": 0,
+          "episode_id": 17
+        },
+        {
+          "configuration_index": 27,
+          "task_data_sha256": "d6dbbe4f5a5c0a7b0f367bf712ab4f96168e9b1f6582ea764ef14a15fe5cc2bd",
+          "task_name": "button-press-v3",
+          "env_name": "button-press-v3",
+          "bank_seed": 0,
+          "episode_id": 18
+        },
+        {
+          "configuration_index": 46,
+          "task_data_sha256": "554fc3792e2a27e75262dfe881773754be5d070370b70f574ebe5f6eba2743a6",
+          "task_name": "button-press-v3",
+          "env_name": "button-press-v3",
+          "bank_seed": 0,
+          "episode_id": 19
+        }
+      ],
+      "data_path": "/home/yikai/Documents/Code/Metaworld/runs/validation/cl_layernorm_2task_diffusion_20260924_01/stage_0_button-press-v3/data_task_0.npy",
+      "data_sha256": "07a5d533b3a0618d40b96cdbd0f3ec3d062daaaa7d8265ffbe53c38e124b8f47",
+      "bc_target_clip_fraction": 0.0
+    }
+  },
+  "splits": {
+    "button-press-v3": {
+      "train_ids": [
+        13,
+        16,
+        3,
+        11,
+        10,
+        8,
+        0,
+        12,
+        7,
+        5,
+        18,
+        17,
+        14,
+        9,
+        1,
+        15
+      ],
+      "validation_ids": [
+        4,
+        19,
+        6,
+        2
+      ],
+      "trajectories": 20,
+      "train_samples": 3200,
+      "validation_samples": 800
+    }
+  },
+  "diffusion_before_state_sha256": "25eabee776580890fc628bd06886d7883e786b6bca19168abb3b8930f0e9cdb2",
+  "policy_before_state_sha256": null,
+  "policy_after_state_sha256": "f4e42b8c5a2732864f397fd095e25a12353d3491cbad3fcbea70568c14f11368",
+  "diffusion_checkpoint": "/home/yikai/Documents/Code/Metaworld/runs/validation/cl_layernorm_2task_diffusion_20260924_01/diffusion_after_task_0_button-press-v3.pt",
+  "diffusion_sha256": "f3243cccd41b22a62813ff8c67af4edcd590f0375c161cdb375bf1ecf5062ba8",
+  "policy_checkpoint": "/home/yikai/Documents/Code/Metaworld/runs/validation/cl_layernorm_2task_diffusion_20260924_01/general_policy_after_task_0_button-press-v3.pt",
+  "policy_sha256": "cee0b0b55a2f5aa08165cf467f9f7d564e77573d0cc4422e39fc0af222c51a92",
+  "normalization_mean": [
+    -0.018140502274036407,
+    0.7046793103218079,
+    0.1438012570142746,
+    0.8049222826957703,
+    -0.008633822202682495,
+    0.7451951503753662,
+    0.11500000208616257,
+    1.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    -0.003615621943026781,
+    0.8092951774597168,
+    -0.04230048134922981,
+    -0.6649470329284668
+  ],
+  "normalization_scale": [
+    0.06041783094406128,
+    0.08932744711637497,
+    0.013036991469562054,
+    0.11934608221054077,
+    0.05751606449484825,
+    0.032732509076595306,
+    0.0010000000474974513,
+    0.0010000000474974513,
+    0.0010000000474974513,
+    0.0010000000474974513,
+    0.0010000000474974513,
+    0.0010000000474974513,
+    0.0010000000474974513,
+    0.0010000000474974513,
+    0.0010000000474974513,
+    0.0010000000474974513,
+    0.0010000000474974513,
+    0.0010000000474974513,
+    0.5986050367355347,
+    0.2316584289073944,
+    0.5704002380371094,
+    0.35195598006248474
+  ],
+  "goal_normalization_mean": [
+    -0.008633822202682495,
+    0.7704798579216003,
+    0.11500000208616257
+  ],
+  "goal_normalization_scale": [
+    0.05751606449484825,
+    0.016191184520721436,
+    0.0010000000474974513
+  ],
+  "diffusion_losses": {
+    "initial": {
+      "train_loss": 0.5008293092250824,
+      "validation_loss": 0.6020878702402115
+    },
+    "best_epoch": 5,
+    "history": [
+      {
+        "epoch": 1,
+        "train_loss": 0.4051521569490433,
+        "validation_loss": 0.48456837236881256
+      },
+      {
+        "epoch": 2,
+        "train_loss": 0.3568519577383995,
+        "validation_loss": 0.39615266770124435
+      },
+      {
+        "epoch": 3,
+        "train_loss": 0.31173329800367355,
+        "validation_loss": 0.3650796189904213
+      },
+      {
+        "epoch": 4,
+        "train_loss": 0.27472418546676636,
+        "validation_loss": 0.3228191062808037
+      },
+      {
+        "epoch": 5,
+        "train_loss": 0.24572349339723587,
+        "validation_loss": 0.2877948582172394
+      }
+    ],
+    "train_loss": 0.24572349339723587,
+    "validation_loss": 0.2877948582172394
+  },
+  "bc_losses": {
+    "initial": {
+      "train_loss": 0.4423646926879883,
+      "validation_loss": 0.3940368592739105,
+      "train_action_mse": 0.4423646926879883,
+      "validation_action_mse": 0.3940368592739105
+    },
+    "best_epoch": 20,
+    "train_loss": 0.04233388975262642,
+    "validation_loss": 0.05367003008723259,
+    "train_action_mse": 0.04233388975262642,
+    "validation_action_mse": 0.05367003008723259,
+    "history": [
+      {
+        "epoch": 1,
+        "train_loss": 0.22641892731189728,
+        "validation_loss": 0.2416083961725235,
+        "train_action_mse": 0.22641892731189728,
+        "validation_action_mse": 0.2416083961725235
+      },
+      {
+        "epoch": 2,
+        "train_loss": 0.2169038951396942,
+        "validation_loss": 0.2424706220626831,
+        "train_action_mse": 0.2169038951396942,
+        "validation_action_mse": 0.2424706220626831
+      },
+      {
+        "epoch": 3,
+        "train_loss": 0.20993053913116455,
+        "validation_loss": 0.23869162797927856,
+        "train_action_mse": 0.20993053913116455,
+        "validation_action_mse": 0.23869162797927856
+      },
+      {
+        "epoch": 4,
+        "train_loss": 0.19824020564556122,
+        "validation_loss": 0.20539653301239014,
+        "train_action_mse": 0.19824020564556122,
+        "validation_action_mse": 0.20539653301239014
+      },
+      {
+        "epoch": 5,
+        "train_loss": 0.1876084953546524,
+        "validation_loss": 0.2029406726360321,
+        "train_action_mse": 0.1876084953546524,
+        "validation_action_mse": 0.2029406726360321
+      },
+      {
+        "epoch": 6,
+        "train_loss": 0.17724134027957916,
+        "validation_loss": 0.1939774751663208,
+        "train_action_mse": 0.17724134027957916,
+        "validation_action_mse": 0.1939774751663208
+      },
+      {
+        "epoch": 7,
+        "train_loss": 0.1549662947654724,
+        "validation_loss": 0.172989159822464,
+        "train_action_mse": 0.1549662947654724,
+        "validation_action_mse": 0.172989159822464
+      },
+      {
+        "epoch": 8,
+        "train_loss": 0.13634054362773895,
+        "validation_loss": 0.15720462799072266,
+        "train_action_mse": 0.13634054362773895,
+        "validation_action_mse": 0.15720462799072266
+      },
+      {
+        "epoch": 9,
+        "train_loss": 0.11718347668647766,
+        "validation_loss": 0.13037756085395813,
+        "train_action_mse": 0.11718347668647766,
+        "validation_action_mse": 0.13037756085395813
+      },
+      {
+        "epoch": 10,
+        "train_loss": 0.10295826196670532,
+        "validation_loss": 0.1150934249162674,
+        "train_action_mse": 0.10295826196670532,
+        "validation_action_mse": 0.1150934249162674
+      },
+      {
+        "epoch": 11,
+        "train_loss": 0.110077865421772,
+        "validation_loss": 0.11952993273735046,
+        "train_action_mse": 0.110077865421772,
+        "validation_action_mse": 0.11952993273735046
+      },
+      {
+        "epoch": 12,
+        "train_loss": 0.09420633316040039,
+        "validation_loss": 0.09518802911043167,
+        "train_action_mse": 0.09420633316040039,
+        "validation_action_mse": 0.09518802911043167
+      },
+      {
+        "epoch": 13,
+        "train_loss": 0.07680639624595642,
+        "validation_loss": 0.08693298697471619,
+        "train_action_mse": 0.07680639624595642,
+        "validation_action_mse": 0.08693298697471619
+      },
+      {
+        "epoch": 14,
+        "train_loss": 0.06932328641414642,
+        "validation_loss": 0.07939993590116501,
+        "train_action_mse": 0.06932328641414642,
+        "validation_action_mse": 0.07939993590116501
+      },
+      {
+        "epoch": 15,
+        "train_loss": 0.07133067399263382,
+        "validation_loss": 0.07797101140022278,
+        "train_action_mse": 0.07133067399263382,
+        "validation_action_mse": 0.07797101140022278
+      },
+      {
+        "epoch": 16,
+        "train_loss": 0.0575588084757328,
+        "validation_loss": 0.07059246301651001,
+        "train_action_mse": 0.0575588084757328,
+        "validation_action_mse": 0.07059246301651001
+      },
+      {
+        "epoch": 17,
+        "train_loss": 0.06638866662979126,
+        "validation_loss": 0.07013098895549774,
+        "train_action_mse": 0.06638866662979126,
+        "validation_action_mse": 0.07013098895549774
+      },
+      {
+        "epoch": 18,
+        "train_loss": 0.04209298640489578,
+        "validation_loss": 0.0606754831969738,
+        "train_action_mse": 0.04209298640489578,
+        "validation_action_mse": 0.0606754831969738
+      },
+      {
+        "epoch": 19,
+        "train_loss": 0.03846143186092377,
+        "validation_loss": 0.053849462419748306,
+        "train_action_mse": 0.03846143186092377,
+        "validation_action_mse": 0.053849462419748306
+      },
+      {
+        "epoch": 20,
+        "train_loss": 0.04233388975262642,
+        "validation_loss": 0.05367003008723259,
+        "train_action_mse": 0.04233388975262642,
+        "validation_action_mse": 0.05367003008723259
+      }
+    ]
+  },
+  "nan_count": 0,
+  "inf_count": 0,
+  "generated_success": null,
+  "action_targets_modified": false
+}

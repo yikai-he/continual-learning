@@ -1,0 +1,64 @@
+{
+  "random_seed_0": {
+    "goal_directed_push_incomplete": [
+      24,
+      27,
+      45
+    ],
+    "never_physical_contact": [
+      0,
+      1,
+      3,
+      5,
+      6,
+      7,
+      8,
+      9,
+      12,
+      14,
+      15,
+      16,
+      17,
+      19,
+      22,
+      28,
+      31,
+      32,
+      33,
+      34,
+      38,
+      40
+    ],
+    "pad_contact_not_v6_valid": [
+      10,
+      11,
+      13,
+      20,
+      25,
+      29,
+      35,
+      37,
+      42,
+      43,
+      44,
+      46,
+      47,
+      48,
+      49
+    ],
+    "valid_contact_immediately_lost": [
+      18,
+      36,
+      39,
+      41
+    ],
+    "wrong_geometry_contact": [
+      2,
+      4,
+      21,
+      23,
+      26,
+      30
+    ]
+  }
+}

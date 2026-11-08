@@ -1,0 +1,29 @@
+{
+  "initial": {
+    "train_loss": 0.5334154367446899,
+    "validation_loss": 0.5321051478385925,
+    "train_action_mse": 0.5334154367446899,
+    "validation_action_mse": 0.5321051478385925
+  },
+  "best_epoch": 1,
+  "train_loss": 0.3025102913379669,
+  "validation_loss": 0.28650543093681335,
+  "train_action_mse": 0.3025102913379669,
+  "validation_action_mse": 0.28650543093681335,
+  "history": [
+    {
+      "epoch": 1,
+      "train_loss": 0.3025102913379669,
+      "validation_loss": 0.28650543093681335,
+      "train_action_mse": 0.3025102913379669,
+      "validation_action_mse": 0.28650543093681335
+    },
+    {
+      "epoch": 2,
+      "train_loss": 0.3095712661743164,
+      "validation_loss": 0.2936754524707794,
+      "train_action_mse": 0.3095712661743164,
+      "validation_action_mse": 0.2936754524707794
+    }
+  ]
+}

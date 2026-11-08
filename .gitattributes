@@ -1,0 +1,3 @@
+# Preserve archived result bytes, including historical line-ending conventions.
+docs/archive/** -whitespace
+docs/experiments/**/*.csv -whitespace

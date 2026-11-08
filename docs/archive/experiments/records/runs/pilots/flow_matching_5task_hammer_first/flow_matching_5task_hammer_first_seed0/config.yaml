@@ -1,0 +1,70 @@
+experiment: diffcrl
+environment:
+  backend: metaworld-v3
+  reward_function_version: v2
+  hammer_reward_variant: original
+  hammer_nail_progress_weight: 0.0
+  peg_unplug_reward_variant: original
+  peg_unplug_progress_weight: 0.0
+  peg_unplug_progress_gamma: 0.99
+bc:
+  epochs: 100
+  batch_size: 256
+  learning_rate: 0.001
+  hidden_sizes:
+  - 256
+  - 256
+  normalization_mode: layer-norm
+  loss: post-tanh-mse
+diffusion:
+  epochs: 300
+  batch_size: 8
+  learning_rate: 0.001
+  steps: 100
+  width: 64
+  action_space: raw
+  action_clamp_epsilon: 0.0001
+  generated_action_projection: none
+flow_matching:
+  epochs: 200
+  batch_size: 8
+  learning_rate: 0.001
+  width: 64
+  residual_blocks: 6
+  time_embedding: sinusoidal
+  time_embedding_scale: 100.0
+  integration_steps: 10
+  gradient_clip_norm: 1.0
+  validation_samples: 4
+  checkpoint_selection: validation-loss
+  probability_path: linear
+  source_distribution: standard-normal
+  ode_solver: euler
+continual:
+  tasks:
+  - hammer-v3
+  - button-press-v3
+  - faucet-close-v3
+  - handle-press-side-v3
+  - window-close-v3
+  experts:
+    hammer-v3: runs/reward_v2/hammer-v3/seed_0/best_model/best_model.zip
+    button-press-v3: runs/reward_v2/button-press-v3/seed_0/best_model/best_model.zip
+    faucet-close-v3: runs/reward_v2/faucet-close-v3/seed_0/best_model/best_model.zip
+    handle-press-side-v3: runs/reward_v2/handle-press-side-v3/seed_0/best_model/best_model.zip
+    window-close-v3: runs/reward_v2/window-close-v3/seed_0/final_model.zip
+  trajectories_per_task: 200
+  replay_mode: flow-matching
+  replay_budget: 200
+  replay_priority_strategy: uniform
+evaluation:
+  episodes: 50
+  seed: 10000
+  mode: fixed-tasks
+  task_set_seed: 10000
+runtime:
+  seed: 0
+  device: cpu
+  output: runs/pilots/flow_matching_5task_hammer_first
+  run_name: flow_matching_5task_hammer_first_seed0
+  run_dir: /home/yikai/Documents/Code/Thesis/continual-learning/runs/pilots/flow_matching_5task_hammer_first/flow_matching_5task_hammer_first_seed0

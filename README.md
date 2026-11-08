@@ -1,397 +1,327 @@
-# Diffusion Replay for Continual RL
+---
+status: current
+last_verified: 2026-11-07
+applies_to: continual-learning
+---
 
-GeneralPolicy, Immediate SAC, continual SAC, and active SAC benchmarks use one
-supported policy architecture: four hidden layers of width 256. GeneralPolicy
-and the transferable SAC actor apply LayerNorm after the first Linear layer.
-Older incompatible checkpoints are historical artifacts and are rejected by
-active training, transfer, and resume entry points.
+# Continual Learning for Robotic Manipulation
 
-This repository contains the continual-learning and DiffCRL experiments for
-modern MetaWorld v3. Default Sawyer tasks use the `metaworld` Conda
-environment.
+Research code for the bachelor’s thesis **Continual Learning for Robotic
+Manipulation towards Real-World Deployment**. The repository studies whether
+trajectory-level generative replay can reduce forgetting as a manipulation
+policy learns a sequence of simulated tasks.
 
-For the implemented system design, data contracts, replay methods, checkpoint
-formats, and developer guide, see [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
+## SAC training
 
-The full-budget three-task SAC protocol and remote-server commands are in
-[docs/SAC_4LAYER_3TASK_1M.md](docs/SAC_4LAYER_3TASK_1M.md).
+`train_sac.py` is the preferred entry point for new single-task SAC experts. New
+runs default to low-disk checkpointing: `best_model.zip` is the validation
+checkpoint maximizing `(success_rate, mean_return)` lexicographically, and
+`latest_model.zip` is the most recently persisted policy. Exact ties retain the
+existing best checkpoint.
 
-## Environment setup
+Low-disk mode does not save replay buffers and therefore does not support exact
+training continuation. Set `sac.checkpoint_mode: full` when replay-backed resume
+or the historical periodic checkpoint layout is required. Historical
+`best_model.zip` files may be return-best and must not be reinterpreted under the
+new naming convention.
 
-Run from the repository root:
+Optimization uses the `runtime.seed` bank, validation defaults to bank `10000`,
+and post-selection final tests default to banks `20000` and `20001`. Serialized
+task identities are checked for pairwise disjointness before training.
+The SAC entropy mode and four-layer 256-unit network are fixed implementation
+choices and therefore are not YAML options.
 
 ```bash
+python train_sac.py --config configs/sac/sac.yaml --seed 0 --device cpu
+```
+
+The main pipeline, DiffCRL, is inspired by DISTR (Diffusion-based Trajectory
+Replay), but it is **not an exact reproduction**. DISTR trains an Immediate
+Policy during continual reinforcement learning. This implementation first
+trains independent single-task SAC experts, collects their trajectories, and
+continually distils those trajectories into one persistent behavior-cloning
+policy. Diffusion or Flow Matching models provide old-task replay.
+
+## Documentation
+
+| Document | Purpose | Status | Last verified |
+|---|---|---|---|
+| [Architecture](docs/ARCHITECTURE.md) | Current pipeline, module, data, evaluation, and resume contracts | current | 2026-11-07 |
+| [Development status](docs/DEVELOPMENT_STATUS.md) | Implemented and validated scope, limitations, and remaining work | current | 2026-11-07 |
+| [SAC training](docs/SAC_TRAINING.md) | Expert training, evaluation, checkpoints, and smoke validation | current | 2026-11-07 |
+| [Workflow index](docs/WORKFLOW_INDEX.md) | Supported entry points and configuration families | current | 2026-11-07 |
+| [Flow replay architecture](docs/FLOW_REPLAY_ARCHITECTURE.md) | Flow Matching replay and allocation contract | current | 2026-11-07 |
+| [Forward transfer](docs/FORWARD_TRANSFER_EXPERIMENT.md) | Supported GeneralPolicy-to-SAC transfer experiment | current | 2026-11-07 |
+| [Runs inventory](docs/RUNS_INVENTORY.md) | Retained canonical artifact families | current | 2026-11-07 |
+| [Research code standards](docs/RESEARCH_CODE_STANDARDS.md) | Local quality priorities and proportional acceptance checks | current | 2026-11-07 |
+| [Documentation archive](docs/archive/README.md) | Historical reports, provenance, and archive conventions | current index | 2026-11-07 |
+
+Historical documents describe their original project state and are not current
+operating instructions.
+
+### Documentation maintenance
+
+Update an existing canonical document before creating another Markdown file.
+Maintained documents must carry `status` and an actually verified
+`last_verified` date. Mark historical experiments explicitly, update relevant
+documentation with behavior changes, and never silently rewrite archived
+experiment records or refresh verification dates without checking their claims.
+
+## Implemented scope
+
+### Environments
+
+- **MetaWorld v3** through `Meta-World/MT1`.
+- **KUKA v3** through the workspace-local `Meta-World-KUKA/MT1` fork.
+
+All adapters expose a 39-dimensional observation, a 4-dimensional continuous
+action, and episode-level success metadata. Fixed-task evaluation is supported
+for both backends.
+
+Hammer and Peg Unplug use fixed reward definitions in their KUKA-v3 task
+implementations. Their former reward-variant and progress-weight configuration
+fields are intentionally not part of this repository's environment API.
+
+### Methods
+
+- **Single-task SAC experts**: one independent Stable-Baselines3 SAC policy per
+  task.
+- **Sequential SAC**: one SAC learner carried across MetaWorld tasks, with its
+  replay buffer reset at task boundaries.
+- **No Replay**: persistent `GeneralPolicy` trained only on current expert data.
+- **Real Replay**: current expert data plus sampled stored trajectories from
+  previous tasks.
+- **Diffusion Replay**: current expert data plus task- and goal-conditioned DDPM
+  trajectory replay.
+- **Flow Matching Replay**: current expert data plus trajectories produced by a
+  task- and goal-conditioned conditional flow model.
+
+The four DiffCRL replay modes are `none`, `real`, `diffusion`, and
+`flow-matching`. Forward-transfer utilities exist for aligned learning curves;
+forward transfer is not inferred from the endpoint evaluation matrix.
+
+## Repository structure
+
+```text
+continual-learning/
+├── train_sac.py                 # single-task SAC experts
+├── train_diffcrl.py             # expert-driven continual BC and replay
+├── train_continual_sac.py       # sequential SAC baseline
+├── run_replay_comparison.py     # no/real/DDPM comparison runner
+├── manage_diffcrl_sync.py       # validated stage backup/restore
+├── configs/                     # active, experimental, and archived YAML
+├── src/
+│   ├── env_adapters/            # MetaWorld/KUKA integration
+│   ├── continual/               # BC, replay, generators, evaluation, resume
+│   ├── sac/                     # SAC checkpoint and transfer utilities
+│   └── support/                 # manifests, hashing, persistence, sync
+├── scripts/                     # collection and evaluation entry points
+├── tests/                       # unit, regression, and integration tests
+├── docs/                        # architecture, protocols, audits, status
+└── runs/                        # generated and retained experiment artifacts
+```
+
+The root entry points are retained for compatibility. Specialized commands
+live under `scripts/`; historical configurations remain under `configs/archive/`
+or `configs/sac/archive/` and should not be treated as current defaults.
+
+## Installation
+
+The tested direct dependencies are pinned in `requirements.txt`. From the
+repository root:
+
+```bash
+conda create -n metaworld python=3.10
 conda activate metaworld
 python -m pip install -r requirements.txt
 ```
 
-The expected package version is `metaworld==3.1.1`.
+PyTorch is installed transitively by Stable-Baselines3. Select a CUDA-matched
+PyTorch build separately when GPU execution is required.
 
-## Testing
+KUKA experiments require `metaworld-kuka-v3/` as a sibling checkout:
 
-Run the full test suite from the repository root:
+```text
+Thesis/
+├── continual-learning/
+└── metaworld-kuka-v3/
+```
+
+Install the fork into the same environment:
 
 ```bash
-PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 python -m pytest -q
+python -m pip install -e ../metaworld-kuka-v3 --no-deps --no-build-isolation
 ```
 
-Plugin autoload is disabled because unrelated system or ROS pytest plugins can
-interfere with the test run. Optional KUKA or hardware-specific integration
-tests may be skipped when their local resources are unavailable.
+The fork provides both `metaworld` and `metaworld_kuka`; merely placing it next
+to this repository does not make it importable.
 
-## Repository and experiment inventory
+## Quick start
 
-Active artifacts are limited to canonical experts and formal continual-learning
-results; see [docs/RUNS_INVENTORY.md](docs/RUNS_INVENTORY.md). Historical
-lightweight reports are indexed in
-[docs/archive/experiments/README.md](docs/archive/experiments/README.md); their
-large checkpoints and datasets were deleted. Cleanup scope and storage figures
-are recorded in
-[docs/ARTIFACT_CLEANUP_REPORT.md](docs/ARTIFACT_CLEANUP_REPORT.md).
-The maintained, experimental, and historical command/configuration boundaries
-are summarized in [docs/WORKFLOW_INDEX.md](docs/WORKFLOW_INDEX.md).
-
-## KUKA experiments
-
-KUKA experiments require the workspace-local MetaWorld-KUKA v3 fork.
-
-With `continual-learning/` and `metaworld-kuka-v3/` as sibling directories,
-install the fork editably into the intended `metaworld` Conda environment:
+Use the smoke configurations to verify a workflow without launching a formal
+experiment:
 
 ```bash
-conda run -n metaworld python -m pip install \
-  -e ../metaworld-kuka-v3 \
-  --no-deps \
-  --no-build-isolation
+python train_sac.py --config configs/sac/sac_smoke.yaml --seed 0
+python train_diffcrl.py --config configs/diffcrl/diffcrl_smoke.yaml \
+  --seed 0 --run-name smoke-seed0
+python train_continual_sac.py \
+  --config configs/continual_sac/continual_sac_smoke.yaml \
+  --run-name smoke-seed0
 ```
 
-The local distribution provides both `metaworld` and `metaworld_kuka`.
-Editable installation is required because merely placing the checkout beside
-this repository does not add it to the Conda interpreter's import path.
+These commands still create environments and train models. They are pipeline
+checks, not scientific experiments and not evidence of method performance.
 
-### KUKA Hammer working reward
+### Train experts and DiffCRL
 
-The selected working configuration for `kuka-hammer-v3` uses the v2 reward
-with normalized nail-progress shaping:
+DiffCRL requires a compatible SAC expert for every task. Train an expert using
+a task-specific copy of `configs/sac/sac.yaml`:
 
-```yaml
-environment:
-  backend: kuka-v3
-  reward_function_version: v2
-  hammer_reward_variant: nail_progress
-  hammer_nail_progress_weight: 4.0
+```bash
+python -u train_sac.py --config path/to/expert.yaml --seed 0
 ```
 
-Development screening found that the original Sawyer-derived dense reward
-could produce high return without reliable task success because it did not
-directly reward nail displacement. Weight 4 was chosen as the project default
-after the screened seed reached stable high success; it is a practical choice,
-not a claim that the weight is globally optimal. This adapts the KUKA Hammer
-reward only. Success remains `NailSlideJoint.qpos[0] > 0.09`, and the original
-reward remains available with `hammer_reward_variant: original` and weight
-`0.0` for ablation and reproducibility.
+Set `continual.experts` in the DiffCRL YAML to the qualified expert checkpoints,
+then run:
 
-The formal fresh-expert preset is `configs/sac/kuka_hammer_v3_1m.yaml`. Its 1M
-steps are a safety ceiling and success-based early stopping may finish the run
-earlier. Do not resume an original-reward Hammer checkpoint or replay buffer
-under this preset. For downstream trajectory collection, use the qualified
-`best_success_model/best_success_model.zip` checkpoint rather than selecting
-the Hammer expert primarily by shaped return.
+```bash
+python -u train_diffcrl.py \
+  --config configs/diffcrl/diffcrl.yaml \
+  --seed 0 \
+  --run-name diffusion-seed0
+```
 
-## Experiment types
+Use `configs/diffcrl/diffcrl_no_replay.yaml` for the no-replay ablation. Flow
+Matching, Real Replay, KUKA, fixed-budget, and pilot configurations are kept in
+the same directory and are labelled by filename and comments. Inspect a YAML
+before running it; not every configuration is a maintained formal protocol.
 
-- **Single-task SAC expert training** trains an independent expert checkpoint
-  for one task with `train_sac.py`; DiffCRL uses these experts to collect data.
-- **Sequential SAC** is a continual-learning baseline that trains one SAC
-  learner across tasks without pretrained experts, behavioral cloning, or
-  diffusion replay.
-- **DiffCRL with diffusion replay** trains the shared behavior-cloning policy
-  from current expert trajectories and generated trajectories for prior tasks.
-- **DiffCRL with Flow Matching replay** uses conditional ODE-generated
-  trajectories for prior tasks.
-- **DiffCRL with real replay** resamples archived original training trajectories
-  for prior tasks without using a generative model.
-- **DiffCRL without replay** is the corresponding ablation: it retains expert
-  supervision and behavioral cloning but disables all prior-task replay.
+Flow Matching sampling uses `torchdiffeq.odeint`. Configure `ode_solver` as
+`euler`, `midpoint`, `heun2`, `rk4`, or `dopri5`; `integration_steps` determines
+the fixed step size for the first four methods, while `rtol` and `atol` control
+adaptive `dopri5`. Replay reports record the velocity network's actual function
+evaluation count rather than inferring NFE from the configured step count.
 
-The corresponding `continual.replay_mode` values are `diffusion`,
-`flow-matching`, `real`, and `none`.
+### Sequential SAC
 
-## Maintained configurations
+```bash
+python -u train_continual_sac.py \
+  --config configs/continual_sac/continual_sac.yaml \
+  --run-name sequential-sac-seed0
+```
+
+The current sequential SAC implementation constructs MetaWorld environments
+directly. KUKA DiffCRL is implemented, but KUKA sequential SAC is not.
+
+### Collection and evaluation
+
+```bash
+python scripts/collection/collect_expert_trajectories.py \
+  --config path/to/trajectory-collection.yaml
+
+python scripts/evaluation/evaluate_sac.py \
+  --task reach-v3 \
+  --model runs/path/to/model.zip \
+  --episodes 50
+
+python scripts/evaluation/evaluate_continual.py --help
+```
+
+Evaluation records success, return, episode length, reset seeds, and task-bank
+provenance. The continual matrix stores success rate `R[k,j]` for task `j`
+after stage `k`, from which Average Performance and end-of-task forgetting are
+computed.
+
+## Configuration
+
+`src/config.py` loads strict YAML sections for `environment`, `sac`, `bc`,
+`diffusion`, `flow_matching`, `continual`, `evaluation`, and `runtime`. Unknown
+keys and incompatible experiment sections are rejected. CLI flags can override
+seed, device, output/run naming, and entry-point-specific resume options.
+
+Maintained starting points are:
 
 - `configs/sac/sac.yaml`
 - `configs/diffcrl/diffcrl.yaml`
 - `configs/diffcrl/diffcrl_no_replay.yaml`
 - `configs/continual_sac/continual_sac.yaml`
 
-The corresponding `*_smoke.yaml` files are small developer/testing presets.
+The corresponding smoke YAML files are developer presets. Configurations under
+an `archive/` directory are retained for historical reproducibility.
 
-Single-task SAC configurations are organized as follows:
+## Outputs, resume, and reproducibility
 
-- Formal 1M-step presets, `sac.yaml`, and smoke-test presets remain directly in
-  `configs/sac/`.
-- Development and batch-training presets live in `configs/sac/dev/`.
-- Historical short probes live in `configs/sac/archive/short_probes/`.
-- Historical reward comparisons and ablations live in
-  `configs/sac/archive/reward_ablations/`.
-- Other historical controls live in
-  `configs/sac/archive/historical_controls/`.
+Runs normally write beneath `runtime.output`. New run directories are
+collision-protected; existing results are not overwritten. DiffCRL writes
+resolved configuration and provenance, policy/generator checkpoints, stage
+datasets and reports, evaluation-matrix snapshots, and a hash-validated
+`stage_<index>_COMPLETE.json` marker. `RUN_COMPLETE` marks a fully completed
+run.
 
-Archived configurations are preserved for reproducibility and normally should
-not be used as starting points for new experiments.
-
-## Single-task experts and DiffCRL
-
-First, train the SAC experts required by the selected DiffCRL configuration.
-For each task, copy `configs/sac/sac.yaml`, update `continual.tasks[0]`, and run:
-
-```bash
-python -u train_sac.py --config path/to/expert-config.yaml --seed 0
-```
-
-Periodic SAC checkpoints include a matching replay-buffer sidecar. To resume
-one into a collision-safe new run directory, keep the desired total timestep
-target in the YAML's `sac.steps` field and run:
-
-```bash
-python -u train_sac.py \
-  --config path/to/expert-config.yaml \
-  --seed 0 \
-  --resume-from runs/path/to/checkpoints/sac_500000_steps.zip
-```
-
-For example, with `sac.steps: 1000000`, a 500,000-step checkpoint trains only
-the remaining approximately 500,000 steps. Model-only legacy checkpoints are
-rejected because they cannot restore SAC's replay buffer faithfully.
-
-Development and smoke-test runs may optionally stop after stable evaluation
-success by adding this block under `sac`. It is disabled by default and should
-remain disabled for fixed-budget formal experiments:
-
-```yaml
-sac:
-  steps: 1000000  # Maximum total global timestep budget.
-  early_stopping:
-    enabled: true
-    min_steps: 100000
-    success_threshold: 0.95
-    patience: 3
-```
-
-The criterion uses globally aligned evaluation results and global timesteps,
-including after resume. Three consecutive qualifying evaluations are required
-in this example; any failed evaluation resets the count.
-
-Then update the expert checkpoint paths under `continual.experts` in
-`configs/diffcrl/diffcrl.yaml` and start the continual-learning run:
+Resume a marker-based DiffCRL run with its original scientific configuration:
 
 ```bash
 python -u train_diffcrl.py \
-  --config configs/diffcrl/diffcrl.yaml \
-  --seed 0 \
-  --run-name example-seed0
-```
-
-Results and checkpoints are written under `runs/`. Use a new `--run-name` for
-each run because existing run directories are not overwritten.
-
-### Fixed-budget Flow Matching replay
-
-Flow Matching uses fresh generative replay from the previous completed Flow
-checkpoint. Its historical replay quantity is a fixed stage-level budget, not
-a per-task quantity:
-
-```yaml
-continual:
-  trajectories_per_task: 200  # current-task expert trajectories
-  replay_mode: flow-matching
-  replay_budget: 200           # all historical synthetic trajectories
-  replay_priority_strategy: uniform
-```
-
-At stage zero there is no historical replay. At later stages, uniform
-allocation divides `replay_budget` across all previous tasks, with remainder
-samples assigned in curriculum order. The current expert data is additional to
-that budget. See [docs/FLOW_REPLAY_ARCHITECTURE.md](docs/FLOW_REPLAY_ARCHITECTURE.md)
-for the execution, provenance, resume, and scientific-comparison contracts.
-
-### Resuming DiffCRL at a completed stage
-
-New DiffCRL runs write `stage_<index>_COMPLETE.json` after each fully finalized
-stage. The marker contains hashes for the policy checkpoint, diffusion
-checkpoint (when replay is enabled), boundary state, stage report, and stage
-evaluation matrix. It is written last, so files from an interrupted stage are
-never interpreted as a completed stage.
-
-Resume an interrupted run with the same scientific configuration and the run's
-current location:
-
-```bash
-python -u train_diffcrl.py \
-  --config configs/diffcrl/diffcrl.yaml \
+  --config path/to/original.yaml \
   --resume-from /path/to/existing/run
 ```
 
-Completed stages are hash-validated and skipped. The policy, selected generative model,
-normalizers, replay/task-bank metadata, evaluation matrix, completed-stage
-index, and Python/NumPy/PyTorch RNG states are restored from the latest marker.
-BC and diffusion optimizers remain fresh at the next stage, matching normal
-uninterrupted execution. If an interrupted stage already left files behind,
-the retry uses a `.resume_N` directory and checkpoint suffix; existing files
-are not changed.
+Completed artifacts and expert hashes are validated before stages are skipped.
+Interrupted-stage outputs are not overwritten. Periodic SAC resume requires
+both the model checkpoint and its replay-buffer sidecar. See
+[Architecture](docs/ARCHITECTURE.md#8-configuration-and-reproducibility) for
+the full contract and [Runs inventory](docs/RUNS_INVENTORY.md) for retained
+artifact policy.
 
-Task order, environment/reward contract, seeds, data budget, model/training
-settings, replay mode, and evaluation protocol must match. Expert and stage
-artifacts must have the recorded SHA-256 hashes. Run directories and expert
-files may be relocated, and execution output/device paths may differ. Exact
-numeric equivalence across a CPU/GPU or GPU-model change is not guaranteed,
-even though RNG state is restored. Runs created before stage completion markers
-cannot be resumed safely by this interface.
+For repeatable experiments:
 
-### Colab storage and stage backups
+1. record the YAML, seed, repository revision, and environment versions;
+2. use expert manifests and fixed task banks where available;
+3. use a fresh run name for every seed and method;
+4. compare methods with matched task order, budgets, and evaluation protocol;
+5. do not interpret smoke or incomplete runs as thesis results.
 
-Direct-to-Drive output remains supported: set `runtime.output` to a mounted
-Drive directory and resume that directory with `--resume-from`. For faster
-local I/O, the recommended Colab mode keeps `runtime.output` under
-`/content/experiments` and synchronizes every completed stage automatically:
+Exact numerical equivalence is not guaranteed across CPU/GPU backends or GPU
+models even when saved RNG state is restored.
 
-```bash
-python -u train_diffcrl.py \
-  --config /content/configs/formal.yaml \
-  --stage-sync-to /content/drive/MyDrive/Thesis/continual-learning/experiments/run-name
-```
+## Testing
 
-Synchronization reads the local marker, validates every referenced artifact,
-copies only required checkpoint/report/matrix/boundary files plus run metadata,
-verifies destination SHA-256 hashes, and publishes the Drive completion marker
-last. Existing identical files are reused; different files are reported as
-conflicts and are never silently replaced. A failure stops training before the
-next stage while preserving the completed local stage and leaving no remote
-completion marker for a partial copy.
-
-Retry a failed backup without repeating training, or inspect it, with:
+Run lightweight and integration tests with the intended environment:
 
 ```bash
-python manage_diffcrl_sync.py sync \
-  --source /content/experiments/run-name \
-  --destination /content/drive/MyDrive/Thesis/continual-learning/experiments/run-name
-python manage_diffcrl_sync.py status \
-  --source /content/drive/MyDrive/Thesis/continual-learning/experiments/run-name
-python manage_diffcrl_sync.py validate \
-  --source /content/drive/MyDrive/Thesis/continual-learning/experiments/run-name
+PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 python -m pytest -q
 ```
 
-After loss of the Colab runtime, restore the latest contiguous validated prefix
-to a fresh local directory and resume it. Restoration refuses non-empty targets
-and verifies all copied hashes:
+Disabling plugin autoload avoids unrelated ROS/system pytest plugins. Tests that
+need the local KUKA fork, CUDA, or retained large artifacts
+may skip or require additional resources. No test result substitutes for a
+multi-seed scientific evaluation.
 
-```bash
-python manage_diffcrl_sync.py restore \
-  --source /content/drive/MyDrive/Thesis/continual-learning/experiments/run-name \
-  --destination /content/experiments/run-name
-python -u train_diffcrl.py \
-  --config /content/configs/formal.yaml \
-  --resume-from /content/experiments/run-name \
-  --stage-sync-to /content/drive/MyDrive/Thesis/continual-learning/experiments/run-name
-```
+## Status and limitations
 
-Only marker-referenced files are restored; disposable generated trajectories,
-caches, and TensorBoard events are not copied. Scientific configuration and
-expert checkpoint hashes must still match. Filesystem relocation is allowed,
-but bitwise equivalence is not promised across different CPU/GPU backends or
-CUDA topologies. The Colab notebook exposes both storage modes and the same
-validate, restore, retry, status, and resume operations.
+- The repository targets simulation; no real-robot deployment path is present.
+- DiffCRL is expert-driven continual imitation/distillation, not the original
+  DISTR online Immediate Policy algorithm.
+- KUKA sequential SAC is not implemented.
+- CUDA device-native DDPM replay sampling is implemented and
+  CPU-equivalence-tested, but CUDA correctness/performance is not yet validated
+  in this repository.
+- Flow Matching and forward-transfer workflows remain experimental; documented
+  results must be read with their protocol and limitations.
 
-The canonical trained KUKA v3 experts are stored under
-`runs/experts/kuka-v3/<task>/policy.zip`. Model provenance, reward
-configuration, hashes, and retained evaluation evidence live beside each
-checkpoint. Hammer's canonical expert uses reward v2 with `nail_progress`
-weight `4.0`.
+See [Development status](docs/DEVELOPMENT_STATUS.md) for the complete
+implemented/validated/experimental classification.
 
-These are standalone KUKA-v3 experts and must not currently be substituted for
-the Sawyer MetaWorld-v3 experts referenced by the DiffCRL configurations. KUKA
-continual-learning support is not yet implemented.
+## References and acknowledgements
 
-SAC checkpoint evaluation for MetaWorld uses an explicit ordered MT1 bank. The
-`evaluation.task_set_seed` generates the fixed task configurations; the rollout
-seed (`runtime.seed + evaluation.seed_offset` for SAC) controls the separate
-per-episode reset-seed sequence. Every checkpoint evaluation uses the same bank
-order, and its hashes are stored in `evaluations/evaluations.npz`.
+- Feng Chen et al., [“Stable Continual Reinforcement Learning via
+  Diffusion-based Trajectory Replay”](https://arxiv.org/abs/2411.10809), 2024.
+- [MetaWorld](https://github.com/Farama-Foundation/Metaworld) provides the
+  manipulation benchmark and task interfaces.
+- [Stable-Baselines3](https://github.com/DLR-RM/stable-baselines3) provides the
+  SAC implementation.
 
-New SAC runs write checkpoint-specific `*.manifest.json` sidecars containing
-the task identity, checkpoint hash, environment contract, training identity,
-and fixed-bank qualification metrics. DiffCRL validates these manifests. Older
-checkpoints without a sidecar remain usable through a warned legacy path, but
-their task/reward identity cannot be proven and they should be requalified
-before a new formal experiment.
-
-Before a fixed-task formal run, the training and evaluation MT1 task hashes are
-checked for disjointness. Formal workflows also write `run_manifest.json` with
-repository, environment, config, expert, and task-bank provenance. `RUNNING`
-marks an incomplete run and is atomically replaced by `RUN_COMPLETE` only after
-all final outputs succeed.
-
-SAC evaluation archives produced before the fixed-bank callback change contain
-reset seeds but not fixed task identities. They must **not** be described as
-fixed-task evaluations.
-
-For a fast pipeline check, use `configs/diffcrl/diffcrl_smoke.yaml`.
-
-Run the no-replay ablation with:
-
-```bash
-python -u train_diffcrl.py \
-  --config configs/diffcrl/diffcrl_no_replay.yaml \
-  --seed 0 \
-  --run-name no-replay-seed0
-```
-
-## Sequential SAC baseline
-
-Sequential SAC maintains one SAC learner across the task sequence. The learner
-state persists across task boundaries, while task-local replay is reset at each
-boundary. It does not load pretrained experts or use behavioral cloning or
-diffusion replay.
-
-Smoke run:
-
-```bash
-python -u train_continual_sac.py \
-  --config configs/continual_sac/continual_sac_smoke.yaml
-```
-
-Formal five-task run:
-
-```bash
-python -u train_continual_sac.py \
-  --config configs/continual_sac/continual_sac.yaml
-```
-
-These configurations write to `runs/continual_sac_smoke/` and
-`runs/formal/continual_sac_5task/`, respectively. Existing run directories are
-not overwritten; use `--run-name NAME` to place a run in a distinct named
-subdirectory.
-
-## Utilities
-
-Evaluate a trained SAC policy:
-
-```bash
-python scripts/evaluation/evaluate_sac.py \
-  --task reach-v3 \
-  --model runs/path/to/model.zip \
-  --episodes 50
-```
-
-Render a saved SAC or DiffCRL policy to MP4 (requires FFmpeg):
-
-```bash
-python scripts/visualization/render_policy_video.py \
-  --task reach-v3 \
-  --model path/to/checkpoint \
-  --policy-type sac \
-  --output videos/reach.mp4
-```
-
-Use `--policy-type diffcrl` for a saved `GeneralPolicy` checkpoint. Run any
-entry point with `--help` to see its remaining options.
+This thesis code builds on those projects while retaining its own environment
+adapters, trajectory contracts, continual orchestration, replay models, and
+evaluation/provenance machinery.

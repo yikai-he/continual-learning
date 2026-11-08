@@ -1,0 +1,14 @@
+{
+  "kind": "flow_matching_continual_stage_diagnostics_v1",
+  "stage": 1,
+  "artifacts": {
+    "diagnostics": {
+      "path": "/home/yikai/Documents/Code/Thesis/continual-learning/runs/pilots/flow_matching_5task/flow_matching_5task_seed0/scientific_diagnostics/stage_1_faucet-close-v3.json",
+      "sha256": "b6071807e4252891439ed8d3b6b10641bacb2f3ac48a8c7933bf09635681175e"
+    },
+    "stage_completion": {
+      "path": "/home/yikai/Documents/Code/Thesis/continual-learning/runs/pilots/flow_matching_5task/flow_matching_5task_seed0/stage_1_COMPLETE.json",
+      "sha256": "12552f18319e4c35ad17bfe3231ad94db75d8b767d50abda78cbd2110b284bba"
+    }
+  }
+}

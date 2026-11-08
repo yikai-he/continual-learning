@@ -1,0 +1,2802 @@
+[
+  {
+    "task_index": 0,
+    "reset_seed": 10000,
+    "cube": [
+      0.010939749889075756,
+      0.5019999742507935,
+      0.019999999552965164
+    ],
+    "goal": [
+      0.010939749889075756,
+      0.7042300701141357,
+      0.019999999552965164
+    ],
+    "cube_y_m": 0.5019999742507935,
+    "physical_gap_m": 0.004993747178422564,
+    "gap_error_m": -6.252821577436285e-06,
+    "cube_position_difference_m": 0.0,
+    "cube_quaternion_difference": 0.0,
+    "goal_difference_m": 0.0,
+    "contact_start_valid_rear_contact": true,
+    "contact_start_latch": true,
+    "near_initial_robot_cube_contact": false,
+    "near_initial_latch": false,
+    "near_workspace_y_margin_m": 0.002954101562499978,
+    "near_workspace_z_margin_m": 0.0,
+    "near_aperture_m": 0.08419391539444844,
+    "contact_tcp": [
+      0.011168319139576676,
+      0.43220651633037144,
+      0.05226427447598875
+    ],
+    "near_tcp": [
+      0.011179255145570468,
+      0.4231458188656244,
+      0.05303458161124836
+    ],
+    "tcp_difference_m": 0.00909338942455079,
+    "tcp_vertical_difference_m": 0.0007703071352596139,
+    "near_joint_limits_valid": true,
+    "near_gripper_table_collision": false,
+    "near_finite": true,
+    "near_initial_cube_speed": 0.0,
+    "contact_acquired": true,
+    "first_contact": {
+      "step": 39,
+      "alignment": 0.999992453308422,
+      "height_m": 0.014386336773689227,
+      "penetration_m": 2.807092948046333e-05,
+      "tcp_mocap_error_m": 0.013137011415927984
+    },
+    "contact_bonus_count": 1,
+    "maximum_cube_displacement_m": 0.00014499761164188385,
+    "maximum_cube_tilt_rad": 0.003885023181403409,
+    "workspace_clipped": false,
+    "valid": true
+  },
+  {
+    "task_index": 1,
+    "reset_seed": 10001,
+    "cube": [
+      0.08565817773342133,
+      0.5354766845703125,
+      0.019999999552965164
+    ],
+    "goal": [
+      0.08565817773342133,
+      0.7456086874008179,
+      0.019999999552965164
+    ],
+    "cube_y_m": 0.5354766845703125,
+    "physical_gap_m": 0.004996847484618768,
+    "gap_error_m": -3.1525153812318046e-06,
+    "cube_position_difference_m": 0.0,
+    "cube_quaternion_difference": 0.0,
+    "goal_difference_m": 0.0,
+    "contact_start_valid_rear_contact": true,
+    "contact_start_latch": true,
+    "near_initial_robot_cube_contact": false,
+    "near_initial_latch": false,
+    "near_workspace_y_margin_m": 0.03646370616379874,
+    "near_workspace_z_margin_m": 0.0,
+    "near_aperture_m": 0.08418641773099911,
+    "contact_tcp": [
+      0.08586703262224499,
+      0.46566534119021885,
+      0.052297989750798864
+    ],
+    "near_tcp": [
+      0.08589988234936684,
+      0.45664648636626476,
+      0.05308550591623766
+    ],
+    "tcp_difference_m": 0.009053231641295796,
+    "tcp_vertical_difference_m": 0.0007875161654387966,
+    "near_joint_limits_valid": true,
+    "near_gripper_table_collision": false,
+    "near_finite": true,
+    "near_initial_cube_speed": 0.0,
+    "contact_acquired": true,
+    "first_contact": {
+      "step": 39,
+      "alignment": 0.9999923328105892,
+      "height_m": 0.014466002359590478,
+      "penetration_m": 3.1032051048727776e-05,
+      "tcp_mocap_error_m": 0.013218052463843555
+    },
+    "contact_bonus_count": 1,
+    "maximum_cube_displacement_m": 0.00014499761164188385,
+    "maximum_cube_tilt_rad": 0.003915916551962783,
+    "workspace_clipped": false,
+    "valid": true
+  },
+  {
+    "task_index": 2,
+    "reset_seed": 10002,
+    "cube": [
+      0.01651659794151783,
+      0.5213577747344971,
+      0.019999999552965164
+    ],
+    "goal": [
+      0.01651659794151783,
+      0.7356295585632324,
+      0.019999999552965164
+    ],
+    "cube_y_m": 0.5213577747344971,
+    "physical_gap_m": 0.005000112290157331,
+    "gap_error_m": 1.1229015733048298e-07,
+    "cube_position_difference_m": 0.0,
+    "cube_quaternion_difference": 0.0,
+    "goal_difference_m": 0.0,
+    "contact_start_valid_rear_contact": true,
+    "contact_start_latch": true,
+    "near_initial_robot_cube_contact": false,
+    "near_initial_latch": false,
+    "near_workspace_y_margin_m": 0.022267787715849863,
+    "near_workspace_z_margin_m": 0.0,
+    "near_aperture_m": 0.0843004080651512,
+    "contact_tcp": [
+      0.01673586504471894,
+      0.45157706258023084,
+      0.052239018524554245
+    ],
+    "near_tcp": [
+      0.01675170917472449,
+      0.44246734771851215,
+      0.053092670894197044
+    ],
+    "tcp_difference_m": 0.009149638149482782,
+    "tcp_vertical_difference_m": 0.0008536523696427989,
+    "near_joint_limits_valid": true,
+    "near_gripper_table_collision": false,
+    "near_finite": true,
+    "near_initial_cube_speed": 0.0,
+    "contact_acquired": true,
+    "first_contact": {
+      "step": 38,
+      "alignment": 0.9999999993534179,
+      "height_m": 0.014428197297984308,
+      "penetration_m": 2.8324876421362728e-05,
+      "tcp_mocap_error_m": 0.013112309221255537
+    },
+    "contact_bonus_count": 1,
+    "maximum_cube_displacement_m": 0.00014499761164188385,
+    "maximum_cube_tilt_rad": 3.5964458043185395e-05,
+    "workspace_clipped": false,
+    "valid": true
+  },
+  {
+    "task_index": 3,
+    "reset_seed": 10003,
+    "cube": [
+      0.031111987307667732,
+      0.5019999742507935,
+      0.019999999552965164
+    ],
+    "goal": [
+      0.031111987307667732,
+      0.7279050350189209,
+      0.019999999552965164
+    ],
+    "cube_y_m": 0.5019999742507935,
+    "physical_gap_m": 0.004995018088351033,
+    "gap_error_m": -4.98191164896751e-06,
+    "cube_position_difference_m": 0.0,
+    "cube_quaternion_difference": 0.0,
+    "goal_difference_m": 0.0,
+    "contact_start_valid_rear_contact": true,
+    "contact_start_latch": true,
+    "near_initial_robot_cube_contact": false,
+    "near_initial_latch": false,
+    "near_workspace_y_margin_m": 0.002966308593750022,
+    "near_workspace_z_margin_m": 0.0,
+    "near_aperture_m": 0.08418624897521951,
+    "contact_tcp": [
+      0.03133980277765582,
+      0.43220508924240003,
+      0.05224975627799677
+    ],
+    "near_tcp": [
+      0.03135391298197672,
+      0.4231491733377691,
+      0.053035783987449604
+    ],
+    "tcp_difference_m": 0.009089975331629975,
+    "tcp_vertical_difference_m": 0.0007860277094528315,
+    "near_joint_limits_valid": true,
+    "near_gripper_table_collision": false,
+    "near_finite": true,
+    "near_initial_cube_speed": 0.0,
+    "contact_acquired": true,
+    "first_contact": {
+      "step": 39,
+      "alignment": 0.9999920095414153,
+      "height_m": 0.014392709672640155,
+      "penetration_m": 2.841225793556059e-05,
+      "tcp_mocap_error_m": 0.013145798755474438
+    },
+    "contact_bonus_count": 1,
+    "maximum_cube_displacement_m": 0.00014499761164188385,
+    "maximum_cube_tilt_rad": 0.003997617273523369,
+    "workspace_clipped": false,
+    "valid": true
+  },
+  {
+    "task_index": 4,
+    "reset_seed": 10004,
+    "cube": [
+      0.09431695938110352,
+      0.5225251317024231,
+      0.019999999552965164
+    ],
+    "goal": [
+      0.09431695938110352,
+      0.7194691896438599,
+      0.019999999552965164
+    ],
+    "cube_y_m": 0.5225251317024231,
+    "physical_gap_m": 0.004996604794797918,
+    "gap_error_m": -3.395205202081676e-06,
+    "cube_position_difference_m": 0.0,
+    "cube_quaternion_difference": 0.0,
+    "goal_difference_m": 0.0,
+    "contact_start_valid_rear_contact": true,
+    "contact_start_latch": true,
+    "near_initial_robot_cube_contact": false,
+    "near_initial_latch": false,
+    "near_workspace_y_margin_m": 0.023515084075409143,
+    "near_workspace_z_margin_m": 0.0,
+    "near_aperture_m": 0.08419201796552926,
+    "contact_tcp": [
+      0.09452976576675237,
+      0.45270950570216084,
+      0.052283790529220255
+    ],
+    "near_tcp": [
+      0.09456145999397325,
+      0.44368821962646554,
+      0.05307626085094162
+    ],
+    "tcp_difference_m": 0.0090560817241444,
+    "tcp_vertical_difference_m": 0.0007924703217213683,
+    "near_joint_limits_valid": true,
+    "near_gripper_table_collision": false,
+    "near_finite": true,
+    "near_initial_cube_speed": 0.0,
+    "contact_acquired": true,
+    "first_contact": {
+      "step": 39,
+      "alignment": 0.9999920594717951,
+      "height_m": 0.0144503397318578,
+      "penetration_m": 2.9497398124017574e-05,
+      "tcp_mocap_error_m": 0.013203912740369408
+    },
+    "contact_bonus_count": 1,
+    "maximum_cube_displacement_m": 0.00014499761164188385,
+    "maximum_cube_tilt_rad": 0.00398510743934218,
+    "workspace_clipped": false,
+    "valid": true
+  },
+  {
+    "task_index": 5,
+    "reset_seed": 10005,
+    "cube": [
+      -0.0015327667351812124,
+      0.5390623211860657,
+      0.019999999552965164
+    ],
+    "goal": [
+      -0.0015327667351812124,
+      0.7320073246955872,
+      0.019999999552965164
+    ],
+    "cube_y_m": 0.5390623211860657,
+    "physical_gap_m": 0.005000052941041729,
+    "gap_error_m": 5.2941041729301364e-08,
+    "cube_position_difference_m": 0.0,
+    "cube_quaternion_difference": 0.0,
+    "goal_difference_m": 0.0,
+    "contact_start_valid_rear_contact": true,
+    "contact_start_latch": true,
+    "near_initial_robot_cube_contact": false,
+    "near_initial_latch": false,
+    "near_workspace_y_margin_m": 0.040009222663778876,
+    "near_workspace_z_margin_m": 0.0,
+    "near_aperture_m": 0.08419211726999462,
+    "contact_tcp": [
+      -0.0017442505712752833,
+      0.46927946054846925,
+      0.05228286095524602
+    ],
+    "near_tcp": [
+      -0.001760774913736625,
+      0.4602236462502691,
+      0.05308207074027824
+    ],
+    "tcp_difference_m": 0.009091027551265637,
+    "tcp_vertical_difference_m": 0.000799209785032215,
+    "near_joint_limits_valid": true,
+    "near_gripper_table_collision": false,
+    "near_finite": true,
+    "near_initial_cube_speed": 0.0,
+    "contact_acquired": true,
+    "first_contact": {
+      "step": 39,
+      "alignment": 0.9999921797710767,
+      "height_m": 0.01444731938175087,
+      "penetration_m": 2.9217326941279037e-05,
+      "tcp_mocap_error_m": 0.013199265808196187
+    },
+    "contact_bonus_count": 1,
+    "maximum_cube_displacement_m": 0.00014499761164188385,
+    "maximum_cube_tilt_rad": 0.00395480546273207,
+    "workspace_clipped": false,
+    "valid": true
+  },
+  {
+    "task_index": 6,
+    "reset_seed": 10006,
+    "cube": [
+      -0.08601696789264679,
+      0.5134866833686829,
+      0.019999999552965164
+    ],
+    "goal": [
+      -0.08601696789264679,
+      0.6801730990409851,
+      0.019999999552965164
+    ],
+    "cube_y_m": 0.5134866833686829,
+    "physical_gap_m": 0.004995492013615947,
+    "gap_error_m": -4.507986384053378e-06,
+    "cube_position_difference_m": 0.0,
+    "cube_quaternion_difference": 0.0,
+    "goal_difference_m": 0.0,
+    "contact_start_valid_rear_contact": true,
+    "contact_start_latch": true,
+    "near_initial_robot_cube_contact": false,
+    "near_initial_latch": false,
+    "near_workspace_y_margin_m": 0.01447635223869842,
+    "near_workspace_z_margin_m": 0.0,
+    "near_aperture_m": 0.08418592789596581,
+    "contact_tcp": [
+      -0.08623442031409284,
+      0.44366795689055594,
+      0.05229553734184962
+    ],
+    "near_tcp": [
+      -0.08626193988347147,
+      0.43464661685347167,
+      0.05306048761741409
+    ],
+    "tcp_difference_m": 0.009053755149963165,
+    "tcp_vertical_difference_m": 0.0007649502755644674,
+    "near_joint_limits_valid": true,
+    "near_gripper_table_collision": false,
+    "near_finite": true,
+    "near_initial_cube_speed": 0.0,
+    "contact_acquired": true,
+    "first_contact": {
+      "step": 39,
+      "alignment": 0.9999921768296752,
+      "height_m": 0.014431652458805764,
+      "penetration_m": 2.910795558305476e-05,
+      "tcp_mocap_error_m": 0.013184545623820064
+    },
+    "contact_bonus_count": 1,
+    "maximum_cube_displacement_m": 0.00014499761164188385,
+    "maximum_cube_tilt_rad": 0.003955548630217864,
+    "workspace_clipped": false,
+    "valid": true
+  },
+  {
+    "task_index": 7,
+    "reset_seed": 10007,
+    "cube": [
+      0.07264052331447601,
+      0.5327466130256653,
+      0.019999999552965164
+    ],
+    "goal": [
+      0.07264052331447601,
+      0.7430304884910583,
+      0.019999999552965164
+    ],
+    "cube_y_m": 0.5327466130256653,
+    "physical_gap_m": 0.004998577406556501,
+    "gap_error_m": -1.422593443499258e-06,
+    "cube_position_difference_m": 0.0,
+    "cube_quaternion_difference": 0.0,
+    "goal_difference_m": 0.0,
+    "contact_start_valid_rear_contact": true,
+    "contact_start_latch": true,
+    "near_initial_robot_cube_contact": false,
+    "near_initial_latch": false,
+    "near_workspace_y_margin_m": 0.033670276535735344,
+    "near_workspace_z_margin_m": 0.0,
+    "near_aperture_m": 0.08433421729654007,
+    "contact_tcp": [
+      0.07285174970878622,
+      0.4629489188351421,
+      0.05226212398374558
+    ],
+    "near_tcp": [
+      0.07288109807480597,
+      0.4538554863353045,
+      0.05312500154703774
+    ],
+    "tcp_difference_m": 0.009134327213589638,
+    "tcp_vertical_difference_m": 0.0008628775632921609,
+    "near_joint_limits_valid": true,
+    "near_gripper_table_collision": false,
+    "near_finite": true,
+    "near_initial_cube_speed": 0.0,
+    "contact_acquired": true,
+    "first_contact": {
+      "step": 38,
+      "alignment": 0.9999999993769099,
+      "height_m": 0.014464802584431027,
+      "penetration_m": 2.7650344411434916e-05,
+      "tcp_mocap_error_m": 0.013149601591964159
+    },
+    "contact_bonus_count": 1,
+    "maximum_cube_displacement_m": 0.00014499761164188385,
+    "maximum_cube_tilt_rad": 3.5304857413347664e-05,
+    "workspace_clipped": false,
+    "valid": true
+  },
+  {
+    "task_index": 8,
+    "reset_seed": 10008,
+    "cube": [
+      -0.05442572385072708,
+      0.5019999742507935,
+      0.019999999552965164
+    ],
+    "goal": [
+      -0.05442572385072708,
+      0.7348343729972839,
+      0.019999999552965164
+    ],
+    "cube_y_m": 0.5019999742507935,
+    "physical_gap_m": 0.0049886192305440905,
+    "gap_error_m": -1.138076945590965e-05,
+    "cube_position_difference_m": 0.0,
+    "cube_quaternion_difference": 0.0,
+    "goal_difference_m": 0.0,
+    "contact_start_valid_rear_contact": true,
+    "contact_start_latch": true,
+    "near_initial_robot_cube_contact": false,
+    "near_initial_latch": false,
+    "near_workspace_y_margin_m": 0.0029296875,
+    "near_workspace_z_margin_m": 0.0,
+    "near_aperture_m": 0.08433066743829479,
+    "contact_tcp": [
+      -0.05465173153877933,
+      0.43219923489652745,
+      0.052227997673548465
+    ],
+    "near_tcp": [
+      -0.05466990962416276,
+      0.4231033628070112,
+      0.053084440084638744
+    ],
+    "tcp_difference_m": 0.009136121338683212,
+    "tcp_vertical_difference_m": 0.0008564424110902788,
+    "near_joint_limits_valid": true,
+    "near_gripper_table_collision": false,
+    "near_finite": true,
+    "near_initial_cube_speed": 0.0,
+    "contact_acquired": true,
+    "first_contact": {
+      "step": 38,
+      "alignment": 0.9999999993796201,
+      "height_m": 0.014404006455004968,
+      "penetration_m": 2.6690645004748915e-05,
+      "tcp_mocap_error_m": 0.013088218524317873
+    },
+    "contact_bonus_count": 1,
+    "maximum_cube_displacement_m": 0.00014499761164188385,
+    "maximum_cube_tilt_rad": 3.5228031174578797e-05,
+    "workspace_clipped": false,
+    "valid": true
+  },
+  {
+    "task_index": 9,
+    "reset_seed": 10009,
+    "cube": [
+      0.04200977087020874,
+      0.533136248588562,
+      0.019999999552965164
+    ],
+    "goal": [
+      0.04200977087020874,
+      0.7370989918708801,
+      0.019999999552965164
+    ],
+    "cube_y_m": 0.533136248588562,
+    "physical_gap_m": 0.004995723348722095,
+    "gap_error_m": -4.276651277904976e-06,
+    "cube_position_difference_m": 0.0,
+    "cube_quaternion_difference": 0.0,
+    "goal_difference_m": 0.0,
+    "contact_start_valid_rear_contact": true,
+    "contact_start_latch": true,
+    "near_initial_robot_cube_contact": false,
+    "near_initial_latch": false,
+    "near_workspace_y_margin_m": 0.034104153685654004,
+    "near_workspace_z_margin_m": 0.0,
+    "near_aperture_m": 0.08419498740025917,
+    "contact_tcp": [
+      0.04222305652133887,
+      0.4633394236646023,
+      0.052281862674639995
+    ],
+    "near_tcp": [
+      0.04224612374003398,
+      0.45429996182344107,
+      0.05307940782994692
+    ],
+    "tcp_difference_m": 0.009074606368826238,
+    "tcp_vertical_difference_m": 0.0007975451553069238,
+    "near_joint_limits_valid": true,
+    "near_gripper_table_collision": false,
+    "near_finite": true,
+    "near_initial_cube_speed": 0.0,
+    "contact_acquired": true,
+    "first_contact": {
+      "step": 39,
+      "alignment": 0.9999920440145111,
+      "height_m": 0.014445895654274218,
+      "penetration_m": 2.9659417904313197e-05,
+      "tcp_mocap_error_m": 0.013198766429284647
+    },
+    "contact_bonus_count": 1,
+    "maximum_cube_displacement_m": 0.00014499761164188385,
+    "maximum_cube_tilt_rad": 0.003988984860540702,
+    "workspace_clipped": false,
+    "valid": true
+  },
+  {
+    "task_index": 10,
+    "reset_seed": 10010,
+    "cube": [
+      -0.07465668767690659,
+      0.5019999742507935,
+      0.019999999552965164
+    ],
+    "goal": [
+      -0.07465668767690659,
+      0.6581142544746399,
+      0.019999999552965164
+    ],
+    "cube_y_m": 0.5019999742507935,
+    "physical_gap_m": 0.004995039624504868,
+    "gap_error_m": -4.960375495132417e-06,
+    "cube_position_difference_m": 0.0,
+    "cube_quaternion_difference": 0.0,
+    "goal_difference_m": 0.0,
+    "contact_start_valid_rear_contact": true,
+    "contact_start_latch": true,
+    "near_initial_robot_cube_contact": false,
+    "near_initial_latch": false,
+    "near_workspace_y_margin_m": 0.002984619140624978,
+    "near_workspace_z_margin_m": 0.0,
+    "near_aperture_m": 0.08419143858663,
+    "contact_tcp": [
+      -0.0748803946845723,
+      0.4321837470283184,
+      0.052274895325980286
+    ],
+    "near_tcp": [
+      -0.07490247497083745,
+      0.42315135524785213,
+      0.05304644348077518
+    ],
+    "tcp_difference_m": 0.009065311653222061,
+    "tcp_vertical_difference_m": 0.000771548154794896,
+    "near_joint_limits_valid": true,
+    "near_gripper_table_collision": false,
+    "near_finite": true,
+    "near_initial_cube_speed": 0.0,
+    "contact_acquired": true,
+    "first_contact": {
+      "step": 39,
+      "alignment": 0.9999924592679098,
+      "height_m": 0.014406880079607113,
+      "penetration_m": 2.812545227317827e-05,
+      "tcp_mocap_error_m": 0.013158277248252666
+    },
+    "contact_bonus_count": 1,
+    "maximum_cube_displacement_m": 0.00014499761164188385,
+    "maximum_cube_tilt_rad": 0.003883488896299648,
+    "workspace_clipped": false,
+    "valid": true
+  },
+  {
+    "task_index": 11,
+    "reset_seed": 10011,
+    "cube": [
+      -0.0677093118429184,
+      0.5023972392082214,
+      0.019999999552965164
+    ],
+    "goal": [
+      -0.0677093118429184,
+      0.7428770661354065,
+      0.019999999552965164
+    ],
+    "cube_y_m": 0.5023972392082214,
+    "physical_gap_m": 0.004993828990226392,
+    "gap_error_m": -6.171009773608266e-06,
+    "cube_position_difference_m": 0.0,
+    "cube_quaternion_difference": 0.0,
+    "goal_difference_m": 0.0,
+    "contact_start_valid_rear_contact": true,
+    "contact_start_latch": true,
+    "near_initial_robot_cube_contact": false,
+    "near_initial_latch": false,
+    "near_workspace_y_margin_m": 0.003325074662473948,
+    "near_workspace_z_margin_m": 0.0,
+    "near_aperture_m": 0.08433633635698691,
+    "contact_tcp": [
+      -0.06793369333547826,
+      0.4325967830892927,
+      0.052225382377943635
+    ],
+    "near_tcp": [
+      -0.0679545269726813,
+      0.42349433121556157,
+      0.0530896657064092
+    ],
+    "tcp_difference_m": 0.00914341565422323,
+    "tcp_vertical_difference_m": 0.0008642833284655677,
+    "near_joint_limits_valid": true,
+    "near_gripper_table_collision": false,
+    "near_finite": true,
+    "near_initial_cube_speed": 0.0,
+    "contact_acquired": true,
+    "first_contact": {
+      "step": 38,
+      "alignment": 0.9999999994042728,
+      "height_m": 0.014414848887267236,
+      "penetration_m": 2.656566062404956e-05,
+      "tcp_mocap_error_m": 0.013099329111903169
+    },
+    "contact_bonus_count": 1,
+    "maximum_cube_displacement_m": 0.00014499761164188385,
+    "maximum_cube_tilt_rad": 3.452100592436565e-05,
+    "workspace_clipped": false,
+    "valid": true
+  },
+  {
+    "task_index": 12,
+    "reset_seed": 10012,
+    "cube": [
+      -0.03693680092692375,
+      0.5038516521453857,
+      0.019999999552965164
+    ],
+    "goal": [
+      -0.03693680092692375,
+      0.6656965613365173,
+      0.019999999552965164
+    ],
+    "cube_y_m": 0.5038516521453857,
+    "physical_gap_m": 0.004993836119118533,
+    "gap_error_m": -6.1638808814667295e-06,
+    "cube_position_difference_m": 0.0,
+    "cube_quaternion_difference": 0.0,
+    "goal_difference_m": 0.0,
+    "contact_start_valid_rear_contact": true,
+    "contact_start_latch": true,
+    "near_initial_robot_cube_contact": false,
+    "near_initial_latch": false,
+    "near_workspace_y_margin_m": 0.004821263609837201,
+    "near_workspace_z_margin_m": 0.0,
+    "near_aperture_m": 0.08418547095297661,
+    "contact_tcp": [
+      -0.03716340097643886,
+      0.4340470937538484,
+      0.05227109241918505
+    ],
+    "near_tcp": [
+      -0.03717888992331119,
+      0.4250028260855553,
+      0.05303720260113934
+    ],
+    "tcp_difference_m": 0.009076670225038577,
+    "tcp_vertical_difference_m": 0.0007661101819542854,
+    "near_joint_limits_valid": true,
+    "near_gripper_table_collision": false,
+    "near_finite": true,
+    "near_initial_cube_speed": 0.0,
+    "contact_acquired": true,
+    "first_contact": {
+      "step": 39,
+      "alignment": 0.9999922852091521,
+      "height_m": 0.014397161299835884,
+      "penetration_m": 2.970425543740054e-05,
+      "tcp_mocap_error_m": 0.013148627991130911
+    },
+    "contact_bonus_count": 1,
+    "maximum_cube_displacement_m": 0.00014499761164188385,
+    "maximum_cube_tilt_rad": 0.003928054068638054,
+    "workspace_clipped": false,
+    "valid": true
+  },
+  {
+    "task_index": 13,
+    "reset_seed": 10013,
+    "cube": [
+      0.06670746952295303,
+      0.5019999742507935,
+      0.019999999552965164
+    ],
+    "goal": [
+      0.06670746952295303,
+      0.6845706701278687,
+      0.019999999552965164
+    ],
+    "cube_y_m": 0.5019999742507935,
+    "physical_gap_m": 0.005000398816260897,
+    "gap_error_m": 3.9881626089696004e-07,
+    "cube_position_difference_m": 0.0,
+    "cube_quaternion_difference": 0.0,
+    "goal_difference_m": 0.0,
+    "contact_start_valid_rear_contact": true,
+    "contact_start_latch": true,
+    "near_initial_robot_cube_contact": false,
+    "near_initial_latch": false,
+    "near_workspace_y_margin_m": 0.002979278564453125,
+    "near_workspace_z_margin_m": 0.0,
+    "near_aperture_m": 0.08418170797830447,
+    "contact_tcp": [
+      0.06693215002558066,
+      0.43219101848067276,
+      0.05225640877666071
+    ],
+    "near_tcp": [
+      0.06695264832655373,
+      0.42314864732514923,
+      0.05304208961122508
+    ],
+    "tcp_difference_m": 0.009076463555173265,
+    "tcp_vertical_difference_m": 0.0007856808345643659,
+    "near_joint_limits_valid": true,
+    "near_gripper_table_collision": false,
+    "near_finite": true,
+    "near_initial_cube_speed": 0.0,
+    "contact_acquired": true,
+    "first_contact": {
+      "step": 39,
+      "alignment": 0.9999922734141021,
+      "height_m": 0.014403028865089786,
+      "penetration_m": 2.8054394536694184e-05,
+      "tcp_mocap_error_m": 0.01315506774424371
+    },
+    "contact_bonus_count": 1,
+    "maximum_cube_displacement_m": 0.00014499761164188385,
+    "maximum_cube_tilt_rad": 0.003931055615132972,
+    "workspace_clipped": false,
+    "valid": true
+  },
+  {
+    "task_index": 14,
+    "reset_seed": 10014,
+    "cube": [
+      -0.0832483097910881,
+      0.5197755098342896,
+      0.019999999552965164
+    ],
+    "goal": [
+      -0.0832483097910881,
+      0.7191203832626343,
+      0.019999999552965164
+    ],
+    "cube_y_m": 0.5197755098342896,
+    "physical_gap_m": 0.004996894303475316,
+    "gap_error_m": -3.105696524684058e-06,
+    "cube_position_difference_m": 0.0,
+    "cube_quaternion_difference": 0.0,
+    "goal_difference_m": 0.0,
+    "contact_start_valid_rear_contact": true,
+    "contact_start_latch": true,
+    "near_initial_robot_cube_contact": false,
+    "near_initial_latch": false,
+    "near_workspace_y_margin_m": 0.020714613253627334,
+    "near_workspace_z_margin_m": 0.0,
+    "near_aperture_m": 0.08431150394793335,
+    "contact_tcp": [
+      -0.08346358015696904,
+      0.4499705181654261,
+      0.052250877355773245
+    ],
+    "near_tcp": [
+      -0.08349210861937993,
+      0.44088933192013957,
+      0.053105871856358046
+    ],
+    "tcp_difference_m": 0.009121390962500132,
+    "tcp_vertical_difference_m": 0.0008549945005848006,
+    "near_joint_limits_valid": true,
+    "near_gripper_table_collision": false,
+    "near_finite": true,
+    "near_initial_cube_speed": 0.0,
+    "contact_acquired": true,
+    "first_contact": {
+      "step": 38,
+      "alignment": 0.9999999993369872,
+      "height_m": 0.01444646484607831,
+      "penetration_m": 2.8883467510033417e-05,
+      "tcp_mocap_error_m": 0.013131238460197744
+    },
+    "contact_bonus_count": 1,
+    "maximum_cube_displacement_m": 0.00014499761164188385,
+    "maximum_cube_tilt_rad": 3.64180995725878e-05,
+    "workspace_clipped": false,
+    "valid": true
+  },
+  {
+    "task_index": 15,
+    "reset_seed": 10015,
+    "cube": [
+      0.06232713162899017,
+      0.5019999742507935,
+      0.019999999552965164
+    ],
+    "goal": [
+      0.06232713162899017,
+      0.7496726512908936,
+      0.019999999552965164
+    ],
+    "cube_y_m": 0.5019999742507935,
+    "physical_gap_m": 0.004996622581002176,
+    "gap_error_m": -3.377418997824004e-06,
+    "cube_position_difference_m": 0.0,
+    "cube_quaternion_difference": 0.0,
+    "goal_difference_m": 0.0,
+    "contact_start_valid_rear_contact": true,
+    "contact_start_latch": true,
+    "near_initial_robot_cube_contact": false,
+    "near_initial_latch": false,
+    "near_workspace_y_margin_m": 0.002978515625000011,
+    "near_workspace_z_margin_m": 0.0,
+    "near_aperture_m": 0.08418642373718067,
+    "contact_tcp": [
+      0.06255232999851484,
+      0.4321849751212692,
+      0.05227482540276966
+    ],
+    "near_tcp": [
+      0.06257195722345671,
+      0.42314939281058617,
+      0.053040743533308204
+    ],
+    "tcp_difference_m": 0.009068007692088405,
+    "tcp_vertical_difference_m": 0.0007659181305385426,
+    "near_joint_limits_valid": true,
+    "near_gripper_table_collision": false,
+    "near_finite": true,
+    "near_initial_cube_speed": 0.0,
+    "contact_acquired": true,
+    "first_contact": {
+      "step": 39,
+      "alignment": 0.9999920896022138,
+      "height_m": 0.014404476009869327,
+      "penetration_m": 2.8311180839088354e-05,
+      "tcp_mocap_error_m": 0.013157554468180533
+    },
+    "contact_bonus_count": 1,
+    "maximum_cube_displacement_m": 0.00014499761164188385,
+    "maximum_cube_tilt_rad": 0.003977539626031209,
+    "workspace_clipped": false,
+    "valid": true
+  },
+  {
+    "task_index": 16,
+    "reset_seed": 10016,
+    "cube": [
+      0.029071340337395668,
+      0.5019999742507935,
+      0.019999999552965164
+    ],
+    "goal": [
+      0.029071340337395668,
+      0.6903897523880005,
+      0.019999999552965164
+    ],
+    "cube_y_m": 0.5019999742507935,
+    "physical_gap_m": 0.004998418563970766,
+    "gap_error_m": -1.5814360292340512e-06,
+    "cube_position_difference_m": 0.0,
+    "cube_quaternion_difference": 0.0,
+    "goal_difference_m": 0.0,
+    "contact_start_valid_rear_contact": true,
+    "contact_start_latch": true,
+    "near_initial_robot_cube_contact": false,
+    "near_initial_latch": false,
+    "near_workspace_y_margin_m": 0.002960205078125,
+    "near_workspace_z_margin_m": 0.0,
+    "near_aperture_m": 0.08418685934519828,
+    "contact_tcp": [
+      0.02929927560960165,
+      0.43219999546150256,
+      0.05226495382008001
+    ],
+    "near_tcp": [
+      0.029313043862542902,
+      0.42314392059794936,
+      0.05303389101984103
+    ],
+    "tcp_difference_m": 0.00908867129542297,
+    "tcp_vertical_difference_m": 0.0007689371997610245,
+    "near_joint_limits_valid": true,
+    "near_gripper_table_collision": false,
+    "near_finite": true,
+    "near_initial_cube_speed": 0.0,
+    "contact_acquired": true,
+    "first_contact": {
+      "step": 39,
+      "alignment": 0.9999922473928525,
+      "height_m": 0.014392108302177933,
+      "penetration_m": 2.7437320757402906e-05,
+      "tcp_mocap_error_m": 0.013144128776789282
+    },
+    "contact_bonus_count": 1,
+    "maximum_cube_displacement_m": 0.00014499761164188385,
+    "maximum_cube_tilt_rad": 0.003937668990882957,
+    "workspace_clipped": false,
+    "valid": true
+  },
+  {
+    "task_index": 17,
+    "reset_seed": 10017,
+    "cube": [
+      -0.03450910374522209,
+      0.5019999742507935,
+      0.019999999552965164
+    ],
+    "goal": [
+      -0.03450910374522209,
+      0.6615779995918274,
+      0.019999999552965164
+    ],
+    "cube_y_m": 0.5019999742507935,
+    "physical_gap_m": 0.004995644258773982,
+    "gap_error_m": -4.355741226018221e-06,
+    "cube_position_difference_m": 0.0,
+    "cube_quaternion_difference": 0.0,
+    "goal_difference_m": 0.0,
+    "contact_start_valid_rear_contact": true,
+    "contact_start_latch": true,
+    "near_initial_robot_cube_contact": false,
+    "near_initial_latch": false,
+    "near_workspace_y_margin_m": 0.002966308593750022,
+    "near_workspace_z_margin_m": 0.0,
+    "near_aperture_m": 0.08418597440316995,
+    "contact_tcp": [
+      -0.034736724030734356,
+      0.4321979507246695,
+      0.05226649899805702
+    ],
+    "near_tcp": [
+      -0.03475138727795366,
+      0.4231477624611917,
+      0.05303457138445858
+    ],
+    "tcp_difference_m": 0.009082734049060508,
+    "tcp_vertical_difference_m": 0.0007680723864015582,
+    "near_joint_limits_valid": true,
+    "near_gripper_table_collision": false,
+    "near_finite": true,
+    "near_initial_cube_speed": 0.0,
+    "contact_acquired": true,
+    "first_contact": {
+      "step": 39,
+      "alignment": 0.9999925021181332,
+      "height_m": 0.01439132776302694,
+      "penetration_m": 2.7887370917781274e-05,
+      "tcp_mocap_error_m": 0.013142013329699043
+    },
+    "contact_bonus_count": 1,
+    "maximum_cube_displacement_m": 0.00014499761164188385,
+    "maximum_cube_tilt_rad": 0.0038724392025216445,
+    "workspace_clipped": false,
+    "valid": true
+  },
+  {
+    "task_index": 18,
+    "reset_seed": 10018,
+    "cube": [
+      0.08266019821166992,
+      0.5019999742507935,
+      0.019999999552965164
+    ],
+    "goal": [
+      0.08266019821166992,
+      0.6761012077331543,
+      0.019999999552965164
+    ],
+    "cube_y_m": 0.5019999742507935,
+    "physical_gap_m": 0.004995869113133056,
+    "gap_error_m": -4.130886866944225e-06,
+    "cube_position_difference_m": 0.0,
+    "cube_quaternion_difference": 0.0,
+    "goal_difference_m": 0.0,
+    "contact_start_valid_rear_contact": true,
+    "contact_start_latch": true,
+    "near_initial_robot_cube_contact": false,
+    "near_initial_latch": false,
+    "near_workspace_y_margin_m": 0.00299072265625,
+    "near_workspace_z_margin_m": 0.0,
+    "near_aperture_m": 0.0841838500723597,
+    "contact_tcp": [
+      0.08288281189283768,
+      0.43218425458002707,
+      0.05225874923831199
+    ],
+    "near_tcp": [
+      0.08290656905090954,
+      0.42315495083415405,
+      0.05304724320136944
+    ],
+    "tcp_difference_m": 0.009063697549431702,
+    "tcp_vertical_difference_m": 0.0007884939630574545,
+    "near_joint_limits_valid": true,
+    "near_gripper_table_collision": false,
+    "near_finite": true,
+    "near_initial_cube_speed": 0.0,
+    "contact_acquired": true,
+    "first_contact": {
+      "step": 39,
+      "alignment": 0.9999918036211365,
+      "height_m": 0.01440963224611206,
+      "penetration_m": 2.850849660264731e-05,
+      "tcp_mocap_error_m": 0.013164063241202261
+    },
+    "contact_bonus_count": 1,
+    "maximum_cube_displacement_m": 0.00014499761164188385,
+    "maximum_cube_tilt_rad": 0.004048800712483693,
+    "workspace_clipped": false,
+    "valid": true
+  },
+  {
+    "task_index": 19,
+    "reset_seed": 10019,
+    "cube": [
+      -0.03266838565468788,
+      0.5019999742507935,
+      0.019999999552965164
+    ],
+    "goal": [
+      -0.03266838565468788,
+      0.6881382465362549,
+      0.019999999552965164
+    ],
+    "cube_y_m": 0.5019999742507935,
+    "physical_gap_m": 0.004994302601913629,
+    "gap_error_m": -5.697398086370979e-06,
+    "cube_position_difference_m": 0.0,
+    "cube_quaternion_difference": 0.0,
+    "goal_difference_m": 0.0,
+    "contact_start_valid_rear_contact": true,
+    "contact_start_latch": true,
+    "near_initial_robot_cube_contact": false,
+    "near_initial_latch": false,
+    "near_workspace_y_margin_m": 0.002966308593750022,
+    "near_workspace_z_margin_m": 0.0,
+    "near_aperture_m": 0.08418786997811258,
+    "contact_tcp": [
+      -0.03289611714754735,
+      0.43219895349437976,
+      0.05226626890226762
+    ],
+    "near_tcp": [
+      -0.032910475434461905,
+      0.42314852218039045,
+      0.05303507766237649
+    ],
+    "tcp_difference_m": 0.009083038040174742,
+    "tcp_vertical_difference_m": 0.0007688087601088675,
+    "near_joint_limits_valid": true,
+    "near_gripper_table_collision": false,
+    "near_finite": true,
+    "near_initial_cube_speed": 0.0,
+    "contact_acquired": true,
+    "first_contact": {
+      "step": 39,
+      "alignment": 0.9999922194078867,
+      "height_m": 0.01439171847799604,
+      "penetration_m": 2.8041045533408778e-05,
+      "tcp_mocap_error_m": 0.013143837223720535
+    },
+    "contact_bonus_count": 1,
+    "maximum_cube_displacement_m": 0.00014499761164188385,
+    "maximum_cube_tilt_rad": 0.003944769609514331,
+    "workspace_clipped": false,
+    "valid": true
+  },
+  {
+    "task_index": 20,
+    "reset_seed": 10020,
+    "cube": [
+      0.07390992343425751,
+      0.5020462274551392,
+      0.019999999552965164
+    ],
+    "goal": [
+      0.07390992343425751,
+      0.7491973042488098,
+      0.019999999552965164
+    ],
+    "cube_y_m": 0.5020462274551392,
+    "physical_gap_m": 0.004989384130246127,
+    "gap_error_m": -1.0615869753873367e-05,
+    "cube_position_difference_m": 0.0,
+    "cube_quaternion_difference": 0.0,
+    "goal_difference_m": 0.0,
+    "contact_start_valid_rear_contact": true,
+    "contact_start_latch": true,
+    "near_initial_robot_cube_contact": false,
+    "near_initial_latch": false,
+    "near_workspace_y_margin_m": 0.003038542000839306,
+    "near_workspace_z_margin_m": 0.0,
+    "near_aperture_m": 0.08418471071073026,
+    "contact_tcp": [
+      0.07413370898128073,
+      0.43222988202221646,
+      0.05227510548951861
+    ],
+    "near_tcp": [
+      0.07415564522181789,
+      0.4232055520643354,
+      0.053043095609790654
+    ],
+    "tcp_difference_m": 0.009056976383550625,
+    "tcp_vertical_difference_m": 0.0007679901202720454,
+    "near_joint_limits_valid": true,
+    "near_gripper_table_collision": false,
+    "near_finite": true,
+    "near_initial_cube_speed": 0.0,
+    "contact_acquired": true,
+    "first_contact": {
+      "step": 39,
+      "alignment": 0.9999926972726437,
+      "height_m": 0.014409113616080948,
+      "penetration_m": 3.1125123853331844e-05,
+      "tcp_mocap_error_m": 0.013158992978980743
+    },
+    "contact_bonus_count": 1,
+    "maximum_cube_displacement_m": 0.00014499761164188385,
+    "maximum_cube_tilt_rad": 0.0038217112111858876,
+    "workspace_clipped": false,
+    "valid": true
+  },
+  {
+    "task_index": 21,
+    "reset_seed": 10021,
+    "cube": [
+      -0.017525821924209595,
+      0.5019999742507935,
+      0.019999999552965164
+    ],
+    "goal": [
+      -0.017525821924209595,
+      0.7343341112136841,
+      0.019999999552965164
+    ],
+    "cube_y_m": 0.5019999742507935,
+    "physical_gap_m": 0.00499835280718535,
+    "gap_error_m": -1.647192814650117e-06,
+    "cube_position_difference_m": 0.0,
+    "cube_quaternion_difference": 0.0,
+    "goal_difference_m": 0.0,
+    "contact_start_valid_rear_contact": true,
+    "contact_start_latch": true,
+    "near_initial_robot_cube_contact": false,
+    "near_initial_latch": false,
+    "near_workspace_y_margin_m": 0.002954101562499978,
+    "near_workspace_z_margin_m": 0.0,
+    "near_aperture_m": 0.0841882268749603,
+    "contact_tcp": [
+      -0.017754256885240766,
+      0.43220396682972967,
+      0.052258768834874604
+    ],
+    "near_tcp": [
+      -0.01776617642667226,
+      0.4231428348373041,
+      0.053032894268400944
+    ],
+    "tcp_difference_m": 0.009094147857081429,
+    "tcp_vertical_difference_m": 0.0007741254335263403,
+    "near_joint_limits_valid": true,
+    "near_gripper_table_collision": false,
+    "near_finite": true,
+    "near_initial_cube_speed": 0.0,
+    "contact_acquired": true,
+    "first_contact": {
+      "step": 39,
+      "alignment": 0.9999928119523941,
+      "height_m": 0.0143921010689005,
+      "penetration_m": 3.0019784849296134e-05,
+      "tcp_mocap_error_m": 0.01314081576913611
+    },
+    "contact_bonus_count": 1,
+    "maximum_cube_displacement_m": 0.00014499761164188385,
+    "maximum_cube_tilt_rad": 0.003791585179894469,
+    "workspace_clipped": false,
+    "valid": true
+  },
+  {
+    "task_index": 22,
+    "reset_seed": 10022,
+    "cube": [
+      0.06477057933807373,
+      0.5229950547218323,
+      0.019999999552965164
+    ],
+    "goal": [
+      0.06477057933807373,
+      0.7084044218063354,
+      0.019999999552965164
+    ],
+    "cube_y_m": 0.5229950547218323,
+    "physical_gap_m": 0.005000561080820121,
+    "gap_error_m": 5.61080820121046e-07,
+    "cube_position_difference_m": 0.0,
+    "cube_quaternion_difference": 0.0,
+    "goal_difference_m": 0.0,
+    "contact_start_valid_rear_contact": true,
+    "contact_start_latch": true,
+    "near_initial_robot_cube_contact": false,
+    "near_initial_latch": false,
+    "near_workspace_y_margin_m": 0.02391511142804137,
+    "near_workspace_z_margin_m": 0.0,
+    "near_aperture_m": 0.08433176441142082,
+    "contact_tcp": [
+      0.06498649532907909,
+      0.4531988124692645,
+      0.05224937524603451
+    ],
+    "near_tcp": [
+      0.06501186045108778,
+      0.44409747059713056,
+      0.053112621687023784
+    ],
+    "tcp_difference_m": 0.009142224110179868,
+    "tcp_vertical_difference_m": 0.000863246440989271,
+    "near_joint_limits_valid": true,
+    "near_gripper_table_collision": false,
+    "near_finite": true,
+    "near_initial_cube_speed": 0.0,
+    "contact_acquired": true,
+    "first_contact": {
+      "step": 38,
+      "alignment": 0.9999999994066399,
+      "height_m": 0.014447555650909924,
+      "penetration_m": 2.6253776683414612e-05,
+      "tcp_mocap_error_m": 0.013132171830443894
+    },
+    "contact_bonus_count": 1,
+    "maximum_cube_displacement_m": 0.00014499761164188385,
+    "maximum_cube_tilt_rad": 3.445240954690118e-05,
+    "workspace_clipped": false,
+    "valid": true
+  },
+  {
+    "task_index": 23,
+    "reset_seed": 10023,
+    "cube": [
+      0.06854858994483948,
+      0.5074670910835266,
+      0.019999999552965164
+    ],
+    "goal": [
+      0.06854858994483948,
+      0.7213212251663208,
+      0.019999999552965164
+    ],
+    "cube_y_m": 0.5074670910835266,
+    "physical_gap_m": 0.0049979523809807165,
+    "gap_error_m": -2.0476190192835614e-06,
+    "cube_position_difference_m": 0.0,
+    "cube_quaternion_difference": 0.0,
+    "goal_difference_m": 0.0,
+    "contact_start_valid_rear_contact": true,
+    "contact_start_latch": true,
+    "near_initial_robot_cube_contact": false,
+    "near_initial_latch": false,
+    "near_workspace_y_margin_m": 0.008445115890786004,
+    "near_workspace_z_margin_m": 0.0,
+    "near_aperture_m": 0.0841929341404049,
+    "contact_tcp": [
+      0.06877069627429916,
+      0.4376539711479573,
+      0.05228035240707607
+    ],
+    "near_tcp": [
+      0.06879295276201694,
+      0.4286172103203206,
+      0.05305242602135346
+    ],
+    "tcp_difference_m": 0.00906970998836337,
+    "tcp_vertical_difference_m": 0.000772073614277391,
+    "near_joint_limits_valid": true,
+    "near_gripper_table_collision": false,
+    "near_finite": true,
+    "near_initial_cube_speed": 0.0,
+    "contact_acquired": true,
+    "first_contact": {
+      "step": 39,
+      "alignment": 0.9999924344856888,
+      "height_m": 0.01441412349136148,
+      "penetration_m": 2.7648189612648208e-05,
+      "tcp_mocap_error_m": 0.013165682118185768
+    },
+    "contact_bonus_count": 1,
+    "maximum_cube_displacement_m": 0.00014499761164188385,
+    "maximum_cube_tilt_rad": 0.0038898651003707843,
+    "workspace_clipped": false,
+    "valid": true
+  },
+  {
+    "task_index": 24,
+    "reset_seed": 10024,
+    "cube": [
+      0.05370047315955162,
+      0.5319741368293762,
+      0.019999999552965164
+    ],
+    "goal": [
+      0.05370047315955162,
+      0.7243362069129944,
+      0.019999999552965164
+    ],
+    "cube_y_m": 0.5319741368293762,
+    "physical_gap_m": 0.004997508923390927,
+    "gap_error_m": -2.491076609072683e-06,
+    "cube_position_difference_m": 0.0,
+    "cube_quaternion_difference": 0.0,
+    "goal_difference_m": 0.0,
+    "contact_start_valid_rear_contact": true,
+    "contact_start_latch": true,
+    "near_initial_robot_cube_contact": false,
+    "near_initial_latch": false,
+    "near_workspace_y_margin_m": 0.0329469960400417,
+    "near_workspace_z_margin_m": 0.0,
+    "near_aperture_m": 0.08418908986161956,
+    "contact_tcp": [
+      0.05391355280009026,
+      0.4621728318007843,
+      0.052286458574509045
+    ],
+    "near_tcp": [
+      0.05393870679861876,
+      0.45313805856784534,
+      0.053077529733963735
+    ],
+    "tcp_difference_m": 0.009069374491859565,
+    "tcp_vertical_difference_m": 0.0007910711594546899,
+    "near_joint_limits_valid": true,
+    "near_gripper_table_collision": false,
+    "near_finite": true,
+    "near_initial_cube_speed": 0.0,
+    "contact_acquired": true,
+    "first_contact": {
+      "step": 39,
+      "alignment": 0.9999918763436091,
+      "height_m": 0.014450282725405352,
+      "penetration_m": 2.9543317381584537e-05,
+      "tcp_mocap_error_m": 0.01320434253777282
+    },
+    "contact_bonus_count": 1,
+    "maximum_cube_displacement_m": 0.00014499761164188385,
+    "maximum_cube_tilt_rad": 0.004030798798560387,
+    "workspace_clipped": false,
+    "valid": true
+  },
+  {
+    "task_index": 25,
+    "reset_seed": 10025,
+    "cube": [
+      0.05064617469906807,
+      0.5044457912445068,
+      0.019999999552965164
+    ],
+    "goal": [
+      0.05064617469906807,
+      0.6763578653335571,
+      0.019999999552965164
+    ],
+    "cube_y_m": 0.5044457912445068,
+    "physical_gap_m": 0.00499705156189629,
+    "gap_error_m": -2.9484381037104407e-06,
+    "cube_position_difference_m": 0.0,
+    "cube_quaternion_difference": 0.0,
+    "goal_difference_m": 0.0,
+    "contact_start_valid_rear_contact": true,
+    "contact_start_latch": true,
+    "near_initial_robot_cube_contact": false,
+    "near_initial_latch": false,
+    "near_workspace_y_margin_m": 0.005374794456846854,
+    "near_workspace_z_margin_m": 0.0,
+    "near_aperture_m": 0.08430079292141635,
+    "contact_tcp": [
+      0.05087142468948096,
+      0.43464646829975384,
+      0.05222735262373121
+    ],
+    "near_tcp": [
+      0.05088951054242658,
+      0.4255513518666857,
+      0.05307619830249061
+    ],
+    "tcp_difference_m": 0.009134659764626792,
+    "tcp_vertical_difference_m": 0.0008488456787593968,
+    "near_joint_limits_valid": true,
+    "near_gripper_table_collision": false,
+    "near_finite": true,
+    "near_initial_cube_speed": 0.0,
+    "contact_acquired": true,
+    "first_contact": {
+      "step": 38,
+      "alignment": 0.9999999993404984,
+      "height_m": 0.014410310140976816,
+      "penetration_m": 2.9358836361891516e-05,
+      "tcp_mocap_error_m": 0.013094616988592683
+    },
+    "contact_bonus_count": 1,
+    "maximum_cube_displacement_m": 0.00014499761164188385,
+    "maximum_cube_tilt_rad": 3.63217385932131e-05,
+    "workspace_clipped": false,
+    "valid": true
+  },
+  {
+    "task_index": 26,
+    "reset_seed": 10026,
+    "cube": [
+      0.09457660466432571,
+      0.5025115013122559,
+      0.019999999552965164
+    ],
+    "goal": [
+      0.09457660466432571,
+      0.6816319823265076,
+      0.019999999552965164
+    ],
+    "cube_y_m": 0.5025115013122559,
+    "physical_gap_m": 0.004996622582834379,
+    "gap_error_m": -3.377417165621212e-06,
+    "cube_position_difference_m": 0.0,
+    "cube_quaternion_difference": 0.0,
+    "goal_difference_m": 0.0,
+    "contact_start_valid_rear_contact": true,
+    "contact_start_latch": true,
+    "near_initial_robot_cube_contact": false,
+    "near_initial_latch": false,
+    "near_workspace_y_margin_m": 0.003507012718896585,
+    "near_workspace_z_margin_m": 0.0,
+    "near_aperture_m": 0.08418236277548831,
+    "contact_tcp": [
+      0.09479725026068815,
+      0.4326924422354448,
+      0.05226116169151086
+    ],
+    "near_tcp": [
+      0.094823758808978,
+      0.4236681000233319,
+      0.05305086228080337
+    ],
+    "tcp_difference_m": 0.009058867593975757,
+    "tcp_vertical_difference_m": 0.000789700589292508,
+    "near_joint_limits_valid": true,
+    "near_gripper_table_collision": false,
+    "near_finite": true,
+    "near_initial_cube_speed": 0.0,
+    "contact_acquired": true,
+    "first_contact": {
+      "step": 39,
+      "alignment": 0.999991974113631,
+      "height_m": 0.014419295802606969,
+      "penetration_m": 2.9039584042521093e-05,
+      "tcp_mocap_error_m": 0.01317330495887034
+    },
+    "contact_bonus_count": 1,
+    "maximum_cube_displacement_m": 0.00014499761164188385,
+    "maximum_cube_tilt_rad": 0.004006469508257276,
+    "workspace_clipped": false,
+    "valid": true
+  },
+  {
+    "task_index": 27,
+    "reset_seed": 10027,
+    "cube": [
+      -0.010318499989807606,
+      0.5179921984672546,
+      0.019999999552965164
+    ],
+    "goal": [
+      -0.010318499989807606,
+      0.745602011680603,
+      0.019999999552965164
+    ],
+    "cube_y_m": 0.5179921984672546,
+    "physical_gap_m": 0.0049992634703928404,
+    "gap_error_m": -7.365296071596555e-07,
+    "cube_position_difference_m": 0.0,
+    "cube_quaternion_difference": 0.0,
+    "goal_difference_m": 0.0,
+    "contact_start_valid_rear_contact": true,
+    "contact_start_latch": true,
+    "near_initial_robot_cube_contact": false,
+    "near_initial_latch": false,
+    "near_workspace_y_margin_m": 0.018941451001945553,
+    "near_workspace_z_margin_m": 0.0,
+    "near_aperture_m": 0.08419385888834922,
+    "contact_tcp": [
+      -0.010539405405638504,
+      0.4482022597795437,
+      0.05228211514935541
+    ],
+    "near_tcp": [
+      -0.010553463350622308,
+      0.43914195877409035,
+      0.0530567781399743
+    ],
+    "tcp_difference_m": 0.009093368720351706,
+    "tcp_vertical_difference_m": 0.0007746629906188948,
+    "near_joint_limits_valid": true,
+    "near_gripper_table_collision": false,
+    "near_finite": true,
+    "near_initial_cube_speed": 0.0,
+    "contact_acquired": true,
+    "first_contact": {
+      "step": 39,
+      "alignment": 0.9999923154903374,
+      "height_m": 0.01441540809326795,
+      "penetration_m": 2.750084125421122e-05,
+      "tcp_mocap_error_m": 0.0131670153653454
+    },
+    "contact_bonus_count": 1,
+    "maximum_cube_displacement_m": 0.00014499761164188385,
+    "maximum_cube_tilt_rad": 0.003920336988576062,
+    "workspace_clipped": false,
+    "valid": true
+  },
+  {
+    "task_index": 28,
+    "reset_seed": 10028,
+    "cube": [
+      -0.07663459330797195,
+      0.5426812767982483,
+      0.019999999552965164
+    ],
+    "goal": [
+      -0.07663459330797195,
+      0.6978082656860352,
+      0.019999999552965164
+    ],
+    "cube_y_m": 0.5426812767982483,
+    "physical_gap_m": 0.004988388146323305,
+    "gap_error_m": -1.1611853676695219e-05,
+    "cube_position_difference_m": 0.0,
+    "cube_quaternion_difference": 0.0,
+    "goal_difference_m": 0.0,
+    "contact_start_valid_rear_contact": true,
+    "contact_start_latch": true,
+    "near_initial_robot_cube_contact": false,
+    "near_initial_latch": false,
+    "near_workspace_y_margin_m": 0.04362526378851456,
+    "near_workspace_z_margin_m": 0.0,
+    "near_aperture_m": 0.08431120815394386,
+    "contact_tcp": [
+      -0.07684157964862437,
+      0.47288728869853147,
+      0.05227024004849235
+    ],
+    "near_tcp": [
+      -0.07687405147288266,
+      0.46381445967292756,
+      0.053127908703650195
+    ],
+    "tcp_difference_m": 0.009113335090363559,
+    "tcp_vertical_difference_m": 0.0008576686551578436,
+    "near_joint_limits_valid": true,
+    "near_gripper_table_collision": false,
+    "near_finite": true,
+    "near_initial_cube_speed": 0.0,
+    "contact_acquired": true,
+    "first_contact": {
+      "step": 38,
+      "alignment": 0.9999999990269303,
+      "height_m": 0.014478190713422448,
+      "penetration_m": 3.498579285877558e-05,
+      "tcp_mocap_error_m": 0.013163113213539343
+    },
+    "contact_bonus_count": 1,
+    "maximum_cube_displacement_m": 0.00014499761164188385,
+    "maximum_cube_tilt_rad": 4.4120317713213856e-05,
+    "workspace_clipped": false,
+    "valid": true
+  },
+  {
+    "task_index": 29,
+    "reset_seed": 10029,
+    "cube": [
+      -0.04150790348649025,
+      0.5019999742507935,
+      0.019999999552965164
+    ],
+    "goal": [
+      -0.04150790348649025,
+      0.7019803524017334,
+      0.019999999552965164
+    ],
+    "cube_y_m": 0.5019999742507935,
+    "physical_gap_m": 0.004993840052771417,
+    "gap_error_m": -6.159947228583269e-06,
+    "cube_position_difference_m": 0.0,
+    "cube_quaternion_difference": 0.0,
+    "goal_difference_m": 0.0,
+    "contact_start_valid_rear_contact": true,
+    "contact_start_latch": true,
+    "near_initial_robot_cube_contact": false,
+    "near_initial_latch": false,
+    "near_workspace_y_margin_m": 0.0029296875,
+    "near_workspace_z_margin_m": 0.0,
+    "near_aperture_m": 0.08429581862896188,
+    "contact_tcp": [
+      -0.041735038800890495,
+      0.4322014082779957,
+      0.05222725587143612
+    ],
+    "near_tcp": [
+      -0.041750907666819034,
+      0.42310829111764403,
+      0.05306901638315803
+    ],
+    "tcp_difference_m": 0.009132009213304705,
+    "tcp_vertical_difference_m": 0.0008417605117219118,
+    "near_joint_limits_valid": true,
+    "near_gripper_table_collision": false,
+    "near_finite": true,
+    "near_initial_cube_speed": 0.0,
+    "contact_acquired": true,
+    "first_contact": {
+      "step": 38,
+      "alignment": 0.9999999992076015,
+      "height_m": 0.014401018020380636,
+      "penetration_m": 2.994302540478642e-05,
+      "tcp_mocap_error_m": 0.013085421112982255
+    },
+    "contact_bonus_count": 1,
+    "maximum_cube_displacement_m": 0.00014499761164188385,
+    "maximum_cube_tilt_rad": 3.9813245287340725e-05,
+    "workspace_clipped": false,
+    "valid": true
+  },
+  {
+    "task_index": 30,
+    "reset_seed": 10030,
+    "cube": [
+      0.07289444655179977,
+      0.5019999742507935,
+      0.019999999552965164
+    ],
+    "goal": [
+      0.07289444655179977,
+      0.674449622631073,
+      0.019999999552965164
+    ],
+    "cube_y_m": 0.5019999742507935,
+    "physical_gap_m": 0.0049982870758296365,
+    "gap_error_m": -1.712924170363568e-06,
+    "cube_position_difference_m": 0.0,
+    "cube_quaternion_difference": 0.0,
+    "goal_difference_m": 0.0,
+    "contact_start_valid_rear_contact": true,
+    "contact_start_latch": true,
+    "near_initial_robot_cube_contact": false,
+    "near_initial_latch": false,
+    "near_workspace_y_margin_m": 0.002981567382812522,
+    "near_workspace_z_margin_m": 0.0,
+    "near_aperture_m": 0.08418639304231382,
+    "contact_tcp": [
+      0.07311838210537741,
+      0.4321840388451666,
+      0.052274927827266705
+    ],
+    "near_tcp": [
+      0.07314010206034083,
+      0.4231488730459612,
+      0.05304347973726234
+    ],
+    "tcp_difference_m": 0.009067820290121114,
+    "tcp_vertical_difference_m": 0.0007685519099956337,
+    "near_joint_limits_valid": true,
+    "near_gripper_table_collision": false,
+    "near_finite": true,
+    "near_initial_cube_speed": 0.0,
+    "contact_acquired": true,
+    "first_contact": {
+      "step": 39,
+      "alignment": 0.9999924987167752,
+      "height_m": 0.01441032984676571,
+      "penetration_m": 2.994333958615406e-05,
+      "tcp_mocap_error_m": 0.013161235059381044
+    },
+    "contact_bonus_count": 1,
+    "maximum_cube_displacement_m": 0.00014499761164188385,
+    "maximum_cube_tilt_rad": 0.0038733179655925905,
+    "workspace_clipped": false,
+    "valid": true
+  },
+  {
+    "task_index": 31,
+    "reset_seed": 10031,
+    "cube": [
+      -0.09017162024974823,
+      0.5019999742507935,
+      0.019999999552965164
+    ],
+    "goal": [
+      -0.09017162024974823,
+      0.6604381203651428,
+      0.019999999552965164
+    ],
+    "cube_y_m": 0.5019999742507935,
+    "physical_gap_m": 0.005000726436090326,
+    "gap_error_m": 7.264360903256814e-07,
+    "cube_position_difference_m": 0.0,
+    "cube_quaternion_difference": 0.0,
+    "goal_difference_m": 0.0,
+    "contact_start_valid_rear_contact": true,
+    "contact_start_latch": true,
+    "near_initial_robot_cube_contact": false,
+    "near_initial_latch": false,
+    "near_workspace_y_margin_m": 0.002944183349609386,
+    "near_workspace_z_margin_m": 0.0,
+    "near_aperture_m": 0.08429733469627101,
+    "contact_tcp": [
+      -0.09039314186670638,
+      0.4321889501637913,
+      0.05223624125592871
+    ],
+    "near_tcp": [
+      -0.0904185412033067,
+      0.42310614240900085,
+      0.053082085196235466
+    ],
+    "tcp_difference_m": 0.009122143049094025,
+    "tcp_vertical_difference_m": 0.000845843940306755,
+    "near_joint_limits_valid": true,
+    "near_gripper_table_collision": false,
+    "near_finite": true,
+    "near_initial_cube_speed": 0.0,
+    "contact_acquired": true,
+    "first_contact": {
+      "step": 38,
+      "alignment": 0.999999999309705,
+      "height_m": 0.014420683227695734,
+      "penetration_m": 2.7641963720824326e-05,
+      "tcp_mocap_error_m": 0.013105712701143713
+    },
+    "contact_bonus_count": 1,
+    "maximum_cube_displacement_m": 0.00014499761164188385,
+    "maximum_cube_tilt_rad": 3.715965999744403e-05,
+    "workspace_clipped": false,
+    "valid": true
+  },
+  {
+    "task_index": 32,
+    "reset_seed": 10032,
+    "cube": [
+      0.09756974130868912,
+      0.5039604902267456,
+      0.019999999552965164
+    ],
+    "goal": [
+      0.09756974130868912,
+      0.6564533114433289,
+      0.019999999552965164
+    ],
+    "cube_y_m": 0.5039604902267456,
+    "physical_gap_m": 0.004993895203996625,
+    "gap_error_m": -6.104796003375025e-06,
+    "cube_position_difference_m": 0.0,
+    "cube_quaternion_difference": 0.0,
+    "goal_difference_m": 0.0,
+    "contact_start_valid_rear_contact": true,
+    "contact_start_latch": true,
+    "near_initial_robot_cube_contact": false,
+    "near_initial_latch": false,
+    "near_workspace_y_margin_m": 0.004914315214369358,
+    "near_workspace_z_margin_m": 0.0,
+    "near_aperture_m": 0.08429968974870265,
+    "contact_tcp": [
+      0.09778933692277458,
+      0.4341480383503765,
+      0.052235829599060646
+    ],
+    "near_tcp": [
+      0.09781693244613608,
+      0.4250754326639001,
+      0.053087487390007695
+    ],
+    "tcp_difference_m": 0.009112532932619507,
+    "tcp_vertical_difference_m": 0.0008516577909470496,
+    "near_joint_limits_valid": true,
+    "near_gripper_table_collision": false,
+    "near_finite": true,
+    "near_initial_cube_speed": 0.0,
+    "contact_acquired": true,
+    "first_contact": {
+      "step": 38,
+      "alignment": 0.9999999992954406,
+      "height_m": 0.014428826733088825,
+      "penetration_m": 3.1036326769429284e-05,
+      "tcp_mocap_error_m": 0.01311370740280132
+    },
+    "contact_bonus_count": 1,
+    "maximum_cube_displacement_m": 0.00014499761164188385,
+    "maximum_cube_tilt_rad": 3.754154381148993e-05,
+    "workspace_clipped": false,
+    "valid": true
+  },
+  {
+    "task_index": 33,
+    "reset_seed": 10033,
+    "cube": [
+      0.0468926802277565,
+      0.508643388748169,
+      0.019999999552965164
+    ],
+    "goal": [
+      0.0468926802277565,
+      0.7399396896362305,
+      0.019999999552965164
+    ],
+    "cube_y_m": 0.508643388748169,
+    "physical_gap_m": 0.0049965854487305705,
+    "gap_error_m": -3.4145512694296054e-06,
+    "cube_position_difference_m": 0.0,
+    "cube_quaternion_difference": 0.0,
+    "goal_difference_m": 0.0,
+    "contact_start_valid_rear_contact": true,
+    "contact_start_latch": true,
+    "near_initial_robot_cube_contact": false,
+    "near_initial_latch": false,
+    "near_workspace_y_margin_m": 0.009571695536641223,
+    "near_workspace_z_margin_m": 0.0,
+    "near_aperture_m": 0.08429874162912368,
+    "contact_tcp": [
+      0.04711633413940219,
+      0.4388492524424471,
+      0.0522283776576211
+    ],
+    "near_tcp": [
+      0.047134764704397175,
+      0.4297521963777873,
+      0.053080082217854735
+    ],
+    "tcp_difference_m": 0.009136857741434575,
+    "tcp_vertical_difference_m": 0.0008517045602336321,
+    "near_joint_limits_valid": true,
+    "near_gripper_table_collision": false,
+    "near_finite": true,
+    "near_initial_cube_speed": 0.0,
+    "contact_acquired": true,
+    "first_contact": {
+      "step": 38,
+      "alignment": 0.9999999992964372,
+      "height_m": 0.01441295469557095,
+      "penetration_m": 2.8633964874051874e-05,
+      "tcp_mocap_error_m": 0.013097532846360007
+    },
+    "contact_bonus_count": 1,
+    "maximum_cube_displacement_m": 0.00014499761164188385,
+    "maximum_cube_tilt_rad": 3.7515368331994024e-05,
+    "workspace_clipped": false,
+    "valid": true
+  },
+  {
+    "task_index": 34,
+    "reset_seed": 10034,
+    "cube": [
+      -0.009841205552220345,
+      0.5290934443473816,
+      0.019999999552965164
+    ],
+    "goal": [
+      -0.009841205552220345,
+      0.739647388458252,
+      0.019999999552965164
+    ],
+    "cube_y_m": 0.5290934443473816,
+    "physical_gap_m": 0.005000364606207412,
+    "gap_error_m": 3.646062074116191e-07,
+    "cube_position_difference_m": 0.0,
+    "cube_quaternion_difference": 0.0,
+    "goal_difference_m": 0.0,
+    "contact_start_valid_rear_contact": true,
+    "contact_start_latch": true,
+    "near_initial_robot_cube_contact": false,
+    "near_initial_latch": false,
+    "near_workspace_y_margin_m": 0.030043073427106715,
+    "near_workspace_z_margin_m": 0.0,
+    "near_aperture_m": 0.08418994457535071,
+    "contact_tcp": [
+      -0.01005706297020355,
+      0.45930399558105617,
+      0.05229615391490496
+    ],
+    "near_tcp": [
+      -0.010073259052375352,
+      0.45024937393016945,
+      0.05306882404890219
+    ],
+    "tcp_difference_m": 0.009087543930554368,
+    "tcp_vertical_difference_m": 0.0007726701339972261,
+    "near_joint_limits_valid": true,
+    "near_gripper_table_collision": false,
+    "near_finite": true,
+    "near_initial_cube_speed": 0.0,
+    "contact_acquired": true,
+    "first_contact": {
+      "step": 39,
+      "alignment": 0.9999926753040796,
+      "height_m": 0.014436136475596429,
+      "penetration_m": 2.925604280093097e-05,
+      "tcp_mocap_error_m": 0.013185823641550163
+    },
+    "contact_bonus_count": 1,
+    "maximum_cube_displacement_m": 0.00014499761164188385,
+    "maximum_cube_tilt_rad": 0.0038274553187307137,
+    "workspace_clipped": false,
+    "valid": true
+  },
+  {
+    "task_index": 35,
+    "reset_seed": 10035,
+    "cube": [
+      0.08760345727205276,
+      0.5232372283935547,
+      0.019999999552965164
+    ],
+    "goal": [
+      0.08760345727205276,
+      0.7175549864768982,
+      0.019999999552965164
+    ],
+    "cube_y_m": 0.5232372283935547,
+    "physical_gap_m": 0.004992071691333781,
+    "gap_error_m": -7.928308666219248e-06,
+    "cube_position_difference_m": 0.0,
+    "cube_quaternion_difference": 0.0,
+    "goal_difference_m": 0.0,
+    "contact_start_valid_rear_contact": true,
+    "contact_start_latch": true,
+    "near_initial_robot_cube_contact": false,
+    "near_initial_latch": false,
+    "near_workspace_y_margin_m": 0.024182730004975728,
+    "near_workspace_z_margin_m": 0.0,
+    "near_aperture_m": 0.08431252791421032,
+    "contact_tcp": [
+      0.0878168282542148,
+      0.4534306803993037,
+      0.05225887373236536
+    ],
+    "near_tcp": [
+      0.08784718581061657,
+      0.44435814029716525,
+      0.05311094663992262
+    ],
+    "tcp_difference_m": 0.009112515225004218,
+    "tcp_vertical_difference_m": 0.0008520729075572608,
+    "near_joint_limits_valid": true,
+    "near_gripper_table_collision": false,
+    "near_finite": true,
+    "near_initial_cube_speed": 0.0,
+    "contact_acquired": true,
+    "first_contact": {
+      "step": 38,
+      "alignment": 0.9999999992778662,
+      "height_m": 0.014453317669563287,
+      "penetration_m": 3.117385660105411e-05,
+      "tcp_mocap_error_m": 0.013138190465725064
+    },
+    "contact_bonus_count": 1,
+    "maximum_cube_displacement_m": 0.00014499761164188385,
+    "maximum_cube_tilt_rad": 3.800697956157933e-05,
+    "workspace_clipped": false,
+    "valid": true
+  },
+  {
+    "task_index": 36,
+    "reset_seed": 10036,
+    "cube": [
+      -0.09070845693349838,
+      0.5019999742507935,
+      0.019999999552965164
+    ],
+    "goal": [
+      -0.09070845693349838,
+      0.7278812527656555,
+      0.019999999552965164
+    ],
+    "cube_y_m": 0.5019999742507935,
+    "physical_gap_m": 0.004999001693335135,
+    "gap_error_m": -9.983066648648273e-07,
+    "cube_position_difference_m": 0.0,
+    "cube_quaternion_difference": 0.0,
+    "goal_difference_m": 0.0,
+    "contact_start_valid_rear_contact": true,
+    "contact_start_latch": true,
+    "near_initial_robot_cube_contact": false,
+    "near_initial_latch": false,
+    "near_workspace_y_margin_m": 0.0029449462890625,
+    "near_workspace_z_margin_m": 0.0,
+    "near_aperture_m": 0.08430136952176735,
+    "contact_tcp": [
+      -0.0909298926493613,
+      0.432189495591062,
+      0.052231732770436655
+    ],
+    "near_tcp": [
+      -0.09095541295570342,
+      0.4231067510798814,
+      0.053083751242539404
+    ],
+    "tcp_difference_m": 0.00912265502023517,
+    "tcp_vertical_difference_m": 0.0008520184721027488,
+    "near_joint_limits_valid": true,
+    "near_gripper_table_collision": false,
+    "near_finite": true,
+    "near_initial_cube_speed": 0.0,
+    "contact_acquired": true,
+    "first_contact": {
+      "step": 38,
+      "alignment": 0.9999999993628914,
+      "height_m": 0.014421284749248767,
+      "penetration_m": 2.7653392915531296e-05,
+      "tcp_mocap_error_m": 0.013105991073541243
+    },
+    "contact_bonus_count": 1,
+    "maximum_cube_displacement_m": 0.00014499761164188385,
+    "maximum_cube_tilt_rad": 3.569955625485154e-05,
+    "workspace_clipped": false,
+    "valid": true
+  },
+  {
+    "task_index": 37,
+    "reset_seed": 10037,
+    "cube": [
+      -0.07940781861543655,
+      0.5264464616775513,
+      0.019999999552965164
+    ],
+    "goal": [
+      -0.07940781861543655,
+      0.6990376114845276,
+      0.019999999552965164
+    ],
+    "cube_y_m": 0.5264464616775513,
+    "physical_gap_m": 0.004998332739404011,
+    "gap_error_m": -1.6672605959886996e-06,
+    "cube_position_difference_m": 0.0,
+    "cube_quaternion_difference": 0.0,
+    "goal_difference_m": 0.0,
+    "contact_start_valid_rear_contact": true,
+    "contact_start_latch": true,
+    "near_initial_robot_cube_contact": false,
+    "near_initial_latch": false,
+    "near_workspace_y_margin_m": 0.02738510941711708,
+    "near_workspace_z_margin_m": 0.0,
+    "near_aperture_m": 0.08430178907542926,
+    "contact_tcp": [
+      -0.07962087124486443,
+      0.4566429525429653,
+      0.052261369263734946
+    ],
+    "near_tcp": [
+      -0.07965017874470867,
+      0.44756474063919305,
+      0.05310847125498932
+    ],
+    "tcp_difference_m": 0.009117695546733615,
+    "tcp_vertical_difference_m": 0.0008471019912543731,
+    "near_joint_limits_valid": true,
+    "near_gripper_table_collision": false,
+    "near_finite": true,
+    "near_initial_cube_speed": 0.0,
+    "contact_acquired": true,
+    "first_contact": {
+      "step": 38,
+      "alignment": 0.9999999993138211,
+      "height_m": 0.01445449738933097,
+      "penetration_m": 2.9797623978336394e-05,
+      "tcp_mocap_error_m": 0.013139269547904654
+    },
+    "contact_bonus_count": 1,
+    "maximum_cube_displacement_m": 0.00014499761164188385,
+    "maximum_cube_tilt_rad": 3.704886289008053e-05,
+    "workspace_clipped": false,
+    "valid": true
+  },
+  {
+    "task_index": 38,
+    "reset_seed": 10038,
+    "cube": [
+      0.017593014985322952,
+      0.5299370288848877,
+      0.019999999552965164
+    ],
+    "goal": [
+      0.017593014985322952,
+      0.7128547430038452,
+      0.019999999552965164
+    ],
+    "cube_y_m": 0.5299370288848877,
+    "physical_gap_m": 0.005003488837260304,
+    "gap_error_m": 3.488837260303898e-06,
+    "cube_position_difference_m": 0.0,
+    "cube_quaternion_difference": 0.0,
+    "goal_difference_m": 0.0,
+    "contact_start_valid_rear_contact": true,
+    "contact_start_latch": true,
+    "near_initial_robot_cube_contact": false,
+    "near_initial_latch": false,
+    "near_workspace_y_margin_m": 0.03089049585861986,
+    "near_workspace_z_margin_m": 0.0,
+    "near_aperture_m": 0.08418144854249517,
+    "contact_tcp": [
+      0.017808443947030312,
+      0.4601493859301823,
+      0.052277412497084036
+    ],
+    "near_tcp": [
+      0.017826209655246082,
+      0.45109402491978823,
+      0.053068556992472635
+    ],
+    "tcp_difference_m": 0.009089872840779292,
+    "tcp_vertical_difference_m": 0.0007911444953885988,
+    "near_joint_limits_valid": true,
+    "near_gripper_table_collision": false,
+    "near_finite": true,
+    "near_initial_cube_speed": 0.0,
+    "contact_acquired": true,
+    "first_contact": {
+      "step": 39,
+      "alignment": 0.9999923502662978,
+      "height_m": 0.014438397893967982,
+      "penetration_m": 2.9864596975747716e-05,
+      "tcp_mocap_error_m": 0.01318956232946856
+    },
+    "contact_bonus_count": 1,
+    "maximum_cube_displacement_m": 0.00014499761164188385,
+    "maximum_cube_tilt_rad": 0.003911456861436731,
+    "workspace_clipped": false,
+    "valid": true
+  },
+  {
+    "task_index": 39,
+    "reset_seed": 10039,
+    "cube": [
+      -0.010669155046343803,
+      0.5390466451644897,
+      0.019999999552965164
+    ],
+    "goal": [
+      -0.010669155046343803,
+      0.7393156886100769,
+      0.019999999552965164
+    ],
+    "cube_y_m": 0.5390466451644897,
+    "physical_gap_m": 0.0049971844696334285,
+    "gap_error_m": -2.815530366571603e-06,
+    "cube_position_difference_m": 0.0,
+    "cube_quaternion_difference": 0.0,
+    "goal_difference_m": 0.0,
+    "contact_start_valid_rear_contact": true,
+    "contact_start_latch": true,
+    "near_initial_robot_cube_contact": false,
+    "near_initial_latch": false,
+    "near_workspace_y_margin_m": 0.04000082281863554,
+    "near_workspace_z_margin_m": 0.0,
+    "near_aperture_m": 0.0841916447358834,
+    "contact_tcp": [
+      -0.010880605741287356,
+      0.46947800620034896,
+      0.05232416480053359
+    ],
+    "near_tcp": [
+      -0.010898938955410019,
+      0.4602114987758593,
+      0.05308222670382448
+    ],
+    "tcp_difference_m": 0.009297481046180346,
+    "tcp_vertical_difference_m": 0.0007580619032908908,
+    "near_joint_limits_valid": true,
+    "near_gripper_table_collision": false,
+    "near_finite": true,
+    "near_initial_cube_speed": 0.0,
+    "contact_acquired": true,
+    "first_contact": {
+      "step": 39,
+      "alignment": 0.9999918648816545,
+      "height_m": 0.014451158975237108,
+      "penetration_m": 2.9607298133870347e-05,
+      "tcp_mocap_error_m": 0.013204831950197147
+    },
+    "contact_bonus_count": 1,
+    "maximum_cube_displacement_m": 0.00014499761164188385,
+    "maximum_cube_tilt_rad": 0.004033641460195619,
+    "workspace_clipped": false,
+    "valid": true
+  },
+  {
+    "task_index": 40,
+    "reset_seed": 10040,
+    "cube": [
+      -0.07804205268621445,
+      0.505464494228363,
+      0.019999999552965164
+    ],
+    "goal": [
+      -0.07804205268621445,
+      0.7176661491394043,
+      0.019999999552965164
+    ],
+    "cube_y_m": 0.505464494228363,
+    "physical_gap_m": 0.0049948467741821245,
+    "gap_error_m": -5.153225817875612e-06,
+    "cube_position_difference_m": 0.0,
+    "cube_quaternion_difference": 0.0,
+    "goal_difference_m": 0.0,
+    "contact_start_valid_rear_contact": true,
+    "contact_start_latch": true,
+    "near_initial_robot_cube_contact": false,
+    "near_initial_latch": false,
+    "near_workspace_y_margin_m": 0.006450501730085323,
+    "near_workspace_z_margin_m": 0.0,
+    "near_aperture_m": 0.08419417283273767,
+    "contact_tcp": [
+      -0.0782638355776549,
+      0.4356515529797814,
+      0.05225905172548152
+    ],
+    "near_tcp": [
+      -0.07828754216902384,
+      0.42661831520837035,
+      0.05305391220422287
+    ],
+    "tcp_difference_m": 0.009068172352684247,
+    "tcp_vertical_difference_m": 0.0007948604787413466,
+    "near_joint_limits_valid": true,
+    "near_gripper_table_collision": false,
+    "near_finite": true,
+    "near_initial_cube_speed": 0.0,
+    "contact_acquired": true,
+    "first_contact": {
+      "step": 39,
+      "alignment": 0.9999921954732035,
+      "height_m": 0.014415863351067256,
+      "penetration_m": 2.856738746995223e-05,
+      "tcp_mocap_error_m": 0.013168591096419097
+    },
+    "contact_bonus_count": 1,
+    "maximum_cube_displacement_m": 0.00014499761164188385,
+    "maximum_cube_tilt_rad": 0.003950832522175377,
+    "workspace_clipped": false,
+    "valid": true
+  },
+  {
+    "task_index": 41,
+    "reset_seed": 10041,
+    "cube": [
+      -0.07298839837312698,
+      0.5243052840232849,
+      0.019999999552965164
+    ],
+    "goal": [
+      -0.07298839837312698,
+      0.7228701114654541,
+      0.019999999552965164
+    ],
+    "cube_y_m": 0.5243052840232849,
+    "physical_gap_m": 0.0050001469889909295,
+    "gap_error_m": 1.4698899092942946e-07,
+    "cube_position_difference_m": 0.0,
+    "cube_quaternion_difference": 0.0,
+    "goal_difference_m": 0.0,
+    "contact_start_valid_rear_contact": true,
+    "contact_start_latch": true,
+    "near_initial_robot_cube_contact": false,
+    "near_initial_latch": false,
+    "near_workspace_y_margin_m": 0.025239373930457942,
+    "near_workspace_z_margin_m": 0.0,
+    "near_aperture_m": 0.08430233580701722,
+    "contact_tcp": [
+      -0.07320298218097929,
+      0.45450372230990976,
+      0.05225731762301511
+    ],
+    "near_tcp": [
+      -0.07323038791228068,
+      0.44541981492958393,
+      0.05310514067567771
+    ],
+    "tcp_difference_m": 0.009123427442418357,
+    "tcp_vertical_difference_m": 0.000847823052662601,
+    "near_joint_limits_valid": true,
+    "near_gripper_table_collision": false,
+    "near_finite": true,
+    "near_initial_cube_speed": 0.0,
+    "contact_acquired": true,
+    "first_contact": {
+      "step": 38,
+      "alignment": 0.9999999993326496,
+      "height_m": 0.01444972928511376,
+      "penetration_m": 2.9105044860521832e-05,
+      "tcp_mocap_error_m": 0.013134417211919483
+    },
+    "contact_bonus_count": 1,
+    "maximum_cube_displacement_m": 0.00014499761164188385,
+    "maximum_cube_tilt_rad": 3.653710941799616e-05,
+    "workspace_clipped": false,
+    "valid": true
+  },
+  {
+    "task_index": 42,
+    "reset_seed": 10042,
+    "cube": [
+      -0.07022497057914734,
+      0.5052122473716736,
+      0.019999999552965164
+    ],
+    "goal": [
+      -0.07022497057914734,
+      0.673377275466919,
+      0.019999999552965164
+    ],
+    "cube_y_m": 0.5052122473716736,
+    "physical_gap_m": 0.004991220974004452,
+    "gap_error_m": -8.779025995548154e-06,
+    "cube_position_difference_m": 0.0,
+    "cube_quaternion_difference": 0.0,
+    "goal_difference_m": 0.0,
+    "contact_start_valid_rear_contact": true,
+    "contact_start_latch": true,
+    "near_initial_robot_cube_contact": false,
+    "near_initial_latch": false,
+    "near_workspace_y_margin_m": 0.006198978613283612,
+    "near_workspace_z_margin_m": 0.0,
+    "near_aperture_m": 0.08419102366373699,
+    "contact_tcp": [
+      -0.07044785209590138,
+      0.4353980369746575,
+      0.052278402774661406
+    ],
+    "near_tcp": [
+      -0.07046987166144161,
+      0.4263691617594396,
+      0.05304907343331513
+    ],
+    "tcp_difference_m": 0.009061733044917636,
+    "tcp_vertical_difference_m": 0.0007706706586537229,
+    "near_joint_limits_valid": true,
+    "near_gripper_table_collision": false,
+    "near_finite": true,
+    "near_initial_cube_speed": 0.0,
+    "contact_acquired": true,
+    "first_contact": {
+      "step": 39,
+      "alignment": 0.9999921709379762,
+      "height_m": 0.01441285750356976,
+      "penetration_m": 2.985197191722812e-05,
+      "tcp_mocap_error_m": 0.013165435514015604
+    },
+    "contact_bonus_count": 1,
+    "maximum_cube_displacement_m": 0.00014499761164188385,
+    "maximum_cube_tilt_rad": 0.003957037845525699,
+    "workspace_clipped": false,
+    "valid": true
+  },
+  {
+    "task_index": 43,
+    "reset_seed": 10043,
+    "cube": [
+      -8.386455738218501e-05,
+      0.5019999742507935,
+      0.019999999552965164
+    ],
+    "goal": [
+      -8.386455738218501e-05,
+      0.690689742565155,
+      0.019999999552965164
+    ],
+    "cube_y_m": 0.5019999742507935,
+    "physical_gap_m": 0.004998145672893059,
+    "gap_error_m": -1.8543271069412781e-06,
+    "cube_position_difference_m": 0.0,
+    "cube_quaternion_difference": 0.0,
+    "goal_difference_m": 0.0,
+    "contact_start_valid_rear_contact": true,
+    "contact_start_latch": true,
+    "near_initial_robot_cube_contact": false,
+    "near_initial_latch": false,
+    "near_workspace_y_margin_m": 0.0029449462890625,
+    "near_workspace_z_margin_m": 0.0,
+    "near_aperture_m": 0.0841888893508587,
+    "contact_tcp": [
+      -0.00031254883752183157,
+      0.4322178177832173,
+      0.052253823541118044
+    ],
+    "near_tcp": [
+      -0.0003218339369518207,
+      0.4231417882511965,
+      0.053031102804101754
+    ],
+    "tcp_difference_m": 0.009109256903383978,
+    "tcp_vertical_difference_m": 0.00077727926298371,
+    "near_joint_limits_valid": true,
+    "near_gripper_table_collision": false,
+    "near_finite": true,
+    "near_initial_cube_speed": 0.0,
+    "contact_acquired": true,
+    "first_contact": {
+      "step": 39,
+      "alignment": 0.9999926359860818,
+      "height_m": 0.014382282905013623,
+      "penetration_m": 2.668694845391179e-05,
+      "tcp_mocap_error_m": 0.013132100788121746
+    },
+    "contact_bonus_count": 1,
+    "maximum_cube_displacement_m": 0.00014499761164188385,
+    "maximum_cube_tilt_rad": 0.003837713998173083,
+    "workspace_clipped": false,
+    "valid": true
+  },
+  {
+    "task_index": 44,
+    "reset_seed": 10044,
+    "cube": [
+      0.03765302896499634,
+      0.5019999742507935,
+      0.019999999552965164
+    ],
+    "goal": [
+      0.03765302896499634,
+      0.6714231967926025,
+      0.019999999552965164
+    ],
+    "cube_y_m": 0.5019999742507935,
+    "physical_gap_m": 0.004996166896400382,
+    "gap_error_m": -3.833103599618429e-06,
+    "cube_position_difference_m": 0.0,
+    "cube_quaternion_difference": 0.0,
+    "goal_difference_m": 0.0,
+    "contact_start_valid_rear_contact": true,
+    "contact_start_latch": true,
+    "near_initial_robot_cube_contact": false,
+    "near_initial_latch": false,
+    "near_workspace_y_margin_m": 0.002966308593750022,
+    "near_workspace_z_margin_m": 0.0,
+    "near_aperture_m": 0.08418932354521305,
+    "contact_tcp": [
+      0.03788043834056863,
+      0.43219584367059427,
+      0.052270190482918685
+    ],
+    "near_tcp": [
+      0.03789563316334678,
+      0.42314648083802975,
+      0.05303662101909231
+    ],
+    "tcp_difference_m": 0.009081773743317922,
+    "tcp_vertical_difference_m": 0.0007664305361736248,
+    "near_joint_limits_valid": true,
+    "near_gripper_table_collision": false,
+    "near_finite": true,
+    "near_initial_cube_speed": 0.0,
+    "contact_acquired": true,
+    "first_contact": {
+      "step": 39,
+      "alignment": 0.9999920960666413,
+      "height_m": 0.01439541260847927,
+      "penetration_m": 2.7988976692946646e-05,
+      "tcp_mocap_error_m": 0.013148223434893039
+    },
+    "contact_bonus_count": 1,
+    "maximum_cube_displacement_m": 0.00014499761164188385,
+    "maximum_cube_tilt_rad": 0.003975913775575708,
+    "workspace_clipped": false,
+    "valid": true
+  },
+  {
+    "task_index": 45,
+    "reset_seed": 10045,
+    "cube": [
+      -0.0944235622882843,
+      0.5019999742507935,
+      0.019999999552965164
+    ],
+    "goal": [
+      -0.0944235622882843,
+      0.7397760152816772,
+      0.019999999552965164
+    ],
+    "cube_y_m": 0.5019999742507935,
+    "physical_gap_m": 0.00499182660240868,
+    "gap_error_m": -8.173397591320318e-06,
+    "cube_position_difference_m": 0.0,
+    "cube_quaternion_difference": 0.0,
+    "goal_difference_m": 0.0,
+    "contact_start_valid_rear_contact": true,
+    "contact_start_latch": true,
+    "near_initial_robot_cube_contact": false,
+    "near_initial_latch": false,
+    "near_workspace_y_margin_m": 0.002954101562499978,
+    "near_workspace_z_margin_m": 0.0,
+    "near_aperture_m": 0.08430225838936294,
+    "contact_tcp": [
+      -0.0946444274917878,
+      0.4321876117556608,
+      0.052233679061312877
+    ],
+    "near_tcp": [
+      -0.09467077136834183,
+      0.4231148561349847,
+      0.05308520935251049
+    ],
+    "tcp_difference_m": 0.00911266659047553,
+    "tcp_vertical_difference_m": 0.0008515302911976108,
+    "near_joint_limits_valid": true,
+    "near_gripper_table_collision": false,
+    "near_finite": true,
+    "near_initial_cube_speed": 0.0,
+    "contact_acquired": true,
+    "first_contact": {
+      "step": 38,
+      "alignment": 0.9999999992823975,
+      "height_m": 0.014423528869410947,
+      "penetration_m": 3.099399786572038e-05,
+      "tcp_mocap_error_m": 0.01310833971842671
+    },
+    "contact_bonus_count": 1,
+    "maximum_cube_displacement_m": 0.00014499761164188385,
+    "maximum_cube_tilt_rad": 3.788744994134495e-05,
+    "workspace_clipped": false,
+    "valid": true
+  },
+  {
+    "task_index": 46,
+    "reset_seed": 10046,
+    "cube": [
+      0.0879744365811348,
+      0.5019999742507935,
+      0.019999999552965164
+    ],
+    "goal": [
+      0.0879744365811348,
+      0.6548347473144531,
+      0.019999999552965164
+    ],
+    "cube_y_m": 0.5019999742507935,
+    "physical_gap_m": 0.004998920945701685,
+    "gap_error_m": -1.0790542983151602e-06,
+    "cube_position_difference_m": 0.0,
+    "cube_quaternion_difference": 0.0,
+    "goal_difference_m": 0.0,
+    "contact_start_valid_rear_contact": true,
+    "contact_start_latch": true,
+    "near_initial_robot_cube_contact": false,
+    "near_initial_latch": false,
+    "near_workspace_y_margin_m": 0.0029449462890625,
+    "near_workspace_z_margin_m": 0.0,
+    "near_aperture_m": 0.08429813222733099,
+    "contact_tcp": [
+      0.08819627860709048,
+      0.4321904377245325,
+      0.052230041566273464
+    ],
+    "near_tcp": [
+      0.08822120002827943,
+      0.42310754650042154,
+      0.05308172351031002
+    ],
+    "tcp_difference_m": 0.009122768011961248,
+    "tcp_vertical_difference_m": 0.0008516819440365572,
+    "near_joint_limits_valid": true,
+    "near_gripper_table_collision": false,
+    "near_finite": true,
+    "near_initial_cube_speed": 0.0,
+    "contact_acquired": true,
+    "first_contact": {
+      "step": 38,
+      "alignment": 0.999999999191721,
+      "height_m": 0.014423043450174745,
+      "penetration_m": 2.9521723591970366e-05,
+      "tcp_mocap_error_m": 0.01310798131138646
+    },
+    "contact_bonus_count": 1,
+    "maximum_cube_displacement_m": 0.00014499761164188385,
+    "maximum_cube_tilt_rad": 4.0209802624184706e-05,
+    "workspace_clipped": false,
+    "valid": true
+  },
+  {
+    "task_index": 47,
+    "reset_seed": 10047,
+    "cube": [
+      -0.06802624464035034,
+      0.5019999742507935,
+      0.019999999552965164
+    ],
+    "goal": [
+      -0.06802624464035034,
+      0.7129207253456116,
+      0.019999999552965164
+    ],
+    "cube_y_m": 0.5019999742507935,
+    "physical_gap_m": 0.004993674481788252,
+    "gap_error_m": -6.32551821174842e-06,
+    "cube_position_difference_m": 0.0,
+    "cube_quaternion_difference": 0.0,
+    "goal_difference_m": 0.0,
+    "contact_start_valid_rear_contact": true,
+    "contact_start_latch": true,
+    "near_initial_robot_cube_contact": false,
+    "near_initial_latch": false,
+    "near_workspace_y_margin_m": 0.0029296875,
+    "near_workspace_z_margin_m": 0.0,
+    "near_aperture_m": 0.08433242935047466,
+    "contact_tcp": [
+      -0.06825075525691535,
+      0.4321993016072928,
+      0.052226896679383364
+    ],
+    "near_tcp": [
+      -0.06827154023280053,
+      0.42309857140062834,
+      0.053088092149628674
+    ],
+    "tcp_difference_m": 0.009141410172817355,
+    "tcp_vertical_difference_m": 0.0008611954702453101,
+    "near_joint_limits_valid": true,
+    "near_gripper_table_collision": false,
+    "near_finite": true,
+    "near_initial_cube_speed": 0.0,
+    "contact_acquired": true,
+    "first_contact": {
+      "step": 38,
+      "alignment": 0.9999999994203354,
+      "height_m": 0.014410514293810503,
+      "penetration_m": 2.4994242997572003e-05,
+      "tcp_mocap_error_m": 0.013094907969537307
+    },
+    "contact_bonus_count": 1,
+    "maximum_cube_displacement_m": 0.00014499761164188385,
+    "maximum_cube_tilt_rad": 3.405245946611112e-05,
+    "workspace_clipped": false,
+    "valid": true
+  },
+  {
+    "task_index": 48,
+    "reset_seed": 10048,
+    "cube": [
+      -0.07903537899255753,
+      0.5182496905326843,
+      0.019999999552965164
+    ],
+    "goal": [
+      -0.07903537899255753,
+      0.7200848460197449,
+      0.019999999552965164
+    ],
+    "cube_y_m": 0.5182496905326843,
+    "physical_gap_m": 0.004993188190213819,
+    "gap_error_m": -6.811809786181483e-06,
+    "cube_position_difference_m": 0.0,
+    "cube_quaternion_difference": 0.0,
+    "goal_difference_m": 0.0,
+    "contact_start_valid_rear_contact": true,
+    "contact_start_latch": true,
+    "near_initial_robot_cube_contact": false,
+    "near_initial_latch": false,
+    "near_workspace_y_margin_m": 0.019189871640226785,
+    "near_workspace_z_margin_m": 0.0,
+    "near_aperture_m": 0.08431583267168713,
+    "contact_tcp": [
+      -0.07925175811600364,
+      0.44844527575967563,
+      0.052248659283491754
+    ],
+    "near_tcp": [
+      -0.07927898800502241,
+      0.4393649997978698,
+      0.0531049160643596
+    ],
+    "tcp_difference_m": 0.009120599140636919,
+    "tcp_vertical_difference_m": 0.0008562567808678492,
+    "near_joint_limits_valid": true,
+    "near_gripper_table_collision": false,
+    "near_finite": true,
+    "near_initial_cube_speed": 0.0,
+    "contact_acquired": true,
+    "first_contact": {
+      "step": 38,
+      "alignment": 0.9999999992945798,
+      "height_m": 0.014445273814189998,
+      "penetration_m": 3.139588165395038e-05,
+      "tcp_mocap_error_m": 0.013130057422577966
+    },
+    "contact_bonus_count": 1,
+    "maximum_cube_displacement_m": 0.00014499761164188385,
+    "maximum_cube_tilt_rad": 3.756463041306656e-05,
+    "workspace_clipped": false,
+    "valid": true
+  },
+  {
+    "task_index": 49,
+    "reset_seed": 10049,
+    "cube": [
+      -0.0011995253153145313,
+      0.5091094970703125,
+      0.019999999552965164
+    ],
+    "goal": [
+      -0.0011995253153145313,
+      0.7225441932678223,
+      0.019999999552965164
+    ],
+    "cube_y_m": 0.5091094970703125,
+    "physical_gap_m": 0.004998674486033171,
+    "gap_error_m": -1.3255139668291033e-06,
+    "cube_position_difference_m": 0.0,
+    "cube_quaternion_difference": 0.0,
+    "goal_difference_m": 0.0,
+    "contact_start_valid_rear_contact": true,
+    "contact_start_latch": true,
+    "near_initial_robot_cube_contact": false,
+    "near_initial_latch": false,
+    "near_workspace_y_margin_m": 0.01005579868745482,
+    "near_workspace_z_margin_m": 0.0,
+    "near_aperture_m": 0.08419062110687775,
+    "contact_tcp": [
+      -0.001424666119071391,
+      0.4395452314705678,
+      0.05228588394089193
+    ],
+    "near_tcp": [
+      -0.0014355009177634175,
+      0.4302558757366541,
+      0.05304388154241623
+    ],
+    "tcp_difference_m": 0.00932023646202041,
+    "tcp_vertical_difference_m": 0.000757997601524299,
+    "near_joint_limits_valid": true,
+    "near_gripper_table_collision": false,
+    "near_finite": true,
+    "near_initial_cube_speed": 0.0,
+    "contact_acquired": true,
+    "first_contact": {
+      "step": 39,
+      "alignment": 0.9999925638706341,
+      "height_m": 0.014398096196617069,
+      "penetration_m": 2.868662898907923e-05,
+      "tcp_mocap_error_m": 0.013148029774130123
+    },
+    "contact_bonus_count": 1,
+    "maximum_cube_displacement_m": 0.00014499761164188385,
+    "maximum_cube_tilt_rad": 0.0038564599050499994,
+    "workspace_clipped": false,
+    "valid": true
+  }
+]

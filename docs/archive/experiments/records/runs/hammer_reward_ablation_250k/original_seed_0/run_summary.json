@@ -1,0 +1,38 @@
+{
+  "task": "kuka-hammer-v3",
+  "backend": "kuka-v3",
+  "seed": 0,
+  "total_timesteps": 250000,
+  "reward_function_version": "v2",
+  "horizon": 200,
+  "initial": {
+    "success_rate": 0.0,
+    "mean_return": 203.04835599291704,
+    "return_std": 16.567070725776826
+  },
+  "final": {
+    "step": 240000,
+    "success_rate": 0.05,
+    "mean_return": 722.1138105934604,
+    "return_std": 54.75691628969749
+  },
+  "best_success": {
+    "step": 20000,
+    "success_rate": 0.45,
+    "mean_return": 253.5099437344304,
+    "return_std": 105.50744032066353,
+    "model_path": "best_success_model/best_success_model.zip"
+  },
+  "best_return": {
+    "step": 240000,
+    "success_rate": 0.05,
+    "mean_return": 722.1138105934604,
+    "return_std": 54.75691628969749,
+    "model_path": "best_model/best_model.zip"
+  },
+  "artifacts": {
+    "final_model": "final_model.zip",
+    "evaluations_npz": "evaluations/evaluations.npz",
+    "tensorboard": "tensorboard"
+  }
+}

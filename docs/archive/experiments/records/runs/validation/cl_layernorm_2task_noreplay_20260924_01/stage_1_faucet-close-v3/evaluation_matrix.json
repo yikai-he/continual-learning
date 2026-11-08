@@ -1,0 +1,847 @@
+{
+  "kind": "continual_stage_evaluation",
+  "tasks": [
+    {
+      "task_id": "button-press-v3",
+      "task_name": "button-press-v3"
+    },
+    {
+      "task_id": "faucet-close-v3",
+      "task_name": "faucet-close-v3"
+    }
+  ],
+  "R": [
+    [
+      1.0,
+      null
+    ],
+    [
+      0.15,
+      1.0
+    ]
+  ],
+  "cells": [
+    [
+      {
+        "mean_return": 1482.4781496307892,
+        "std_return": 95.60996752661272,
+        "success_rate": 1.0,
+        "success_count": 20,
+        "mean_episode_length": 200.0,
+        "episodes": 20,
+        "horizon": 200,
+        "seeds": [
+          10000,
+          10001,
+          10002,
+          10003,
+          10004,
+          10005,
+          10006,
+          10007,
+          10008,
+          10009,
+          10010,
+          10011,
+          10012,
+          10013,
+          10014,
+          10015,
+          10016,
+          10017,
+          10018,
+          10019
+        ],
+        "episode_returns": [
+          1391.6392878757779,
+          1329.6372111618184,
+          1453.357770863111,
+          1548.6935738935808,
+          1525.0293061966947,
+          1565.4972552771853,
+          1397.7551897163842,
+          1557.4528525286203,
+          1510.9139845129644,
+          1572.2458050502894,
+          1551.71280789718,
+          1321.8102754881404,
+          1569.5341067050308,
+          1271.826161729942,
+          1550.6506579613138,
+          1382.4174081895828,
+          1563.7355919743125,
+          1553.114619833522,
+          1468.7524509349034,
+          1563.7866748254291
+        ],
+        "episode_lengths": [
+          200,
+          200,
+          200,
+          200,
+          200,
+          200,
+          200,
+          200,
+          200,
+          200,
+          200,
+          200,
+          200,
+          200,
+          200,
+          200,
+          200,
+          200,
+          200,
+          200
+        ],
+        "episode_successes": [
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true
+        ],
+        "deterministic": true,
+        "evaluation_mode": "fixed-tasks",
+        "task_set_seed": 10000,
+        "task_bank_size": 50,
+        "episode_provenance": [
+          {
+            "task_index": 0,
+            "task_env_name": "button-press-v3",
+            "task_data_sha256": "cd4363773babe136a834fa655a5f1b845beecd3faf3b5bf9617f46afce23a735",
+            "reset_seed": 10000,
+            "episode_return": 1391.6392878757779,
+            "success": true
+          },
+          {
+            "task_index": 1,
+            "task_env_name": "button-press-v3",
+            "task_data_sha256": "955eb36c4d40df83eff38eb400bd3a75e7ec9466398f8aae05133b2e12ce83bd",
+            "reset_seed": 10001,
+            "episode_return": 1329.6372111618184,
+            "success": true
+          },
+          {
+            "task_index": 2,
+            "task_env_name": "button-press-v3",
+            "task_data_sha256": "0225e8361434aa4d204c736eff460f3e314add782e3f9e3740c5cb6991db1877",
+            "reset_seed": 10002,
+            "episode_return": 1453.357770863111,
+            "success": true
+          },
+          {
+            "task_index": 3,
+            "task_env_name": "button-press-v3",
+            "task_data_sha256": "e89c8453f5a9f86b9c11a3c635fce716d7d24a0b2912360279522fc2b40e3ae9",
+            "reset_seed": 10003,
+            "episode_return": 1548.6935738935808,
+            "success": true
+          },
+          {
+            "task_index": 4,
+            "task_env_name": "button-press-v3",
+            "task_data_sha256": "739150ec165b9925cd88453d9635b1b5e2738a1bca9c7447db7603a62a88b5ba",
+            "reset_seed": 10004,
+            "episode_return": 1525.0293061966947,
+            "success": true
+          },
+          {
+            "task_index": 5,
+            "task_env_name": "button-press-v3",
+            "task_data_sha256": "885eb07540cadf8d7b118ce3ec997be1411128ad44648d88b7ce1b0f44ce4b7b",
+            "reset_seed": 10005,
+            "episode_return": 1565.4972552771853,
+            "success": true
+          },
+          {
+            "task_index": 6,
+            "task_env_name": "button-press-v3",
+            "task_data_sha256": "4cf2cd8e68fc054d54e0ffce59beb5b273caaeed4f7dd10976b7d009365fc5de",
+            "reset_seed": 10006,
+            "episode_return": 1397.7551897163842,
+            "success": true
+          },
+          {
+            "task_index": 7,
+            "task_env_name": "button-press-v3",
+            "task_data_sha256": "0bf6847a452937c42ca4a94fdf019679090e6b8e3c2af4f58a1404cc9c65b8f3",
+            "reset_seed": 10007,
+            "episode_return": 1557.4528525286203,
+            "success": true
+          },
+          {
+            "task_index": 8,
+            "task_env_name": "button-press-v3",
+            "task_data_sha256": "de8a5357dcb0b32b79efa46e28be02bdfc5865164914383cc2132a0b474fc64d",
+            "reset_seed": 10008,
+            "episode_return": 1510.9139845129644,
+            "success": true
+          },
+          {
+            "task_index": 9,
+            "task_env_name": "button-press-v3",
+            "task_data_sha256": "d12737a3c23d912312544ab7c353e14b4f6899a817a61b765487ecb629f502ee",
+            "reset_seed": 10009,
+            "episode_return": 1572.2458050502894,
+            "success": true
+          },
+          {
+            "task_index": 10,
+            "task_env_name": "button-press-v3",
+            "task_data_sha256": "bee9255b466b2d3f4a737c15573a3c8e7b7c7ee7d9f3c7ed0a2c08f97a5b1c2a",
+            "reset_seed": 10010,
+            "episode_return": 1551.71280789718,
+            "success": true
+          },
+          {
+            "task_index": 11,
+            "task_env_name": "button-press-v3",
+            "task_data_sha256": "e37c9ba086424e333eef5022449595ddae6d55b2f704ec9229781fdb05472fa6",
+            "reset_seed": 10011,
+            "episode_return": 1321.8102754881404,
+            "success": true
+          },
+          {
+            "task_index": 12,
+            "task_env_name": "button-press-v3",
+            "task_data_sha256": "6473a433b287a99e0ee664479f1ec93aa4e5ed6d5b02b9e03a7e23964c15133f",
+            "reset_seed": 10012,
+            "episode_return": 1569.5341067050308,
+            "success": true
+          },
+          {
+            "task_index": 13,
+            "task_env_name": "button-press-v3",
+            "task_data_sha256": "b9f029919baed0afa678c71129abb8553b9c291783f7b398593d136048344d59",
+            "reset_seed": 10013,
+            "episode_return": 1271.826161729942,
+            "success": true
+          },
+          {
+            "task_index": 14,
+            "task_env_name": "button-press-v3",
+            "task_data_sha256": "f52c92b94ce2ffc0da4d52e25873c5f3ee0896dc35750f5d892c3a15aeea1782",
+            "reset_seed": 10014,
+            "episode_return": 1550.6506579613138,
+            "success": true
+          },
+          {
+            "task_index": 15,
+            "task_env_name": "button-press-v3",
+            "task_data_sha256": "7fc7822b899965c171fe8118b69037b3f30297e9d560b2e75080f3e070a872ff",
+            "reset_seed": 10015,
+            "episode_return": 1382.4174081895828,
+            "success": true
+          },
+          {
+            "task_index": 16,
+            "task_env_name": "button-press-v3",
+            "task_data_sha256": "a71932de9225a7272b36ea1e9a40492dccb15e8952b4039b7f42856ddb1d88b2",
+            "reset_seed": 10016,
+            "episode_return": 1563.7355919743125,
+            "success": true
+          },
+          {
+            "task_index": 17,
+            "task_env_name": "button-press-v3",
+            "task_data_sha256": "e2017d9434063c658a2b3bdf2dc11acde87d0ec710eeb4f565ce8534a07c45b7",
+            "reset_seed": 10017,
+            "episode_return": 1553.114619833522,
+            "success": true
+          },
+          {
+            "task_index": 18,
+            "task_env_name": "button-press-v3",
+            "task_data_sha256": "d5f92e0b063f1a9f8757214a52fff73983ec8e46cd5c94c04525de083654fa06",
+            "reset_seed": 10018,
+            "episode_return": 1468.7524509349034,
+            "success": true
+          },
+          {
+            "task_index": 19,
+            "task_env_name": "button-press-v3",
+            "task_data_sha256": "b5dd36a9f7680df2b72823ab1fa1680f367f0fdb1127c14d4901bf36e39e89b0",
+            "reset_seed": 10019,
+            "episode_return": 1563.7866748254291,
+            "success": true
+          }
+        ]
+      },
+      null
+    ],
+    [
+      {
+        "mean_return": 674.4089642402911,
+        "std_return": 160.70425320896086,
+        "success_rate": 0.15,
+        "success_count": 3,
+        "mean_episode_length": 200.0,
+        "episodes": 20,
+        "horizon": 200,
+        "seeds": [
+          10000,
+          10001,
+          10002,
+          10003,
+          10004,
+          10005,
+          10006,
+          10007,
+          10008,
+          10009,
+          10010,
+          10011,
+          10012,
+          10013,
+          10014,
+          10015,
+          10016,
+          10017,
+          10018,
+          10019
+        ],
+        "episode_returns": [
+          654.3286219728675,
+          686.9752587671009,
+          595.3742197565873,
+          581.8176850221286,
+          527.5646437626411,
+          807.8794783623827,
+          618.0654712419854,
+          591.1001900771561,
+          692.4582226544765,
+          1225.5620635113153,
+          673.0918769841411,
+          597.6596992236788,
+          591.7180079931253,
+          691.4755676733304,
+          823.3936162352433,
+          427.95030770767465,
+          591.3625120310764,
+          576.0414502768572,
+          672.8328144972246,
+          861.52757705483
+        ],
+        "episode_lengths": [
+          200,
+          200,
+          200,
+          200,
+          200,
+          200,
+          200,
+          200,
+          200,
+          200,
+          200,
+          200,
+          200,
+          200,
+          200,
+          200,
+          200,
+          200,
+          200,
+          200
+        ],
+        "episode_successes": [
+          false,
+          false,
+          true,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          true,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          true
+        ],
+        "deterministic": true,
+        "evaluation_mode": "fixed-tasks",
+        "task_set_seed": 10000,
+        "task_bank_size": 50,
+        "episode_provenance": [
+          {
+            "task_index": 0,
+            "task_env_name": "button-press-v3",
+            "task_data_sha256": "cd4363773babe136a834fa655a5f1b845beecd3faf3b5bf9617f46afce23a735",
+            "reset_seed": 10000,
+            "episode_return": 654.3286219728675,
+            "success": false
+          },
+          {
+            "task_index": 1,
+            "task_env_name": "button-press-v3",
+            "task_data_sha256": "955eb36c4d40df83eff38eb400bd3a75e7ec9466398f8aae05133b2e12ce83bd",
+            "reset_seed": 10001,
+            "episode_return": 686.9752587671009,
+            "success": false
+          },
+          {
+            "task_index": 2,
+            "task_env_name": "button-press-v3",
+            "task_data_sha256": "0225e8361434aa4d204c736eff460f3e314add782e3f9e3740c5cb6991db1877",
+            "reset_seed": 10002,
+            "episode_return": 595.3742197565873,
+            "success": true
+          },
+          {
+            "task_index": 3,
+            "task_env_name": "button-press-v3",
+            "task_data_sha256": "e89c8453f5a9f86b9c11a3c635fce716d7d24a0b2912360279522fc2b40e3ae9",
+            "reset_seed": 10003,
+            "episode_return": 581.8176850221286,
+            "success": false
+          },
+          {
+            "task_index": 4,
+            "task_env_name": "button-press-v3",
+            "task_data_sha256": "739150ec165b9925cd88453d9635b1b5e2738a1bca9c7447db7603a62a88b5ba",
+            "reset_seed": 10004,
+            "episode_return": 527.5646437626411,
+            "success": false
+          },
+          {
+            "task_index": 5,
+            "task_env_name": "button-press-v3",
+            "task_data_sha256": "885eb07540cadf8d7b118ce3ec997be1411128ad44648d88b7ce1b0f44ce4b7b",
+            "reset_seed": 10005,
+            "episode_return": 807.8794783623827,
+            "success": false
+          },
+          {
+            "task_index": 6,
+            "task_env_name": "button-press-v3",
+            "task_data_sha256": "4cf2cd8e68fc054d54e0ffce59beb5b273caaeed4f7dd10976b7d009365fc5de",
+            "reset_seed": 10006,
+            "episode_return": 618.0654712419854,
+            "success": false
+          },
+          {
+            "task_index": 7,
+            "task_env_name": "button-press-v3",
+            "task_data_sha256": "0bf6847a452937c42ca4a94fdf019679090e6b8e3c2af4f58a1404cc9c65b8f3",
+            "reset_seed": 10007,
+            "episode_return": 591.1001900771561,
+            "success": false
+          },
+          {
+            "task_index": 8,
+            "task_env_name": "button-press-v3",
+            "task_data_sha256": "de8a5357dcb0b32b79efa46e28be02bdfc5865164914383cc2132a0b474fc64d",
+            "reset_seed": 10008,
+            "episode_return": 692.4582226544765,
+            "success": false
+          },
+          {
+            "task_index": 9,
+            "task_env_name": "button-press-v3",
+            "task_data_sha256": "d12737a3c23d912312544ab7c353e14b4f6899a817a61b765487ecb629f502ee",
+            "reset_seed": 10009,
+            "episode_return": 1225.5620635113153,
+            "success": true
+          },
+          {
+            "task_index": 10,
+            "task_env_name": "button-press-v3",
+            "task_data_sha256": "bee9255b466b2d3f4a737c15573a3c8e7b7c7ee7d9f3c7ed0a2c08f97a5b1c2a",
+            "reset_seed": 10010,
+            "episode_return": 673.0918769841411,
+            "success": false
+          },
+          {
+            "task_index": 11,
+            "task_env_name": "button-press-v3",
+            "task_data_sha256": "e37c9ba086424e333eef5022449595ddae6d55b2f704ec9229781fdb05472fa6",
+            "reset_seed": 10011,
+            "episode_return": 597.6596992236788,
+            "success": false
+          },
+          {
+            "task_index": 12,
+            "task_env_name": "button-press-v3",
+            "task_data_sha256": "6473a433b287a99e0ee664479f1ec93aa4e5ed6d5b02b9e03a7e23964c15133f",
+            "reset_seed": 10012,
+            "episode_return": 591.7180079931253,
+            "success": false
+          },
+          {
+            "task_index": 13,
+            "task_env_name": "button-press-v3",
+            "task_data_sha256": "b9f029919baed0afa678c71129abb8553b9c291783f7b398593d136048344d59",
+            "reset_seed": 10013,
+            "episode_return": 691.4755676733304,
+            "success": false
+          },
+          {
+            "task_index": 14,
+            "task_env_name": "button-press-v3",
+            "task_data_sha256": "f52c92b94ce2ffc0da4d52e25873c5f3ee0896dc35750f5d892c3a15aeea1782",
+            "reset_seed": 10014,
+            "episode_return": 823.3936162352433,
+            "success": false
+          },
+          {
+            "task_index": 15,
+            "task_env_name": "button-press-v3",
+            "task_data_sha256": "7fc7822b899965c171fe8118b69037b3f30297e9d560b2e75080f3e070a872ff",
+            "reset_seed": 10015,
+            "episode_return": 427.95030770767465,
+            "success": false
+          },
+          {
+            "task_index": 16,
+            "task_env_name": "button-press-v3",
+            "task_data_sha256": "a71932de9225a7272b36ea1e9a40492dccb15e8952b4039b7f42856ddb1d88b2",
+            "reset_seed": 10016,
+            "episode_return": 591.3625120310764,
+            "success": false
+          },
+          {
+            "task_index": 17,
+            "task_env_name": "button-press-v3",
+            "task_data_sha256": "e2017d9434063c658a2b3bdf2dc11acde87d0ec710eeb4f565ce8534a07c45b7",
+            "reset_seed": 10017,
+            "episode_return": 576.0414502768572,
+            "success": false
+          },
+          {
+            "task_index": 18,
+            "task_env_name": "button-press-v3",
+            "task_data_sha256": "d5f92e0b063f1a9f8757214a52fff73983ec8e46cd5c94c04525de083654fa06",
+            "reset_seed": 10018,
+            "episode_return": 672.8328144972246,
+            "success": false
+          },
+          {
+            "task_index": 19,
+            "task_env_name": "button-press-v3",
+            "task_data_sha256": "b5dd36a9f7680df2b72823ab1fa1680f367f0fdb1127c14d4901bf36e39e89b0",
+            "reset_seed": 10019,
+            "episode_return": 861.52757705483,
+            "success": true
+          }
+        ]
+      },
+      {
+        "mean_return": 1747.6321108634643,
+        "std_return": 23.2767847770434,
+        "success_rate": 1.0,
+        "success_count": 20,
+        "mean_episode_length": 200.0,
+        "episodes": 20,
+        "horizon": 200,
+        "seeds": [
+          10000,
+          10001,
+          10002,
+          10003,
+          10004,
+          10005,
+          10006,
+          10007,
+          10008,
+          10009,
+          10010,
+          10011,
+          10012,
+          10013,
+          10014,
+          10015,
+          10016,
+          10017,
+          10018,
+          10019
+        ],
+        "episode_returns": [
+          1742.8164645887728,
+          1739.0433016700547,
+          1786.7084323208064,
+          1755.4661003464585,
+          1708.1924474587986,
+          1722.7064265722956,
+          1738.93237334168,
+          1761.5686560052934,
+          1764.8014769318306,
+          1773.500080133447,
+          1707.113147398994,
+          1730.0929882159764,
+          1772.7849356769932,
+          1781.8540089940925,
+          1730.5373128823942,
+          1721.7817339226733,
+          1772.5628788492445,
+          1763.7809592319686,
+          1738.1947084921103,
+          1740.2037842354043
+        ],
+        "episode_lengths": [
+          200,
+          200,
+          200,
+          200,
+          200,
+          200,
+          200,
+          200,
+          200,
+          200,
+          200,
+          200,
+          200,
+          200,
+          200,
+          200,
+          200,
+          200,
+          200,
+          200
+        ],
+        "episode_successes": [
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true
+        ],
+        "deterministic": true,
+        "evaluation_mode": "fixed-tasks",
+        "task_set_seed": 10000,
+        "task_bank_size": 50,
+        "episode_provenance": [
+          {
+            "task_index": 0,
+            "task_env_name": "faucet-close-v3",
+            "task_data_sha256": "13f5f2ce30750cd20099a61dd177656cff533483be7c79a919fa9bd88aaf8d7e",
+            "reset_seed": 10000,
+            "episode_return": 1742.8164645887728,
+            "success": true
+          },
+          {
+            "task_index": 1,
+            "task_env_name": "faucet-close-v3",
+            "task_data_sha256": "843d7c9e761fe5554c8b545b23789d4219d48632449bc6562d5e89d04f3a7f15",
+            "reset_seed": 10001,
+            "episode_return": 1739.0433016700547,
+            "success": true
+          },
+          {
+            "task_index": 2,
+            "task_env_name": "faucet-close-v3",
+            "task_data_sha256": "81cac5c18869a11ea4dc5ff5f2037c6eaf74b8864b37f64e4cb5489c2a7793d8",
+            "reset_seed": 10002,
+            "episode_return": 1786.7084323208064,
+            "success": true
+          },
+          {
+            "task_index": 3,
+            "task_env_name": "faucet-close-v3",
+            "task_data_sha256": "f34c86cf84397cd5b37e6222c0792dd82e59789b7f8bd2c119cbc72144f362fa",
+            "reset_seed": 10003,
+            "episode_return": 1755.4661003464585,
+            "success": true
+          },
+          {
+            "task_index": 4,
+            "task_env_name": "faucet-close-v3",
+            "task_data_sha256": "93e98f06b6b2a7845a1a99ccbbb416f8cbbb034f342b1f891152ffd30a8476be",
+            "reset_seed": 10004,
+            "episode_return": 1708.1924474587986,
+            "success": true
+          },
+          {
+            "task_index": 5,
+            "task_env_name": "faucet-close-v3",
+            "task_data_sha256": "39ac5d7ac2639d70e70b6271550019d8202432898756dc9d8cc64adb2c2af952",
+            "reset_seed": 10005,
+            "episode_return": 1722.7064265722956,
+            "success": true
+          },
+          {
+            "task_index": 6,
+            "task_env_name": "faucet-close-v3",
+            "task_data_sha256": "54b5361ee9daad7198ddbefee959bd1560434def3da6df7115db3d484a87929b",
+            "reset_seed": 10006,
+            "episode_return": 1738.93237334168,
+            "success": true
+          },
+          {
+            "task_index": 7,
+            "task_env_name": "faucet-close-v3",
+            "task_data_sha256": "a50e98acc1272a7a6a883ba0c83d0ec0a30c722482756f2e3b64daffbd2a4346",
+            "reset_seed": 10007,
+            "episode_return": 1761.5686560052934,
+            "success": true
+          },
+          {
+            "task_index": 8,
+            "task_env_name": "faucet-close-v3",
+            "task_data_sha256": "7c84e64884414ee63f353c1335466bf702056959b47fe312a00e6972722a8c8a",
+            "reset_seed": 10008,
+            "episode_return": 1764.8014769318306,
+            "success": true
+          },
+          {
+            "task_index": 9,
+            "task_env_name": "faucet-close-v3",
+            "task_data_sha256": "54d86cc56f569adc0d3ca47de3000cf02ec6fac75057afdf8012daa051c90e51",
+            "reset_seed": 10009,
+            "episode_return": 1773.500080133447,
+            "success": true
+          },
+          {
+            "task_index": 10,
+            "task_env_name": "faucet-close-v3",
+            "task_data_sha256": "37025bb7d33f3d191dea3d1479a57464de8f0169369d38eb4693bdfb9237c466",
+            "reset_seed": 10010,
+            "episode_return": 1707.113147398994,
+            "success": true
+          },
+          {
+            "task_index": 11,
+            "task_env_name": "faucet-close-v3",
+            "task_data_sha256": "6da3a7643d46d522814f4a1d14f14adae6eacca7807bd5e4cdfea65eadc85063",
+            "reset_seed": 10011,
+            "episode_return": 1730.0929882159764,
+            "success": true
+          },
+          {
+            "task_index": 12,
+            "task_env_name": "faucet-close-v3",
+            "task_data_sha256": "92af8675f0d5533c2c6299d81923f1f8184b157fa7207293f6f2e9a5b66b5101",
+            "reset_seed": 10012,
+            "episode_return": 1772.7849356769932,
+            "success": true
+          },
+          {
+            "task_index": 13,
+            "task_env_name": "faucet-close-v3",
+            "task_data_sha256": "1659c54034ba508183ce180803179385c9eb1aaf0ef937d7f1a0288108b8024e",
+            "reset_seed": 10013,
+            "episode_return": 1781.8540089940925,
+            "success": true
+          },
+          {
+            "task_index": 14,
+            "task_env_name": "faucet-close-v3",
+            "task_data_sha256": "63653469c28b4013290be203f76387a6b259c78ffab26d449213545d3dba9d89",
+            "reset_seed": 10014,
+            "episode_return": 1730.5373128823942,
+            "success": true
+          },
+          {
+            "task_index": 15,
+            "task_env_name": "faucet-close-v3",
+            "task_data_sha256": "e19603078d4e109cbc212187aea41179f9e5d08e2a9240311e1ddea47a95a335",
+            "reset_seed": 10015,
+            "episode_return": 1721.7817339226733,
+            "success": true
+          },
+          {
+            "task_index": 16,
+            "task_env_name": "faucet-close-v3",
+            "task_data_sha256": "7b6edc3843b9d1285faee506aa3fdcdb5344ff06276d572cba1320af55250ac1",
+            "reset_seed": 10016,
+            "episode_return": 1772.5628788492445,
+            "success": true
+          },
+          {
+            "task_index": 17,
+            "task_env_name": "faucet-close-v3",
+            "task_data_sha256": "d0caaae670fcf39dbd85d4cc29fdba3f4ae54afab44538214daa4d85cd443086",
+            "reset_seed": 10017,
+            "episode_return": 1763.7809592319686,
+            "success": true
+          },
+          {
+            "task_index": 18,
+            "task_env_name": "faucet-close-v3",
+            "task_data_sha256": "3e9b06b2ec14f91a864c1362cedc3dfb5dac0ad3e8d46e651a7a0be5116b3735",
+            "reset_seed": 10018,
+            "episode_return": 1738.1947084921103,
+            "success": true
+          },
+          {
+            "task_index": 19,
+            "task_env_name": "faucet-close-v3",
+            "task_data_sha256": "96e6a3686b65e725cf53144ea2d50e261001f9afc5397d604ea944a4f1fc35b8",
+            "reset_seed": 10019,
+            "episode_return": 1740.2037842354043,
+            "success": true
+          }
+        ]
+      }
+    ]
+  ],
+  "stage_provenance": {
+    "0": {
+      "report": "/home/yikai/Documents/Code/Metaworld/runs/validation/cl_layernorm_2task_noreplay_20260924_01/stage_0_button-press-v3/report.json",
+      "bc_normalization_mode": "layer-norm",
+      "bc_loss": "post-tanh-mse",
+      "bc_clamp_epsilon": 0.0001,
+      "generated_action_projection": "none"
+    },
+    "1": {
+      "report": "/home/yikai/Documents/Code/Metaworld/runs/validation/cl_layernorm_2task_noreplay_20260924_01/stage_1_faucet-close-v3/report.json",
+      "bc_normalization_mode": "layer-norm",
+      "bc_loss": "post-tanh-mse",
+      "bc_clamp_epsilon": 0.0001,
+      "generated_action_projection": "none"
+    }
+  },
+  "metrics_by_stage": {
+    "0": {
+      "average_performance": 1.0,
+      "forgetting": 0.0,
+      "forward_transfer": null
+    },
+    "1": {
+      "average_performance": 0.575,
+      "forgetting": 0.425,
+      "forward_transfer": null
+    }
+  }
+}

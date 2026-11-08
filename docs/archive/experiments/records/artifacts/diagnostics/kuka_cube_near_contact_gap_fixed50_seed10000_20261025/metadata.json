@@ -1,0 +1,32 @@
+{
+  "task_set_seed": 10000,
+  "task_indices": [
+    0,
+    49
+  ],
+  "reset_seed_formula": "10000 + task_index",
+  "candidate_gaps_m": [
+    0.001,
+    0.002,
+    0.003,
+    0.005,
+    0.007,
+    0.01
+  ],
+  "gap_tolerance_m": 2.5e-05,
+  "search_iterations": 14,
+  "settle_steps": 100,
+  "approach_action": [
+    0.0,
+    0.025,
+    0.0,
+    -1.0
+  ],
+  "approach_horizon": 100,
+  "gap_definition": "minimum mj_geomDistance(objGeom, collision-enabled Robotiq descendant geom)",
+  "training_commit": "598f526984a8379babc8ff64f0fdcda89cdd1aa8",
+  "environment_commit": "2ed78a08c7bf0ce0fd7aac4e44fd0ee3f9dd76ea",
+  "environment_sha256": "1e408838c9b4156a19e174caf7faab4fba0366c2ab7005e04a5ac8f7ebc2def7",
+  "diagnostic_sha256": "5fa1fad313a1d8472b2e224eea920f9911987714e43497df71fda1351a095a65",
+  "note": "Historical Contact-Start command z=0.039 m is 1 mm below mocap_low z=0.040 m; recorded separately."
+}

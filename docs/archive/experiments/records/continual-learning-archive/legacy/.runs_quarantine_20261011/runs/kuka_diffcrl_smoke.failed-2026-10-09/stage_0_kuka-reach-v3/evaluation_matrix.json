@@ -1,0 +1,84 @@
+{
+  "kind": "continual_stage_evaluation",
+  "tasks": [
+    {
+      "task_id": "kuka-reach-v3",
+      "task_name": "kuka-reach-v3"
+    },
+    {
+      "task_id": "kuka-handle-press-side-v3",
+      "task_name": "kuka-handle-press-side-v3"
+    }
+  ],
+  "R": [
+    [
+      0.5,
+      null
+    ],
+    [
+      null,
+      null
+    ]
+  ],
+  "cells": [
+    [
+      {
+        "mean_return": 1149.4390775291363,
+        "std_return": 602.2638479383693,
+        "success_rate": 0.5,
+        "success_count": 1,
+        "mean_episode_length": 200.0,
+        "episodes": 2,
+        "horizon": 200,
+        "seeds": [
+          10000,
+          10001
+        ],
+        "episode_returns": [
+          547.1752295907671,
+          1751.7029254675056
+        ],
+        "episode_lengths": [
+          200,
+          200
+        ],
+        "episode_successes": [
+          false,
+          true
+        ],
+        "deterministic": true,
+        "evaluation_mode": "sampled",
+        "environment_backend": "kuka-v3",
+        "task_set_seed": null,
+        "task_bank_size": null,
+        "episode_provenance": null
+      },
+      null
+    ],
+    [
+      null,
+      null
+    ]
+  ],
+  "stage_provenance": {
+    "0": {
+      "report": "/home/yikai/Documents/Code/Final/continual-learning/runs/kuka_diffcrl_smoke/stage_0_kuka-reach-v3/report.json",
+      "bc_normalization_mode": "layer-norm",
+      "bc_loss": "post-tanh-mse",
+      "bc_clamp_epsilon": 0.0001,
+      "generated_action_projection": "none"
+    }
+  },
+  "metrics_by_stage": {
+    "0": {
+      "average_performance": 0.5,
+      "forgetting": 0.0,
+      "forward_transfer": null
+    },
+    "1": {
+      "average_performance": null,
+      "forgetting": null,
+      "forward_transfer": null
+    }
+  }
+}

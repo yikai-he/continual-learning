@@ -1,0 +1,19 @@
+{
+  "kind": "flow_matching_ablation_completion_v1",
+  "stage": "bc-diffusion",
+  "config_sha256": "c656a7a9d1cb256ff75239d6499d558d334cb86c1ca7db781b3e0602510f8792",
+  "artifacts": {
+    "policy": {
+      "path": "/home/yikai/Documents/Code/Thesis/continual-learning/runs/flow_matching_harder_task/hammer_v3_seed0/bc_diffusion_attempt_1793289551366821507/bc_diffusion.pt",
+      "sha256": "37146c703f1d65e6add483e979fa2ed7d0282ad784772faaadd6b0be7dab4a70"
+    },
+    "curve": {
+      "path": "/home/yikai/Documents/Code/Thesis/continual-learning/runs/flow_matching_harder_task/hammer_v3_seed0/bc_diffusion_attempt_1793289551366821507/bc_training_curve.json",
+      "sha256": "05d28a418c86f071e1cef70207cbc7b091abd42311eda0abe80c0cb99fa8d310"
+    },
+    "results": {
+      "path": "/home/yikai/Documents/Code/Thesis/continual-learning/runs/flow_matching_harder_task/hammer_v3_seed0/bc_diffusion_attempt_1793289551366821507/bc_results.json",
+      "sha256": "05ccc5044f37581839a1bf573314c675a608396263c7b4b50e1a46c21b875ea7"
+    }
+  }
+}

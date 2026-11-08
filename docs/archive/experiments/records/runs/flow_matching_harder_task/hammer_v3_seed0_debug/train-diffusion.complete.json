@@ -1,0 +1,19 @@
+{
+  "kind": "flow_matching_ablation_completion_v1",
+  "stage": "train-diffusion",
+  "config_sha256": "315a64295149be8786358719e2b57aa20a3340e26a631c18ecd9e3d041579849",
+  "artifacts": {
+    "checkpoint": {
+      "path": "/home/yikai/Documents/Code/Thesis/continual-learning/runs/flow_matching_harder_task/hammer_v3_seed0_debug/train_diffusion_attempt_1793288426934679636/diffusion.pt",
+      "sha256": "335cc9bb1f58d6cec222586fbd4211ee7eb52031ca5fa298b304ab5777ba8947"
+    },
+    "curve": {
+      "path": "/home/yikai/Documents/Code/Thesis/continual-learning/runs/flow_matching_harder_task/hammer_v3_seed0_debug/train_diffusion_attempt_1793288426934679636/training_curve.json",
+      "sha256": "3dcaab917297d616f3c582c965d584b611a4aa5dc0a60b6de7c6189905ca433f"
+    },
+    "metrics": {
+      "path": "/home/yikai/Documents/Code/Thesis/continual-learning/runs/flow_matching_harder_task/hammer_v3_seed0_debug/train_diffusion_attempt_1793288426934679636/training_metrics.json",
+      "sha256": "35f3e3bae5d4856f1b65afb5a1c20d22466950fe9b94c38fcc92f16e571f3be5"
+    }
+  }
+}

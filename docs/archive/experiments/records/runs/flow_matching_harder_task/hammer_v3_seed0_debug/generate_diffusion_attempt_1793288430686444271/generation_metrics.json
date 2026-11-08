@@ -1,0 +1,17 @@
+{
+  "seconds": 0.03309808600170072,
+  "nfe": 5,
+  "seed": 100000,
+  "checkpoint": "/home/yikai/Documents/Code/Thesis/continual-learning/runs/flow_matching_harder_task/hammer_v3_seed0_debug/train_diffusion_attempt_1793288426934679636/diffusion.pt",
+  "checkpoint_sha256": "335cc9bb1f58d6cec222586fbd4211ee7eb52031ca5fa298b304ab5777ba8947",
+  "structured_shape": [
+    8,
+    200,
+    22
+  ],
+  "physical_shape": [
+    8,
+    200,
+    43
+  ]
+}

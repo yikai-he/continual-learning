@@ -1,0 +1,38 @@
+{
+  "task": "kuka-door-open-v3",
+  "backend": "kuka-v3",
+  "seed": 0,
+  "total_timesteps": 500000,
+  "reward_function_version": "v2",
+  "horizon": 200,
+  "initial": {
+    "success_rate": 0.0,
+    "mean_return": 136.4118323587775,
+    "return_std": 27.37004269922874
+  },
+  "final": {
+    "step": 160000,
+    "success_rate": 1.0,
+    "mean_return": 1637.7160147918364,
+    "return_std": 25.212830989061533
+  },
+  "best_success": {
+    "step": 160000,
+    "success_rate": 1.0,
+    "mean_return": 1637.7160147918364,
+    "return_std": 25.212830989061533,
+    "model_path": "best_success_model/best_success_model.zip"
+  },
+  "best_return": {
+    "step": 160000,
+    "success_rate": 1.0,
+    "mean_return": 1637.7160147918364,
+    "return_std": 25.212830989061533,
+    "model_path": "best_model/best_model.zip"
+  },
+  "artifacts": {
+    "final_model": "final_model.zip",
+    "evaluations_npz": "evaluations/evaluations.npz",
+    "tensorboard": "tensorboard"
+  }
+}

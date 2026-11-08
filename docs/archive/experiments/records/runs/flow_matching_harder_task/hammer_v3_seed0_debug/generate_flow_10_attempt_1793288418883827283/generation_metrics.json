@@ -1,0 +1,17 @@
+{
+  "seconds": 0.05949998300638981,
+  "nfe": 10,
+  "seed": 100000,
+  "checkpoint": "/home/yikai/Documents/Code/Thesis/continual-learning/runs/flow_matching_harder_task/hammer_v3_seed0_debug/train_flow_attempt_1793288414476828607/flow_matching.pt",
+  "checkpoint_sha256": "81b52099491cc7f054ab1b87d29f35db89637bcd5f0db186ab6b71e46c900586",
+  "structured_shape": [
+    8,
+    200,
+    22
+  ],
+  "physical_shape": [
+    8,
+    200,
+    43
+  ]
+}

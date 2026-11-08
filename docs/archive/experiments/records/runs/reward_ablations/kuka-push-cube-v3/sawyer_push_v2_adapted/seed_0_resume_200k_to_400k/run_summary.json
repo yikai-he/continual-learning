@@ -1,0 +1,38 @@
+{
+  "task": "kuka-push-cube-v3",
+  "backend": "kuka-v3",
+  "seed": 0,
+  "total_timesteps": 400000,
+  "reward_function_version": "sawyer_push_v2_adapted",
+  "horizon": 200,
+  "initial": {
+    "success_rate": 0.12,
+    "mean_return": 103.80400579295622,
+    "return_std": 287.4377519100881
+  },
+  "final": {
+    "step": 400000,
+    "success_rate": 0.08,
+    "mean_return": 75.41724410446487,
+    "return_std": 234.83663739987605
+  },
+  "best_success": {
+    "step": 220000,
+    "success_rate": 0.12,
+    "mean_return": 103.80400579295622,
+    "return_std": 287.4377519100881,
+    "model_path": "best_success_model/best_success_model.zip"
+  },
+  "best_return": {
+    "step": 360000,
+    "success_rate": 0.1,
+    "mean_return": 152.33729543464003,
+    "return_std": 411.9599712789147,
+    "model_path": "best_model/best_model.zip"
+  },
+  "artifacts": {
+    "final_model": "final_model.zip",
+    "evaluations_npz": "evaluations/evaluations.npz",
+    "tensorboard": "tensorboard"
+  }
+}

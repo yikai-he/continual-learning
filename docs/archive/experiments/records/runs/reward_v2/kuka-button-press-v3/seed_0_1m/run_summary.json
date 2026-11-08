@@ -1,0 +1,38 @@
+{
+  "task": "kuka-button-press-v3",
+  "backend": "kuka-v3",
+  "seed": 0,
+  "total_timesteps": 1000000,
+  "reward_function_version": "v2",
+  "horizon": 200,
+  "initial": {
+    "success_rate": 0.0,
+    "mean_return": 57.367383923520904,
+    "return_std": 9.00099663658281
+  },
+  "final": {
+    "step": 1000000,
+    "success_rate": 1.0,
+    "mean_return": 1256.7252257461164,
+    "return_std": 143.91244211912087
+  },
+  "best_success": {
+    "step": 920000,
+    "success_rate": 1.0,
+    "mean_return": 1869.5324278054384,
+    "return_std": 27.221935764557387,
+    "model_path": "best_success_model/best_success_model.zip"
+  },
+  "best_return": {
+    "step": 920000,
+    "success_rate": 1.0,
+    "mean_return": 1869.5324278054384,
+    "return_std": 27.221935764557387,
+    "model_path": "best_model/best_model.zip"
+  },
+  "artifacts": {
+    "final_model": "final_model.zip",
+    "evaluations_npz": "evaluations/evaluations.npz",
+    "tensorboard": "tensorboard"
+  }
+}

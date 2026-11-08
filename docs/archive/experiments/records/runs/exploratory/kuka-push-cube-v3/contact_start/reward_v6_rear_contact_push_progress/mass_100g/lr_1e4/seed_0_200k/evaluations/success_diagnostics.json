@@ -1,0 +1,5557 @@
+[
+  {
+    "step": 0,
+    "episodes": [
+      {
+        "seed": 10000,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10001,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10002,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10003,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10004,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10005,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10006,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10007,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10008,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10009,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10010,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10011,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10012,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10013,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10014,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10015,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10016,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10017,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10018,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10019,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10020,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10021,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10022,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10023,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10024,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10025,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10026,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10027,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10028,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10029,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10030,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10031,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10032,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10033,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10034,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10035,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10036,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10037,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10038,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10039,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10040,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10041,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10042,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10043,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10044,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10045,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10046,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10047,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10048,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10049,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      }
+    ]
+  },
+  {
+    "step": 20000,
+    "episodes": [
+      {
+        "seed": 10000,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10001,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10002,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10003,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10004,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10005,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10006,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10007,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10008,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10009,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10010,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10011,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10012,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10013,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10014,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10015,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10016,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10017,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10018,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10019,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10020,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10021,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10022,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10023,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10024,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10025,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10026,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10027,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10028,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10029,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10030,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10031,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10032,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10033,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10034,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10035,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10036,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10037,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10038,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10039,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10040,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10041,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10042,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10043,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10044,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10045,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10046,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10047,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10048,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10049,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      }
+    ]
+  },
+  {
+    "step": 40000,
+    "episodes": [
+      {
+        "seed": 10000,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10001,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10002,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10003,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10004,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10005,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10006,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10007,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10008,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10009,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10010,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10011,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10012,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10013,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10014,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10015,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10016,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10017,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10018,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10019,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10020,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10021,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10022,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10023,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10024,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10025,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10026,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10027,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10028,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10029,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10030,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10031,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10032,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10033,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10034,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10035,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10036,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10037,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10038,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10039,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10040,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10041,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10042,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10043,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10044,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10045,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10046,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10047,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10048,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10049,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      }
+    ]
+  },
+  {
+    "step": 60000,
+    "episodes": [
+      {
+        "seed": 10000,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10001,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10002,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10003,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10004,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10005,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10006,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10007,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10008,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10009,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10010,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10011,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10012,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10013,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10014,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10015,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10016,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10017,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10018,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10019,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10020,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10021,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10022,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10023,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10024,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10025,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10026,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10027,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10028,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10029,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10030,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10031,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10032,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10033,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10034,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10035,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10036,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10037,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10038,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10039,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10040,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10041,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10042,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10043,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10044,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10045,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10046,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10047,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10048,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10049,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      }
+    ]
+  },
+  {
+    "step": 80000,
+    "episodes": [
+      {
+        "seed": 10000,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10001,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10002,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10003,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10004,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10005,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10006,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10007,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10008,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10009,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10010,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10011,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10012,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10013,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10014,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10015,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10016,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10017,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10018,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10019,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10020,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10021,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10022,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10023,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10024,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10025,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10026,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10027,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10028,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10029,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10030,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10031,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10032,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10033,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10034,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10035,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10036,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10037,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10038,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10039,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10040,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10041,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10042,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10043,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10044,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10045,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10046,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10047,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10048,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10049,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      }
+    ]
+  },
+  {
+    "step": 100000,
+    "episodes": [
+      {
+        "seed": 10000,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10001,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10002,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10003,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10004,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10005,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10006,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10007,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10008,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10009,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10010,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10011,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10012,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10013,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10014,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10015,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10016,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10017,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10018,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10019,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10020,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10021,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10022,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10023,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10024,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10025,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10026,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10027,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10028,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10029,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10030,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10031,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10032,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10033,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10034,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10035,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10036,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10037,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10038,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10039,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10040,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10041,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10042,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10043,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10044,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10045,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10046,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10047,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10048,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10049,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      }
+    ]
+  },
+  {
+    "step": 120000,
+    "episodes": [
+      {
+        "seed": 10000,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10001,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10002,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10003,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10004,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10005,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10006,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10007,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10008,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10009,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10010,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10011,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10012,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10013,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10014,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10015,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10016,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10017,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10018,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10019,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10020,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10021,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10022,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10023,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10024,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10025,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10026,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10027,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10028,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10029,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10030,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10031,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10032,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10033,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10034,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10035,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10036,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10037,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10038,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10039,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10040,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10041,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10042,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10043,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10044,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10045,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10046,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10047,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10048,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10049,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      }
+    ]
+  },
+  {
+    "step": 140000,
+    "episodes": [
+      {
+        "seed": 10000,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10001,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10002,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10003,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10004,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10005,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10006,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10007,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10008,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10009,
+        "any_step_success": true,
+        "final_step_success": false,
+        "sustained_success": true,
+        "longest_success_run": 24,
+        "first_success_step": 36,
+        "success_retention_steps": 29,
+        "success_retention_fraction": 0.17682926829268292
+      },
+      {
+        "seed": 10010,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10011,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10012,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10013,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10014,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10015,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10016,
+        "any_step_success": true,
+        "final_step_success": true,
+        "sustained_success": true,
+        "longest_success_run": 163,
+        "first_success_step": 37,
+        "success_retention_steps": 163,
+        "success_retention_fraction": 1.0
+      },
+      {
+        "seed": 10017,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10018,
+        "any_step_success": true,
+        "final_step_success": true,
+        "sustained_success": true,
+        "longest_success_run": 159,
+        "first_success_step": 41,
+        "success_retention_steps": 159,
+        "success_retention_fraction": 1.0
+      },
+      {
+        "seed": 10019,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10020,
+        "any_step_success": true,
+        "final_step_success": true,
+        "sustained_success": true,
+        "longest_success_run": 153,
+        "first_success_step": 47,
+        "success_retention_steps": 153,
+        "success_retention_fraction": 1.0
+      },
+      {
+        "seed": 10021,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10022,
+        "any_step_success": true,
+        "final_step_success": true,
+        "sustained_success": true,
+        "longest_success_run": 163,
+        "first_success_step": 37,
+        "success_retention_steps": 163,
+        "success_retention_fraction": 1.0
+      },
+      {
+        "seed": 10023,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10024,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10025,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10026,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10027,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10028,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10029,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10030,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10031,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10032,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10033,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10034,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10035,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10036,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10037,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10038,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10039,
+        "any_step_success": true,
+        "final_step_success": true,
+        "sustained_success": true,
+        "longest_success_run": 129,
+        "first_success_step": 71,
+        "success_retention_steps": 129,
+        "success_retention_fraction": 1.0
+      },
+      {
+        "seed": 10040,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10041,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10042,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10043,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10044,
+        "any_step_success": true,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 6,
+        "first_success_step": 36,
+        "success_retention_steps": 6,
+        "success_retention_fraction": 0.036585365853658534
+      },
+      {
+        "seed": 10045,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10046,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10047,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10048,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10049,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      }
+    ]
+  },
+  {
+    "step": 160000,
+    "episodes": [
+      {
+        "seed": 10000,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10001,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10002,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10003,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10004,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10005,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10006,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10007,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10008,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10009,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10010,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10011,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10012,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10013,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10014,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10015,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10016,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10017,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10018,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10019,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10020,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10021,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10022,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10023,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10024,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10025,
+        "any_step_success": true,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 8,
+        "first_success_step": 34,
+        "success_retention_steps": 8,
+        "success_retention_fraction": 0.04819277108433735
+      },
+      {
+        "seed": 10026,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10027,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10028,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10029,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10030,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10031,
+        "any_step_success": true,
+        "final_step_success": false,
+        "sustained_success": true,
+        "longest_success_run": 11,
+        "first_success_step": 26,
+        "success_retention_steps": 11,
+        "success_retention_fraction": 0.06321839080459771
+      },
+      {
+        "seed": 10032,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10033,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10034,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10035,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10036,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10037,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10038,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10039,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10040,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10041,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10042,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10043,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10044,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10045,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10046,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10047,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10048,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10049,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      }
+    ]
+  },
+  {
+    "step": 180000,
+    "episodes": [
+      {
+        "seed": 10000,
+        "any_step_success": true,
+        "final_step_success": true,
+        "sustained_success": true,
+        "longest_success_run": 168,
+        "first_success_step": 32,
+        "success_retention_steps": 168,
+        "success_retention_fraction": 1.0
+      },
+      {
+        "seed": 10001,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10002,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10003,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10004,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10005,
+        "any_step_success": true,
+        "final_step_success": true,
+        "sustained_success": true,
+        "longest_success_run": 172,
+        "first_success_step": 28,
+        "success_retention_steps": 172,
+        "success_retention_fraction": 1.0
+      },
+      {
+        "seed": 10006,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10007,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10008,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10009,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10010,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10011,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10012,
+        "any_step_success": true,
+        "final_step_success": true,
+        "sustained_success": true,
+        "longest_success_run": 177,
+        "first_success_step": 23,
+        "success_retention_steps": 177,
+        "success_retention_fraction": 1.0
+      },
+      {
+        "seed": 10013,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10014,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10015,
+        "any_step_success": true,
+        "final_step_success": true,
+        "sustained_success": true,
+        "longest_success_run": 136,
+        "first_success_step": 64,
+        "success_retention_steps": 136,
+        "success_retention_fraction": 1.0
+      },
+      {
+        "seed": 10016,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10017,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10018,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10019,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10020,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10021,
+        "any_step_success": true,
+        "final_step_success": true,
+        "sustained_success": true,
+        "longest_success_run": 127,
+        "first_success_step": 38,
+        "success_retention_steps": 158,
+        "success_retention_fraction": 0.9753086419753086
+      },
+      {
+        "seed": 10022,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10023,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10024,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10025,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10026,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10027,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10028,
+        "any_step_success": true,
+        "final_step_success": true,
+        "sustained_success": true,
+        "longest_success_run": 175,
+        "first_success_step": 25,
+        "success_retention_steps": 175,
+        "success_retention_fraction": 1.0
+      },
+      {
+        "seed": 10029,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10030,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10031,
+        "any_step_success": true,
+        "final_step_success": true,
+        "sustained_success": true,
+        "longest_success_run": 172,
+        "first_success_step": 28,
+        "success_retention_steps": 172,
+        "success_retention_fraction": 1.0
+      },
+      {
+        "seed": 10032,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10033,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10034,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10035,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10036,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10037,
+        "any_step_success": true,
+        "final_step_success": true,
+        "sustained_success": true,
+        "longest_success_run": 174,
+        "first_success_step": 26,
+        "success_retention_steps": 174,
+        "success_retention_fraction": 1.0
+      },
+      {
+        "seed": 10038,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10039,
+        "any_step_success": true,
+        "final_step_success": true,
+        "sustained_success": true,
+        "longest_success_run": 169,
+        "first_success_step": 31,
+        "success_retention_steps": 169,
+        "success_retention_fraction": 1.0
+      },
+      {
+        "seed": 10040,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10041,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10042,
+        "any_step_success": true,
+        "final_step_success": true,
+        "sustained_success": true,
+        "longest_success_run": 172,
+        "first_success_step": 28,
+        "success_retention_steps": 172,
+        "success_retention_fraction": 1.0
+      },
+      {
+        "seed": 10043,
+        "any_step_success": true,
+        "final_step_success": true,
+        "sustained_success": true,
+        "longest_success_run": 170,
+        "first_success_step": 30,
+        "success_retention_steps": 170,
+        "success_retention_fraction": 1.0
+      },
+      {
+        "seed": 10044,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10045,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10046,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10047,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10048,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10049,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      }
+    ]
+  },
+  {
+    "step": 200000,
+    "episodes": [
+      {
+        "seed": 10000,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10001,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10002,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10003,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10004,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10005,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10006,
+        "any_step_success": true,
+        "final_step_success": false,
+        "sustained_success": true,
+        "longest_success_run": 20,
+        "first_success_step": 26,
+        "success_retention_steps": 20,
+        "success_retention_fraction": 0.11494252873563218
+      },
+      {
+        "seed": 10007,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10008,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10009,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10010,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10011,
+        "any_step_success": true,
+        "final_step_success": true,
+        "sustained_success": true,
+        "longest_success_run": 162,
+        "first_success_step": 38,
+        "success_retention_steps": 162,
+        "success_retention_fraction": 1.0
+      },
+      {
+        "seed": 10012,
+        "any_step_success": true,
+        "final_step_success": true,
+        "sustained_success": true,
+        "longest_success_run": 156,
+        "first_success_step": 23,
+        "success_retention_steps": 172,
+        "success_retention_fraction": 0.9717514124293786
+      },
+      {
+        "seed": 10013,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10014,
+        "any_step_success": true,
+        "final_step_success": false,
+        "sustained_success": true,
+        "longest_success_run": 23,
+        "first_success_step": 32,
+        "success_retention_steps": 23,
+        "success_retention_fraction": 0.13690476190476192
+      },
+      {
+        "seed": 10015,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10016,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10017,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10018,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10019,
+        "any_step_success": true,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 6,
+        "first_success_step": 31,
+        "success_retention_steps": 6,
+        "success_retention_fraction": 0.03550295857988166
+      },
+      {
+        "seed": 10020,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10021,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10022,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10023,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10024,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10025,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10026,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10027,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10028,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10029,
+        "any_step_success": true,
+        "final_step_success": true,
+        "sustained_success": true,
+        "longest_success_run": 164,
+        "first_success_step": 36,
+        "success_retention_steps": 164,
+        "success_retention_fraction": 1.0
+      },
+      {
+        "seed": 10030,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10031,
+        "any_step_success": true,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 8,
+        "first_success_step": 26,
+        "success_retention_steps": 8,
+        "success_retention_fraction": 0.04597701149425287
+      },
+      {
+        "seed": 10032,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10033,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10034,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10035,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10036,
+        "any_step_success": true,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 9,
+        "first_success_step": 39,
+        "success_retention_steps": 9,
+        "success_retention_fraction": 0.055900621118012424
+      },
+      {
+        "seed": 10037,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10038,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10039,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10040,
+        "any_step_success": true,
+        "final_step_success": false,
+        "sustained_success": true,
+        "longest_success_run": 10,
+        "first_success_step": 32,
+        "success_retention_steps": 10,
+        "success_retention_fraction": 0.05952380952380952
+      },
+      {
+        "seed": 10041,
+        "any_step_success": true,
+        "final_step_success": true,
+        "sustained_success": true,
+        "longest_success_run": 170,
+        "first_success_step": 30,
+        "success_retention_steps": 170,
+        "success_retention_fraction": 1.0
+      },
+      {
+        "seed": 10042,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10043,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10044,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10045,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10046,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10047,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      },
+      {
+        "seed": 10048,
+        "any_step_success": true,
+        "final_step_success": true,
+        "sustained_success": true,
+        "longest_success_run": 170,
+        "first_success_step": 30,
+        "success_retention_steps": 170,
+        "success_retention_fraction": 1.0
+      },
+      {
+        "seed": 10049,
+        "any_step_success": false,
+        "final_step_success": false,
+        "sustained_success": false,
+        "longest_success_run": 0,
+        "first_success_step": null,
+        "success_retention_steps": 0,
+        "success_retention_fraction": 0.0
+      }
+    ]
+  }
+]

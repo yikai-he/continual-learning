@@ -1,0 +1,37 @@
+{
+  "random_seed_0": {
+    "episodes": 50,
+    "any_physical_contact_rate": 0.56,
+    "pad_contact_rate": 0.44,
+    "valid_rear_contact_rate": 0.14,
+    "first_contact_bonus_rate": 0.14,
+    "handoff_ready_rate": 0.0,
+    "any_step_goal_success_rate": 0.0,
+    "final_step_goal_success_rate": 0.0,
+    "mean_return": 0.09543137086877448,
+    "return_std": 0.23509224034627194,
+    "mean_minimum_goal_distance_m": 0.18723375882021567,
+    "mean_final_goal_distance_m": 0.18989398266413354,
+    "mean_minimum_tcp_target_distance_m": 0.006085178381153678,
+    "mean_final_tcp_target_distance_m": 0.10535892875536788,
+    "mean_minimum_tcp_cube_distance_m": 0.05901399023550955,
+    "mean_final_tcp_cube_distance_m": 0.122008749096492,
+    "mean_aperture_m": 0.04521287057426499,
+    "aperture_in_handoff_range_fraction": 0.0005,
+    "mean_goal_directed_displacement_m": 0.006352902397130516,
+    "maximum_cube_tilt_rad": 1.8281714566646194,
+    "workspace_clip_episode_rate": 1.0,
+    "reward_contact": 0.7,
+    "reward_push": 0.8951191831998399,
+    "reward_progress": 3.1764493602388852,
+    "reward_success": 0.0,
+    "maximum_reward_sum_error": 8.881784197001252e-16,
+    "failure_categories": {
+      "goal_directed_push_incomplete": 3,
+      "never_physical_contact": 22,
+      "pad_contact_not_v6_valid": 15,
+      "valid_contact_immediately_lost": 4,
+      "wrong_geometry_contact": 6
+    }
+  }
+}

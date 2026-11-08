@@ -1,0 +1,13 @@
+{
+  "stage0_policy_state_exact_match": true,
+  "stage0_probe_actions_exact_match": true,
+  "stage0_R_match": true,
+  "stage0_no_replay_R": [
+    1.0,
+    null
+  ],
+  "stage0_diffusion_R": [
+    1.0,
+    null
+  ]
+}

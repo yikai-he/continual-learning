@@ -1,0 +1,8 @@
+checkpoint,path,sha256
+100k,/home/yikai/Documents/Code/Metaworld/runs/reward_v2/push-v3/seed_0/checkpoints/sac_100000_steps.zip,e344469617c9b217df0955e4701e8f4cb0b54e6904866e7bc801d4ceb89fb3e2
+300k,/home/yikai/Documents/Code/Metaworld/runs/reward_v2/push-v3/seed_0/checkpoints/sac_300000_steps.zip,b59b7a2720fac35c3069cd4e5707753c0f658680f9dfb818d90b5de43bc92c3f
+500k,/home/yikai/Documents/Code/Metaworld/runs/reward_v2/push-v3/seed_0/checkpoints/sac_500000_steps.zip,717053ef6aeda6223f7edf917d42d676488ff7964de93e819c2411048b9756d5
+700k,/home/yikai/Documents/Code/Metaworld/runs/reward_v2/push-v3/seed_0/checkpoints/sac_700000_steps.zip,a3cb536cf0f65ce9134cd3d777bc7bdfad502b7f288fb29c66c58e88b54b2ae4
+1m,/home/yikai/Documents/Code/Metaworld/runs/reward_v2/push-v3/seed_0/checkpoints/sac_1000000_steps.zip,64e7a4119cc7ac3fd58c9b0df18c595ae6630455daaff7b2fc484f972754e2ec
+final,/home/yikai/Documents/Code/Metaworld/runs/reward_v2/push-v3/seed_0/final_model.zip,20dc9dfe2df5004ddef135760b792227bc7e76e9d5e568d02870feaa45f5528e
+best,/home/yikai/Documents/Code/Metaworld/runs/reward_v2/push-v3/seed_0/best_model/best_model.zip,e344469617c9b217df0955e4701e8f4cb0b54e6904866e7bc801d4ceb89fb3e2

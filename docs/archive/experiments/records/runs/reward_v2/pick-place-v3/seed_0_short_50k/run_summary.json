@@ -1,0 +1,38 @@
+{
+  "task": "pick-place-v3",
+  "backend": "metaworld-v3",
+  "seed": 0,
+  "total_timesteps": 50000,
+  "reward_function_version": "v2",
+  "horizon": 200,
+  "initial": {
+    "success_rate": 0.0,
+    "mean_return": 2.0265993114823746,
+    "return_std": 0.46576236176197816
+  },
+  "final": {
+    "step": 50000,
+    "success_rate": 0.0,
+    "mean_return": 4.424404867569679,
+    "return_std": 3.901347786841
+  },
+  "best_success": {
+    "step": 45000,
+    "success_rate": 0.15,
+    "mean_return": 26.41176275342905,
+    "return_std": 88.62938580210754,
+    "model_path": "best_success_model/best_success_model.zip"
+  },
+  "best_return": {
+    "step": 45000,
+    "success_rate": 0.15,
+    "mean_return": 26.41176275342905,
+    "return_std": 88.62938580210754,
+    "model_path": "best_model/best_model.zip"
+  },
+  "artifacts": {
+    "final_model": "final_model.zip",
+    "evaluations_npz": "evaluations/evaluations.npz",
+    "tensorboard": "tensorboard"
+  }
+}

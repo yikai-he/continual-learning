@@ -1,0 +1,108 @@
+{
+  "evaluation": {
+    "task": "kuka-pick-place-v3",
+    "backend": "kuka-v3",
+    "reward_function_version": "v2",
+    "deterministic": true,
+    "terminate_on_success": false,
+    "horizon": 200,
+    "seeds": [
+      10000,
+      10001,
+      10002,
+      10003,
+      10004,
+      10005,
+      10006,
+      10007,
+      10008,
+      10009,
+      10010,
+      10011,
+      10012,
+      10013,
+      10014,
+      10015,
+      10016,
+      10017,
+      10018,
+      10019
+    ],
+    "artifact_run": "/home/yikai/Documents/Code/Final/continual-learning/runs/reward_v2/kuka-pick-place-v3/seed_0_short_50k_20261006_000147_756456",
+    "output_run": "/home/yikai/Documents/Code/Final/continual-learning/runs/reward_v2/kuka-pick-place-v3/seed_0_short_50k"
+  },
+  "thresholds": {
+    "near_object_distance": 0.03,
+    "lift_distance": 0.01,
+    "meaningful_transport_distance": 0.05,
+    "bilateral_contact": "simultaneous contact force at both pad geoms",
+    "grasp": "existing info['grasp_success']",
+    "success": "existing info['success']"
+  },
+  "best_model": {
+    "episodes": 20,
+    "stage_counts": {
+      "no meaningful approach": 20,
+      "reached object": 0,
+      "valid caging/contact": 0,
+      "grasped": 0,
+      "lifted": 0,
+      "transported toward goal": 0,
+      "success": 0
+    },
+    "median_minimum_tcp_to_object_distance": 0.09723950204242515,
+    "minimum_tcp_to_object_distance": 0.04245459222056316,
+    "near_object_episodes": 0,
+    "bilateral_contact_episodes": 0,
+    "positive_closing_action_episodes": 0,
+    "grasp_success_episodes": 0,
+    "lift_episodes": 0,
+    "meaningful_transport_episodes": 0,
+    "success_episodes": 0,
+    "median_maximum_grasp_reward": 0.03758994090405368,
+    "maximum_object_lift": -3.197602927684784e-05,
+    "median_final_object_to_target_distance": 0.30342228587036885
+  },
+  "final_model": {
+    "episodes": 20,
+    "stage_counts": {
+      "no meaningful approach": 20,
+      "reached object": 0,
+      "valid caging/contact": 0,
+      "grasped": 0,
+      "lifted": 0,
+      "transported toward goal": 0,
+      "success": 0
+    },
+    "median_minimum_tcp_to_object_distance": 0.14976111133112924,
+    "minimum_tcp_to_object_distance": 0.04621735975786356,
+    "near_object_episodes": 0,
+    "bilateral_contact_episodes": 0,
+    "positive_closing_action_episodes": 18,
+    "grasp_success_episodes": 0,
+    "lift_episodes": 0,
+    "meaningful_transport_episodes": 0,
+    "success_episodes": 0,
+    "median_maximum_grasp_reward": 0.026159629253888587,
+    "maximum_object_lift": 0.0074170660227537155,
+    "median_final_object_to_target_distance": 0.30342228587036885
+  },
+  "main_failure_stage": "reaching/exploration failure",
+  "ranked_causes": [
+    {
+      "rank": 1,
+      "cause": "exploration difficulty",
+      "evidence": "Neither policy reached the task's 3 cm near-object threshold in any of 40 episodes; best/final median closest distances were 0.0972 m and 0.1498 m."
+    },
+    {
+      "rank": 2,
+      "cause": "reward shaping issue",
+      "evidence": "The v2 reward has no independent reaching term and couples caging with object-to-goal progress; median maximum grasp reward was only 0.0376 for best_model and 0.0262 for final_model."
+    },
+    {
+      "rank": 3,
+      "cause": "insufficient training steps",
+      "evidence": "The 50k run contains only 40k post-learning-start steps, and final_model regressed from best_model: median closest distance worsened from 0.0972 m to 0.1498 m."
+    }
+  ]
+}

@@ -1,0 +1,86 @@
+{
+  "run": "/home/yikai/Documents/Code/Thesis/continual-learning/runs/exploratory/kuka-push-cube-v3/common_distribution/near_contact_5mm/reward_v6/mass_100g/lr_1e4/seed_0_400k",
+  "checkpoints": [
+    {
+      "path": "/home/yikai/Documents/Code/Thesis/continual-learning/runs/exploratory/kuka-push-cube-v3/common_distribution/near_contact_5mm/reward_v6/mass_100g/lr_1e4/seed_0_400k/checkpoints/sac_20000_steps.zip",
+      "sha256": "055221fb27836f1ff254f5317d231eb387cbf881ef7012e4495c6f8618ba37ad",
+      "embedded_num_timesteps": 20000,
+      "observation_shape": [
+        39
+      ],
+      "action_shape": [
+        4
+      ],
+      "policy_kwargs": {
+        "net_arch": [
+          256,
+          256,
+          256,
+          256
+        ],
+        "use_sde": false
+      }
+    },
+    {
+      "path": "/home/yikai/Documents/Code/Thesis/continual-learning/runs/exploratory/kuka-push-cube-v3/common_distribution/near_contact_5mm/reward_v6/mass_100g/lr_1e4/seed_0_400k/checkpoints/sac_40000_steps.zip",
+      "sha256": "09fff3b281aa746e59ed107982bd3c3ecc33d51867099a8e1e9e521aaa4724c8",
+      "embedded_num_timesteps": 40000,
+      "observation_shape": [
+        39
+      ],
+      "action_shape": [
+        4
+      ],
+      "policy_kwargs": {
+        "net_arch": [
+          256,
+          256,
+          256,
+          256
+        ],
+        "use_sde": false
+      }
+    },
+    {
+      "path": "/home/yikai/Documents/Code/Thesis/continual-learning/runs/exploratory/kuka-push-cube-v3/common_distribution/near_contact_5mm/reward_v6/mass_100g/lr_1e4/seed_0_400k/checkpoints/sac_60000_steps.zip",
+      "sha256": "b34bbbde3e9eada5a161a65e165d4b6238ff667a98e0a488524fed89257c65f7",
+      "embedded_num_timesteps": 60000,
+      "observation_shape": [
+        39
+      ],
+      "action_shape": [
+        4
+      ],
+      "policy_kwargs": {
+        "net_arch": [
+          256,
+          256,
+          256,
+          256
+        ],
+        "use_sde": false
+      }
+    }
+  ],
+  "task_set_seed": 10000,
+  "task_indices": [
+    0,
+    49
+  ],
+  "reset_seeds": [
+    10000,
+    10049
+  ],
+  "deterministic_sac": true,
+  "horizon": 200,
+  "environment": {
+    "name": "kuka-push-cube-v3",
+    "reward": "v6_rear_contact_push_progress",
+    "curriculum_level": 2,
+    "initialization": "near_contact",
+    "cube_y_min": 0.502,
+    "near_contact_gap_m": 0.005
+  },
+  "continual_learning_commit": "598f526984a8379babc8ff64f0fdcda89cdd1aa8",
+  "metaworld_kuka_commit": "2ed78a08c7bf0ce0fd7aac4e44fd0ee3f9dd76ea"
+}

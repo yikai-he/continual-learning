@@ -34,9 +34,9 @@ conda-env/
 # --------------------
 # Experiment outputs
 # --------------------
-runs/
-experiments/
-videos/
+/runs/
+/experiments/
+/videos/
 /configs/local/
 
 # Generated or internal documentation artifacts

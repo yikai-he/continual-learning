@@ -1,0 +1,3677 @@
+[
+  {
+    "step": 0,
+    "episodes": [
+      {
+        "final_nail_qpos": 0.0,
+        "max_nail_qpos": 0.0,
+        "progress_fraction": 0.0,
+        "ge_003": false,
+        "ge_005": false,
+        "ge_008": false,
+        "crossed_success_threshold": false,
+        "success": false,
+        "minimum_proxy_goal_distance": 0.2626260131722624,
+        "minimum_striking_goal_distance": 0.26373362290334307,
+        "mean_proxy_error": 0.01034032474140257,
+        "final_proxy_position": [
+          0.24041159407331608,
+          0.4898555349703805,
+          0.02844184144319672
+        ],
+        "final_striking_position": [
+          0.24012755126149904,
+          0.48585528267913075,
+          0.03797291042934938
+        ],
+        "head_nail_contact": false,
+        "head_nail_contact_steps": 0,
+        "first_head_nail_contact_timestep": null
+      },
+      {
+        "final_nail_qpos": 0.0,
+        "max_nail_qpos": 0.0,
+        "progress_fraction": 0.0,
+        "ge_003": false,
+        "ge_005": false,
+        "ge_008": false,
+        "crossed_success_threshold": false,
+        "success": false,
+        "minimum_proxy_goal_distance": 0.2672192304245462,
+        "minimum_striking_goal_distance": 0.268287070814312,
+        "mean_proxy_error": 0.01034032474140257,
+        "final_proxy_position": [
+          0.16379624542500215,
+          0.4966913382754413,
+          0.028441841443196718
+        ],
+        "final_striking_position": [
+          0.16351220261318508,
+          0.4926910859841916,
+          0.037972910429349374
+        ],
+        "head_nail_contact": false,
+        "head_nail_contact_steps": 0,
+        "first_head_nail_contact_timestep": null
+      },
+      {
+        "final_nail_qpos": 0.0,
+        "max_nail_qpos": 0.0,
+        "progress_fraction": 0.0,
+        "ge_003": false,
+        "ge_005": false,
+        "ge_008": false,
+        "crossed_success_threshold": false,
+        "success": false,
+        "minimum_proxy_goal_distance": 0.31069462120512864,
+        "minimum_striking_goal_distance": 0.31183858676177795,
+        "mean_proxy_error": 0.01034032474140257,
+        "final_proxy_position": [
+          0.08156493883947165,
+          0.4849912178283891,
+          0.028441841443196718
+        ],
+        "final_striking_position": [
+          0.08128089602765458,
+          0.4809909655371394,
+          0.037972910429349374
+        ],
+        "head_nail_contact": false,
+        "head_nail_contact_steps": 0,
+        "first_head_nail_contact_timestep": null
+      },
+      {
+        "final_nail_qpos": 0.0,
+        "max_nail_qpos": 0.0,
+        "progress_fraction": 0.0,
+        "ge_003": false,
+        "ge_005": false,
+        "ge_008": false,
+        "crossed_success_threshold": false,
+        "success": false,
+        "minimum_proxy_goal_distance": 0.24909726424074619,
+        "minimum_striking_goal_distance": 0.2497559099435187,
+        "mean_proxy_error": 0.010340324741402581,
+        "final_proxy_position": [
+          0.13409592596577727,
+          0.5292067977434707,
+          0.028441841443196718
+        ],
+        "final_striking_position": [
+          0.1338118831539602,
+          0.5252065454522209,
+          0.037972910429349374
+        ],
+        "head_nail_contact": false,
+        "head_nail_contact_steps": 0,
+        "first_head_nail_contact_timestep": null
+      },
+      {
+        "final_nail_qpos": 0.0,
+        "max_nail_qpos": 0.0,
+        "progress_fraction": 0.0,
+        "ge_003": false,
+        "ge_005": false,
+        "ge_008": false,
+        "crossed_success_threshold": false,
+        "success": false,
+        "minimum_proxy_goal_distance": 0.2327835284040184,
+        "minimum_striking_goal_distance": 0.23320125339889053,
+        "mean_proxy_error": 0.010340324741402581,
+        "final_proxy_position": [
+          0.14018616199866224,
+          0.5455125484659259,
+          0.02844184144319672
+        ],
+        "final_striking_position": [
+          0.13990211918684517,
+          0.5415122961746761,
+          0.037972910429349374
+        ],
+        "head_nail_contact": false,
+        "head_nail_contact_steps": 0,
+        "first_head_nail_contact_timestep": null
+      },
+      {
+        "final_nail_qpos": 0.0,
+        "max_nail_qpos": 0.0,
+        "progress_fraction": 0.0,
+        "ge_003": false,
+        "ge_005": false,
+        "ge_008": false,
+        "crossed_success_threshold": false,
+        "success": false,
+        "minimum_proxy_goal_distance": 0.2792254909806355,
+        "minimum_striking_goal_distance": 0.2799846653714658,
+        "mean_proxy_error": 0.010340324741402581,
+        "final_proxy_position": [
+          0.08699302581567657,
+          0.5205558371473982,
+          0.028441841443196718
+        ],
+        "final_striking_position": [
+          0.0867089830038595,
+          0.5165555848561484,
+          0.037972910429349374
+        ],
+        "head_nail_contact": false,
+        "head_nail_contact_steps": 0,
+        "first_head_nail_contact_timestep": null
+      },
+      {
+        "final_nail_qpos": 0.0,
+        "max_nail_qpos": 0.0,
+        "progress_fraction": 0.0,
+        "ge_003": false,
+        "ge_005": false,
+        "ge_008": false,
+        "crossed_success_threshold": false,
+        "success": false,
+        "minimum_proxy_goal_distance": 0.21913998457177045,
+        "minimum_striking_goal_distance": 0.21931901128250023,
+        "mean_proxy_error": 0.010340324741402581,
+        "final_proxy_position": [
+          0.14448176455164072,
+          0.5597263205539114,
+          0.028441841443196718
+        ],
+        "final_striking_position": [
+          0.14419772173982365,
+          0.5557260682626616,
+          0.037972910429349374
+        ],
+        "head_nail_contact": false,
+        "head_nail_contact_steps": 0,
+        "first_head_nail_contact_timestep": null
+      },
+      {
+        "final_nail_qpos": 0.0,
+        "max_nail_qpos": 0.0,
+        "progress_fraction": 0.0,
+        "ge_003": false,
+        "ge_005": false,
+        "ge_008": false,
+        "crossed_success_threshold": false,
+        "success": false,
+        "minimum_proxy_goal_distance": 0.21272075364518186,
+        "minimum_striking_goal_distance": 0.21296262618895542,
+        "mean_proxy_error": 0.010340324741402547,
+        "final_proxy_position": [
+          0.1729624539910298,
+          0.5546460509387432,
+          0.028441841443196718
+        ],
+        "final_striking_position": [
+          0.17267841117921273,
+          0.5506457986474935,
+          0.037972910429349374
+        ],
+        "head_nail_contact": false,
+        "head_nail_contact_steps": 0,
+        "first_head_nail_contact_timestep": null
+      },
+      {
+        "final_nail_qpos": 0.0,
+        "max_nail_qpos": 0.0,
+        "progress_fraction": 0.0,
+        "ge_003": false,
+        "ge_005": false,
+        "ge_008": false,
+        "crossed_success_threshold": false,
+        "success": false,
+        "minimum_proxy_goal_distance": 0.27506149124575624,
+        "minimum_striking_goal_distance": 0.2760797266446145,
+        "mean_proxy_error": 0.010340324741402573,
+        "final_proxy_position": [
+          0.13129442444001785,
+          0.5003295559108791,
+          0.028441841443196718
+        ],
+        "final_striking_position": [
+          0.13101038162820078,
+          0.4963293036196294,
+          0.037972910429349374
+        ],
+        "head_nail_contact": false,
+        "head_nail_contact_steps": 0,
+        "first_head_nail_contact_timestep": null
+      },
+      {
+        "final_nail_qpos": 0.0,
+        "max_nail_qpos": 0.0,
+        "progress_fraction": 0.0,
+        "ge_003": false,
+        "ge_005": false,
+        "ge_008": false,
+        "crossed_success_threshold": false,
+        "success": false,
+        "minimum_proxy_goal_distance": 0.255251406374082,
+        "minimum_striking_goal_distance": 0.2562730880080952,
+        "mean_proxy_error": 0.010340324741402562,
+        "final_proxy_position": [
+          0.20842592042943292,
+          0.49967447504725154,
+          0.028441841443196718
+        ],
+        "final_striking_position": [
+          0.20814187761761588,
+          0.4956742227560018,
+          0.037972910429349374
+        ],
+        "head_nail_contact": false,
+        "head_nail_contact_steps": 0,
+        "first_head_nail_contact_timestep": null
+      },
+      {
+        "final_nail_qpos": 0.0,
+        "max_nail_qpos": 0.0,
+        "progress_fraction": 0.0,
+        "ge_003": false,
+        "ge_005": false,
+        "ge_008": false,
+        "crossed_success_threshold": false,
+        "success": false,
+        "minimum_proxy_goal_distance": 0.255251406374082,
+        "minimum_striking_goal_distance": 0.2562730880080952,
+        "mean_proxy_error": 0.010340324741402562,
+        "final_proxy_position": [
+          0.20842592042943292,
+          0.49967447504725154,
+          0.028441841443196718
+        ],
+        "final_striking_position": [
+          0.20814187761761588,
+          0.4956742227560018,
+          0.037972910429349374
+        ],
+        "head_nail_contact": false,
+        "head_nail_contact_steps": 0,
+        "first_head_nail_contact_timestep": null
+      },
+      {
+        "final_nail_qpos": 0.0,
+        "max_nail_qpos": 0.0,
+        "progress_fraction": 0.0,
+        "ge_003": false,
+        "ge_005": false,
+        "ge_008": false,
+        "crossed_success_threshold": false,
+        "success": false,
+        "minimum_proxy_goal_distance": 0.2022472097888468,
+        "minimum_striking_goal_distance": 0.20239433235610638,
+        "mean_proxy_error": 0.01034032474140258,
+        "final_proxy_position": [
+          0.2506877336552754,
+          0.5545553823367654,
+          0.028441841443196718
+        ],
+        "final_striking_position": [
+          0.25040369084345837,
+          0.5505551300455156,
+          0.037972910429349374
+        ],
+        "head_nail_contact": false,
+        "head_nail_contact_steps": 0,
+        "first_head_nail_contact_timestep": null
+      },
+      {
+        "final_nail_qpos": 0.0,
+        "max_nail_qpos": 0.0,
+        "progress_fraction": 0.0,
+        "ge_003": false,
+        "ge_005": false,
+        "ge_008": false,
+        "crossed_success_threshold": false,
+        "success": false,
+        "minimum_proxy_goal_distance": 0.2672192304245462,
+        "minimum_striking_goal_distance": 0.268287070814312,
+        "mean_proxy_error": 0.01034032474140257,
+        "final_proxy_position": [
+          0.16379624542500215,
+          0.4966913382754413,
+          0.028441841443196718
+        ],
+        "final_striking_position": [
+          0.16351220261318508,
+          0.4926910859841916,
+          0.037972910429349374
+        ],
+        "head_nail_contact": false,
+        "head_nail_contact_steps": 0,
+        "first_head_nail_contact_timestep": null
+      },
+      {
+        "final_nail_qpos": 0.0,
+        "max_nail_qpos": 0.0,
+        "progress_fraction": 0.0,
+        "ge_003": false,
+        "ge_005": false,
+        "ge_008": false,
+        "crossed_success_threshold": false,
+        "success": false,
+        "minimum_proxy_goal_distance": 0.21143252446403424,
+        "minimum_striking_goal_distance": 0.21177162286227305,
+        "mean_proxy_error": 0.010340324741402581,
+        "final_proxy_position": [
+          0.2062907936606606,
+          0.5472115102058761,
+          0.028441841443196714
+        ],
+        "final_striking_position": [
+          0.20600675084884354,
+          0.5432112579146263,
+          0.03797291042934937
+        ],
+        "head_nail_contact": false,
+        "head_nail_contact_steps": 0,
+        "first_head_nail_contact_timestep": null
+      },
+      {
+        "final_nail_qpos": 0.0,
+        "max_nail_qpos": 0.0,
+        "progress_fraction": 0.0,
+        "ge_003": false,
+        "ge_005": false,
+        "ge_008": false,
+        "crossed_success_threshold": false,
+        "success": false,
+        "minimum_proxy_goal_distance": 0.31069462120512864,
+        "minimum_striking_goal_distance": 0.31183858676177795,
+        "mean_proxy_error": 0.01034032474140257,
+        "final_proxy_position": [
+          0.08156493883947165,
+          0.4849912178283891,
+          0.028441841443196718
+        ],
+        "final_striking_position": [
+          0.08128089602765458,
+          0.4809909655371394,
+          0.037972910429349374
+        ],
+        "head_nail_contact": false,
+        "head_nail_contact_steps": 0,
+        "first_head_nail_contact_timestep": null
+      },
+      {
+        "final_nail_qpos": 0.0,
+        "max_nail_qpos": 0.0,
+        "progress_fraction": 0.0,
+        "ge_003": false,
+        "ge_005": false,
+        "ge_008": false,
+        "crossed_success_threshold": false,
+        "success": false,
+        "minimum_proxy_goal_distance": 0.2985598431221724,
+        "minimum_striking_goal_distance": 0.2997242498498878,
+        "mean_proxy_error": 0.01034032474140257,
+        "final_proxy_position": [
+          0.10662145679472979,
+          0.4851507424177719,
+          0.02844184144319672
+        ],
+        "final_striking_position": [
+          0.10633741398291272,
+          0.48115049012652217,
+          0.037972910429349374
+        ],
+        "head_nail_contact": false,
+        "head_nail_contact_steps": 0,
+        "first_head_nail_contact_timestep": null
+      },
+      {
+        "final_nail_qpos": 0.0,
+        "max_nail_qpos": 0.0,
+        "progress_fraction": 0.0,
+        "ge_003": false,
+        "ge_005": false,
+        "ge_008": false,
+        "crossed_success_threshold": false,
+        "success": false,
+        "minimum_proxy_goal_distance": 0.3053360574737345,
+        "minimum_striking_goal_distance": 0.30639423408661215,
+        "mean_proxy_error": 0.01034032474140257,
+        "final_proxy_position": [
+          0.07887060476056434,
+          0.49328675364661695,
+          0.028441841443196718
+        ],
+        "final_striking_position": [
+          0.07858656194874727,
+          0.4892865013553672,
+          0.037972910429349374
+        ],
+        "head_nail_contact": false,
+        "head_nail_contact_steps": 0,
+        "first_head_nail_contact_timestep": null
+      },
+      {
+        "final_nail_qpos": 0.0,
+        "max_nail_qpos": 0.0,
+        "progress_fraction": 0.0,
+        "ge_003": false,
+        "ge_005": false,
+        "ge_008": false,
+        "crossed_success_threshold": false,
+        "success": false,
+        "minimum_proxy_goal_distance": 0.2586105833561305,
+        "minimum_striking_goal_distance": 0.25916944283674664,
+        "mean_proxy_error": 0.010340324741402581,
+        "final_proxy_position": [
+          0.10209461508978226,
+          0.5363789338313542,
+          0.02844184144319672
+        ],
+        "final_striking_position": [
+          0.1018105722779652,
+          0.5323786815401044,
+          0.037972910429349374
+        ],
+        "head_nail_contact": false,
+        "head_nail_contact_steps": 0,
+        "first_head_nail_contact_timestep": null
+      },
+      {
+        "final_nail_qpos": 0.0,
+        "max_nail_qpos": 0.0,
+        "progress_fraction": 0.0,
+        "ge_003": false,
+        "ge_005": false,
+        "ge_008": false,
+        "crossed_success_threshold": false,
+        "success": false,
+        "minimum_proxy_goal_distance": 0.2586105833561305,
+        "minimum_striking_goal_distance": 0.25916944283674664,
+        "mean_proxy_error": 0.010340324741402581,
+        "final_proxy_position": [
+          0.10209461508978226,
+          0.5363789338313542,
+          0.02844184144319672
+        ],
+        "final_striking_position": [
+          0.1018105722779652,
+          0.5323786815401044,
+          0.037972910429349374
+        ],
+        "head_nail_contact": false,
+        "head_nail_contact_steps": 0,
+        "first_head_nail_contact_timestep": null
+      },
+      {
+        "final_nail_qpos": 0.0,
+        "max_nail_qpos": 0.0,
+        "progress_fraction": 0.0,
+        "ge_003": false,
+        "ge_005": false,
+        "ge_008": false,
+        "crossed_success_threshold": false,
+        "success": false,
+        "minimum_proxy_goal_distance": 0.26617367518496254,
+        "minimum_striking_goal_distance": 0.2668058889900565,
+        "mean_proxy_error": 0.010340324741402581,
+        "final_proxy_position": [
+          0.09609979752820032,
+          0.5308561331546733,
+          0.028441841443196718
+        ],
+        "final_striking_position": [
+          0.09581575471638325,
+          0.5268558808634235,
+          0.037972910429349374
+        ],
+        "head_nail_contact": false,
+        "head_nail_contact_steps": 0,
+        "first_head_nail_contact_timestep": null
+      }
+    ]
+  },
+  {
+    "step": 20000,
+    "episodes": [
+      {
+        "final_nail_qpos": 0.0,
+        "max_nail_qpos": 0.0,
+        "progress_fraction": 0.0,
+        "ge_003": false,
+        "ge_005": false,
+        "ge_008": false,
+        "crossed_success_threshold": false,
+        "success": false,
+        "minimum_proxy_goal_distance": 0.25384957309278877,
+        "minimum_striking_goal_distance": 0.25419156803887155,
+        "mean_proxy_error": 0.01034032474140258,
+        "final_proxy_position": [
+          0.08971253871784494,
+          0.5517095735638858,
+          0.02844184144319672
+        ],
+        "final_striking_position": [
+          0.08942849590602787,
+          0.547709321272636,
+          0.03797291042934938
+        ],
+        "head_nail_contact": false,
+        "head_nail_contact_steps": 0,
+        "first_head_nail_contact_timestep": null
+      },
+      {
+        "final_nail_qpos": 0.0,
+        "max_nail_qpos": 0.0,
+        "progress_fraction": 0.0,
+        "ge_003": false,
+        "ge_005": false,
+        "ge_008": false,
+        "crossed_success_threshold": false,
+        "success": false,
+        "minimum_proxy_goal_distance": 0.29897451823735066,
+        "minimum_striking_goal_distance": 0.3017486597970697,
+        "mean_proxy_error": 0.011422374059643092,
+        "final_proxy_position": [
+          0.08007488284047962,
+          0.5010092492790885,
+          0.028188383913867226
+        ],
+        "final_striking_position": [
+          0.08079159645645659,
+          0.4940628891701957,
+          0.03775129449510854
+        ],
+        "head_nail_contact": false,
+        "head_nail_contact_steps": 0,
+        "first_head_nail_contact_timestep": null
+      },
+      {
+        "final_nail_qpos": 0.0,
+        "max_nail_qpos": 0.0,
+        "progress_fraction": 0.0,
+        "ge_003": false,
+        "ge_005": false,
+        "ge_008": false,
+        "crossed_success_threshold": false,
+        "success": false,
+        "minimum_proxy_goal_distance": 0.1122808867328349,
+        "minimum_striking_goal_distance": 0.13102761303887686,
+        "mean_proxy_error": 0.06045177386598259,
+        "final_proxy_position": [
+          0.08820416814114192,
+          0.845016328240491,
+          0.02841391715868605
+        ],
+        "final_striking_position": [
+          0.09611286617271723,
+          0.7637669788877897,
+          0.037960344628065634
+        ],
+        "head_nail_contact": false,
+        "head_nail_contact_steps": 0,
+        "first_head_nail_contact_timestep": null
+      },
+      {
+        "final_nail_qpos": 0.0,
+        "max_nail_qpos": 0.0,
+        "progress_fraction": 0.0,
+        "ge_003": false,
+        "ge_005": false,
+        "ge_008": false,
+        "crossed_success_threshold": false,
+        "success": false,
+        "minimum_proxy_goal_distance": 0.10636943160221747,
+        "minimum_striking_goal_distance": 0.11516804579445217,
+        "mean_proxy_error": 0.02054186464002378,
+        "final_proxy_position": [
+          -0.1305098852194246,
+          0.47469150571070595,
+          0.06905165531966266
+        ],
+        "final_striking_position": [
+          -0.13783666940389902,
+          0.48658762134871475,
+          0.052994328994520876
+        ],
+        "head_nail_contact": false,
+        "head_nail_contact_steps": 0,
+        "first_head_nail_contact_timestep": null
+      },
+      {
+        "final_nail_qpos": 0.0,
+        "max_nail_qpos": 0.0,
+        "progress_fraction": 0.0,
+        "ge_003": false,
+        "ge_005": false,
+        "ge_008": false,
+        "crossed_success_threshold": false,
+        "success": false,
+        "minimum_proxy_goal_distance": 0.10600598169918388,
+        "minimum_striking_goal_distance": 0.11679024073679717,
+        "mean_proxy_error": 0.05024263621430129,
+        "final_proxy_position": [
+          0.08336533467777099,
+          0.8448157577802811,
+          0.02926249362007526
+        ],
+        "final_striking_position": [
+          0.09144478943075982,
+          0.7645806389668359,
+          0.037970929561375565
+        ],
+        "head_nail_contact": false,
+        "head_nail_contact_steps": 0,
+        "first_head_nail_contact_timestep": null
+      },
+      {
+        "final_nail_qpos": 0.0,
+        "max_nail_qpos": 0.0,
+        "progress_fraction": 0.0,
+        "ge_003": false,
+        "ge_005": false,
+        "ge_008": false,
+        "crossed_success_threshold": false,
+        "success": false,
+        "minimum_proxy_goal_distance": 0.23944955254356853,
+        "minimum_striking_goal_distance": 0.23921341903116178,
+        "mean_proxy_error": 0.009675173001327352,
+        "final_proxy_position": [
+          0.10640254948227906,
+          0.5550724787036481,
+          0.028441841443196725
+        ],
+        "final_striking_position": [
+          0.10458757224675885,
+          0.5552609933636911,
+          0.037972910429349374
+        ],
+        "head_nail_contact": false,
+        "head_nail_contact_steps": 0,
+        "first_head_nail_contact_timestep": null
+      },
+      {
+        "final_nail_qpos": 0.0,
+        "max_nail_qpos": 0.0,
+        "progress_fraction": 0.0,
+        "ge_003": false,
+        "ge_005": false,
+        "ge_008": false,
+        "crossed_success_threshold": false,
+        "success": false,
+        "minimum_proxy_goal_distance": 0.12324217890102313,
+        "minimum_striking_goal_distance": 0.14814070928294068,
+        "mean_proxy_error": 0.0697421183190417,
+        "final_proxy_position": [
+          0.08918204719353587,
+          0.8448499460922412,
+          0.028415512169720818
+        ],
+        "final_striking_position": [
+          0.0971572288279679,
+          0.7641324902167955,
+          0.03796147345858475
+        ],
+        "head_nail_contact": false,
+        "head_nail_contact_steps": 0,
+        "first_head_nail_contact_timestep": null
+      },
+      {
+        "final_nail_qpos": 0.0,
+        "max_nail_qpos": 0.0,
+        "progress_fraction": 0.0,
+        "ge_003": false,
+        "ge_005": false,
+        "ge_008": false,
+        "crossed_success_threshold": false,
+        "success": false,
+        "minimum_proxy_goal_distance": 0.28888867851434785,
+        "minimum_striking_goal_distance": 0.290000590951698,
+        "mean_proxy_error": 0.009995317518801521,
+        "final_proxy_position": [
+          0.11750471053218633,
+          0.4813133544836353,
+          0.02831039574651137
+        ],
+        "final_striking_position": [
+          0.11637123569591065,
+          0.4796698056207308,
+          0.037899545504832766
+        ],
+        "head_nail_contact": false,
+        "head_nail_contact_steps": 0,
+        "first_head_nail_contact_timestep": null
+      },
+      {
+        "final_nail_qpos": 0.0,
+        "max_nail_qpos": 0.0,
+        "progress_fraction": 0.0,
+        "ge_003": false,
+        "ge_005": false,
+        "ge_008": false,
+        "crossed_success_threshold": false,
+        "success": false,
+        "minimum_proxy_goal_distance": 0.10600598169918388,
+        "minimum_striking_goal_distance": 0.11679024073679717,
+        "mean_proxy_error": 0.05024263621430129,
+        "final_proxy_position": [
+          0.08336533467777099,
+          0.8448157577802811,
+          0.02926249362007526
+        ],
+        "final_striking_position": [
+          0.09144478943075982,
+          0.7645806389668359,
+          0.037970929561375565
+        ],
+        "head_nail_contact": false,
+        "head_nail_contact_steps": 0,
+        "first_head_nail_contact_timestep": null
+      },
+      {
+        "final_nail_qpos": 0.0,
+        "max_nail_qpos": 0.0,
+        "progress_fraction": 0.0,
+        "ge_003": false,
+        "ge_005": false,
+        "ge_008": false,
+        "crossed_success_threshold": false,
+        "success": false,
+        "minimum_proxy_goal_distance": 0.11234371192577494,
+        "minimum_striking_goal_distance": 0.11815844611198888,
+        "mean_proxy_error": 0.06860872827473652,
+        "final_proxy_position": [
+          0.11914677243494504,
+          0.8197901059960206,
+          0.028433234378450124
+        ],
+        "final_striking_position": [
+          0.12705164984312006,
+          0.7385057366648421,
+          0.037968839483513324
+        ],
+        "head_nail_contact": false,
+        "head_nail_contact_steps": 0,
+        "first_head_nail_contact_timestep": null
+      },
+      {
+        "final_nail_qpos": 0.0,
+        "max_nail_qpos": 0.0,
+        "progress_fraction": 0.0,
+        "ge_003": false,
+        "ge_005": false,
+        "ge_008": false,
+        "crossed_success_threshold": false,
+        "success": false,
+        "minimum_proxy_goal_distance": 0.2684666977217139,
+        "minimum_striking_goal_distance": 0.26887740022523143,
+        "mean_proxy_error": 0.010340324741402547,
+        "final_proxy_position": [
+          0.07122439100238506,
+          0.5471550842430846,
+          0.028441841443196718
+        ],
+        "final_striking_position": [
+          0.07094034819056799,
+          0.5431548319518349,
+          0.037972910429349374
+        ],
+        "head_nail_contact": false,
+        "head_nail_contact_steps": 0,
+        "first_head_nail_contact_timestep": null
+      },
+      {
+        "final_nail_qpos": 0.0,
+        "max_nail_qpos": 0.0,
+        "progress_fraction": 0.0,
+        "ge_003": false,
+        "ge_005": false,
+        "ge_008": false,
+        "crossed_success_threshold": false,
+        "success": false,
+        "minimum_proxy_goal_distance": 0.3053890377839144,
+        "minimum_striking_goal_distance": 0.3083634022930236,
+        "mean_proxy_error": 0.011805663167070157,
+        "final_proxy_position": [
+          0.06658024138067989,
+          0.5023014780580666,
+          0.02822308158396993
+        ],
+        "final_striking_position": [
+          0.0674677034956006,
+          0.4948346277261559,
+          0.03778826428845117
+        ],
+        "head_nail_contact": false,
+        "head_nail_contact_steps": 0,
+        "first_head_nail_contact_timestep": null
+      },
+      {
+        "final_nail_qpos": 0.0,
+        "max_nail_qpos": 0.0,
+        "progress_fraction": 0.0,
+        "ge_003": false,
+        "ge_005": false,
+        "ge_008": false,
+        "crossed_success_threshold": false,
+        "success": false,
+        "minimum_proxy_goal_distance": 0.11511775544258643,
+        "minimum_striking_goal_distance": 0.13831702569526846,
+        "mean_proxy_error": 0.07207623397366762,
+        "final_proxy_position": [
+          0.09298578486882063,
+          0.8372641171011876,
+          0.02843971027684267
+        ],
+        "final_striking_position": [
+          0.10043937156557069,
+          0.7526795343646308,
+          0.037973575917986536
+        ],
+        "head_nail_contact": false,
+        "head_nail_contact_steps": 0,
+        "first_head_nail_contact_timestep": null
+      },
+      {
+        "final_nail_qpos": 0.0,
+        "max_nail_qpos": 0.0,
+        "progress_fraction": 0.0,
+        "ge_003": false,
+        "ge_005": false,
+        "ge_008": false,
+        "crossed_success_threshold": false,
+        "success": false,
+        "minimum_proxy_goal_distance": 0.14150753442559863,
+        "minimum_striking_goal_distance": 0.1942804223052128,
+        "mean_proxy_error": 0.08762668084808972,
+        "final_proxy_position": [
+          0.12477682536542664,
+          0.7509973691491076,
+          0.028441841443196725
+        ],
+        "final_striking_position": [
+          0.1138936944710027,
+          0.6109391523807355,
+          0.03797291042934938
+        ],
+        "head_nail_contact": false,
+        "head_nail_contact_steps": 0,
+        "first_head_nail_contact_timestep": null
+      },
+      {
+        "final_nail_qpos": 0.0,
+        "max_nail_qpos": 0.0,
+        "progress_fraction": 0.0,
+        "ge_003": false,
+        "ge_005": false,
+        "ge_008": false,
+        "crossed_success_threshold": false,
+        "success": false,
+        "minimum_proxy_goal_distance": 0.21337704489018502,
+        "minimum_striking_goal_distance": 0.21417466195755813,
+        "mean_proxy_error": 0.023811542443872027,
+        "final_proxy_position": [
+          0.1586700396575951,
+          0.5337091120635906,
+          0.028441841443196707
+        ],
+        "final_striking_position": [
+          0.14578146584511073,
+          0.5573953535197359,
+          0.037972910429349374
+        ],
+        "head_nail_contact": false,
+        "head_nail_contact_steps": 0,
+        "first_head_nail_contact_timestep": null
+      },
+      {
+        "final_nail_qpos": 0.0,
+        "max_nail_qpos": 0.0,
+        "progress_fraction": 0.0,
+        "ge_003": false,
+        "ge_005": false,
+        "ge_008": false,
+        "crossed_success_threshold": false,
+        "success": false,
+        "minimum_proxy_goal_distance": 0.10600598169918388,
+        "minimum_striking_goal_distance": 0.11679024073679717,
+        "mean_proxy_error": 0.05024263621430129,
+        "final_proxy_position": [
+          0.08336533467777099,
+          0.8448157577802811,
+          0.02926249362007526
+        ],
+        "final_striking_position": [
+          0.09144478943075982,
+          0.7645806389668359,
+          0.037970929561375565
+        ],
+        "head_nail_contact": false,
+        "head_nail_contact_steps": 0,
+        "first_head_nail_contact_timestep": null
+      },
+      {
+        "final_nail_qpos": 0.0,
+        "max_nail_qpos": 0.0,
+        "progress_fraction": 0.0,
+        "ge_003": false,
+        "ge_005": false,
+        "ge_008": false,
+        "crossed_success_threshold": false,
+        "success": false,
+        "minimum_proxy_goal_distance": 0.2684666977217139,
+        "minimum_striking_goal_distance": 0.26887740022523143,
+        "mean_proxy_error": 0.010340324741402547,
+        "final_proxy_position": [
+          0.07122439100238506,
+          0.5471550842430846,
+          0.028441841443196718
+        ],
+        "final_striking_position": [
+          0.07094034819056799,
+          0.5431548319518349,
+          0.037972910429349374
+        ],
+        "head_nail_contact": false,
+        "head_nail_contact_steps": 0,
+        "first_head_nail_contact_timestep": null
+      },
+      {
+        "final_nail_qpos": 0.0,
+        "max_nail_qpos": 0.0,
+        "progress_fraction": 0.0,
+        "ge_003": false,
+        "ge_005": false,
+        "ge_008": false,
+        "crossed_success_threshold": false,
+        "success": false,
+        "minimum_proxy_goal_distance": 0.10600598169918388,
+        "minimum_striking_goal_distance": 0.11679024073679717,
+        "mean_proxy_error": 0.05024263621430129,
+        "final_proxy_position": [
+          0.08336533467777099,
+          0.8448157577802811,
+          0.02926249362007526
+        ],
+        "final_striking_position": [
+          0.09144478943075982,
+          0.7645806389668359,
+          0.037970929561375565
+        ],
+        "head_nail_contact": false,
+        "head_nail_contact_steps": 0,
+        "first_head_nail_contact_timestep": null
+      },
+      {
+        "final_nail_qpos": 0.0,
+        "max_nail_qpos": 0.0,
+        "progress_fraction": 0.0,
+        "ge_003": false,
+        "ge_005": false,
+        "ge_008": false,
+        "crossed_success_threshold": false,
+        "success": false,
+        "minimum_proxy_goal_distance": 0.10636943160221747,
+        "minimum_striking_goal_distance": 0.11516804579445217,
+        "mean_proxy_error": 0.02054186464002378,
+        "final_proxy_position": [
+          -0.1305098852194246,
+          0.47469150571070595,
+          0.06905165531966266
+        ],
+        "final_striking_position": [
+          -0.13783666940389902,
+          0.48658762134871475,
+          0.052994328994520876
+        ],
+        "head_nail_contact": false,
+        "head_nail_contact_steps": 0,
+        "first_head_nail_contact_timestep": null
+      },
+      {
+        "final_nail_qpos": 0.0,
+        "max_nail_qpos": 0.0,
+        "progress_fraction": 0.0,
+        "ge_003": false,
+        "ge_005": false,
+        "ge_008": false,
+        "crossed_success_threshold": false,
+        "success": false,
+        "minimum_proxy_goal_distance": 0.11734259604757379,
+        "minimum_striking_goal_distance": 0.16750453304945231,
+        "mean_proxy_error": 0.09070557233064949,
+        "final_proxy_position": [
+          0.15646302924027938,
+          0.7621797049992796,
+          0.028441841443196725
+        ],
+        "final_striking_position": [
+          0.1454853279425557,
+          0.6219455899766116,
+          0.037972910429349374
+        ],
+        "head_nail_contact": false,
+        "head_nail_contact_steps": 0,
+        "first_head_nail_contact_timestep": null
+      }
+    ]
+  },
+  {
+    "step": 40000,
+    "episodes": [
+      {
+        "final_nail_qpos": 0.0,
+        "max_nail_qpos": 0.0,
+        "progress_fraction": 0.0,
+        "ge_003": false,
+        "ge_005": false,
+        "ge_008": false,
+        "crossed_success_threshold": false,
+        "success": false,
+        "minimum_proxy_goal_distance": 0.20719783541789538,
+        "minimum_striking_goal_distance": 0.2283707284719363,
+        "mean_proxy_error": 0.02197420652907437,
+        "final_proxy_position": [
+          0.02252154160856723,
+          0.5424179138184408,
+          0.02844184144319672
+        ],
+        "final_striking_position": [
+          0.02730820564269021,
+          0.5210250903596778,
+          0.03797291042934937
+        ],
+        "head_nail_contact": false,
+        "head_nail_contact_steps": 0,
+        "first_head_nail_contact_timestep": null
+      },
+      {
+        "final_nail_qpos": 0.00012427118764348556,
+        "max_nail_qpos": 0.00012427118764348556,
+        "progress_fraction": 0.0013807909738165064,
+        "ge_003": false,
+        "ge_005": false,
+        "ge_008": false,
+        "crossed_success_threshold": false,
+        "success": false,
+        "minimum_proxy_goal_distance": 0.280498381535401,
+        "minimum_striking_goal_distance": 0.2817197607969994,
+        "mean_proxy_error": 0.010340324741402559,
+        "final_proxy_position": [
+          0.1630940032390388,
+          0.4823863169807265,
+          0.02844184144319672
+        ],
+        "final_striking_position": [
+          0.16280996042722176,
+          0.47838606468947675,
+          0.037972910429349374
+        ],
+        "head_nail_contact": false,
+        "head_nail_contact_steps": 0,
+        "first_head_nail_contact_timestep": null
+      },
+      {
+        "final_nail_qpos": 0.0,
+        "max_nail_qpos": 0.0,
+        "progress_fraction": 0.0,
+        "ge_003": false,
+        "ge_005": false,
+        "ge_008": false,
+        "crossed_success_threshold": false,
+        "success": false,
+        "minimum_proxy_goal_distance": 0.2969102616721871,
+        "minimum_striking_goal_distance": 0.2976994958211695,
+        "mean_proxy_error": 0.010340324741402583,
+        "final_proxy_position": [
+          0.06130620845156215,
+          0.5167865768262101,
+          0.02844184144319672
+        ],
+        "final_striking_position": [
+          0.06102216563974508,
+          0.5127863245349603,
+          0.03797291042934938
+        ],
+        "head_nail_contact": false,
+        "head_nail_contact_steps": 0,
+        "first_head_nail_contact_timestep": null
+      },
+      {
+        "final_nail_qpos": 0.0,
+        "max_nail_qpos": 0.0,
+        "progress_fraction": 0.0,
+        "ge_003": false,
+        "ge_005": false,
+        "ge_008": false,
+        "crossed_success_threshold": false,
+        "success": false,
+        "minimum_proxy_goal_distance": 0.20719783541789538,
+        "minimum_striking_goal_distance": 0.2283707284719363,
+        "mean_proxy_error": 0.02197420652907437,
+        "final_proxy_position": [
+          0.02252154160856723,
+          0.5424179138184408,
+          0.02844184144319672
+        ],
+        "final_striking_position": [
+          0.02730820564269021,
+          0.5210250903596778,
+          0.03797291042934937
+        ],
+        "head_nail_contact": false,
+        "head_nail_contact_steps": 0,
+        "first_head_nail_contact_timestep": null
+      },
+      {
+        "final_nail_qpos": 0.0,
+        "max_nail_qpos": 0.0,
+        "progress_fraction": 0.0,
+        "ge_003": false,
+        "ge_005": false,
+        "ge_008": false,
+        "crossed_success_threshold": false,
+        "success": false,
+        "minimum_proxy_goal_distance": 0.1944837495167734,
+        "minimum_striking_goal_distance": 0.23411144854201701,
+        "mean_proxy_error": 0.035595812570509235,
+        "final_proxy_position": [
+          0.12507502488343858,
+          0.36341053453769384,
+          0.02844184144319671
+        ],
+        "final_striking_position": [
+          0.10910819888620521,
+          0.39229024825612324,
+          0.037972910429349374
+        ],
+        "head_nail_contact": false,
+        "head_nail_contact_steps": 0,
+        "first_head_nail_contact_timestep": null
+      },
+      {
+        "final_nail_qpos": 0.09668347459352865,
+        "max_nail_qpos": 0.09668347459352865,
+        "progress_fraction": 1.074260828816985,
+        "ge_003": true,
+        "ge_005": true,
+        "ge_008": true,
+        "crossed_success_threshold": true,
+        "success": true,
+        "minimum_proxy_goal_distance": 0.05501774666769636,
+        "minimum_striking_goal_distance": 0.1455731464864858,
+        "mean_proxy_error": 0.1284986931143337,
+        "final_proxy_position": [
+          0.08014932365941084,
+          0.7759650332216725,
+          0.028441841443196725
+        ],
+        "final_striking_position": [
+          0.07390007605858841,
+          0.6452128964294317,
+          0.037972910429349374
+        ],
+        "head_nail_contact": false,
+        "head_nail_contact_steps": 0,
+        "first_head_nail_contact_timestep": null
+      },
+      {
+        "final_nail_qpos": 0.05977295000981966,
+        "max_nail_qpos": 0.05977295000981966,
+        "progress_fraction": 0.6641438889979963,
+        "ge_003": true,
+        "ge_005": true,
+        "ge_008": false,
+        "crossed_success_threshold": false,
+        "success": false,
+        "minimum_proxy_goal_distance": 0.2618312102738383,
+        "minimum_striking_goal_distance": 0.28118546991399535,
+        "mean_proxy_error": 0.01574617391018552,
+        "final_proxy_position": [
+          0.11842598855815678,
+          0.4721244857327752,
+          0.028441841443196725
+        ],
+        "final_striking_position": [
+          0.11215420180251529,
+          0.4829255816047901,
+          0.03797291042934938
+        ],
+        "head_nail_contact": false,
+        "head_nail_contact_steps": 0,
+        "first_head_nail_contact_timestep": null
+      },
+      {
+        "final_nail_qpos": 0.0,
+        "max_nail_qpos": 0.0,
+        "progress_fraction": 0.0,
+        "ge_003": false,
+        "ge_005": false,
+        "ge_008": false,
+        "crossed_success_threshold": false,
+        "success": false,
+        "minimum_proxy_goal_distance": 0.06473872078190265,
+        "minimum_striking_goal_distance": 0.16701420508033302,
+        "mean_proxy_error": 0.1524808840696407,
+        "final_proxy_position": [
+          0.12804853187994128,
+          0.8515560249115095,
+          0.028441841443196718
+        ],
+        "final_striking_position": [
+          0.0848322718912696,
+          0.6690541196489889,
+          0.03797291042934937
+        ],
+        "head_nail_contact": false,
+        "head_nail_contact_steps": 0,
+        "first_head_nail_contact_timestep": null
+      },
+      {
+        "final_nail_qpos": 0.09618891432086761,
+        "max_nail_qpos": 0.09618891432086761,
+        "progress_fraction": 1.0687657146763068,
+        "ge_003": true,
+        "ge_005": true,
+        "ge_008": true,
+        "crossed_success_threshold": true,
+        "success": true,
+        "minimum_proxy_goal_distance": 0.23479678899080617,
+        "minimum_striking_goal_distance": 0.2547816115473928,
+        "mean_proxy_error": 0.012425834430233106,
+        "final_proxy_position": [
+          0.11778346252104238,
+          0.5094913443708728,
+          0.028441841443196714
+        ],
+        "final_striking_position": [
+          0.11462734763854762,
+          0.5130928728527255,
+          0.037972910429349374
+        ],
+        "head_nail_contact": false,
+        "head_nail_contact_steps": 0,
+        "first_head_nail_contact_timestep": null
+      },
+      {
+        "final_nail_qpos": 0.0,
+        "max_nail_qpos": 0.0,
+        "progress_fraction": 0.0,
+        "ge_003": false,
+        "ge_005": false,
+        "ge_008": false,
+        "crossed_success_threshold": false,
+        "success": false,
+        "minimum_proxy_goal_distance": 0.2969102616721871,
+        "minimum_striking_goal_distance": 0.2976994958211695,
+        "mean_proxy_error": 0.010340324741402583,
+        "final_proxy_position": [
+          0.06130620845156215,
+          0.5167865768262101,
+          0.02844184144319672
+        ],
+        "final_striking_position": [
+          0.06102216563974508,
+          0.5127863245349603,
+          0.03797291042934938
+        ],
+        "head_nail_contact": false,
+        "head_nail_contact_steps": 0,
+        "first_head_nail_contact_timestep": null
+      },
+      {
+        "final_nail_qpos": 0.0,
+        "max_nail_qpos": 0.0,
+        "progress_fraction": 0.0,
+        "ge_003": false,
+        "ge_005": false,
+        "ge_008": false,
+        "crossed_success_threshold": false,
+        "success": false,
+        "minimum_proxy_goal_distance": 0.25545990887108716,
+        "minimum_striking_goal_distance": 0.2557562208334891,
+        "mean_proxy_error": 0.010340324741402581,
+        "final_proxy_position": [
+          0.083088680695027,
+          0.5549632391690784,
+          0.02844184144319672
+        ],
+        "final_striking_position": [
+          0.08280463788320994,
+          0.5509629868778286,
+          0.037972910429349374
+        ],
+        "head_nail_contact": false,
+        "head_nail_contact_steps": 0,
+        "first_head_nail_contact_timestep": null
+      },
+      {
+        "final_nail_qpos": 0.09993658348906252,
+        "max_nail_qpos": 0.10124170675944981,
+        "progress_fraction": 1.1249078528827756,
+        "ge_003": true,
+        "ge_005": true,
+        "ge_008": true,
+        "crossed_success_threshold": true,
+        "success": true,
+        "minimum_proxy_goal_distance": 0.114520127001066,
+        "minimum_striking_goal_distance": 0.21426750411817277,
+        "mean_proxy_error": 0.10293274741448116,
+        "final_proxy_position": [
+          0.2532085929393707,
+          0.644371555811238,
+          0.028441841443196718
+        ],
+        "final_striking_position": [
+          0.25406746868425373,
+          0.5317447487821828,
+          0.03797291042934938
+        ],
+        "head_nail_contact": false,
+        "head_nail_contact_steps": 0,
+        "first_head_nail_contact_timestep": null
+      },
+      {
+        "final_nail_qpos": 0.09618891432086761,
+        "max_nail_qpos": 0.09618891432086761,
+        "progress_fraction": 1.0687657146763068,
+        "ge_003": true,
+        "ge_005": true,
+        "ge_008": true,
+        "crossed_success_threshold": true,
+        "success": true,
+        "minimum_proxy_goal_distance": 0.23479678899080617,
+        "minimum_striking_goal_distance": 0.2547816115473928,
+        "mean_proxy_error": 0.012425834430233106,
+        "final_proxy_position": [
+          0.11778346252104238,
+          0.5094913443708728,
+          0.028441841443196714
+        ],
+        "final_striking_position": [
+          0.11462734763854762,
+          0.5130928728527255,
+          0.037972910429349374
+        ],
+        "head_nail_contact": false,
+        "head_nail_contact_steps": 0,
+        "first_head_nail_contact_timestep": null
+      },
+      {
+        "final_nail_qpos": 0.0,
+        "max_nail_qpos": 0.0,
+        "progress_fraction": 0.0,
+        "ge_003": false,
+        "ge_005": false,
+        "ge_008": false,
+        "crossed_success_threshold": false,
+        "success": false,
+        "minimum_proxy_goal_distance": 0.2969102616721871,
+        "minimum_striking_goal_distance": 0.2976994958211695,
+        "mean_proxy_error": 0.010340324741402583,
+        "final_proxy_position": [
+          0.06130620845156215,
+          0.5167865768262101,
+          0.02844184144319672
+        ],
+        "final_striking_position": [
+          0.06102216563974508,
+          0.5127863245349603,
+          0.03797291042934938
+        ],
+        "head_nail_contact": false,
+        "head_nail_contact_steps": 0,
+        "first_head_nail_contact_timestep": null
+      },
+      {
+        "final_nail_qpos": 0.0,
+        "max_nail_qpos": 0.0,
+        "progress_fraction": 0.0,
+        "ge_003": false,
+        "ge_005": false,
+        "ge_008": false,
+        "crossed_success_threshold": false,
+        "success": false,
+        "minimum_proxy_goal_distance": 0.19349830231020393,
+        "minimum_striking_goal_distance": 0.2615121662844988,
+        "mean_proxy_error": 0.12526530657623525,
+        "final_proxy_position": [
+          0.06786587861603269,
+          0.35259656881353846,
+          0.028323137095623157
+        ],
+        "final_striking_position": [
+          0.02063775255461396,
+          0.16640023204878746,
+          0.037966219359001824
+        ],
+        "head_nail_contact": false,
+        "head_nail_contact_steps": 0,
+        "first_head_nail_contact_timestep": null
+      },
+      {
+        "final_nail_qpos": 0.0,
+        "max_nail_qpos": 0.0,
+        "progress_fraction": 0.0,
+        "ge_003": false,
+        "ge_005": false,
+        "ge_008": false,
+        "crossed_success_threshold": false,
+        "success": false,
+        "minimum_proxy_goal_distance": 0.25384957309278877,
+        "minimum_striking_goal_distance": 0.25419156803887155,
+        "mean_proxy_error": 0.010340324741402547,
+        "final_proxy_position": [
+          0.08971253871784492,
+          0.5517095735638857,
+          0.02844184144319672
+        ],
+        "final_striking_position": [
+          0.08942849590602785,
+          0.547709321272636,
+          0.037972910429349374
+        ],
+        "head_nail_contact": false,
+        "head_nail_contact_steps": 0,
+        "first_head_nail_contact_timestep": null
+      },
+      {
+        "final_nail_qpos": 0.09996633432242956,
+        "max_nail_qpos": 0.10100579154398828,
+        "progress_fraction": 1.122286572710981,
+        "ge_003": true,
+        "ge_005": true,
+        "ge_008": true,
+        "crossed_success_threshold": true,
+        "success": true,
+        "minimum_proxy_goal_distance": 0.21362196554160712,
+        "minimum_striking_goal_distance": 0.21400568298232886,
+        "mean_proxy_error": 0.010340324741402581,
+        "final_proxy_position": [
+          0.2439754352534636,
+          0.5419632860361562,
+          0.028441841443196718
+        ],
+        "final_striking_position": [
+          0.2436913924416465,
+          0.5379630337449064,
+          0.037972910429349374
+        ],
+        "head_nail_contact": false,
+        "head_nail_contact_steps": 0,
+        "first_head_nail_contact_timestep": null
+      },
+      {
+        "final_nail_qpos": 0.0,
+        "max_nail_qpos": 0.0,
+        "progress_fraction": 0.0,
+        "ge_003": false,
+        "ge_005": false,
+        "ge_008": false,
+        "crossed_success_threshold": false,
+        "success": false,
+        "minimum_proxy_goal_distance": 0.2372824519480538,
+        "minimum_striking_goal_distance": 0.2544788666228123,
+        "mean_proxy_error": 0.05086111279438829,
+        "final_proxy_position": [
+          -0.06406039914875422,
+          0.5063748772273038,
+          0.028441841443196714
+        ],
+        "final_striking_position": [
+          -0.10022270182350408,
+          0.5617411783951961,
+          0.037972910429349374
+        ],
+        "head_nail_contact": false,
+        "head_nail_contact_steps": 0,
+        "first_head_nail_contact_timestep": null
+      },
+      {
+        "final_nail_qpos": 0.09618891432086761,
+        "max_nail_qpos": 0.09618891432086761,
+        "progress_fraction": 1.0687657146763068,
+        "ge_003": true,
+        "ge_005": true,
+        "ge_008": true,
+        "crossed_success_threshold": true,
+        "success": true,
+        "minimum_proxy_goal_distance": 0.23479678899080617,
+        "minimum_striking_goal_distance": 0.2547816115473928,
+        "mean_proxy_error": 0.012425834430233106,
+        "final_proxy_position": [
+          0.11778346252104238,
+          0.5094913443708728,
+          0.028441841443196714
+        ],
+        "final_striking_position": [
+          0.11462734763854762,
+          0.5130928728527255,
+          0.037972910429349374
+        ],
+        "head_nail_contact": false,
+        "head_nail_contact_steps": 0,
+        "first_head_nail_contact_timestep": null
+      },
+      {
+        "final_nail_qpos": 0.0,
+        "max_nail_qpos": 0.0,
+        "progress_fraction": 0.0,
+        "ge_003": false,
+        "ge_005": false,
+        "ge_008": false,
+        "crossed_success_threshold": false,
+        "success": false,
+        "minimum_proxy_goal_distance": 0.2972739687346104,
+        "minimum_striking_goal_distance": 0.29832031360626615,
+        "mean_proxy_error": 0.010340324741402564,
+        "final_proxy_position": [
+          0.09114644208122659,
+          0.4954301107467794,
+          0.02844184144319672
+        ],
+        "final_striking_position": [
+          0.09086239926940952,
+          0.49142985845552967,
+          0.037972910429349374
+        ],
+        "head_nail_contact": false,
+        "head_nail_contact_steps": 0,
+        "first_head_nail_contact_timestep": null
+      }
+    ]
+  },
+  {
+    "step": 60000,
+    "episodes": [
+      {
+        "final_nail_qpos": 0.09140408267274912,
+        "max_nail_qpos": 0.10224164229893408,
+        "progress_fraction": 1.1360182477659342,
+        "ge_003": true,
+        "ge_005": true,
+        "ge_008": true,
+        "crossed_success_threshold": true,
+        "success": true,
+        "minimum_proxy_goal_distance": 0.08122929506764072,
+        "minimum_striking_goal_distance": 0.07077499775847468,
+        "mean_proxy_error": 0.08798169516764304,
+        "final_proxy_position": [
+          0.3613738900815213,
+          0.41183245565685517,
+          0.028441841443196718
+        ],
+        "final_striking_position": [
+          0.2788416684092075,
+          0.5023113646273605,
+          0.037972910429349374
+        ],
+        "head_nail_contact": false,
+        "head_nail_contact_steps": 0,
+        "first_head_nail_contact_timestep": null
+      },
+      {
+        "final_nail_qpos": 0.07407101473053751,
+        "max_nail_qpos": 0.1029832543950778,
+        "progress_fraction": 1.1442583821675312,
+        "ge_003": true,
+        "ge_005": true,
+        "ge_008": true,
+        "crossed_success_threshold": true,
+        "success": true,
+        "minimum_proxy_goal_distance": 0.07639456724676905,
+        "minimum_striking_goal_distance": 0.10101570636233863,
+        "mean_proxy_error": 0.044694647436279704,
+        "final_proxy_position": [
+          0.2704788502998808,
+          0.6693328536703353,
+          0.028439902851104242
+        ],
+        "final_striking_position": [
+          0.2667344581808866,
+          0.6743659772059782,
+          0.03797289025984271
+        ],
+        "head_nail_contact": false,
+        "head_nail_contact_steps": 0,
+        "first_head_nail_contact_timestep": null
+      },
+      {
+        "final_nail_qpos": 0.10083854354978188,
+        "max_nail_qpos": 0.10194860396652215,
+        "progress_fraction": 1.1327622662946906,
+        "ge_003": true,
+        "ge_005": true,
+        "ge_008": true,
+        "crossed_success_threshold": true,
+        "success": true,
+        "minimum_proxy_goal_distance": 0.2022472097888468,
+        "minimum_striking_goal_distance": 0.20239433235610638,
+        "mean_proxy_error": 0.010340324741402578,
+        "final_proxy_position": [
+          0.2506877336552754,
+          0.5545553823367655,
+          0.02844184144319672
+        ],
+        "final_striking_position": [
+          0.25040369084345837,
+          0.5505551300455157,
+          0.037972910429349374
+        ],
+        "head_nail_contact": false,
+        "head_nail_contact_steps": 0,
+        "first_head_nail_contact_timestep": null
+      },
+      {
+        "final_nail_qpos": -0.06470179204563148,
+        "max_nail_qpos": 0.003921574812161761,
+        "progress_fraction": 0.04357305346846402,
+        "ge_003": false,
+        "ge_005": false,
+        "ge_008": false,
+        "crossed_success_threshold": false,
+        "success": false,
+        "minimum_proxy_goal_distance": 0.15967371214031087,
+        "minimum_striking_goal_distance": 0.2652330846017512,
+        "mean_proxy_error": 0.04556644944308707,
+        "final_proxy_position": [
+          0.1498070953244966,
+          0.5036968180684654,
+          0.028441841443196718
+        ],
+        "final_striking_position": [
+          0.15552031963740479,
+          0.4781102749102432,
+          0.03797291042934937
+        ],
+        "head_nail_contact": false,
+        "head_nail_contact_steps": 0,
+        "first_head_nail_contact_timestep": null
+      },
+      {
+        "final_nail_qpos": 0.00023747065379133448,
+        "max_nail_qpos": 0.03411618295636324,
+        "progress_fraction": 0.37906869951514716,
+        "ge_003": true,
+        "ge_005": false,
+        "ge_008": false,
+        "crossed_success_threshold": false,
+        "success": false,
+        "minimum_proxy_goal_distance": 0.05475870322133404,
+        "minimum_striking_goal_distance": 0.1353986584035288,
+        "mean_proxy_error": 0.08547018206850007,
+        "final_proxy_position": [
+          0.09426792918773795,
+          0.6078487644049344,
+          0.028440443024556193
+        ],
+        "final_striking_position": [
+          0.091373421129106,
+          0.6108012891536012,
+          0.037971656464055564
+        ],
+        "head_nail_contact": false,
+        "head_nail_contact_steps": 0,
+        "first_head_nail_contact_timestep": null
+      },
+      {
+        "final_nail_qpos": 0.05647882732317677,
+        "max_nail_qpos": 0.057684761431332755,
+        "progress_fraction": 0.6409417936814751,
+        "ge_003": true,
+        "ge_005": true,
+        "ge_008": false,
+        "crossed_success_threshold": false,
+        "success": false,
+        "minimum_proxy_goal_distance": 0.03094461542451794,
+        "minimum_striking_goal_distance": 0.0727901797223229,
+        "mean_proxy_error": 0.04948797120126377,
+        "final_proxy_position": [
+          0.23702168156555628,
+          0.7424932504535795,
+          0.02833925969924718
+        ],
+        "final_striking_position": [
+          0.24099487145447818,
+          0.7243997262999734,
+          0.03796424176609241
+        ],
+        "head_nail_contact": false,
+        "head_nail_contact_steps": 0,
+        "first_head_nail_contact_timestep": null
+      },
+      {
+        "final_nail_qpos": 0.004914931380278357,
+        "max_nail_qpos": 0.021858853536746266,
+        "progress_fraction": 0.24287615040829186,
+        "ge_003": false,
+        "ge_005": false,
+        "ge_008": false,
+        "crossed_success_threshold": false,
+        "success": false,
+        "minimum_proxy_goal_distance": 0.10760199504775801,
+        "minimum_striking_goal_distance": 0.19249259147704467,
+        "mean_proxy_error": 0.04412396118312018,
+        "final_proxy_position": [
+          0.2089895710771604,
+          0.6065212973493481,
+          0.02844184144319672
+        ],
+        "final_striking_position": [
+          0.21745048037321987,
+          0.5628332795442251,
+          0.037972910429349374
+        ],
+        "head_nail_contact": false,
+        "head_nail_contact_steps": 0,
+        "first_head_nail_contact_timestep": null
+      },
+      {
+        "final_nail_qpos": 0.0,
+        "max_nail_qpos": 0.0,
+        "progress_fraction": 0.0,
+        "ge_003": false,
+        "ge_005": false,
+        "ge_008": false,
+        "crossed_success_threshold": false,
+        "success": false,
+        "minimum_proxy_goal_distance": 0.12757364275423227,
+        "minimum_striking_goal_distance": 0.21318721756338158,
+        "mean_proxy_error": 0.03760385944774985,
+        "final_proxy_position": [
+          0.20605042554417297,
+          0.5669741247016507,
+          0.028441841443196714
+        ],
+        "final_striking_position": [
+          0.21285156858558799,
+          0.5356540376035148,
+          0.037972910429349374
+        ],
+        "head_nail_contact": false,
+        "head_nail_contact_steps": 0,
+        "first_head_nail_contact_timestep": null
+      },
+      {
+        "final_nail_qpos": 0.10055402372713926,
+        "max_nail_qpos": 0.10183783634399854,
+        "progress_fraction": 1.1315315149333172,
+        "ge_003": true,
+        "ge_005": true,
+        "ge_008": true,
+        "crossed_success_threshold": true,
+        "success": true,
+        "minimum_proxy_goal_distance": 0.05102544004490794,
+        "minimum_striking_goal_distance": 0.0780750682387238,
+        "mean_proxy_error": 0.04733577636806774,
+        "final_proxy_position": [
+          0.3015877073623324,
+          0.7422737697209212,
+          0.10474516469863407
+        ],
+        "final_striking_position": [
+          0.28863366842280314,
+          0.7335940199130302,
+          0.03781447475730819
+        ],
+        "head_nail_contact": false,
+        "head_nail_contact_steps": 0,
+        "first_head_nail_contact_timestep": null
+      },
+      {
+        "final_nail_qpos": 0.004914931380278357,
+        "max_nail_qpos": 0.021858853536746266,
+        "progress_fraction": 0.24287615040829186,
+        "ge_003": false,
+        "ge_005": false,
+        "ge_008": false,
+        "crossed_success_threshold": false,
+        "success": false,
+        "minimum_proxy_goal_distance": 0.10760199504775801,
+        "minimum_striking_goal_distance": 0.19249259147704467,
+        "mean_proxy_error": 0.04412396118312018,
+        "final_proxy_position": [
+          0.2089895710771604,
+          0.6065212973493481,
+          0.02844184144319672
+        ],
+        "final_striking_position": [
+          0.21745048037321987,
+          0.5628332795442251,
+          0.037972910429349374
+        ],
+        "head_nail_contact": false,
+        "head_nail_contact_steps": 0,
+        "first_head_nail_contact_timestep": null
+      },
+      {
+        "final_nail_qpos": 0.10059199279295282,
+        "max_nail_qpos": 0.10068790368216732,
+        "progress_fraction": 1.1187544853574147,
+        "ge_003": true,
+        "ge_005": true,
+        "ge_008": true,
+        "crossed_success_threshold": true,
+        "success": true,
+        "minimum_proxy_goal_distance": 0.043999626455372164,
+        "minimum_striking_goal_distance": 0.07630840322885607,
+        "mean_proxy_error": 0.04091784517547624,
+        "final_proxy_position": [
+          0.3003956575258689,
+          0.7436806454679561,
+          0.09975558992879018
+        ],
+        "final_striking_position": [
+          0.2899634270590921,
+          0.7341995164156637,
+          0.038003456402688436
+        ],
+        "head_nail_contact": false,
+        "head_nail_contact_steps": 0,
+        "first_head_nail_contact_timestep": null
+      },
+      {
+        "final_nail_qpos": -0.014579873207614846,
+        "max_nail_qpos": 0.011403848172931082,
+        "progress_fraction": 0.1267094241436787,
+        "ge_003": false,
+        "ge_005": false,
+        "ge_008": false,
+        "crossed_success_threshold": false,
+        "success": false,
+        "minimum_proxy_goal_distance": 0.05652715700906901,
+        "minimum_striking_goal_distance": 0.13420152507391223,
+        "mean_proxy_error": 0.08469041424431024,
+        "final_proxy_position": [
+          0.11313562181758628,
+          0.6262953939301663,
+          0.02844184144319671
+        ],
+        "final_striking_position": [
+          0.1163154623043701,
+          0.611211965289621,
+          0.037972910429349374
+        ],
+        "head_nail_contact": false,
+        "head_nail_contact_steps": 0,
+        "first_head_nail_contact_timestep": null
+      },
+      {
+        "final_nail_qpos": 0.1008099706362857,
+        "max_nail_qpos": 0.10099531587984267,
+        "progress_fraction": 1.1221701764426963,
+        "ge_003": true,
+        "ge_005": true,
+        "ge_008": true,
+        "crossed_success_threshold": true,
+        "success": true,
+        "minimum_proxy_goal_distance": 0.2626260131722624,
+        "minimum_striking_goal_distance": 0.26373362290334307,
+        "mean_proxy_error": 0.010340324741402559,
+        "final_proxy_position": [
+          0.24041159407331608,
+          0.4898555349703805,
+          0.02844184144319672
+        ],
+        "final_striking_position": [
+          0.24012755126149904,
+          0.48585528267913075,
+          0.037972910429349374
+        ],
+        "head_nail_contact": false,
+        "head_nail_contact_steps": 0,
+        "first_head_nail_contact_timestep": null
+      },
+      {
+        "final_nail_qpos": -0.005933771365958588,
+        "max_nail_qpos": 0.004247259609385113,
+        "progress_fraction": 0.04719177343761237,
+        "ge_003": false,
+        "ge_005": false,
+        "ge_008": false,
+        "crossed_success_threshold": false,
+        "success": false,
+        "minimum_proxy_goal_distance": 0.07289275640829787,
+        "minimum_striking_goal_distance": 0.1197314711643059,
+        "mean_proxy_error": 0.07033941571856955,
+        "final_proxy_position": [
+          0.10569398588421816,
+          0.8321575106990371,
+          0.02844184144319672
+        ],
+        "final_striking_position": [
+          0.11242133079344693,
+          0.7430516490299458,
+          0.03797291042934938
+        ],
+        "head_nail_contact": false,
+        "head_nail_contact_steps": 0,
+        "first_head_nail_contact_timestep": null
+      },
+      {
+        "final_nail_qpos": 0.03924903199306523,
+        "max_nail_qpos": 0.03925780041764337,
+        "progress_fraction": 0.4361977824182596,
+        "ge_003": true,
+        "ge_005": false,
+        "ge_008": false,
+        "crossed_success_threshold": false,
+        "success": false,
+        "minimum_proxy_goal_distance": 0.16999610480539368,
+        "minimum_striking_goal_distance": 0.2296060951681154,
+        "mean_proxy_error": 0.03221489290622696,
+        "final_proxy_position": [
+          0.19253483479769717,
+          0.5430751324024217,
+          0.028441841443196714
+        ],
+        "final_striking_position": [
+          0.19834808219198677,
+          0.5170033759841535,
+          0.037972910429349374
+        ],
+        "head_nail_contact": false,
+        "head_nail_contact_steps": 0,
+        "first_head_nail_contact_timestep": null
+      },
+      {
+        "final_nail_qpos": 0.09140408267274912,
+        "max_nail_qpos": 0.10224164229893408,
+        "progress_fraction": 1.1360182477659342,
+        "ge_003": true,
+        "ge_005": true,
+        "ge_008": true,
+        "crossed_success_threshold": true,
+        "success": true,
+        "minimum_proxy_goal_distance": 0.08122929506764072,
+        "minimum_striking_goal_distance": 0.07077499775847468,
+        "mean_proxy_error": 0.08798169516764304,
+        "final_proxy_position": [
+          0.3613738900815213,
+          0.41183245565685517,
+          0.028441841443196718
+        ],
+        "final_striking_position": [
+          0.2788416684092075,
+          0.5023113646273605,
+          0.037972910429349374
+        ],
+        "head_nail_contact": false,
+        "head_nail_contact_steps": 0,
+        "first_head_nail_contact_timestep": null
+      },
+      {
+        "final_nail_qpos": -0.0033566706973156882,
+        "max_nail_qpos": 0.0002065591855140281,
+        "progress_fraction": 0.0022951020612669787,
+        "ge_003": false,
+        "ge_005": false,
+        "ge_008": false,
+        "crossed_success_threshold": false,
+        "success": false,
+        "minimum_proxy_goal_distance": 0.133414728174557,
+        "minimum_striking_goal_distance": 0.18177601333947593,
+        "mean_proxy_error": 0.1802986921932377,
+        "final_proxy_position": [
+          0.20591471358921823,
+          0.8998526182763524,
+          0.07218581712129393
+        ],
+        "final_striking_position": [
+          0.08583533587816922,
+          0.6850057983190639,
+          0.015929206263742383
+        ],
+        "head_nail_contact": false,
+        "head_nail_contact_steps": 0,
+        "first_head_nail_contact_timestep": null
+      },
+      {
+        "final_nail_qpos": 0.014717941280530637,
+        "max_nail_qpos": 0.014717941280530637,
+        "progress_fraction": 0.16353268089478487,
+        "ge_003": false,
+        "ge_005": false,
+        "ge_008": false,
+        "crossed_success_threshold": false,
+        "success": false,
+        "minimum_proxy_goal_distance": 0.031969483976919816,
+        "minimum_striking_goal_distance": 0.0652902110435782,
+        "mean_proxy_error": 0.04518498009189391,
+        "final_proxy_position": [
+          0.23198151825783858,
+          0.7490313362581302,
+          0.028441841443186785
+        ],
+        "final_striking_position": [
+          0.23834671718830666,
+          0.7201404877863673,
+          0.03797291042934462
+        ],
+        "head_nail_contact": false,
+        "head_nail_contact_steps": 0,
+        "first_head_nail_contact_timestep": null
+      },
+      {
+        "final_nail_qpos": 0.10077513277913405,
+        "max_nail_qpos": 0.10084446260539082,
+        "progress_fraction": 1.1204940289487868,
+        "ge_003": true,
+        "ge_005": true,
+        "ge_008": true,
+        "crossed_success_threshold": true,
+        "success": true,
+        "minimum_proxy_goal_distance": 0.2237287297722655,
+        "minimum_striking_goal_distance": 0.22429120890281876,
+        "mean_proxy_error": 0.010340324741402581,
+        "final_proxy_position": [
+          0.20798923192201763,
+          0.5335300137040572,
+          0.028441841443196718
+        ],
+        "final_striking_position": [
+          0.20770518911020056,
+          0.5295297614128074,
+          0.037972910429349374
+        ],
+        "head_nail_contact": false,
+        "head_nail_contact_steps": 0,
+        "first_head_nail_contact_timestep": null
+      },
+      {
+        "final_nail_qpos": 0.10055402372713926,
+        "max_nail_qpos": 0.10183783634399854,
+        "progress_fraction": 1.1315315149333172,
+        "ge_003": true,
+        "ge_005": true,
+        "ge_008": true,
+        "crossed_success_threshold": true,
+        "success": true,
+        "minimum_proxy_goal_distance": 0.05102544004490794,
+        "minimum_striking_goal_distance": 0.0780750682387238,
+        "mean_proxy_error": 0.04733577636806774,
+        "final_proxy_position": [
+          0.3015877073623324,
+          0.7422737697209212,
+          0.10474516469863407
+        ],
+        "final_striking_position": [
+          0.28863366842280314,
+          0.7335940199130302,
+          0.03781447475730819
+        ],
+        "head_nail_contact": false,
+        "head_nail_contact_steps": 0,
+        "first_head_nail_contact_timestep": null
+      }
+    ]
+  },
+  {
+    "step": 80000,
+    "episodes": [
+      {
+        "final_nail_qpos": 0.10086574213980182,
+        "max_nail_qpos": 0.10290413259430468,
+        "progress_fraction": 1.1433792510478298,
+        "ge_003": true,
+        "ge_005": true,
+        "ge_008": true,
+        "crossed_success_threshold": true,
+        "success": true,
+        "minimum_proxy_goal_distance": 0.19348490429015322,
+        "minimum_striking_goal_distance": 0.23633683029539454,
+        "mean_proxy_error": 0.04514848211619038,
+        "final_proxy_position": [
+          0.24436681343642896,
+          0.5548033959940117,
+          0.028441841443196718
+        ],
+        "final_striking_position": [
+          0.2523903046985587,
+          0.5151323189380882,
+          0.037972910429349374
+        ],
+        "head_nail_contact": false,
+        "head_nail_contact_steps": 0,
+        "first_head_nail_contact_timestep": null
+      },
+      {
+        "final_nail_qpos": 0.0755069897780772,
+        "max_nail_qpos": 0.10295094877277339,
+        "progress_fraction": 1.1438994308085932,
+        "ge_003": true,
+        "ge_005": true,
+        "ge_008": true,
+        "crossed_success_threshold": true,
+        "success": true,
+        "minimum_proxy_goal_distance": 0.05010097469828974,
+        "minimum_striking_goal_distance": 0.07864350679457735,
+        "mean_proxy_error": 0.07465824112684491,
+        "final_proxy_position": [
+          0.1583939450663861,
+          0.8364425663736439,
+          0.0489417491640772
+        ],
+        "final_striking_position": [
+          0.15290636477047828,
+          0.710744027159812,
+          0.02558336517983924
+        ],
+        "head_nail_contact": false,
+        "head_nail_contact_steps": 0,
+        "first_head_nail_contact_timestep": null
+      },
+      {
+        "final_nail_qpos": 0.10102423908444509,
+        "max_nail_qpos": 0.10322811625648022,
+        "progress_fraction": 1.146979069516447,
+        "ge_003": true,
+        "ge_005": true,
+        "ge_008": true,
+        "crossed_success_threshold": true,
+        "success": true,
+        "minimum_proxy_goal_distance": 0.06753160922622006,
+        "minimum_striking_goal_distance": 0.09386564064049427,
+        "mean_proxy_error": 0.033629008633453195,
+        "final_proxy_position": [
+          0.30255931010545023,
+          0.7737032436742148,
+          0.029101489719558473
+        ],
+        "final_striking_position": [
+          0.3112784060525211,
+          0.7250907956713712,
+          0.04094168913997284
+        ],
+        "head_nail_contact": false,
+        "head_nail_contact_steps": 0,
+        "first_head_nail_contact_timestep": null
+      },
+      {
+        "final_nail_qpos": 0.10084660456762921,
+        "max_nail_qpos": 0.10293577486386986,
+        "progress_fraction": 1.1437308318207762,
+        "ge_003": true,
+        "ge_005": true,
+        "ge_008": true,
+        "crossed_success_threshold": true,
+        "success": true,
+        "minimum_proxy_goal_distance": 0.09728203197129007,
+        "minimum_striking_goal_distance": 0.09056582726792477,
+        "mean_proxy_error": 0.012906756955413082,
+        "final_proxy_position": [
+          0.2950593959890451,
+          0.740650275763115,
+          0.02753077754743137
+        ],
+        "final_striking_position": [
+          0.29588054091423704,
+          0.7334165667014811,
+          0.036926408742733646
+        ],
+        "head_nail_contact": false,
+        "head_nail_contact_steps": 0,
+        "first_head_nail_contact_timestep": null
+      },
+      {
+        "final_nail_qpos": 0.10086929219577825,
+        "max_nail_qpos": 0.10116941831239101,
+        "progress_fraction": 1.1241046479154557,
+        "ge_003": true,
+        "ge_005": true,
+        "ge_008": true,
+        "crossed_success_threshold": true,
+        "success": true,
+        "minimum_proxy_goal_distance": 0.0900901116600199,
+        "minimum_striking_goal_distance": 0.08307488420433808,
+        "mean_proxy_error": 0.011281662853448176,
+        "final_proxy_position": [
+          0.2948571118917686,
+          0.7401374597539907,
+          0.027527317006552303
+        ],
+        "final_striking_position": [
+          0.29545552740070213,
+          0.7335779935097483,
+          0.03692190523168449
+        ],
+        "head_nail_contact": false,
+        "head_nail_contact_steps": 0,
+        "first_head_nail_contact_timestep": null
+      },
+      {
+        "final_nail_qpos": 0.10086929219577825,
+        "max_nail_qpos": 0.10116941831239101,
+        "progress_fraction": 1.1241046479154557,
+        "ge_003": true,
+        "ge_005": true,
+        "ge_008": true,
+        "crossed_success_threshold": true,
+        "success": true,
+        "minimum_proxy_goal_distance": 0.0900901116600199,
+        "minimum_striking_goal_distance": 0.08307488420433808,
+        "mean_proxy_error": 0.011281662853448176,
+        "final_proxy_position": [
+          0.2948571118917686,
+          0.7401374597539907,
+          0.027527317006552303
+        ],
+        "final_striking_position": [
+          0.29545552740070213,
+          0.7335779935097483,
+          0.03692190523168449
+        ],
+        "head_nail_contact": false,
+        "head_nail_contact_steps": 0,
+        "first_head_nail_contact_timestep": null
+      },
+      {
+        "final_nail_qpos": 0.10068717430667552,
+        "max_nail_qpos": 0.10540006376145722,
+        "progress_fraction": 1.171111819571747,
+        "ge_003": true,
+        "ge_005": true,
+        "ge_008": true,
+        "crossed_success_threshold": true,
+        "success": true,
+        "minimum_proxy_goal_distance": 0.07560224902764702,
+        "minimum_striking_goal_distance": 0.07321501874561857,
+        "mean_proxy_error": 0.012559636136335293,
+        "final_proxy_position": [
+          0.2882475847359344,
+          0.7437743307286808,
+          0.028342689244800847
+        ],
+        "final_striking_position": [
+          0.29039134701833214,
+          0.7323227592971207,
+          0.03774749846372868
+        ],
+        "head_nail_contact": false,
+        "head_nail_contact_steps": 0,
+        "first_head_nail_contact_timestep": null
+      },
+      {
+        "final_nail_qpos": 0.09887835743263206,
+        "max_nail_qpos": 0.10162030102714192,
+        "progress_fraction": 1.1291144558571324,
+        "ge_003": true,
+        "ge_005": true,
+        "ge_008": true,
+        "crossed_success_threshold": true,
+        "success": true,
+        "minimum_proxy_goal_distance": 0.06305297789575684,
+        "minimum_striking_goal_distance": 0.08370672796162516,
+        "mean_proxy_error": 0.045983063393958766,
+        "final_proxy_position": [
+          0.30768874395359924,
+          0.7854185672684411,
+          0.084952304965173
+        ],
+        "final_striking_position": [
+          0.3151982734575902,
+          0.7166459429388651,
+          0.06046560270203247
+        ],
+        "head_nail_contact": false,
+        "head_nail_contact_steps": 0,
+        "first_head_nail_contact_timestep": null
+      },
+      {
+        "final_nail_qpos": 0.09987029643409669,
+        "max_nail_qpos": 0.10321771962336151,
+        "progress_fraction": 1.1468635513706835,
+        "ge_003": true,
+        "ge_005": true,
+        "ge_008": true,
+        "crossed_success_threshold": true,
+        "success": true,
+        "minimum_proxy_goal_distance": 0.10781968764517365,
+        "minimum_striking_goal_distance": 0.12858386417602372,
+        "mean_proxy_error": 0.05723859048764452,
+        "final_proxy_position": [
+          0.35001327777003105,
+          0.7744688987155928,
+          0.07997025641172434
+        ],
+        "final_striking_position": [
+          0.3573261981204634,
+          0.7174312641111474,
+          0.0528850007350076
+        ],
+        "head_nail_contact": false,
+        "head_nail_contact_steps": 0,
+        "first_head_nail_contact_timestep": null
+      },
+      {
+        "final_nail_qpos": 0.1008538601037599,
+        "max_nail_qpos": 0.10376147942860187,
+        "progress_fraction": 1.1529053269844651,
+        "ge_003": true,
+        "ge_005": true,
+        "ge_008": true,
+        "crossed_success_threshold": true,
+        "success": true,
+        "minimum_proxy_goal_distance": 0.09752579334920754,
+        "minimum_striking_goal_distance": 0.09246876661530352,
+        "mean_proxy_error": 0.014178290560630157,
+        "final_proxy_position": [
+          0.2998563953755624,
+          0.7443447268611856,
+          0.027524911157526567
+        ],
+        "final_striking_position": [
+          0.30217209774190756,
+          0.7323088938779676,
+          0.03696161861862251
+        ],
+        "head_nail_contact": false,
+        "head_nail_contact_steps": 0,
+        "first_head_nail_contact_timestep": null
+      },
+      {
+        "final_nail_qpos": 0.09887835743263206,
+        "max_nail_qpos": 0.10162030102714192,
+        "progress_fraction": 1.1291144558571324,
+        "ge_003": true,
+        "ge_005": true,
+        "ge_008": true,
+        "crossed_success_threshold": true,
+        "success": true,
+        "minimum_proxy_goal_distance": 0.06305297789575684,
+        "minimum_striking_goal_distance": 0.08370672796162516,
+        "mean_proxy_error": 0.045983063393958766,
+        "final_proxy_position": [
+          0.30768874395359924,
+          0.7854185672684411,
+          0.084952304965173
+        ],
+        "final_striking_position": [
+          0.3151982734575902,
+          0.7166459429388651,
+          0.06046560270203247
+        ],
+        "head_nail_contact": false,
+        "head_nail_contact_steps": 0,
+        "first_head_nail_contact_timestep": null
+      },
+      {
+        "final_nail_qpos": 0.1012366553333078,
+        "max_nail_qpos": 0.10145230161094881,
+        "progress_fraction": 1.1272477956772091,
+        "ge_003": true,
+        "ge_005": true,
+        "ge_008": true,
+        "crossed_success_threshold": true,
+        "success": true,
+        "minimum_proxy_goal_distance": 0.2626260131722624,
+        "minimum_striking_goal_distance": 0.26373362290334307,
+        "mean_proxy_error": 0.010348995826306972,
+        "final_proxy_position": [
+          0.2404789826600338,
+          0.4899466768403135,
+          0.028441841443196707
+        ],
+        "final_striking_position": [
+          0.24020377386156191,
+          0.48592122283766387,
+          0.037972910429349374
+        ],
+        "head_nail_contact": false,
+        "head_nail_contact_steps": 0,
+        "first_head_nail_contact_timestep": null
+      },
+      {
+        "final_nail_qpos": 0.10051396918768006,
+        "max_nail_qpos": 0.10434443889102694,
+        "progress_fraction": 1.1593826543447439,
+        "ge_003": true,
+        "ge_005": true,
+        "ge_008": true,
+        "crossed_success_threshold": true,
+        "success": true,
+        "minimum_proxy_goal_distance": 0.048061443811277374,
+        "minimum_striking_goal_distance": 0.07505638101129043,
+        "mean_proxy_error": 0.0442540718802716,
+        "final_proxy_position": [
+          0.27970031364945536,
+          0.7464158941536243,
+          0.06011035915014349
+        ],
+        "final_striking_position": [
+          0.2815589551865986,
+          0.7315484099900443,
+          0.037730989766135585
+        ],
+        "head_nail_contact": false,
+        "head_nail_contact_steps": 0,
+        "first_head_nail_contact_timestep": null
+      },
+      {
+        "final_nail_qpos": 0.10092082111595573,
+        "max_nail_qpos": 0.10297527269733958,
+        "progress_fraction": 1.1441696966371064,
+        "ge_003": true,
+        "ge_005": true,
+        "ge_008": true,
+        "crossed_success_threshold": true,
+        "success": true,
+        "minimum_proxy_goal_distance": 0.0771028512906707,
+        "minimum_striking_goal_distance": 0.08534197261073088,
+        "mean_proxy_error": 0.059138777801919375,
+        "final_proxy_position": [
+          0.3215109684114726,
+          0.7814972337413846,
+          0.07005018841740838
+        ],
+        "final_striking_position": [
+          0.32932345304232763,
+          0.7164616928471566,
+          0.04660635490150138
+        ],
+        "head_nail_contact": false,
+        "head_nail_contact_steps": 0,
+        "first_head_nail_contact_timestep": null
+      },
+      {
+        "final_nail_qpos": 0.09994693672919007,
+        "max_nail_qpos": 0.10370404874390432,
+        "progress_fraction": 1.1522672082656036,
+        "ge_003": true,
+        "ge_005": true,
+        "ge_008": true,
+        "crossed_success_threshold": true,
+        "success": true,
+        "minimum_proxy_goal_distance": 0.09601381913071524,
+        "minimum_striking_goal_distance": 0.10381498423649622,
+        "mean_proxy_error": 0.05984085239179644,
+        "final_proxy_position": [
+          0.32197905278574873,
+          0.7814259728963815,
+          0.07430684124899069
+        ],
+        "final_striking_position": [
+          0.3305323371700115,
+          0.7165677198553823,
+          0.05692329441103215
+        ],
+        "head_nail_contact": false,
+        "head_nail_contact_steps": 0,
+        "first_head_nail_contact_timestep": null
+      },
+      {
+        "final_nail_qpos": 0.09948968630179829,
+        "max_nail_qpos": 0.10337683224828507,
+        "progress_fraction": 1.1486314694253899,
+        "ge_003": true,
+        "ge_005": true,
+        "ge_008": true,
+        "crossed_success_threshold": true,
+        "success": true,
+        "minimum_proxy_goal_distance": 0.10403978451252399,
+        "minimum_striking_goal_distance": 0.11538492322409474,
+        "mean_proxy_error": 0.059801105404260084,
+        "final_proxy_position": [
+          0.3399126147575634,
+          0.7766848699462259,
+          0.07273871339005832
+        ],
+        "final_striking_position": [
+          0.34909183128508314,
+          0.7169161715898665,
+          0.062045762689512424
+        ],
+        "head_nail_contact": false,
+        "head_nail_contact_steps": 0,
+        "first_head_nail_contact_timestep": null
+      },
+      {
+        "final_nail_qpos": 0.0,
+        "max_nail_qpos": 0.0,
+        "progress_fraction": 0.0,
+        "ge_003": false,
+        "ge_005": false,
+        "ge_008": false,
+        "crossed_success_threshold": false,
+        "success": false,
+        "minimum_proxy_goal_distance": 0.2902907664412102,
+        "minimum_striking_goal_distance": 0.306367796152644,
+        "mean_proxy_error": 0.03048633015361043,
+        "final_proxy_position": [
+          0.12018490118820396,
+          0.43240040411761665,
+          0.05863791956300305
+        ],
+        "final_striking_position": [
+          0.11957221809836285,
+          0.42615022786506906,
+          0.03759891637134923
+        ],
+        "head_nail_contact": false,
+        "head_nail_contact_steps": 0,
+        "first_head_nail_contact_timestep": null
+      },
+      {
+        "final_nail_qpos": 0.10087934007911753,
+        "max_nail_qpos": 0.10332144015264018,
+        "progress_fraction": 1.148016001696002,
+        "ge_003": true,
+        "ge_005": true,
+        "ge_008": true,
+        "crossed_success_threshold": true,
+        "success": true,
+        "minimum_proxy_goal_distance": 0.08966393615978624,
+        "minimum_striking_goal_distance": 0.1032533063766371,
+        "mean_proxy_error": 0.05098787699964709,
+        "final_proxy_position": [
+          0.32741093841751523,
+          0.7799833430963483,
+          0.07002686552012811
+        ],
+        "final_striking_position": [
+          0.3368945722401195,
+          0.7229515431461683,
+          0.06844963543238537
+        ],
+        "head_nail_contact": false,
+        "head_nail_contact_steps": 0,
+        "first_head_nail_contact_timestep": null
+      },
+      {
+        "final_nail_qpos": 0.0984823684070054,
+        "max_nail_qpos": 0.10412406449505456,
+        "progress_fraction": 1.1569340499450507,
+        "ge_003": true,
+        "ge_005": true,
+        "ge_008": true,
+        "crossed_success_threshold": true,
+        "success": true,
+        "minimum_proxy_goal_distance": 0.09294621293104892,
+        "minimum_striking_goal_distance": 0.10451232228962234,
+        "mean_proxy_error": 0.05498585049059237,
+        "final_proxy_position": [
+          0.32652822194785414,
+          0.7801247363059653,
+          0.08269570087289899
+        ],
+        "final_striking_position": [
+          0.33424317465342457,
+          0.7170763952083719,
+          0.05823343900852945
+        ],
+        "head_nail_contact": false,
+        "head_nail_contact_steps": 0,
+        "first_head_nail_contact_timestep": null
+      },
+      {
+        "final_nail_qpos": 0.10087934007911753,
+        "max_nail_qpos": 0.10332144015264018,
+        "progress_fraction": 1.148016001696002,
+        "ge_003": true,
+        "ge_005": true,
+        "ge_008": true,
+        "crossed_success_threshold": true,
+        "success": true,
+        "minimum_proxy_goal_distance": 0.08966393615978624,
+        "minimum_striking_goal_distance": 0.1032533063766371,
+        "mean_proxy_error": 0.05098787699964709,
+        "final_proxy_position": [
+          0.32741093841751523,
+          0.7799833430963483,
+          0.07002686552012811
+        ],
+        "final_striking_position": [
+          0.3368945722401195,
+          0.7229515431461683,
+          0.06844963543238537
+        ],
+        "head_nail_contact": false,
+        "head_nail_contact_steps": 0,
+        "first_head_nail_contact_timestep": null
+      }
+    ]
+  },
+  {
+    "step": 100000,
+    "episodes": [
+      {
+        "final_nail_qpos": 0.10077575500837935,
+        "max_nail_qpos": 0.10254938701223149,
+        "progress_fraction": 1.1394376334692389,
+        "ge_003": true,
+        "ge_005": true,
+        "ge_008": true,
+        "crossed_success_threshold": true,
+        "success": true,
+        "minimum_proxy_goal_distance": 0.09435388149802171,
+        "minimum_striking_goal_distance": 0.10601729941822334,
+        "mean_proxy_error": 0.04939357307893756,
+        "final_proxy_position": [
+          0.3133490218037044,
+          0.7716948621089714,
+          0.028359872268939885
+        ],
+        "final_striking_position": [
+          0.3225939656374281,
+          0.7128412488164241,
+          0.0378906006900348
+        ],
+        "head_nail_contact": false,
+        "head_nail_contact_steps": 0,
+        "first_head_nail_contact_timestep": null
+      },
+      {
+        "final_nail_qpos": 0.10104013962131332,
+        "max_nail_qpos": 0.1027516956880542,
+        "progress_fraction": 1.1416855076450467,
+        "ge_003": true,
+        "ge_005": true,
+        "ge_008": true,
+        "crossed_success_threshold": true,
+        "success": true,
+        "minimum_proxy_goal_distance": 0.07895597657034298,
+        "minimum_striking_goal_distance": 0.08952653069227216,
+        "mean_proxy_error": 0.03293940448206478,
+        "final_proxy_position": [
+          0.29536417204057064,
+          0.7625449887844093,
+          0.05071360707843581
+        ],
+        "final_striking_position": [
+          0.30246657566949664,
+          0.7279521009621509,
+          0.03778049638443963
+        ],
+        "head_nail_contact": false,
+        "head_nail_contact_steps": 0,
+        "first_head_nail_contact_timestep": null
+      },
+      {
+        "final_nail_qpos": 0.10117570629760624,
+        "max_nail_qpos": 0.10278413753704146,
+        "progress_fraction": 1.1420459726337941,
+        "ge_003": true,
+        "ge_005": true,
+        "ge_008": true,
+        "crossed_success_threshold": true,
+        "success": true,
+        "minimum_proxy_goal_distance": 0.12261131964667507,
+        "minimum_striking_goal_distance": 0.13458890617516803,
+        "mean_proxy_error": 0.04860369360721028,
+        "final_proxy_position": [
+          0.34546733651968886,
+          0.7757103042236659,
+          0.02743643357327982
+        ],
+        "final_striking_position": [
+          0.3544975545535818,
+          0.7240027726049673,
+          0.03723543145876562
+        ],
+        "head_nail_contact": false,
+        "head_nail_contact_steps": 0,
+        "first_head_nail_contact_timestep": null
+      },
+      {
+        "final_nail_qpos": 0.10092562727555267,
+        "max_nail_qpos": 0.10316228048430114,
+        "progress_fraction": 1.1462475609366793,
+        "ge_003": true,
+        "ge_005": true,
+        "ge_008": true,
+        "crossed_success_threshold": true,
+        "success": true,
+        "minimum_proxy_goal_distance": 0.0759921626721852,
+        "minimum_striking_goal_distance": 0.0714360758266272,
+        "mean_proxy_error": 0.06078330682929059,
+        "final_proxy_position": [
+          0.3138014495326191,
+          0.78372738409868,
+          0.06572161905925906
+        ],
+        "final_striking_position": [
+          0.3228929653542147,
+          0.7182423247756163,
+          0.055045786474506496
+        ],
+        "head_nail_contact": false,
+        "head_nail_contact_steps": 0,
+        "first_head_nail_contact_timestep": null
+      },
+      {
+        "final_nail_qpos": 0.10063879954245478,
+        "max_nail_qpos": 0.10544686483053693,
+        "progress_fraction": 1.1716318314504104,
+        "ge_003": true,
+        "ge_005": true,
+        "ge_008": true,
+        "crossed_success_threshold": true,
+        "success": true,
+        "minimum_proxy_goal_distance": 0.0902955267664822,
+        "minimum_striking_goal_distance": 0.0843572819899882,
+        "mean_proxy_error": 0.012396613436637128,
+        "final_proxy_position": [
+          0.2902061429392896,
+          0.7382936756512026,
+          0.027563147574816198
+        ],
+        "final_striking_position": [
+          0.2899357136312394,
+          0.7342846988208588,
+          0.036915664400810996
+        ],
+        "head_nail_contact": false,
+        "head_nail_contact_steps": 0,
+        "first_head_nail_contact_timestep": null
+      },
+      {
+        "final_nail_qpos": 0.1007635175343929,
+        "max_nail_qpos": 0.10273592416158313,
+        "progress_fraction": 1.1415102684620348,
+        "ge_003": true,
+        "ge_005": true,
+        "ge_008": true,
+        "crossed_success_threshold": true,
+        "success": true,
+        "minimum_proxy_goal_distance": 0.14322595103227834,
+        "minimum_striking_goal_distance": 0.15210129801129943,
+        "mean_proxy_error": 0.020581336642099195,
+        "final_proxy_position": [
+          0.38256390002700014,
+          0.7615339147248799,
+          0.07233482342629897
+        ],
+        "final_striking_position": [
+          0.3800427788014816,
+          0.7559868120332459,
+          0.04116938239529819
+        ],
+        "head_nail_contact": false,
+        "head_nail_contact_steps": 0,
+        "first_head_nail_contact_timestep": null
+      },
+      {
+        "final_nail_qpos": 0.10073154377314683,
+        "max_nail_qpos": 0.10250660499014579,
+        "progress_fraction": 1.1389622776682866,
+        "ge_003": true,
+        "ge_005": true,
+        "ge_008": true,
+        "crossed_success_threshold": true,
+        "success": true,
+        "minimum_proxy_goal_distance": 0.09597717761223035,
+        "minimum_striking_goal_distance": 0.10078368080445588,
+        "mean_proxy_error": 0.03276765245574636,
+        "final_proxy_position": [
+          0.31162416918482816,
+          0.7653735553315386,
+          0.027747972819446156
+        ],
+        "final_striking_position": [
+          0.31954554362073206,
+          0.7265651071401764,
+          0.037199435113648704
+        ],
+        "head_nail_contact": false,
+        "head_nail_contact_steps": 0,
+        "first_head_nail_contact_timestep": null
+      },
+      {
+        "final_nail_qpos": 0.10117503259680737,
+        "max_nail_qpos": 0.10242101660312733,
+        "progress_fraction": 1.1380112955903037,
+        "ge_003": true,
+        "ge_005": true,
+        "ge_008": true,
+        "crossed_success_threshold": true,
+        "success": true,
+        "minimum_proxy_goal_distance": 0.1105784829531658,
+        "minimum_striking_goal_distance": 0.13557977519321213,
+        "mean_proxy_error": 0.0496240178835343,
+        "final_proxy_position": [
+          0.3486321060599912,
+          0.7750600813237252,
+          0.027425853903520425
+        ],
+        "final_striking_position": [
+          0.35762027795246265,
+          0.7241563869283248,
+          0.037236816383739074
+        ],
+        "head_nail_contact": false,
+        "head_nail_contact_steps": 0,
+        "first_head_nail_contact_timestep": null
+      },
+      {
+        "final_nail_qpos": 0.10081609039636998,
+        "max_nail_qpos": 0.10267236517305219,
+        "progress_fraction": 1.1408040574783576,
+        "ge_003": true,
+        "ge_005": true,
+        "ge_008": true,
+        "crossed_success_threshold": true,
+        "success": true,
+        "minimum_proxy_goal_distance": 0.09747525918666454,
+        "minimum_striking_goal_distance": 0.09177834240147745,
+        "mean_proxy_error": 0.016088889513485628,
+        "final_proxy_position": [
+          0.2946146953063426,
+          0.7426738467183724,
+          0.027543178251471227
+        ],
+        "final_striking_position": [
+          0.2962797115045138,
+          0.7327978695260919,
+          0.03692426961741743
+        ],
+        "head_nail_contact": false,
+        "head_nail_contact_steps": 0,
+        "first_head_nail_contact_timestep": null
+      },
+      {
+        "final_nail_qpos": 0.10089868399780334,
+        "max_nail_qpos": 0.10272515997200446,
+        "progress_fraction": 1.141390666355605,
+        "ge_003": true,
+        "ge_005": true,
+        "ge_008": true,
+        "crossed_success_threshold": true,
+        "success": true,
+        "minimum_proxy_goal_distance": 0.06957214370087528,
+        "minimum_striking_goal_distance": 0.09252276240871667,
+        "mean_proxy_error": 0.046551389352076075,
+        "final_proxy_position": [
+          0.3109923808916642,
+          0.7845916456432784,
+          0.06520945323153089
+        ],
+        "final_striking_position": [
+          0.31999970400858135,
+          0.7175219184470708,
+          0.05413950787371263
+        ],
+        "head_nail_contact": false,
+        "head_nail_contact_steps": 0,
+        "first_head_nail_contact_timestep": null
+      },
+      {
+        "final_nail_qpos": 0.10082092835443693,
+        "max_nail_qpos": 0.1030671665404465,
+        "progress_fraction": 1.1451907393382945,
+        "ge_003": true,
+        "ge_005": true,
+        "ge_008": true,
+        "crossed_success_threshold": true,
+        "success": true,
+        "minimum_proxy_goal_distance": 0.07614830427752825,
+        "minimum_striking_goal_distance": 0.08509740764743476,
+        "mean_proxy_error": 0.04351920566704138,
+        "final_proxy_position": [
+          0.2892180610475026,
+          0.77683231877264,
+          0.031006839432933763
+        ],
+        "final_striking_position": [
+          0.2985789002466251,
+          0.7195132041406905,
+          0.037768422044449274
+        ],
+        "head_nail_contact": false,
+        "head_nail_contact_steps": 0,
+        "first_head_nail_contact_timestep": null
+      },
+      {
+        "final_nail_qpos": 0.1009844792152046,
+        "max_nail_qpos": 0.10270267655659207,
+        "progress_fraction": 1.1411408506288008,
+        "ge_003": true,
+        "ge_005": true,
+        "ge_008": true,
+        "crossed_success_threshold": true,
+        "success": true,
+        "minimum_proxy_goal_distance": 0.15050717651104972,
+        "minimum_striking_goal_distance": 0.15690709518203066,
+        "mean_proxy_error": 0.02332509350805266,
+        "final_proxy_position": [
+          0.3850651840575686,
+          0.7612287265804814,
+          0.07169527812283852
+        ],
+        "final_striking_position": [
+          0.3815962073745216,
+          0.7583783209724855,
+          0.0405831807943578
+        ],
+        "head_nail_contact": false,
+        "head_nail_contact_steps": 0,
+        "first_head_nail_contact_timestep": null
+      },
+      {
+        "final_nail_qpos": 0.1008625284001367,
+        "max_nail_qpos": 0.10452967532069794,
+        "progress_fraction": 1.1614408368966438,
+        "ge_003": true,
+        "ge_005": true,
+        "ge_008": true,
+        "crossed_success_threshold": true,
+        "success": true,
+        "minimum_proxy_goal_distance": 0.10234478111023056,
+        "minimum_striking_goal_distance": 0.10118181230725842,
+        "mean_proxy_error": 0.013799013017337877,
+        "final_proxy_position": [
+          0.3151018288072497,
+          0.744681434932229,
+          0.027494152749678143
+        ],
+        "final_striking_position": [
+          0.31753531958100134,
+          0.7322124912369649,
+          0.037094140333497075
+        ],
+        "head_nail_contact": false,
+        "head_nail_contact_steps": 0,
+        "first_head_nail_contact_timestep": null
+      },
+      {
+        "final_nail_qpos": 0.1009781259514161,
+        "max_nail_qpos": 0.10318153518640961,
+        "progress_fraction": 1.1464615020712179,
+        "ge_003": true,
+        "ge_005": true,
+        "ge_008": true,
+        "crossed_success_threshold": true,
+        "success": true,
+        "minimum_proxy_goal_distance": 0.15212302281635645,
+        "minimum_striking_goal_distance": 0.16211244080877885,
+        "mean_proxy_error": 0.045435267348623,
+        "final_proxy_position": [
+          0.3780411411471802,
+          0.7717790513466254,
+          0.028143327184065793
+        ],
+        "final_striking_position": [
+          0.3851342489314663,
+          0.7386657080947401,
+          0.03778703082416187
+        ],
+        "head_nail_contact": false,
+        "head_nail_contact_steps": 0,
+        "first_head_nail_contact_timestep": null
+      },
+      {
+        "final_nail_qpos": 0.1007635175343929,
+        "max_nail_qpos": 0.10273592416158313,
+        "progress_fraction": 1.1415102684620348,
+        "ge_003": true,
+        "ge_005": true,
+        "ge_008": true,
+        "crossed_success_threshold": true,
+        "success": true,
+        "minimum_proxy_goal_distance": 0.14322595103227834,
+        "minimum_striking_goal_distance": 0.15210129801129943,
+        "mean_proxy_error": 0.020581336642099195,
+        "final_proxy_position": [
+          0.38256390002700014,
+          0.7615339147248799,
+          0.07233482342629897
+        ],
+        "final_striking_position": [
+          0.3800427788014816,
+          0.7559868120332459,
+          0.04116938239529819
+        ],
+        "head_nail_contact": false,
+        "head_nail_contact_steps": 0,
+        "first_head_nail_contact_timestep": null
+      },
+      {
+        "final_nail_qpos": 0.10126561110423375,
+        "max_nail_qpos": 0.10233876143385,
+        "progress_fraction": 1.137097349265,
+        "ge_003": true,
+        "ge_005": true,
+        "ge_008": true,
+        "crossed_success_threshold": true,
+        "success": true,
+        "minimum_proxy_goal_distance": 0.15067101943397435,
+        "minimum_striking_goal_distance": 0.14724797628513675,
+        "mean_proxy_error": 0.013392428927885875,
+        "final_proxy_position": [
+          0.3669087216089537,
+          0.7314655380529209,
+          0.028397980170694125
+        ],
+        "final_striking_position": [
+          0.3677839390190883,
+          0.72403949974357,
+          0.03794486319041015
+        ],
+        "head_nail_contact": false,
+        "head_nail_contact_steps": 0,
+        "first_head_nail_contact_timestep": null
+      },
+      {
+        "final_nail_qpos": 0.10082150457291963,
+        "max_nail_qpos": 0.10498319429496174,
+        "progress_fraction": 1.166479936610686,
+        "ge_003": true,
+        "ge_005": true,
+        "ge_008": true,
+        "crossed_success_threshold": true,
+        "success": true,
+        "minimum_proxy_goal_distance": 0.1759700119591107,
+        "minimum_striking_goal_distance": 0.29170007736586256,
+        "mean_proxy_error": 0.10972697577761777,
+        "final_proxy_position": [
+          0.15823771888065793,
+          0.5935201429298052,
+          0.028441841443196735
+        ],
+        "final_striking_position": [
+          0.15513955160428822,
+          0.47006170289266697,
+          0.037972910429349374
+        ],
+        "head_nail_contact": false,
+        "head_nail_contact_steps": 0,
+        "first_head_nail_contact_timestep": null
+      },
+      {
+        "final_nail_qpos": 0.1008835418782531,
+        "max_nail_qpos": 0.10297794691306053,
+        "progress_fraction": 1.144199410145117,
+        "ge_003": true,
+        "ge_005": true,
+        "ge_008": true,
+        "crossed_success_threshold": true,
+        "success": true,
+        "minimum_proxy_goal_distance": 0.07749582382989836,
+        "minimum_striking_goal_distance": 0.10658720124896769,
+        "mean_proxy_error": 0.06405725843570774,
+        "final_proxy_position": [
+          0.3217814299568585,
+          0.7813784822460583,
+          0.06854598683922848
+        ],
+        "final_striking_position": [
+          0.33045805246754245,
+          0.7178567137111463,
+          0.052059805814663095
+        ],
+        "head_nail_contact": false,
+        "head_nail_contact_steps": 0,
+        "first_head_nail_contact_timestep": null
+      },
+      {
+        "final_nail_qpos": 0.09571947386760307,
+        "max_nail_qpos": 0.09571947386760307,
+        "progress_fraction": 1.0635497096400341,
+        "ge_003": true,
+        "ge_005": true,
+        "ge_008": true,
+        "crossed_success_threshold": true,
+        "success": true,
+        "minimum_proxy_goal_distance": 0.1117773310231572,
+        "minimum_striking_goal_distance": 0.15733765285734813,
+        "mean_proxy_error": 0.052558305740627975,
+        "final_proxy_position": [
+          0.36912972232122043,
+          0.7684412186568677,
+          0.02844184144319672
+        ],
+        "final_striking_position": [
+          0.37818953190979554,
+          0.7164374368789976,
+          0.037972910429349374
+        ],
+        "head_nail_contact": false,
+        "head_nail_contact_steps": 0,
+        "first_head_nail_contact_timestep": null
+      },
+      {
+        "final_nail_qpos": 0.09983081155528835,
+        "max_nail_qpos": 0.10145822322474059,
+        "progress_fraction": 1.1273135913860066,
+        "ge_003": true,
+        "ge_005": true,
+        "ge_008": true,
+        "crossed_success_threshold": true,
+        "success": true,
+        "minimum_proxy_goal_distance": 0.1869573584922952,
+        "minimum_striking_goal_distance": 0.20560919714028658,
+        "mean_proxy_error": 0.024737646985477403,
+        "final_proxy_position": [
+          0.4239432513007214,
+          0.7153524779486564,
+          0.028439790658506558
+        ],
+        "final_striking_position": [
+          0.42784457849350954,
+          0.697560901206185,
+          0.03796890134922432
+        ],
+        "head_nail_contact": false,
+        "head_nail_contact_steps": 0,
+        "first_head_nail_contact_timestep": null
+      }
+    ]
+  },
+  {
+    "step": 120000,
+    "episodes": [
+      {
+        "final_nail_qpos": 0.09580763834005246,
+        "max_nail_qpos": 0.10585443087961001,
+        "progress_fraction": 1.176160343106778,
+        "ge_003": true,
+        "ge_005": true,
+        "ge_008": true,
+        "crossed_success_threshold": true,
+        "success": true,
+        "minimum_proxy_goal_distance": 0.04708208490074313,
+        "minimum_striking_goal_distance": 0.10932464645019811,
+        "mean_proxy_error": 0.11228658329556938,
+        "final_proxy_position": [
+          0.2922192446581855,
+          0.7882557729129787,
+          0.0282962378591015
+        ],
+        "final_striking_position": [
+          0.291858103127958,
+          0.672023834889559,
+          0.03775160737056379
+        ],
+        "head_nail_contact": false,
+        "head_nail_contact_steps": 0,
+        "first_head_nail_contact_timestep": null
+      },
+      {
+        "final_nail_qpos": 0.10097885680181064,
+        "max_nail_qpos": 0.10098884878916789,
+        "progress_fraction": 1.1220983198796433,
+        "ge_003": true,
+        "ge_005": true,
+        "ge_008": true,
+        "crossed_success_threshold": true,
+        "success": true,
+        "minimum_proxy_goal_distance": 0.06144350418693709,
+        "minimum_striking_goal_distance": 0.11304112277723487,
+        "mean_proxy_error": 0.060336083054421626,
+        "final_proxy_position": [
+          0.33002069204817447,
+          0.7791953608434732,
+          0.0769475903733601
+        ],
+        "final_striking_position": [
+          0.337687787141292,
+          0.7221718427174286,
+          0.0521506998689136
+        ],
+        "head_nail_contact": false,
+        "head_nail_contact_steps": 0,
+        "first_head_nail_contact_timestep": null
+      },
+      {
+        "final_nail_qpos": 0.10060896085161213,
+        "max_nail_qpos": 0.10379571328316868,
+        "progress_fraction": 1.1532857031463186,
+        "ge_003": true,
+        "ge_005": true,
+        "ge_008": true,
+        "crossed_success_threshold": true,
+        "success": true,
+        "minimum_proxy_goal_distance": 0.055072322042174146,
+        "minimum_striking_goal_distance": 0.06887787338242865,
+        "mean_proxy_error": 0.02487079843338764,
+        "final_proxy_position": [
+          0.29574794128901016,
+          0.768154483227774,
+          0.0650561433431916
+        ],
+        "final_striking_position": [
+          0.30432084530751236,
+          0.7244923278178669,
+          0.07228461931803162
+        ],
+        "head_nail_contact": true,
+        "head_nail_contact_steps": 2,
+        "first_head_nail_contact_timestep": 60
+      },
+      {
+        "final_nail_qpos": 0.10090690296305496,
+        "max_nail_qpos": 0.10299911687960332,
+        "progress_fraction": 1.1444346319955925,
+        "ge_003": true,
+        "ge_005": true,
+        "ge_008": true,
+        "crossed_success_threshold": true,
+        "success": true,
+        "minimum_proxy_goal_distance": 0.09047660888601643,
+        "minimum_striking_goal_distance": 0.11003360171485486,
+        "mean_proxy_error": 0.05495624352610015,
+        "final_proxy_position": [
+          0.33142868754523214,
+          0.7789322502440734,
+          0.07443781047738218
+        ],
+        "final_striking_position": [
+          0.3404609557709067,
+          0.7230677374071377,
+          0.062313865393055785
+        ],
+        "head_nail_contact": false,
+        "head_nail_contact_steps": 0,
+        "first_head_nail_contact_timestep": null
+      },
+      {
+        "final_nail_qpos": 0.10063250358655611,
+        "max_nail_qpos": 0.10427227999794772,
+        "progress_fraction": 1.1585808888660858,
+        "ge_003": true,
+        "ge_005": true,
+        "ge_008": true,
+        "crossed_success_threshold": true,
+        "success": true,
+        "minimum_proxy_goal_distance": 0.08688178685284051,
+        "minimum_striking_goal_distance": 0.08698280219219905,
+        "mean_proxy_error": 0.010651248248218153,
+        "final_proxy_position": [
+          0.2914668828135707,
+          0.7386453360720118,
+          0.02756688029528528
+        ],
+        "final_striking_position": [
+          0.2913697632771156,
+          0.734139898893148,
+          0.036916870495929885
+        ],
+        "head_nail_contact": false,
+        "head_nail_contact_steps": 0,
+        "first_head_nail_contact_timestep": null
+      },
+      {
+        "final_nail_qpos": 0.10096564382767569,
+        "max_nail_qpos": 0.10096564382767569,
+        "progress_fraction": 1.1218404869741743,
+        "ge_003": true,
+        "ge_005": true,
+        "ge_008": true,
+        "crossed_success_threshold": true,
+        "success": true,
+        "minimum_proxy_goal_distance": 0.04953262318155512,
+        "minimum_striking_goal_distance": 0.11005097135017274,
+        "mean_proxy_error": 0.05858666543804136,
+        "final_proxy_position": [
+          0.32639771084985797,
+          0.780123857756519,
+          0.07599567903867499
+        ],
+        "final_striking_position": [
+          0.3341633841668892,
+          0.7212519921740169,
+          0.051717990326213256
+        ],
+        "head_nail_contact": false,
+        "head_nail_contact_steps": 0,
+        "first_head_nail_contact_timestep": null
+      },
+      {
+        "final_nail_qpos": 0.10097885680181064,
+        "max_nail_qpos": 0.10098884878916789,
+        "progress_fraction": 1.1220983198796433,
+        "ge_003": true,
+        "ge_005": true,
+        "ge_008": true,
+        "crossed_success_threshold": true,
+        "success": true,
+        "minimum_proxy_goal_distance": 0.06144350418693709,
+        "minimum_striking_goal_distance": 0.11304112277723487,
+        "mean_proxy_error": 0.060336083054421626,
+        "final_proxy_position": [
+          0.33002069204817447,
+          0.7791953608434732,
+          0.0769475903733601
+        ],
+        "final_striking_position": [
+          0.337687787141292,
+          0.7221718427174286,
+          0.0521506998689136
+        ],
+        "head_nail_contact": false,
+        "head_nail_contact_steps": 0,
+        "first_head_nail_contact_timestep": null
+      },
+      {
+        "final_nail_qpos": 0.10085702891381039,
+        "max_nail_qpos": 0.10313818281957375,
+        "progress_fraction": 1.145979809106375,
+        "ge_003": true,
+        "ge_005": true,
+        "ge_008": true,
+        "crossed_success_threshold": true,
+        "success": true,
+        "minimum_proxy_goal_distance": 0.117229855724708,
+        "minimum_striking_goal_distance": 0.11810847873834279,
+        "mean_proxy_error": 0.014071972656624911,
+        "final_proxy_position": [
+          0.331589442499566,
+          0.7290144562613265,
+          0.028390900114127333
+        ],
+        "final_striking_position": [
+          0.332208917851767,
+          0.7223650981092058,
+          0.037935173371058575
+        ],
+        "head_nail_contact": false,
+        "head_nail_contact_steps": 0,
+        "first_head_nail_contact_timestep": null
+      },
+      {
+        "final_nail_qpos": 0.10097674745925375,
+        "max_nail_qpos": 0.10106946637226634,
+        "progress_fraction": 1.1229940708029593,
+        "ge_003": true,
+        "ge_005": true,
+        "ge_008": true,
+        "crossed_success_threshold": true,
+        "success": true,
+        "minimum_proxy_goal_distance": 0.04859104055064072,
+        "minimum_striking_goal_distance": 0.10594692380001006,
+        "mean_proxy_error": 0.06036078851584847,
+        "final_proxy_position": [
+          0.323608913497391,
+          0.780937015989627,
+          0.07594222218563842
+        ],
+        "final_striking_position": [
+          0.3318993311105229,
+          0.7220649954428742,
+          0.055618270750183774
+        ],
+        "head_nail_contact": false,
+        "head_nail_contact_steps": 0,
+        "first_head_nail_contact_timestep": null
+      },
+      {
+        "final_nail_qpos": 0.1009876084042368,
+        "max_nail_qpos": 0.10346216542120358,
+        "progress_fraction": 1.1495796157911509,
+        "ge_003": true,
+        "ge_005": true,
+        "ge_008": true,
+        "crossed_success_threshold": true,
+        "success": true,
+        "minimum_proxy_goal_distance": 0.07501987813471332,
+        "minimum_striking_goal_distance": 0.12533465302588534,
+        "mean_proxy_error": 0.06114754533528626,
+        "final_proxy_position": [
+          0.34203330808111554,
+          0.7762521295229663,
+          0.07896344546774163
+        ],
+        "final_striking_position": [
+          0.3480550605954462,
+          0.7230346546444532,
+          0.04539597542535039
+        ],
+        "head_nail_contact": false,
+        "head_nail_contact_steps": 0,
+        "first_head_nail_contact_timestep": null
+      },
+      {
+        "final_nail_qpos": 0.10098406488758424,
+        "max_nail_qpos": 0.10138359428581892,
+        "progress_fraction": 1.1264843809535436,
+        "ge_003": true,
+        "ge_005": true,
+        "ge_008": true,
+        "crossed_success_threshold": true,
+        "success": true,
+        "minimum_proxy_goal_distance": 0.23888239705914097,
+        "minimum_striking_goal_distance": 0.2562730880080952,
+        "mean_proxy_error": 0.025536731759852514,
+        "final_proxy_position": [
+          0.2255144111212874,
+          0.5046507501038346,
+          0.028441841443196714
+        ],
+        "final_striking_position": [
+          0.23097522579240898,
+          0.48025801807471247,
+          0.037972910429349374
+        ],
+        "head_nail_contact": false,
+        "head_nail_contact_steps": 0,
+        "first_head_nail_contact_timestep": null
+      },
+      {
+        "final_nail_qpos": 0.10084952391377394,
+        "max_nail_qpos": 0.1028216591768398,
+        "progress_fraction": 1.1424628797426646,
+        "ge_003": true,
+        "ge_005": true,
+        "ge_008": true,
+        "crossed_success_threshold": true,
+        "success": true,
+        "minimum_proxy_goal_distance": 0.09648259670333167,
+        "minimum_striking_goal_distance": 0.10385006968874608,
+        "mean_proxy_error": 0.03982889187119157,
+        "final_proxy_position": [
+          0.2919290061133055,
+          0.7387448143748365,
+          0.02844184144319671
+        ],
+        "final_striking_position": [
+          0.30032156054947057,
+          0.6957479415708665,
+          0.03797291042934937
+        ],
+        "head_nail_contact": false,
+        "head_nail_contact_steps": 0,
+        "first_head_nail_contact_timestep": null
+      },
+      {
+        "final_nail_qpos": 0.10052300678238096,
+        "max_nail_qpos": 0.10485653698755137,
+        "progress_fraction": 1.1650726331950154,
+        "ge_003": true,
+        "ge_005": true,
+        "ge_008": true,
+        "crossed_success_threshold": true,
+        "success": true,
+        "minimum_proxy_goal_distance": 0.046129403648278916,
+        "minimum_striking_goal_distance": 0.07246934707559034,
+        "mean_proxy_error": 0.03715399380067308,
+        "final_proxy_position": [
+          0.28099694764192396,
+          0.7693563659361038,
+          0.05157764695381471
+        ],
+        "final_striking_position": [
+          0.28915658695214813,
+          0.7253215629078971,
+          0.0373141202963876
+        ],
+        "head_nail_contact": false,
+        "head_nail_contact_steps": 0,
+        "first_head_nail_contact_timestep": null
+      },
+      {
+        "final_nail_qpos": 0.10097663365409966,
+        "max_nail_qpos": 0.10368910069277518,
+        "progress_fraction": 1.1521011188086132,
+        "ge_003": true,
+        "ge_005": true,
+        "ge_008": true,
+        "crossed_success_threshold": true,
+        "success": true,
+        "minimum_proxy_goal_distance": 0.08425010944208082,
+        "minimum_striking_goal_distance": 0.09953186388682644,
+        "mean_proxy_error": 0.058060732154927824,
+        "final_proxy_position": [
+          0.3189875016102808,
+          0.7821989298818468,
+          0.06980018356609162
+        ],
+        "final_striking_position": [
+          0.32785151082937747,
+          0.7197392738651394,
+          0.055140835601998776
+        ],
+        "head_nail_contact": false,
+        "head_nail_contact_steps": 0,
+        "first_head_nail_contact_timestep": null
+      },
+      {
+        "final_nail_qpos": 0.10097652565976399,
+        "max_nail_qpos": 0.10259419520691732,
+        "progress_fraction": 1.1399355022990814,
+        "ge_003": true,
+        "ge_005": true,
+        "ge_008": true,
+        "crossed_success_threshold": true,
+        "success": true,
+        "minimum_proxy_goal_distance": 0.08135918918007964,
+        "minimum_striking_goal_distance": 0.10095443761514737,
+        "mean_proxy_error": 0.056918746971254174,
+        "final_proxy_position": [
+          0.31976753645032524,
+          0.781966318452088,
+          0.06975278563362465
+        ],
+        "final_striking_position": [
+          0.32860643265576894,
+          0.7196334864349224,
+          0.05478665644444736
+        ],
+        "head_nail_contact": false,
+        "head_nail_contact_steps": 0,
+        "first_head_nail_contact_timestep": null
+      },
+      {
+        "final_nail_qpos": 0.1009876084042368,
+        "max_nail_qpos": 0.10346216542120358,
+        "progress_fraction": 1.1495796157911509,
+        "ge_003": true,
+        "ge_005": true,
+        "ge_008": true,
+        "crossed_success_threshold": true,
+        "success": true,
+        "minimum_proxy_goal_distance": 0.07501987813471332,
+        "minimum_striking_goal_distance": 0.12533465302588534,
+        "mean_proxy_error": 0.06114754533528626,
+        "final_proxy_position": [
+          0.34203330808111554,
+          0.7762521295229663,
+          0.07896344546774163
+        ],
+        "final_striking_position": [
+          0.3480550605954462,
+          0.7230346546444532,
+          0.04539597542535039
+        ],
+        "head_nail_contact": false,
+        "head_nail_contact_steps": 0,
+        "first_head_nail_contact_timestep": null
+      },
+      {
+        "final_nail_qpos": 0.0,
+        "max_nail_qpos": 0.0,
+        "progress_fraction": 0.0,
+        "ge_003": false,
+        "ge_005": false,
+        "ge_008": false,
+        "crossed_success_threshold": false,
+        "success": false,
+        "minimum_proxy_goal_distance": 0.07496679979133453,
+        "minimum_striking_goal_distance": 0.10019507507802126,
+        "mean_proxy_error": 0.009746031981519902,
+        "final_proxy_position": [
+          0.18068583810350466,
+          0.7107814477897734,
+          0.07467115235096626
+        ],
+        "final_striking_position": [
+          0.17459679922484392,
+          0.7123923040664314,
+          0.039294345887372205
+        ],
+        "head_nail_contact": false,
+        "head_nail_contact_steps": 0,
+        "first_head_nail_contact_timestep": null
+      },
+      {
+        "final_nail_qpos": 0.10030672271882321,
+        "max_nail_qpos": 0.10455079928815796,
+        "progress_fraction": 1.1616755476461995,
+        "ge_003": true,
+        "ge_005": true,
+        "ge_008": true,
+        "crossed_success_threshold": true,
+        "success": true,
+        "minimum_proxy_goal_distance": 0.10022829505591245,
+        "minimum_striking_goal_distance": 0.10980379381225569,
+        "mean_proxy_error": 0.0343983616500316,
+        "final_proxy_position": [
+          0.32613709963811255,
+          0.7621077882306602,
+          0.027359116098638996
+        ],
+        "final_striking_position": [
+          0.3335141827842081,
+          0.727160561153066,
+          0.0370167869567386
+        ],
+        "head_nail_contact": false,
+        "head_nail_contact_steps": 0,
+        "first_head_nail_contact_timestep": null
+      },
+      {
+        "final_nail_qpos": 0.10099275910785818,
+        "max_nail_qpos": 0.10257301828635228,
+        "progress_fraction": 1.139700203181692,
+        "ge_003": true,
+        "ge_005": true,
+        "ge_008": true,
+        "crossed_success_threshold": true,
+        "success": true,
+        "minimum_proxy_goal_distance": 0.06378551501020822,
+        "minimum_striking_goal_distance": 0.08591353213862085,
+        "mean_proxy_error": 0.047551382618698894,
+        "final_proxy_position": [
+          0.30256860320909096,
+          0.7741687017486243,
+          0.06523271464238986
+        ],
+        "final_striking_position": [
+          0.3116511685439955,
+          0.7188749564620208,
+          0.054055180641526035
+        ],
+        "head_nail_contact": false,
+        "head_nail_contact_steps": 0,
+        "first_head_nail_contact_timestep": null
+      },
+      {
+        "final_nail_qpos": 0.10084952391377394,
+        "max_nail_qpos": 0.1028216591768398,
+        "progress_fraction": 1.1424628797426646,
+        "ge_003": true,
+        "ge_005": true,
+        "ge_008": true,
+        "crossed_success_threshold": true,
+        "success": true,
+        "minimum_proxy_goal_distance": 0.09648259670333167,
+        "minimum_striking_goal_distance": 0.10385006968874608,
+        "mean_proxy_error": 0.03982889187119157,
+        "final_proxy_position": [
+          0.2919290061133055,
+          0.7387448143748365,
+          0.02844184144319671
+        ],
+        "final_striking_position": [
+          0.30032156054947057,
+          0.6957479415708665,
+          0.03797291042934937
+        ],
+        "head_nail_contact": false,
+        "head_nail_contact_steps": 0,
+        "first_head_nail_contact_timestep": null
+      }
+    ]
+  }
+]

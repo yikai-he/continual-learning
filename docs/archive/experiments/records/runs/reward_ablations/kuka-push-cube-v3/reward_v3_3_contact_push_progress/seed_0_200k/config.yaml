@@ -1,0 +1,46 @@
+experiment: sac
+environment:
+  backend: kuka-v3
+  reward_function_version: v3_3_contact_push_progress
+  hammer_reward_variant: original
+  hammer_nail_progress_weight: 0.0
+  peg_unplug_reward_variant: original
+  peg_unplug_progress_weight: 0.0
+  peg_unplug_progress_gamma: 0.99
+sac:
+  steps: 200000
+  learning_rate: 0.0003
+  buffer_size: 1000000
+  learning_starts: 10000
+  batch_size: 128
+  gamma: 0.99
+  tau: 0.005
+  train_freq: 1
+  gradient_steps: 1
+  ent_coef: auto
+  net_arch:
+  - 256
+  - 256
+  - 256
+  - 256
+  checkpoint_freq: 20000
+  early_stopping:
+    enabled: true
+    min_steps: 100000
+    success_threshold: 0.95
+    patience: 3
+continual:
+  tasks:
+  - kuka-push-cube-v3
+evaluation:
+  episodes: 50
+  frequency: 20000
+  seed_offset: 10000
+  mode: fixed-tasks
+  task_set_seed: 10000
+runtime:
+  seed: 0
+  device: cpu
+  output: runs/reward_ablations/kuka-push-cube-v3/reward_v3_3_contact_push_progress
+  run_name: seed_0_200k
+  run_dir: /home/yikai/Documents/Code/Final/continual-learning/runs/reward_ablations/kuka-push-cube-v3/reward_v3_3_contact_push_progress/seed_0_200k

@@ -1,0 +1,32 @@
+experiment: sac
+environment:
+  backend: kuka-v2
+  reward_function_version: v2
+sac:
+  steps: 160000
+  learning_rate: 0.001
+  buffer_size: 100000
+  learning_starts: 50
+  batch_size: 128
+  gamma: 0.99
+  tau: 0.005
+  train_freq: 1
+  gradient_steps: 1
+  ent_coef: auto
+  net_arch:
+  - 256
+  - 256
+  checkpoint_freq: 10000
+continual:
+  tasks:
+  - kuka-reach-v2
+evaluation:
+  episodes: 50
+  frequency: 10000
+  seed_offset: 10000
+runtime:
+  seed: 0
+  device: cpu
+  output: runs/kuka_experts/reach_160k_buffer100k
+  run_name: null
+  run_dir: /home/yikai/Documents/Code/Final/continual-learning/runs/kuka_experts/reach_160k_buffer100k/reward_v2/kuka-reach-v2/seed_0

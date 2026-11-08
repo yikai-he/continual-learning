@@ -1,0 +1,365 @@
+{
+  "checkpoint": "/home/yikai/Documents/Code/Thesis/continual-learning/runs/exploratory/kuka-push-cube-v3/contact_start/reward_v6_rear_contact_push_progress/mass_100g/lr_1e4_resume_400k/seed_0_resume_200k_to_400k/best_success_model/best_success_model.zip",
+  "checkpoint_sha256": "5cdcbb5882dafed3c741b3d9d6d24648a46e27f3150c8d2bb75cbed2186f850a",
+  "conditions": [
+    {
+      "direction": 0,
+      "family": "baseline",
+      "kind": "baseline",
+      "name": "baseline",
+      "value": 0.0
+    },
+    {
+      "direction": 1,
+      "family": "tcp_velocity",
+      "kind": "tcp_velocity",
+      "name": "tcp_velocity_toward_10mms",
+      "value": 0.01
+    },
+    {
+      "direction": -1,
+      "family": "tcp_velocity",
+      "kind": "tcp_velocity",
+      "name": "tcp_velocity_away_10mms",
+      "value": 0.01
+    },
+    {
+      "direction": 1,
+      "family": "tcp_velocity",
+      "kind": "tcp_velocity",
+      "name": "tcp_velocity_toward_20mms",
+      "value": 0.02
+    },
+    {
+      "direction": -1,
+      "family": "tcp_velocity",
+      "kind": "tcp_velocity",
+      "name": "tcp_velocity_away_20mms",
+      "value": 0.02
+    },
+    {
+      "direction": 1,
+      "family": "tcp_velocity",
+      "kind": "tcp_velocity",
+      "name": "tcp_velocity_toward_30mms",
+      "value": 0.03
+    },
+    {
+      "direction": -1,
+      "family": "tcp_velocity",
+      "kind": "tcp_velocity",
+      "name": "tcp_velocity_away_30mms",
+      "value": 0.03
+    },
+    {
+      "direction": 1,
+      "family": "tcp_velocity",
+      "kind": "tcp_velocity",
+      "name": "tcp_velocity_toward_50mms",
+      "value": 0.05
+    },
+    {
+      "direction": -1,
+      "family": "tcp_velocity",
+      "kind": "tcp_velocity",
+      "name": "tcp_velocity_away_50mms",
+      "value": 0.05
+    },
+    {
+      "direction": 1,
+      "family": "cube_velocity",
+      "kind": "cube_velocity",
+      "name": "cube_velocity_toward_5mms",
+      "value": 0.005
+    },
+    {
+      "direction": -1,
+      "family": "cube_velocity",
+      "kind": "cube_velocity",
+      "name": "cube_velocity_away_5mms",
+      "value": 0.005
+    },
+    {
+      "direction": 1,
+      "family": "cube_velocity",
+      "kind": "cube_velocity",
+      "name": "cube_velocity_toward_10mms",
+      "value": 0.01
+    },
+    {
+      "direction": -1,
+      "family": "cube_velocity",
+      "kind": "cube_velocity",
+      "name": "cube_velocity_away_10mms",
+      "value": 0.01
+    },
+    {
+      "direction": 1,
+      "family": "cube_velocity",
+      "kind": "cube_velocity",
+      "name": "cube_velocity_toward_20mms",
+      "value": 0.02
+    },
+    {
+      "direction": -1,
+      "family": "cube_velocity",
+      "kind": "cube_velocity",
+      "name": "cube_velocity_away_20mms",
+      "value": 0.02
+    },
+    {
+      "direction": 1,
+      "family": "cube_velocity",
+      "kind": "cube_velocity",
+      "name": "cube_velocity_toward_40mms",
+      "value": 0.04
+    },
+    {
+      "direction": -1,
+      "family": "cube_velocity",
+      "kind": "cube_velocity",
+      "name": "cube_velocity_away_40mms",
+      "value": 0.04
+    },
+    {
+      "direction": 1,
+      "family": "cube_angular",
+      "kind": "cube_angular",
+      "name": "cube_angular_positive_0.1rads",
+      "value": 0.1
+    },
+    {
+      "direction": -1,
+      "family": "cube_angular",
+      "kind": "cube_angular",
+      "name": "cube_angular_negative_0.1rads",
+      "value": 0.1
+    },
+    {
+      "direction": 1,
+      "family": "cube_angular",
+      "kind": "cube_angular",
+      "name": "cube_angular_positive_0.25rads",
+      "value": 0.25
+    },
+    {
+      "direction": -1,
+      "family": "cube_angular",
+      "kind": "cube_angular",
+      "name": "cube_angular_negative_0.25rads",
+      "value": 0.25
+    },
+    {
+      "direction": 1,
+      "family": "cube_angular",
+      "kind": "cube_angular",
+      "name": "cube_angular_positive_0.5rads",
+      "value": 0.5
+    },
+    {
+      "direction": -1,
+      "family": "cube_angular",
+      "kind": "cube_angular",
+      "name": "cube_angular_negative_0.5rads",
+      "value": 0.5
+    },
+    {
+      "direction": 1,
+      "family": "cube_angular",
+      "kind": "cube_angular",
+      "name": "cube_angular_positive_1rads",
+      "value": 1.0
+    },
+    {
+      "direction": -1,
+      "family": "cube_angular",
+      "kind": "cube_angular",
+      "name": "cube_angular_negative_1rads",
+      "value": 1.0
+    },
+    {
+      "direction": 0,
+      "family": "tcp_lateral",
+      "kind": "tcp_lateral",
+      "name": "tcp_lateral_-5mm",
+      "value": -0.005
+    },
+    {
+      "direction": 0,
+      "family": "tcp_lateral",
+      "kind": "tcp_lateral",
+      "name": "tcp_lateral_-2mm",
+      "value": -0.002
+    },
+    {
+      "direction": 0,
+      "family": "tcp_lateral",
+      "kind": "tcp_lateral",
+      "name": "tcp_lateral_+2mm",
+      "value": 0.002
+    },
+    {
+      "direction": 0,
+      "family": "tcp_lateral",
+      "kind": "tcp_lateral",
+      "name": "tcp_lateral_+5mm",
+      "value": 0.005
+    },
+    {
+      "direction": 0,
+      "family": "tcp_forward",
+      "kind": "tcp_forward",
+      "name": "tcp_forward_-5mm",
+      "value": -0.005
+    },
+    {
+      "direction": 0,
+      "family": "tcp_forward",
+      "kind": "tcp_forward",
+      "name": "tcp_forward_-2mm",
+      "value": -0.002
+    },
+    {
+      "direction": 0,
+      "family": "tcp_forward",
+      "kind": "tcp_forward",
+      "name": "tcp_forward_+2mm",
+      "value": 0.002
+    },
+    {
+      "direction": 0,
+      "family": "tcp_forward",
+      "kind": "tcp_forward",
+      "name": "tcp_forward_+5mm",
+      "value": 0.005
+    },
+    {
+      "direction": 0,
+      "family": "aperture",
+      "kind": "aperture",
+      "name": "aperture_85mm",
+      "value": 0.085
+    },
+    {
+      "direction": 0,
+      "family": "aperture",
+      "kind": "aperture",
+      "name": "aperture_82mm",
+      "value": 0.082
+    },
+    {
+      "direction": 0,
+      "family": "aperture",
+      "kind": "aperture",
+      "name": "aperture_80mm",
+      "value": 0.08
+    },
+    {
+      "direction": 0,
+      "family": "aperture",
+      "kind": "aperture",
+      "name": "aperture_75mm",
+      "value": 0.075
+    },
+    {
+      "direction": 0,
+      "family": "preload",
+      "kind": "preload",
+      "name": "preload_delta_-0.75mm",
+      "value": -0.00075
+    },
+    {
+      "direction": 0,
+      "family": "preload",
+      "kind": "preload",
+      "name": "preload_delta_-0.50mm",
+      "value": -0.0005
+    },
+    {
+      "direction": 0,
+      "family": "preload",
+      "kind": "preload",
+      "name": "preload_delta_-0.25mm",
+      "value": -0.00025
+    },
+    {
+      "direction": 0,
+      "family": "preload",
+      "kind": "preload",
+      "name": "preload_delta_+0.25mm",
+      "value": 0.00025
+    },
+    {
+      "direction": 0,
+      "family": "history",
+      "kind": "history_approach",
+      "name": "history_short_approach",
+      "value": 0.0
+    },
+    {
+      "direction": 0,
+      "family": "history",
+      "kind": "history_settle",
+      "name": "history_contact_settle",
+      "value": 0.0
+    }
+  ],
+  "deterministic": true,
+  "horizon": 200,
+  "max_safe_penetration": 0.0005,
+  "passive_joint_limit_tolerance": 0.005,
+  "reset_seeds": [
+    10000,
+    10001,
+    10002,
+    10003,
+    10004,
+    10005,
+    10006,
+    10007,
+    10008,
+    10009,
+    10010,
+    10011,
+    10012,
+    10013,
+    10014,
+    10015,
+    10016,
+    10017,
+    10018,
+    10019,
+    10020,
+    10021,
+    10022,
+    10023,
+    10024,
+    10025,
+    10026,
+    10027,
+    10028,
+    10029,
+    10030,
+    10031,
+    10032,
+    10033,
+    10034,
+    10035,
+    10036,
+    10037,
+    10038,
+    10039,
+    10040,
+    10041,
+    10042,
+    10043,
+    10044,
+    10045,
+    10046,
+    10047,
+    10048,
+    10049
+  ],
+  "task_count": 50,
+  "task_set_seed": 10000
+}

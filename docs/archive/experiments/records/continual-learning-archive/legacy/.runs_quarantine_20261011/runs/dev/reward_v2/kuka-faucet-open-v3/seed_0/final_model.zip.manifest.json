@@ -1,0 +1,36 @@
+{
+  "schema_version": 1,
+  "task_name": "kuka-faucet-open-v3",
+  "checkpoint_identifier": "final_model.zip",
+  "checkpoint_path": "/home/yikai/Documents/Code/Final/continual-learning/runs/dev/reward_v2/kuka-faucet-open-v3/seed_0/final_model.zip",
+  "checkpoint_sha256": "2c4ead7037c7b6a0083f8a4fef00d3995e0fe2439d08366bd05061ccda4f1f3d",
+  "backend": "kuka-v3",
+  "algorithm": "SAC",
+  "reward_function_version": "v2",
+  "training_seed": 0,
+  "training_config_reference": "/home/yikai/Documents/Code/Final/continual-learning/runs/dev/reward_v2/kuka-faucet-open-v3/seed_0/config.yaml",
+  "training_config_sha256": "79add335ae26a65f7d46486f976e28295d4470ba9170c796b27e9c8360f00dcd",
+  "observation_shape": [
+    39
+  ],
+  "action_shape": [
+    4
+  ],
+  "qualification_status": "qualified",
+  "qualification": {
+    "protocol": "fixed-mt1-task-bank-v1",
+    "episodes": 10,
+    "success_rate": 1.0,
+    "mean_return": 1870.312239111685,
+    "return_std": 36.23532842272838,
+    "task_set_seed": 10000,
+    "evaluation_seed": 10000,
+    "deterministic": true,
+    "ordered_task_data_sha256": [],
+    "selection_key": [
+      1.0,
+      1870.312239111685
+    ],
+    "selection_rule": "maximum success_rate; mean_return breaks ties"
+  }
+}

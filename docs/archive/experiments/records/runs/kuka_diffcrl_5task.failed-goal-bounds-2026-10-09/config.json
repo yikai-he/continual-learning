@@ -1,0 +1,79 @@
+{
+  "trajectories_per_task": 200,
+  "diffusion_epochs": 300,
+  "bc_epochs": 100,
+  "eval_episodes": 50,
+  "seed": 0,
+  "eval_seed": 10000,
+  "diffusion_steps": 100,
+  "diffusion_width": 64,
+  "bc_normalization_mode": "layer-norm",
+  "replay_mode": "diffusion",
+  "bc_loss": "post-tanh-mse",
+  "diffusion_action_space": "raw",
+  "diffusion_action_clamp_epsilon": 0.0001,
+  "generated_action_projection": "none",
+  "evaluation_mode": "fixed-tasks",
+  "tasks": [
+    "kuka-reach-v3",
+    "kuka-handle-press-side-v3",
+    "kuka-drawer-close-v3",
+    "kuka-faucet-close-v3",
+    "kuka-hammer-v3"
+  ],
+  "environment_backend": "kuka-v3",
+  "horizon": 200,
+  "task_set_seed": 10000,
+  "diffusion": {
+    "horizon": 200,
+    "features": 22,
+    "steps": 100,
+    "width": 64,
+    "num_tasks": 5,
+    "diffusion_action_space": "raw",
+    "diffusion_action_clamp_epsilon": 0.0001
+  },
+  "experts": {
+    "kuka-reach-v3": {
+      "path": "/home/yikai/Documents/Code/Final/continual-learning/runs/experts/kuka-v3/reach-v3/expert_model.zip",
+      "sha256": "2be77e7884b1fdf0b29d364ec0a5dcfdae51b0abb34b56f7ecaded5e6be32792"
+    },
+    "kuka-handle-press-side-v3": {
+      "path": "/home/yikai/Documents/Code/Final/continual-learning/runs/experts/kuka-v3/handle-press-side-v3/expert_model.zip",
+      "sha256": "090824e59d5dcfe3a3be0700a020877b97e5545b3bf9e507a02d1b132dc47049"
+    },
+    "kuka-drawer-close-v3": {
+      "path": "/home/yikai/Documents/Code/Final/continual-learning/runs/experts/kuka-v3/drawer-close-v3/expert_model.zip",
+      "sha256": "135c3c070025b15ebdce2f60b71b654fc50ab608acacc4936ed47e762871240d"
+    },
+    "kuka-faucet-close-v3": {
+      "path": "/home/yikai/Documents/Code/Final/continual-learning/runs/experts/kuka-v3/faucet-close-v3/expert_model.zip",
+      "sha256": "a3d920085ec0b27c664fcecd10c65a8b6de371412248e47e5a2abc3137975603"
+    },
+    "kuka-hammer-v3": {
+      "path": "/home/yikai/Documents/Code/Final/continual-learning/runs/experts/kuka-v3/hammer-v3/expert_model.zip",
+      "sha256": "1900fe4dd8d3150f7d484f7f8886f4e65616bf11fa681d5a29ae6b7a06696c8c"
+    }
+  },
+  "replay_per_old_task": 200,
+  "split": "per-task whole episodes; rounded 20% validation",
+  "bc": {
+    "hidden_sizes": [
+      256,
+      256
+    ],
+    "epochs": 100,
+    "batch_size": 256,
+    "learning_rate": 0.001,
+    "objective": "post-tanh-mse",
+    "clamp_epsilon": 0.0001
+  },
+  "diffusion_fit": {
+    "batch_size": 8,
+    "learning_rate": 0.001,
+    "prediction": "x0"
+  },
+  "normalization": "stage training split only, feature std floor .001; no normalization clipping",
+  "optimizers": "BC Adam fresh per stage with paired best-epoch restoration; diffusion Adam fresh per fit",
+  "collection": "deterministic; all episodes retained; any-step success recorded"
+}

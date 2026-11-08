@@ -1,0 +1,36 @@
+{
+  "schema_version": 1,
+  "task_name": "kuka-hammer-v3",
+  "checkpoint_identifier": "final_model.zip",
+  "checkpoint_path": "/home/yikai/Documents/Code/Final/continual-learning/runs/reward_v2/kuka-hammer-v3/seed_0_1m/final_model.zip",
+  "checkpoint_sha256": "f70bdc7d509359aa2c5c346e5bc54cd265f73be6ea07925c2f2c8bdca1cf0089",
+  "backend": "kuka-v3",
+  "algorithm": "SAC",
+  "reward_function_version": "v2",
+  "training_seed": 0,
+  "training_config_reference": "/home/yikai/Documents/Code/Final/continual-learning/runs/reward_v2/kuka-hammer-v3/seed_0_1m/config.yaml",
+  "training_config_sha256": "356711c2e89e106ed8f31c7c85d973897f8dc1926017c48c5e8870aca8f94caa",
+  "observation_shape": [
+    39
+  ],
+  "action_shape": [
+    4
+  ],
+  "qualification_status": "qualified",
+  "qualification": {
+    "protocol": "fixed-mt1-task-bank-v1",
+    "episodes": 20,
+    "success_rate": 0.95,
+    "mean_return": 1426.802340968281,
+    "return_std": 403.67302361242935,
+    "task_set_seed": 10000,
+    "evaluation_seed": 10000,
+    "deterministic": true,
+    "ordered_task_data_sha256": [],
+    "selection_key": [
+      0.95,
+      1426.802340968281
+    ],
+    "selection_rule": "maximum success_rate; mean_return breaks ties"
+  }
+}

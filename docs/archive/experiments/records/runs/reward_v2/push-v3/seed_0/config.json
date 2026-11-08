@@ -1,0 +1,28 @@
+{
+  "algorithm": "SAC",
+  "batch_size": 128,
+  "buffer_size": 1000000,
+  "checkpoint_freq": 50000,
+  "device": "cpu",
+  "ent_coef": "auto",
+  "eval_episodes": 10,
+  "eval_freq": 20000,
+  "gamma": 0.99,
+  "gradient_steps": 1,
+  "learning_rate": 0.001,
+  "learning_starts": 10000,
+  "net_arch": [
+    256,
+    256,
+    256,
+    256
+  ],
+  "policy": "MlpPolicy",
+  "reward_function_version": "v2",
+  "run_dir": "/root/Code/train_sac/runs/reward_v2/push-v3/seed_0",
+  "seed": 0,
+  "steps": 1000000,
+  "task": "push-v3",
+  "tau": 0.005,
+  "train_freq": 1
+}

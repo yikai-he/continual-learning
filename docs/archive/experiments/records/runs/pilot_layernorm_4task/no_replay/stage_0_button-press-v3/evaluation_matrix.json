@@ -1,0 +1,726 @@
+{
+  "kind": "continual_stage_evaluation",
+  "tasks": [
+    {
+      "task_id": "button-press-v3",
+      "task_name": "button-press-v3"
+    },
+    {
+      "task_id": "faucet-close-v3",
+      "task_name": "faucet-close-v3"
+    },
+    {
+      "task_id": "hammer-v3",
+      "task_name": "hammer-v3"
+    },
+    {
+      "task_id": "handle-press-side-v3",
+      "task_name": "handle-press-side-v3"
+    }
+  ],
+  "R": [
+    [
+      1.0,
+      null,
+      null,
+      null
+    ],
+    [
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      null,
+      null,
+      null,
+      null
+    ]
+  ],
+  "cells": [
+    [
+      {
+        "mean_return": 1524.2724599444969,
+        "std_return": 96.01472068713464,
+        "success_rate": 1.0,
+        "success_count": 50,
+        "mean_episode_length": 200.0,
+        "episodes": 50,
+        "horizon": 200,
+        "seeds": [
+          10000,
+          10001,
+          10002,
+          10003,
+          10004,
+          10005,
+          10006,
+          10007,
+          10008,
+          10009,
+          10010,
+          10011,
+          10012,
+          10013,
+          10014,
+          10015,
+          10016,
+          10017,
+          10018,
+          10019,
+          10020,
+          10021,
+          10022,
+          10023,
+          10024,
+          10025,
+          10026,
+          10027,
+          10028,
+          10029,
+          10030,
+          10031,
+          10032,
+          10033,
+          10034,
+          10035,
+          10036,
+          10037,
+          10038,
+          10039,
+          10040,
+          10041,
+          10042,
+          10043,
+          10044,
+          10045,
+          10046,
+          10047,
+          10048,
+          10049
+        ],
+        "episode_returns": [
+          1414.1507768236377,
+          1569.9685824075884,
+          1587.561753003675,
+          1555.1417210760073,
+          1547.171553322413,
+          1553.4375875153203,
+          1391.0837638938235,
+          1561.2427025429076,
+          1585.5116849821447,
+          1565.079930933484,
+          1545.3591003198815,
+          1564.27406736835,
+          1572.3031924804723,
+          1104.5865769411637,
+          1560.9389155238248,
+          1430.329572925043,
+          1566.3492013115533,
+          1562.3504003307187,
+          1549.1838978240535,
+          1559.6687054432687,
+          1598.9224627528467,
+          1456.1938480376034,
+          1552.3944921751936,
+          1554.2881436188773,
+          1553.0306524635055,
+          1583.3208000649672,
+          1601.5060986211301,
+          1585.605103496747,
+          1552.497011519737,
+          1568.570500336686,
+          1605.6358151538436,
+          1404.4912094892481,
+          1545.7730811711617,
+          1412.9663395526904,
+          1599.7290237214797,
+          1572.5132585985639,
+          1388.8024935010983,
+          1594.1833062972528,
+          1438.144203938324,
+          1579.301711167277,
+          1563.5397734322296,
+          1239.8386521748678,
+          1597.406268072323,
+          1587.7933251361426,
+          1556.393485738005,
+          1552.8507366017566,
+          1559.8584341007752,
+          1457.577434465668,
+          1414.230565751113,
+          1590.5710791043962
+        ],
+        "episode_lengths": [
+          200,
+          200,
+          200,
+          200,
+          200,
+          200,
+          200,
+          200,
+          200,
+          200,
+          200,
+          200,
+          200,
+          200,
+          200,
+          200,
+          200,
+          200,
+          200,
+          200,
+          200,
+          200,
+          200,
+          200,
+          200,
+          200,
+          200,
+          200,
+          200,
+          200,
+          200,
+          200,
+          200,
+          200,
+          200,
+          200,
+          200,
+          200,
+          200,
+          200,
+          200,
+          200,
+          200,
+          200,
+          200,
+          200,
+          200,
+          200,
+          200,
+          200
+        ],
+        "episode_successes": [
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true
+        ],
+        "deterministic": true,
+        "evaluation_mode": "fixed-tasks",
+        "task_set_seed": 10000,
+        "task_bank_size": 50,
+        "episode_provenance": [
+          {
+            "task_index": 0,
+            "task_env_name": "button-press-v3",
+            "task_data_sha256": "cd4363773babe136a834fa655a5f1b845beecd3faf3b5bf9617f46afce23a735",
+            "reset_seed": 10000,
+            "episode_return": 1414.1507768236377,
+            "success": true
+          },
+          {
+            "task_index": 1,
+            "task_env_name": "button-press-v3",
+            "task_data_sha256": "955eb36c4d40df83eff38eb400bd3a75e7ec9466398f8aae05133b2e12ce83bd",
+            "reset_seed": 10001,
+            "episode_return": 1569.9685824075884,
+            "success": true
+          },
+          {
+            "task_index": 2,
+            "task_env_name": "button-press-v3",
+            "task_data_sha256": "0225e8361434aa4d204c736eff460f3e314add782e3f9e3740c5cb6991db1877",
+            "reset_seed": 10002,
+            "episode_return": 1587.561753003675,
+            "success": true
+          },
+          {
+            "task_index": 3,
+            "task_env_name": "button-press-v3",
+            "task_data_sha256": "e89c8453f5a9f86b9c11a3c635fce716d7d24a0b2912360279522fc2b40e3ae9",
+            "reset_seed": 10003,
+            "episode_return": 1555.1417210760073,
+            "success": true
+          },
+          {
+            "task_index": 4,
+            "task_env_name": "button-press-v3",
+            "task_data_sha256": "739150ec165b9925cd88453d9635b1b5e2738a1bca9c7447db7603a62a88b5ba",
+            "reset_seed": 10004,
+            "episode_return": 1547.171553322413,
+            "success": true
+          },
+          {
+            "task_index": 5,
+            "task_env_name": "button-press-v3",
+            "task_data_sha256": "885eb07540cadf8d7b118ce3ec997be1411128ad44648d88b7ce1b0f44ce4b7b",
+            "reset_seed": 10005,
+            "episode_return": 1553.4375875153203,
+            "success": true
+          },
+          {
+            "task_index": 6,
+            "task_env_name": "button-press-v3",
+            "task_data_sha256": "4cf2cd8e68fc054d54e0ffce59beb5b273caaeed4f7dd10976b7d009365fc5de",
+            "reset_seed": 10006,
+            "episode_return": 1391.0837638938235,
+            "success": true
+          },
+          {
+            "task_index": 7,
+            "task_env_name": "button-press-v3",
+            "task_data_sha256": "0bf6847a452937c42ca4a94fdf019679090e6b8e3c2af4f58a1404cc9c65b8f3",
+            "reset_seed": 10007,
+            "episode_return": 1561.2427025429076,
+            "success": true
+          },
+          {
+            "task_index": 8,
+            "task_env_name": "button-press-v3",
+            "task_data_sha256": "de8a5357dcb0b32b79efa46e28be02bdfc5865164914383cc2132a0b474fc64d",
+            "reset_seed": 10008,
+            "episode_return": 1585.5116849821447,
+            "success": true
+          },
+          {
+            "task_index": 9,
+            "task_env_name": "button-press-v3",
+            "task_data_sha256": "d12737a3c23d912312544ab7c353e14b4f6899a817a61b765487ecb629f502ee",
+            "reset_seed": 10009,
+            "episode_return": 1565.079930933484,
+            "success": true
+          },
+          {
+            "task_index": 10,
+            "task_env_name": "button-press-v3",
+            "task_data_sha256": "bee9255b466b2d3f4a737c15573a3c8e7b7c7ee7d9f3c7ed0a2c08f97a5b1c2a",
+            "reset_seed": 10010,
+            "episode_return": 1545.3591003198815,
+            "success": true
+          },
+          {
+            "task_index": 11,
+            "task_env_name": "button-press-v3",
+            "task_data_sha256": "e37c9ba086424e333eef5022449595ddae6d55b2f704ec9229781fdb05472fa6",
+            "reset_seed": 10011,
+            "episode_return": 1564.27406736835,
+            "success": true
+          },
+          {
+            "task_index": 12,
+            "task_env_name": "button-press-v3",
+            "task_data_sha256": "6473a433b287a99e0ee664479f1ec93aa4e5ed6d5b02b9e03a7e23964c15133f",
+            "reset_seed": 10012,
+            "episode_return": 1572.3031924804723,
+            "success": true
+          },
+          {
+            "task_index": 13,
+            "task_env_name": "button-press-v3",
+            "task_data_sha256": "b9f029919baed0afa678c71129abb8553b9c291783f7b398593d136048344d59",
+            "reset_seed": 10013,
+            "episode_return": 1104.5865769411637,
+            "success": true
+          },
+          {
+            "task_index": 14,
+            "task_env_name": "button-press-v3",
+            "task_data_sha256": "f52c92b94ce2ffc0da4d52e25873c5f3ee0896dc35750f5d892c3a15aeea1782",
+            "reset_seed": 10014,
+            "episode_return": 1560.9389155238248,
+            "success": true
+          },
+          {
+            "task_index": 15,
+            "task_env_name": "button-press-v3",
+            "task_data_sha256": "7fc7822b899965c171fe8118b69037b3f30297e9d560b2e75080f3e070a872ff",
+            "reset_seed": 10015,
+            "episode_return": 1430.329572925043,
+            "success": true
+          },
+          {
+            "task_index": 16,
+            "task_env_name": "button-press-v3",
+            "task_data_sha256": "a71932de9225a7272b36ea1e9a40492dccb15e8952b4039b7f42856ddb1d88b2",
+            "reset_seed": 10016,
+            "episode_return": 1566.3492013115533,
+            "success": true
+          },
+          {
+            "task_index": 17,
+            "task_env_name": "button-press-v3",
+            "task_data_sha256": "e2017d9434063c658a2b3bdf2dc11acde87d0ec710eeb4f565ce8534a07c45b7",
+            "reset_seed": 10017,
+            "episode_return": 1562.3504003307187,
+            "success": true
+          },
+          {
+            "task_index": 18,
+            "task_env_name": "button-press-v3",
+            "task_data_sha256": "d5f92e0b063f1a9f8757214a52fff73983ec8e46cd5c94c04525de083654fa06",
+            "reset_seed": 10018,
+            "episode_return": 1549.1838978240535,
+            "success": true
+          },
+          {
+            "task_index": 19,
+            "task_env_name": "button-press-v3",
+            "task_data_sha256": "b5dd36a9f7680df2b72823ab1fa1680f367f0fdb1127c14d4901bf36e39e89b0",
+            "reset_seed": 10019,
+            "episode_return": 1559.6687054432687,
+            "success": true
+          },
+          {
+            "task_index": 20,
+            "task_env_name": "button-press-v3",
+            "task_data_sha256": "b93beceec1c68786a3a9d2d492253639abf78c93335180a2285503c0c929ca7b",
+            "reset_seed": 10020,
+            "episode_return": 1598.9224627528467,
+            "success": true
+          },
+          {
+            "task_index": 21,
+            "task_env_name": "button-press-v3",
+            "task_data_sha256": "599c6761e80db46c9b5f262ee5193abd2e2bafedcd2f779de68075f1954bbc85",
+            "reset_seed": 10021,
+            "episode_return": 1456.1938480376034,
+            "success": true
+          },
+          {
+            "task_index": 22,
+            "task_env_name": "button-press-v3",
+            "task_data_sha256": "989313a0ae8ee94510ee51e78570c41d63627a46976950f580e8e0c62a5f7f07",
+            "reset_seed": 10022,
+            "episode_return": 1552.3944921751936,
+            "success": true
+          },
+          {
+            "task_index": 23,
+            "task_env_name": "button-press-v3",
+            "task_data_sha256": "54baba4b57747a107f508debcc5591e6a196a75f421b8c67a02d117a83016de6",
+            "reset_seed": 10023,
+            "episode_return": 1554.2881436188773,
+            "success": true
+          },
+          {
+            "task_index": 24,
+            "task_env_name": "button-press-v3",
+            "task_data_sha256": "cac140256c144392c22fc87d0ab191678f33621e0c7c992af8f40eb9952dc01c",
+            "reset_seed": 10024,
+            "episode_return": 1553.0306524635055,
+            "success": true
+          },
+          {
+            "task_index": 25,
+            "task_env_name": "button-press-v3",
+            "task_data_sha256": "37334fc8bd6612c608a48223e135b396eb2f895c03665f1f7593d1c03c6e5f6b",
+            "reset_seed": 10025,
+            "episode_return": 1583.3208000649672,
+            "success": true
+          },
+          {
+            "task_index": 26,
+            "task_env_name": "button-press-v3",
+            "task_data_sha256": "3a09c2acd6ce79e4b222f570b02834e054c9f27b06a4a63aa2f7612449824789",
+            "reset_seed": 10026,
+            "episode_return": 1601.5060986211301,
+            "success": true
+          },
+          {
+            "task_index": 27,
+            "task_env_name": "button-press-v3",
+            "task_data_sha256": "0b6d8e03498fd1096ba03aaf0986167a08e6c1c3fbcb601d7f0206c0e90f526d",
+            "reset_seed": 10027,
+            "episode_return": 1585.605103496747,
+            "success": true
+          },
+          {
+            "task_index": 28,
+            "task_env_name": "button-press-v3",
+            "task_data_sha256": "d6986f91d4623c5573eda6864df2ae2da83ee7c16fed915e0c86c7c2081d097d",
+            "reset_seed": 10028,
+            "episode_return": 1552.497011519737,
+            "success": true
+          },
+          {
+            "task_index": 29,
+            "task_env_name": "button-press-v3",
+            "task_data_sha256": "0cc7c147c56445afc583f9cece453dc67d75f87b26187529b71580e42b14ef2b",
+            "reset_seed": 10029,
+            "episode_return": 1568.570500336686,
+            "success": true
+          },
+          {
+            "task_index": 30,
+            "task_env_name": "button-press-v3",
+            "task_data_sha256": "d50feeeccd43c02dc3b2b0fc87d30ebde64a4d225dd236fcfd87787f6e8dbdd8",
+            "reset_seed": 10030,
+            "episode_return": 1605.6358151538436,
+            "success": true
+          },
+          {
+            "task_index": 31,
+            "task_env_name": "button-press-v3",
+            "task_data_sha256": "c7b04a300ac73b13f60fd6ccb8b02fc80197cfbf263c2b0f1b910e9a5079fe80",
+            "reset_seed": 10031,
+            "episode_return": 1404.4912094892481,
+            "success": true
+          },
+          {
+            "task_index": 32,
+            "task_env_name": "button-press-v3",
+            "task_data_sha256": "24350e7b99844f5116d8a56089980df2b67d0c31107b119b4c1697ff78884d78",
+            "reset_seed": 10032,
+            "episode_return": 1545.7730811711617,
+            "success": true
+          },
+          {
+            "task_index": 33,
+            "task_env_name": "button-press-v3",
+            "task_data_sha256": "d27be9bb4b8a6914e46cdc116184e5f841590ff45de7e0c4fbfc81098bee4b1f",
+            "reset_seed": 10033,
+            "episode_return": 1412.9663395526904,
+            "success": true
+          },
+          {
+            "task_index": 34,
+            "task_env_name": "button-press-v3",
+            "task_data_sha256": "403753520326a2d32e0dbf4ecb57bb4dfa9521d475999cdfe2d96a1fbe4a3003",
+            "reset_seed": 10034,
+            "episode_return": 1599.7290237214797,
+            "success": true
+          },
+          {
+            "task_index": 35,
+            "task_env_name": "button-press-v3",
+            "task_data_sha256": "6d6e5b02158265ec9070eaf8d5535f3847c552e2c65b92d88fd234ce5b862a54",
+            "reset_seed": 10035,
+            "episode_return": 1572.5132585985639,
+            "success": true
+          },
+          {
+            "task_index": 36,
+            "task_env_name": "button-press-v3",
+            "task_data_sha256": "939644f1a9c17bfc1f939273f2a8c0fe44e382e37b6ac66e27d97bbb73d8adc0",
+            "reset_seed": 10036,
+            "episode_return": 1388.8024935010983,
+            "success": true
+          },
+          {
+            "task_index": 37,
+            "task_env_name": "button-press-v3",
+            "task_data_sha256": "a6f5af3fdb5ad83f074a54551d0e134fe6ffe28c5bfa759ce3a0f4452342cad0",
+            "reset_seed": 10037,
+            "episode_return": 1594.1833062972528,
+            "success": true
+          },
+          {
+            "task_index": 38,
+            "task_env_name": "button-press-v3",
+            "task_data_sha256": "e9d485fff10065bb09e8167d2d226ae17b18e283b36c026222d9b36902368b2d",
+            "reset_seed": 10038,
+            "episode_return": 1438.144203938324,
+            "success": true
+          },
+          {
+            "task_index": 39,
+            "task_env_name": "button-press-v3",
+            "task_data_sha256": "ae06867c6680ec1b59b809e58b3b5e13ab54393580741da8557b67d9a160fe58",
+            "reset_seed": 10039,
+            "episode_return": 1579.301711167277,
+            "success": true
+          },
+          {
+            "task_index": 40,
+            "task_env_name": "button-press-v3",
+            "task_data_sha256": "cc6b88dbb6507dcb0e4e21134f2dae01e33f3c3ea4ff1375021181c6cf793e09",
+            "reset_seed": 10040,
+            "episode_return": 1563.5397734322296,
+            "success": true
+          },
+          {
+            "task_index": 41,
+            "task_env_name": "button-press-v3",
+            "task_data_sha256": "9a560eb200497759efb1d52a4a3bfa1edc8f0f79b71d15d23ac665225ff0ad4e",
+            "reset_seed": 10041,
+            "episode_return": 1239.8386521748678,
+            "success": true
+          },
+          {
+            "task_index": 42,
+            "task_env_name": "button-press-v3",
+            "task_data_sha256": "9d79cc18c346eaaf30185fbe5a7dc76ba7244594120f1b2817edca7f669740a8",
+            "reset_seed": 10042,
+            "episode_return": 1597.406268072323,
+            "success": true
+          },
+          {
+            "task_index": 43,
+            "task_env_name": "button-press-v3",
+            "task_data_sha256": "0c4eaec5958c9e56a379cb16d077f2b8d3d8fc1f33fb3cf617b0347013230a80",
+            "reset_seed": 10043,
+            "episode_return": 1587.7933251361426,
+            "success": true
+          },
+          {
+            "task_index": 44,
+            "task_env_name": "button-press-v3",
+            "task_data_sha256": "7d6330c8a9413a1c92ecbc5071d09e7f301926bfcc6a60d5694be210d2da1854",
+            "reset_seed": 10044,
+            "episode_return": 1556.393485738005,
+            "success": true
+          },
+          {
+            "task_index": 45,
+            "task_env_name": "button-press-v3",
+            "task_data_sha256": "8d7d02fec9818c6bb284909490f8c029d8484559715a0a9c09bbd68a46cc9080",
+            "reset_seed": 10045,
+            "episode_return": 1552.8507366017566,
+            "success": true
+          },
+          {
+            "task_index": 46,
+            "task_env_name": "button-press-v3",
+            "task_data_sha256": "73a73cad42726173755c9126a467072eebf04d7bbba0c7f1d55d0b03abe46a89",
+            "reset_seed": 10046,
+            "episode_return": 1559.8584341007752,
+            "success": true
+          },
+          {
+            "task_index": 47,
+            "task_env_name": "button-press-v3",
+            "task_data_sha256": "578f2fd40129105f4f954bdb085a9915ab41a777bd7a79bf53451c2369a2c6bc",
+            "reset_seed": 10047,
+            "episode_return": 1457.577434465668,
+            "success": true
+          },
+          {
+            "task_index": 48,
+            "task_env_name": "button-press-v3",
+            "task_data_sha256": "fbf524e97051051296569271031e1315a124630c0dca30ec44789bd40996cb4a",
+            "reset_seed": 10048,
+            "episode_return": 1414.230565751113,
+            "success": true
+          },
+          {
+            "task_index": 49,
+            "task_env_name": "button-press-v3",
+            "task_data_sha256": "cef526380d88d098fb2e6bb099fe3d791df57b78c519c45d4c07d99e3414d0ce",
+            "reset_seed": 10049,
+            "episode_return": 1590.5710791043962,
+            "success": true
+          }
+        ]
+      },
+      null,
+      null,
+      null
+    ],
+    [
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      null,
+      null,
+      null,
+      null
+    ]
+  ],
+  "stage_provenance": {
+    "0": {
+      "report": "/home/yikai/Documents/Code/Metaworld/runs/pilot_layernorm_4task/no_replay/stage_0_button-press-v3/report.json",
+      "bc_normalization_mode": "layer-norm",
+      "bc_loss": "post-tanh-mse",
+      "bc_clamp_epsilon": 0.0001,
+      "generated_action_projection": "none"
+    }
+  },
+  "metrics_by_stage": {
+    "0": {
+      "average_performance": 1.0,
+      "forgetting": 0.0,
+      "forward_transfer": null
+    },
+    "1": {
+      "average_performance": null,
+      "forgetting": null,
+      "forward_transfer": null
+    },
+    "2": {
+      "average_performance": null,
+      "forgetting": null,
+      "forward_transfer": null
+    },
+    "3": {
+      "average_performance": null,
+      "forgetting": null,
+      "forward_transfer": null
+    }
+  }
+}

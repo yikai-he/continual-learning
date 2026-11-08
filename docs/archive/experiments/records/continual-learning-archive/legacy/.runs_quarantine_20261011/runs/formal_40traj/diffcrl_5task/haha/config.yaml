@@ -1,0 +1,68 @@
+experiment: diffcrl
+environment:
+  reward_function_version: v2
+sac:
+  steps: 10000
+  learning_rate: 0.001
+  buffer_size: 1000000
+  learning_starts: 10000
+  batch_size: 128
+  gamma: 0.99
+  tau: 0.005
+  train_freq: 1
+  gradient_steps: 1
+  ent_coef: auto
+  net_arch:
+  - 256
+  - 256
+  - 256
+  - 256
+  checkpoint_freq: 10000
+bc:
+  epochs: 100
+  batch_size: 256
+  learning_rate: 0.001
+  hidden_sizes:
+  - 256
+  - 256
+  normalization_mode: none
+  loss: post-tanh-mse
+diffusion:
+  epochs: 300
+  batch_size: 8
+  learning_rate: 0.001
+  steps: 100
+  width: 64
+  action_space: raw
+  action_clamp_epsilon: 0.0001
+  generated_action_projection: none
+continual:
+  tasks:
+  - button-press-v3
+  - faucet-close-v3
+  - hammer-v3
+  - handle-press-side-v3
+  - window-close-v3
+  experts:
+    button-press-v3: runs/reward_v2/button-press-v3/seed_0/best_model/best_model.zip
+    faucet-close-v3: runs/reward_v2/faucet-close-v3/seed_0/best_model/best_model.zip
+    hammer-v3: runs/reward_v2/hammer-v3/seed_0/best_model/best_model.zip
+    handle-press-side-v3: runs/reward_v2/handle-press-side-v3/seed_0/best_model/best_model.zip
+    window-close-v3: runs/reward_v2/window-close-v3/seed_0/final_model.zip
+  trajectories_per_task: 40
+  replay_mode: diffusion
+  steps_per_task: 1000000
+  boundary_warmup_steps: 10000
+evaluation:
+  episodes: 50
+  seed: 10000
+  mode: fixed-tasks
+  task_set_seed: 10000
+  frequency: 5000
+  seed_offset: 10000
+runtime:
+  seed: 0
+  device: cpu
+  output: runs/formal_40traj/diffcrl_5task
+  run_name: haha
+  run_dir: /home/yikai/Documents/Code/Metaworld/runs/formal_40traj/diffcrl_5task/haha

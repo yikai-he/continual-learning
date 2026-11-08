@@ -1,0 +1,43 @@
+{
+  "kind": "flow_matching_ablation_completion_v1",
+  "stage": "validation",
+  "config_sha256": "c656a7a9d1cb256ff75239d6499d558d334cb86c1ca7db781b3e0602510f8792",
+  "artifacts": {
+    "train-flow": {
+      "path": "/home/yikai/Documents/Code/Thesis/continual-learning/runs/flow_matching_harder_task/hammer_v3_seed0/train-flow.complete.json",
+      "sha256": "293b9dcb501dc3e2ed9f765cc566fd60bfff58789d79272e9c6bbd87055fdcc3"
+    },
+    "train-diffusion": {
+      "path": "/home/yikai/Documents/Code/Thesis/continual-learning/runs/flow_matching_harder_task/hammer_v3_seed0/train-diffusion.complete.json",
+      "sha256": "9f39aeee85dc0db9fa2b4a1bba9c732c20168609acac320634cd7caa1f7096be"
+    },
+    "generate-flow-10": {
+      "path": "/home/yikai/Documents/Code/Thesis/continual-learning/runs/flow_matching_harder_task/hammer_v3_seed0/generate-flow-10.complete.json",
+      "sha256": "428b92284d62968a7b5b2b6b7e1f0c308b07c36d1ad1fa05c63bd3778418d583"
+    },
+    "generate-flow-50": {
+      "path": "/home/yikai/Documents/Code/Thesis/continual-learning/runs/flow_matching_harder_task/hammer_v3_seed0/generate-flow-50.complete.json",
+      "sha256": "60043806323a08c9f9291aa1a0a70bc8483845a551047de338f6b5371c873be2"
+    },
+    "generate-diffusion": {
+      "path": "/home/yikai/Documents/Code/Thesis/continual-learning/runs/flow_matching_harder_task/hammer_v3_seed0/generate-diffusion.complete.json",
+      "sha256": "e8d634aa176cb83a9570eb4c77a8d0eaed5ae2da4fe201038e0d3fdce2800a29"
+    },
+    "bc-real": {
+      "path": "/home/yikai/Documents/Code/Thesis/continual-learning/runs/flow_matching_harder_task/hammer_v3_seed0/bc-real.complete.json",
+      "sha256": "6d0c25eac45ee312a24cc8f006419f6e50dad5ffced9b6b1e045c6ada40677c3"
+    },
+    "bc-flow-10": {
+      "path": "/home/yikai/Documents/Code/Thesis/continual-learning/runs/flow_matching_harder_task/hammer_v3_seed0/bc-flow-10.complete.json",
+      "sha256": "efa7cdcdc297499fd065177cc77e5619270d05822adf2ba128ad80d538f97196"
+    },
+    "bc-flow-50": {
+      "path": "/home/yikai/Documents/Code/Thesis/continual-learning/runs/flow_matching_harder_task/hammer_v3_seed0/bc-flow-50.complete.json",
+      "sha256": "a9fd1c121bc98fb2a44d79de698dce03ba6e97dd5eca9502c5294f8dde88aab0"
+    },
+    "bc-diffusion": {
+      "path": "/home/yikai/Documents/Code/Thesis/continual-learning/runs/flow_matching_harder_task/hammer_v3_seed0/bc-diffusion.complete.json",
+      "sha256": "cc211123bc9a30b576efad12624394521a6ff3eb81b93e85278741c72a74caaf"
+    }
+  }
+}

@@ -1,0 +1,1232 @@
+{
+  "mode": "diffusion",
+  "tasks": [
+    "button-press-v3",
+    "faucet-close-v3"
+  ],
+  "policy_object_id": 136524637697840,
+  "diffusion_instantiated": true,
+  "diffusion_architecture_probe": [
+    "Embedding",
+    "Conv1d",
+    "Sequential",
+    "ModuleList",
+    "Conv1d",
+    "Linear"
+  ],
+  "boundary": {
+    "same_policy_object": true,
+    "parameter_hash_before": "f4e42b8c5a2732864f397fd095e25a12353d3491cbad3fcbea70568c14f11368",
+    "parameter_hash_after_dataset_prepare": "f4e42b8c5a2732864f397fd095e25a12353d3491cbad3fcbea70568c14f11368",
+    "hash_unchanged_after_dataset_prepare": true,
+    "actions_exactly_equal_after_dataset_prepare": true,
+    "action_mse_after_dataset_prepare": 0.0,
+    "action_mae_after_dataset_prepare": 0.0,
+    "action_max_abs_diff_after_dataset_prepare": 0.0,
+    "parameter_hash_after_diffusion_fit": "f4e42b8c5a2732864f397fd095e25a12353d3491cbad3fcbea70568c14f11368",
+    "hash_unchanged_after_diffusion_fit": true,
+    "actions_exactly_equal_after_diffusion_fit": true
+  },
+  "checkpoint_reload_exact": true,
+  "stage0": {
+    "bc_samples": 3200,
+    "target_min": -0.9931495189666748,
+    "target_max": 0.9983201026916504,
+    "target_outside_bounds_fraction": 0.0,
+    "prediction_min": -0.9981899857521057,
+    "prediction_max": 0.9976519346237183,
+    "prediction_near_bounds_fraction": 0.0,
+    "prediction_nan_count": 0,
+    "prediction_inf_count": 0,
+    "optimizer_updates": 260,
+    "real_trajectories": 20,
+    "real_success_count": 20,
+    "generated_trajectories": 0,
+    "losses": {
+      "initial": {
+        "train_loss": 0.4423646926879883,
+        "validation_loss": 0.3940368592739105,
+        "train_action_mse": 0.4423646926879883,
+        "validation_action_mse": 0.3940368592739105
+      },
+      "best_epoch": 20,
+      "train_loss": 0.04233388975262642,
+      "validation_loss": 0.05367003008723259,
+      "train_action_mse": 0.04233388975262642,
+      "validation_action_mse": 0.05367003008723259,
+      "history": [
+        {
+          "epoch": 1,
+          "train_loss": 0.22641892731189728,
+          "validation_loss": 0.2416083961725235,
+          "train_action_mse": 0.22641892731189728,
+          "validation_action_mse": 0.2416083961725235
+        },
+        {
+          "epoch": 2,
+          "train_loss": 0.2169038951396942,
+          "validation_loss": 0.2424706220626831,
+          "train_action_mse": 0.2169038951396942,
+          "validation_action_mse": 0.2424706220626831
+        },
+        {
+          "epoch": 3,
+          "train_loss": 0.20993053913116455,
+          "validation_loss": 0.23869162797927856,
+          "train_action_mse": 0.20993053913116455,
+          "validation_action_mse": 0.23869162797927856
+        },
+        {
+          "epoch": 4,
+          "train_loss": 0.19824020564556122,
+          "validation_loss": 0.20539653301239014,
+          "train_action_mse": 0.19824020564556122,
+          "validation_action_mse": 0.20539653301239014
+        },
+        {
+          "epoch": 5,
+          "train_loss": 0.1876084953546524,
+          "validation_loss": 0.2029406726360321,
+          "train_action_mse": 0.1876084953546524,
+          "validation_action_mse": 0.2029406726360321
+        },
+        {
+          "epoch": 6,
+          "train_loss": 0.17724134027957916,
+          "validation_loss": 0.1939774751663208,
+          "train_action_mse": 0.17724134027957916,
+          "validation_action_mse": 0.1939774751663208
+        },
+        {
+          "epoch": 7,
+          "train_loss": 0.1549662947654724,
+          "validation_loss": 0.172989159822464,
+          "train_action_mse": 0.1549662947654724,
+          "validation_action_mse": 0.172989159822464
+        },
+        {
+          "epoch": 8,
+          "train_loss": 0.13634054362773895,
+          "validation_loss": 0.15720462799072266,
+          "train_action_mse": 0.13634054362773895,
+          "validation_action_mse": 0.15720462799072266
+        },
+        {
+          "epoch": 9,
+          "train_loss": 0.11718347668647766,
+          "validation_loss": 0.13037756085395813,
+          "train_action_mse": 0.11718347668647766,
+          "validation_action_mse": 0.13037756085395813
+        },
+        {
+          "epoch": 10,
+          "train_loss": 0.10295826196670532,
+          "validation_loss": 0.1150934249162674,
+          "train_action_mse": 0.10295826196670532,
+          "validation_action_mse": 0.1150934249162674
+        },
+        {
+          "epoch": 11,
+          "train_loss": 0.110077865421772,
+          "validation_loss": 0.11952993273735046,
+          "train_action_mse": 0.110077865421772,
+          "validation_action_mse": 0.11952993273735046
+        },
+        {
+          "epoch": 12,
+          "train_loss": 0.09420633316040039,
+          "validation_loss": 0.09518802911043167,
+          "train_action_mse": 0.09420633316040039,
+          "validation_action_mse": 0.09518802911043167
+        },
+        {
+          "epoch": 13,
+          "train_loss": 0.07680639624595642,
+          "validation_loss": 0.08693298697471619,
+          "train_action_mse": 0.07680639624595642,
+          "validation_action_mse": 0.08693298697471619
+        },
+        {
+          "epoch": 14,
+          "train_loss": 0.06932328641414642,
+          "validation_loss": 0.07939993590116501,
+          "train_action_mse": 0.06932328641414642,
+          "validation_action_mse": 0.07939993590116501
+        },
+        {
+          "epoch": 15,
+          "train_loss": 0.07133067399263382,
+          "validation_loss": 0.07797101140022278,
+          "train_action_mse": 0.07133067399263382,
+          "validation_action_mse": 0.07797101140022278
+        },
+        {
+          "epoch": 16,
+          "train_loss": 0.0575588084757328,
+          "validation_loss": 0.07059246301651001,
+          "train_action_mse": 0.0575588084757328,
+          "validation_action_mse": 0.07059246301651001
+        },
+        {
+          "epoch": 17,
+          "train_loss": 0.06638866662979126,
+          "validation_loss": 0.07013098895549774,
+          "train_action_mse": 0.06638866662979126,
+          "validation_action_mse": 0.07013098895549774
+        },
+        {
+          "epoch": 18,
+          "train_loss": 0.04209298640489578,
+          "validation_loss": 0.0606754831969738,
+          "train_action_mse": 0.04209298640489578,
+          "validation_action_mse": 0.0606754831969738
+        },
+        {
+          "epoch": 19,
+          "train_loss": 0.03846143186092377,
+          "validation_loss": 0.053849462419748306,
+          "train_action_mse": 0.03846143186092377,
+          "validation_action_mse": 0.053849462419748306
+        },
+        {
+          "epoch": 20,
+          "train_loss": 0.04233388975262642,
+          "validation_loss": 0.05367003008723259,
+          "train_action_mse": 0.04233388975262642,
+          "validation_action_mse": 0.05367003008723259
+        }
+      ]
+    },
+    "policy_checkpoint": "/home/yikai/Documents/Code/Metaworld/runs/validation/cl_layernorm_2task_diffusion_20260924_01/general_policy_after_task_0_button-press-v3.pt",
+    "diffusion_checkpoint": "/home/yikai/Documents/Code/Metaworld/runs/validation/cl_layernorm_2task_diffusion_20260924_01/diffusion_after_task_0_button-press-v3.pt"
+  },
+  "stage1": {
+    "bc_samples": 6400,
+    "target_min": -0.9989012479782104,
+    "target_max": 1.0186830759048462,
+    "target_outside_bounds_fraction": 0.0021875000093132257,
+    "prediction_min": -0.996819794178009,
+    "prediction_max": 0.9999520778656006,
+    "prediction_near_bounds_fraction": 0.014335937798023224,
+    "prediction_nan_count": 0,
+    "prediction_inf_count": 0,
+    "optimizer_updates": 500,
+    "real_trajectories": 20,
+    "real_success_count": 20,
+    "generated_trajectories": 20,
+    "losses": {
+      "initial": {
+        "train_loss": 0.6234857439994812,
+        "validation_loss": 0.6231300234794617,
+        "train_action_mse": 0.6234857439994812,
+        "validation_action_mse": 0.6231300234794617
+      },
+      "best_epoch": 17,
+      "train_loss": 0.0119238356128335,
+      "validation_loss": 0.0178670734167099,
+      "train_action_mse": 0.0119238356128335,
+      "validation_action_mse": 0.0178670734167099,
+      "history": [
+        {
+          "epoch": 1,
+          "train_loss": 0.10314124077558517,
+          "validation_loss": 0.11765063554048538,
+          "train_action_mse": 0.10314124077558517,
+          "validation_action_mse": 0.11765063554048538
+        },
+        {
+          "epoch": 2,
+          "train_loss": 0.07202769815921783,
+          "validation_loss": 0.08154694736003876,
+          "train_action_mse": 0.07202769815921783,
+          "validation_action_mse": 0.08154694736003876
+        },
+        {
+          "epoch": 3,
+          "train_loss": 0.052482686936855316,
+          "validation_loss": 0.060009051114320755,
+          "train_action_mse": 0.052482686936855316,
+          "validation_action_mse": 0.060009051114320755
+        },
+        {
+          "epoch": 4,
+          "train_loss": 0.03807482868432999,
+          "validation_loss": 0.04665541648864746,
+          "train_action_mse": 0.03807482868432999,
+          "validation_action_mse": 0.04665541648864746
+        },
+        {
+          "epoch": 5,
+          "train_loss": 0.033691324293613434,
+          "validation_loss": 0.03845885023474693,
+          "train_action_mse": 0.033691324293613434,
+          "validation_action_mse": 0.03845885023474693
+        },
+        {
+          "epoch": 6,
+          "train_loss": 0.027184348553419113,
+          "validation_loss": 0.03809494897723198,
+          "train_action_mse": 0.027184348553419113,
+          "validation_action_mse": 0.03809494897723198
+        },
+        {
+          "epoch": 7,
+          "train_loss": 0.025635652244091034,
+          "validation_loss": 0.03141479566693306,
+          "train_action_mse": 0.025635652244091034,
+          "validation_action_mse": 0.03141479566693306
+        },
+        {
+          "epoch": 8,
+          "train_loss": 0.0205013919621706,
+          "validation_loss": 0.029605479910969734,
+          "train_action_mse": 0.0205013919621706,
+          "validation_action_mse": 0.029605479910969734
+        },
+        {
+          "epoch": 9,
+          "train_loss": 0.01912725530564785,
+          "validation_loss": 0.026727670803666115,
+          "train_action_mse": 0.01912725530564785,
+          "validation_action_mse": 0.026727670803666115
+        },
+        {
+          "epoch": 10,
+          "train_loss": 0.018512824550271034,
+          "validation_loss": 0.027676215395331383,
+          "train_action_mse": 0.018512824550271034,
+          "validation_action_mse": 0.027676215395331383
+        },
+        {
+          "epoch": 11,
+          "train_loss": 0.017543531954288483,
+          "validation_loss": 0.024386610835790634,
+          "train_action_mse": 0.017543531954288483,
+          "validation_action_mse": 0.024386610835790634
+        },
+        {
+          "epoch": 12,
+          "train_loss": 0.017263436689972878,
+          "validation_loss": 0.02197091653943062,
+          "train_action_mse": 0.017263436689972878,
+          "validation_action_mse": 0.02197091653943062
+        },
+        {
+          "epoch": 13,
+          "train_loss": 0.018085690215229988,
+          "validation_loss": 0.02616908587515354,
+          "train_action_mse": 0.018085690215229988,
+          "validation_action_mse": 0.02616908587515354
+        },
+        {
+          "epoch": 14,
+          "train_loss": 0.014578688889741898,
+          "validation_loss": 0.023338669911026955,
+          "train_action_mse": 0.014578688889741898,
+          "validation_action_mse": 0.023338669911026955
+        },
+        {
+          "epoch": 15,
+          "train_loss": 0.012960311956703663,
+          "validation_loss": 0.019379084929823875,
+          "train_action_mse": 0.012960311956703663,
+          "validation_action_mse": 0.019379084929823875
+        },
+        {
+          "epoch": 16,
+          "train_loss": 0.01334377657622099,
+          "validation_loss": 0.02163858152925968,
+          "train_action_mse": 0.01334377657622099,
+          "validation_action_mse": 0.02163858152925968
+        },
+        {
+          "epoch": 17,
+          "train_loss": 0.0119238356128335,
+          "validation_loss": 0.0178670734167099,
+          "train_action_mse": 0.0119238356128335,
+          "validation_action_mse": 0.0178670734167099
+        },
+        {
+          "epoch": 18,
+          "train_loss": 0.012351075187325478,
+          "validation_loss": 0.01802203617990017,
+          "train_action_mse": 0.012351075187325478,
+          "validation_action_mse": 0.01802203617990017
+        },
+        {
+          "epoch": 19,
+          "train_loss": 0.012302330695092678,
+          "validation_loss": 0.01950886845588684,
+          "train_action_mse": 0.012302330695092678,
+          "validation_action_mse": 0.01950886845588684
+        },
+        {
+          "epoch": 20,
+          "train_loss": 0.01927972212433815,
+          "validation_loss": 0.02918725460767746,
+          "train_action_mse": 0.01927972212433815,
+          "validation_action_mse": 0.02918725460767746
+        }
+      ]
+    },
+    "policy_checkpoint": "/home/yikai/Documents/Code/Metaworld/runs/validation/cl_layernorm_2task_diffusion_20260924_01/general_policy_after_task_1_faucet-close-v3.pt",
+    "diffusion_checkpoint": "/home/yikai/Documents/Code/Metaworld/runs/validation/cl_layernorm_2task_diffusion_20260924_01/diffusion_after_task_1_faucet-close-v3.pt"
+  },
+  "generated_replay": {
+    "generated_before_current_collection": true,
+    "shape": [
+      20,
+      200,
+      43
+    ],
+    "count": 20,
+    "action_min": -0.9508335590362549,
+    "action_max": 1.0186830759048462,
+    "action_outside_minus1_plus1_fraction": 0.004625000059604645,
+    "projection": "none",
+    "checkpoint_dynamic_mean_finite": true,
+    "checkpoint_dynamic_scale_finite": true,
+    "checkpoint_goal_mean_finite": true,
+    "checkpoint_goal_scale_finite": true,
+    "dynamic_feature_count": 22,
+    "checkpoint_kind": "trajectory_diffusion_22_v1"
+  },
+  "checkpoint_checks": [
+    {
+      "path": "/home/yikai/Documents/Code/Metaworld/runs/validation/cl_layernorm_2task_diffusion_20260924_01/general_policy_after_task_0_button-press-v3.pt",
+      "kind": "general_policy_layer_norm_v1",
+      "has_obs_mean": false,
+      "has_obs_std": false,
+      "architecture": [
+        "Linear",
+        "LayerNorm",
+        "ReLU",
+        "Linear",
+        "ReLU",
+        "Linear",
+        "Tanh"
+      ]
+    },
+    {
+      "path": "/home/yikai/Documents/Code/Metaworld/runs/validation/cl_layernorm_2task_diffusion_20260924_01/general_policy_after_task_1_faucet-close-v3.pt",
+      "kind": "general_policy_layer_norm_v1",
+      "has_obs_mean": false,
+      "has_obs_std": false,
+      "architecture": [
+        "Linear",
+        "LayerNorm",
+        "ReLU",
+        "Linear",
+        "ReLU",
+        "Linear",
+        "Tanh"
+      ]
+    }
+  ],
+  "R": [
+    [
+      1.0,
+      null
+    ],
+    [
+      0.95,
+      1.0
+    ]
+  ],
+  "cells": [
+    [
+      {
+        "mean_return": 1482.4781496307892,
+        "std_return": 95.60996752661272,
+        "success_rate": 1.0,
+        "success_count": 20,
+        "mean_episode_length": 200.0,
+        "episodes": 20,
+        "horizon": 200,
+        "seeds": [
+          10000,
+          10001,
+          10002,
+          10003,
+          10004,
+          10005,
+          10006,
+          10007,
+          10008,
+          10009,
+          10010,
+          10011,
+          10012,
+          10013,
+          10014,
+          10015,
+          10016,
+          10017,
+          10018,
+          10019
+        ],
+        "episode_returns": [
+          1391.6392878757779,
+          1329.6372111618184,
+          1453.357770863111,
+          1548.6935738935808,
+          1525.0293061966947,
+          1565.4972552771853,
+          1397.7551897163842,
+          1557.4528525286203,
+          1510.9139845129644,
+          1572.2458050502894,
+          1551.71280789718,
+          1321.8102754881404,
+          1569.5341067050308,
+          1271.826161729942,
+          1550.6506579613138,
+          1382.4174081895828,
+          1563.7355919743125,
+          1553.114619833522,
+          1468.7524509349034,
+          1563.7866748254291
+        ],
+        "episode_lengths": [
+          200,
+          200,
+          200,
+          200,
+          200,
+          200,
+          200,
+          200,
+          200,
+          200,
+          200,
+          200,
+          200,
+          200,
+          200,
+          200,
+          200,
+          200,
+          200,
+          200
+        ],
+        "episode_successes": [
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true
+        ],
+        "deterministic": true,
+        "evaluation_mode": "fixed-tasks",
+        "task_set_seed": 10000,
+        "task_bank_size": 50,
+        "episode_provenance": [
+          {
+            "task_index": 0,
+            "task_env_name": "button-press-v3",
+            "task_data_sha256": "cd4363773babe136a834fa655a5f1b845beecd3faf3b5bf9617f46afce23a735",
+            "reset_seed": 10000,
+            "episode_return": 1391.6392878757779,
+            "success": true
+          },
+          {
+            "task_index": 1,
+            "task_env_name": "button-press-v3",
+            "task_data_sha256": "955eb36c4d40df83eff38eb400bd3a75e7ec9466398f8aae05133b2e12ce83bd",
+            "reset_seed": 10001,
+            "episode_return": 1329.6372111618184,
+            "success": true
+          },
+          {
+            "task_index": 2,
+            "task_env_name": "button-press-v3",
+            "task_data_sha256": "0225e8361434aa4d204c736eff460f3e314add782e3f9e3740c5cb6991db1877",
+            "reset_seed": 10002,
+            "episode_return": 1453.357770863111,
+            "success": true
+          },
+          {
+            "task_index": 3,
+            "task_env_name": "button-press-v3",
+            "task_data_sha256": "e89c8453f5a9f86b9c11a3c635fce716d7d24a0b2912360279522fc2b40e3ae9",
+            "reset_seed": 10003,
+            "episode_return": 1548.6935738935808,
+            "success": true
+          },
+          {
+            "task_index": 4,
+            "task_env_name": "button-press-v3",
+            "task_data_sha256": "739150ec165b9925cd88453d9635b1b5e2738a1bca9c7447db7603a62a88b5ba",
+            "reset_seed": 10004,
+            "episode_return": 1525.0293061966947,
+            "success": true
+          },
+          {
+            "task_index": 5,
+            "task_env_name": "button-press-v3",
+            "task_data_sha256": "885eb07540cadf8d7b118ce3ec997be1411128ad44648d88b7ce1b0f44ce4b7b",
+            "reset_seed": 10005,
+            "episode_return": 1565.4972552771853,
+            "success": true
+          },
+          {
+            "task_index": 6,
+            "task_env_name": "button-press-v3",
+            "task_data_sha256": "4cf2cd8e68fc054d54e0ffce59beb5b273caaeed4f7dd10976b7d009365fc5de",
+            "reset_seed": 10006,
+            "episode_return": 1397.7551897163842,
+            "success": true
+          },
+          {
+            "task_index": 7,
+            "task_env_name": "button-press-v3",
+            "task_data_sha256": "0bf6847a452937c42ca4a94fdf019679090e6b8e3c2af4f58a1404cc9c65b8f3",
+            "reset_seed": 10007,
+            "episode_return": 1557.4528525286203,
+            "success": true
+          },
+          {
+            "task_index": 8,
+            "task_env_name": "button-press-v3",
+            "task_data_sha256": "de8a5357dcb0b32b79efa46e28be02bdfc5865164914383cc2132a0b474fc64d",
+            "reset_seed": 10008,
+            "episode_return": 1510.9139845129644,
+            "success": true
+          },
+          {
+            "task_index": 9,
+            "task_env_name": "button-press-v3",
+            "task_data_sha256": "d12737a3c23d912312544ab7c353e14b4f6899a817a61b765487ecb629f502ee",
+            "reset_seed": 10009,
+            "episode_return": 1572.2458050502894,
+            "success": true
+          },
+          {
+            "task_index": 10,
+            "task_env_name": "button-press-v3",
+            "task_data_sha256": "bee9255b466b2d3f4a737c15573a3c8e7b7c7ee7d9f3c7ed0a2c08f97a5b1c2a",
+            "reset_seed": 10010,
+            "episode_return": 1551.71280789718,
+            "success": true
+          },
+          {
+            "task_index": 11,
+            "task_env_name": "button-press-v3",
+            "task_data_sha256": "e37c9ba086424e333eef5022449595ddae6d55b2f704ec9229781fdb05472fa6",
+            "reset_seed": 10011,
+            "episode_return": 1321.8102754881404,
+            "success": true
+          },
+          {
+            "task_index": 12,
+            "task_env_name": "button-press-v3",
+            "task_data_sha256": "6473a433b287a99e0ee664479f1ec93aa4e5ed6d5b02b9e03a7e23964c15133f",
+            "reset_seed": 10012,
+            "episode_return": 1569.5341067050308,
+            "success": true
+          },
+          {
+            "task_index": 13,
+            "task_env_name": "button-press-v3",
+            "task_data_sha256": "b9f029919baed0afa678c71129abb8553b9c291783f7b398593d136048344d59",
+            "reset_seed": 10013,
+            "episode_return": 1271.826161729942,
+            "success": true
+          },
+          {
+            "task_index": 14,
+            "task_env_name": "button-press-v3",
+            "task_data_sha256": "f52c92b94ce2ffc0da4d52e25873c5f3ee0896dc35750f5d892c3a15aeea1782",
+            "reset_seed": 10014,
+            "episode_return": 1550.6506579613138,
+            "success": true
+          },
+          {
+            "task_index": 15,
+            "task_env_name": "button-press-v3",
+            "task_data_sha256": "7fc7822b899965c171fe8118b69037b3f30297e9d560b2e75080f3e070a872ff",
+            "reset_seed": 10015,
+            "episode_return": 1382.4174081895828,
+            "success": true
+          },
+          {
+            "task_index": 16,
+            "task_env_name": "button-press-v3",
+            "task_data_sha256": "a71932de9225a7272b36ea1e9a40492dccb15e8952b4039b7f42856ddb1d88b2",
+            "reset_seed": 10016,
+            "episode_return": 1563.7355919743125,
+            "success": true
+          },
+          {
+            "task_index": 17,
+            "task_env_name": "button-press-v3",
+            "task_data_sha256": "e2017d9434063c658a2b3bdf2dc11acde87d0ec710eeb4f565ce8534a07c45b7",
+            "reset_seed": 10017,
+            "episode_return": 1553.114619833522,
+            "success": true
+          },
+          {
+            "task_index": 18,
+            "task_env_name": "button-press-v3",
+            "task_data_sha256": "d5f92e0b063f1a9f8757214a52fff73983ec8e46cd5c94c04525de083654fa06",
+            "reset_seed": 10018,
+            "episode_return": 1468.7524509349034,
+            "success": true
+          },
+          {
+            "task_index": 19,
+            "task_env_name": "button-press-v3",
+            "task_data_sha256": "b5dd36a9f7680df2b72823ab1fa1680f367f0fdb1127c14d4901bf36e39e89b0",
+            "reset_seed": 10019,
+            "episode_return": 1563.7866748254291,
+            "success": true
+          }
+        ]
+      },
+      null
+    ],
+    [
+      {
+        "mean_return": 525.3293461614129,
+        "std_return": 307.9400034208656,
+        "success_rate": 0.95,
+        "success_count": 19,
+        "mean_episode_length": 200.0,
+        "episodes": 20,
+        "horizon": 200,
+        "seeds": [
+          10000,
+          10001,
+          10002,
+          10003,
+          10004,
+          10005,
+          10006,
+          10007,
+          10008,
+          10009,
+          10010,
+          10011,
+          10012,
+          10013,
+          10014,
+          10015,
+          10016,
+          10017,
+          10018,
+          10019
+        ],
+        "episode_returns": [
+          364.4749321345199,
+          365.50591853048996,
+          387.44788540625933,
+          323.6131218862365,
+          339.75936331867206,
+          399.82134417054436,
+          364.0020590219505,
+          322.8017331284293,
+          272.234383498855,
+          730.5066217816455,
+          683.7382032654127,
+          354.8049010903712,
+          320.95433997190776,
+          1486.9848159260407,
+          865.4130626443502,
+          358.5194616323988,
+          483.79960232372053,
+          416.78011181805937,
+          1145.2457465005364,
+          520.1793151778572
+        ],
+        "episode_lengths": [
+          200,
+          200,
+          200,
+          200,
+          200,
+          200,
+          200,
+          200,
+          200,
+          200,
+          200,
+          200,
+          200,
+          200,
+          200,
+          200,
+          200,
+          200,
+          200,
+          200
+        ],
+        "episode_successes": [
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          false,
+          true,
+          true,
+          true,
+          true
+        ],
+        "deterministic": true,
+        "evaluation_mode": "fixed-tasks",
+        "task_set_seed": 10000,
+        "task_bank_size": 50,
+        "episode_provenance": [
+          {
+            "task_index": 0,
+            "task_env_name": "button-press-v3",
+            "task_data_sha256": "cd4363773babe136a834fa655a5f1b845beecd3faf3b5bf9617f46afce23a735",
+            "reset_seed": 10000,
+            "episode_return": 364.4749321345199,
+            "success": true
+          },
+          {
+            "task_index": 1,
+            "task_env_name": "button-press-v3",
+            "task_data_sha256": "955eb36c4d40df83eff38eb400bd3a75e7ec9466398f8aae05133b2e12ce83bd",
+            "reset_seed": 10001,
+            "episode_return": 365.50591853048996,
+            "success": true
+          },
+          {
+            "task_index": 2,
+            "task_env_name": "button-press-v3",
+            "task_data_sha256": "0225e8361434aa4d204c736eff460f3e314add782e3f9e3740c5cb6991db1877",
+            "reset_seed": 10002,
+            "episode_return": 387.44788540625933,
+            "success": true
+          },
+          {
+            "task_index": 3,
+            "task_env_name": "button-press-v3",
+            "task_data_sha256": "e89c8453f5a9f86b9c11a3c635fce716d7d24a0b2912360279522fc2b40e3ae9",
+            "reset_seed": 10003,
+            "episode_return": 323.6131218862365,
+            "success": true
+          },
+          {
+            "task_index": 4,
+            "task_env_name": "button-press-v3",
+            "task_data_sha256": "739150ec165b9925cd88453d9635b1b5e2738a1bca9c7447db7603a62a88b5ba",
+            "reset_seed": 10004,
+            "episode_return": 339.75936331867206,
+            "success": true
+          },
+          {
+            "task_index": 5,
+            "task_env_name": "button-press-v3",
+            "task_data_sha256": "885eb07540cadf8d7b118ce3ec997be1411128ad44648d88b7ce1b0f44ce4b7b",
+            "reset_seed": 10005,
+            "episode_return": 399.82134417054436,
+            "success": true
+          },
+          {
+            "task_index": 6,
+            "task_env_name": "button-press-v3",
+            "task_data_sha256": "4cf2cd8e68fc054d54e0ffce59beb5b273caaeed4f7dd10976b7d009365fc5de",
+            "reset_seed": 10006,
+            "episode_return": 364.0020590219505,
+            "success": true
+          },
+          {
+            "task_index": 7,
+            "task_env_name": "button-press-v3",
+            "task_data_sha256": "0bf6847a452937c42ca4a94fdf019679090e6b8e3c2af4f58a1404cc9c65b8f3",
+            "reset_seed": 10007,
+            "episode_return": 322.8017331284293,
+            "success": true
+          },
+          {
+            "task_index": 8,
+            "task_env_name": "button-press-v3",
+            "task_data_sha256": "de8a5357dcb0b32b79efa46e28be02bdfc5865164914383cc2132a0b474fc64d",
+            "reset_seed": 10008,
+            "episode_return": 272.234383498855,
+            "success": true
+          },
+          {
+            "task_index": 9,
+            "task_env_name": "button-press-v3",
+            "task_data_sha256": "d12737a3c23d912312544ab7c353e14b4f6899a817a61b765487ecb629f502ee",
+            "reset_seed": 10009,
+            "episode_return": 730.5066217816455,
+            "success": true
+          },
+          {
+            "task_index": 10,
+            "task_env_name": "button-press-v3",
+            "task_data_sha256": "bee9255b466b2d3f4a737c15573a3c8e7b7c7ee7d9f3c7ed0a2c08f97a5b1c2a",
+            "reset_seed": 10010,
+            "episode_return": 683.7382032654127,
+            "success": true
+          },
+          {
+            "task_index": 11,
+            "task_env_name": "button-press-v3",
+            "task_data_sha256": "e37c9ba086424e333eef5022449595ddae6d55b2f704ec9229781fdb05472fa6",
+            "reset_seed": 10011,
+            "episode_return": 354.8049010903712,
+            "success": true
+          },
+          {
+            "task_index": 12,
+            "task_env_name": "button-press-v3",
+            "task_data_sha256": "6473a433b287a99e0ee664479f1ec93aa4e5ed6d5b02b9e03a7e23964c15133f",
+            "reset_seed": 10012,
+            "episode_return": 320.95433997190776,
+            "success": true
+          },
+          {
+            "task_index": 13,
+            "task_env_name": "button-press-v3",
+            "task_data_sha256": "b9f029919baed0afa678c71129abb8553b9c291783f7b398593d136048344d59",
+            "reset_seed": 10013,
+            "episode_return": 1486.9848159260407,
+            "success": true
+          },
+          {
+            "task_index": 14,
+            "task_env_name": "button-press-v3",
+            "task_data_sha256": "f52c92b94ce2ffc0da4d52e25873c5f3ee0896dc35750f5d892c3a15aeea1782",
+            "reset_seed": 10014,
+            "episode_return": 865.4130626443502,
+            "success": true
+          },
+          {
+            "task_index": 15,
+            "task_env_name": "button-press-v3",
+            "task_data_sha256": "7fc7822b899965c171fe8118b69037b3f30297e9d560b2e75080f3e070a872ff",
+            "reset_seed": 10015,
+            "episode_return": 358.5194616323988,
+            "success": false
+          },
+          {
+            "task_index": 16,
+            "task_env_name": "button-press-v3",
+            "task_data_sha256": "a71932de9225a7272b36ea1e9a40492dccb15e8952b4039b7f42856ddb1d88b2",
+            "reset_seed": 10016,
+            "episode_return": 483.79960232372053,
+            "success": true
+          },
+          {
+            "task_index": 17,
+            "task_env_name": "button-press-v3",
+            "task_data_sha256": "e2017d9434063c658a2b3bdf2dc11acde87d0ec710eeb4f565ce8534a07c45b7",
+            "reset_seed": 10017,
+            "episode_return": 416.78011181805937,
+            "success": true
+          },
+          {
+            "task_index": 18,
+            "task_env_name": "button-press-v3",
+            "task_data_sha256": "d5f92e0b063f1a9f8757214a52fff73983ec8e46cd5c94c04525de083654fa06",
+            "reset_seed": 10018,
+            "episode_return": 1145.2457465005364,
+            "success": true
+          },
+          {
+            "task_index": 19,
+            "task_env_name": "button-press-v3",
+            "task_data_sha256": "b5dd36a9f7680df2b72823ab1fa1680f367f0fdb1127c14d4901bf36e39e89b0",
+            "reset_seed": 10019,
+            "episode_return": 520.1793151778572,
+            "success": true
+          }
+        ]
+      },
+      {
+        "mean_return": 1757.3763537771888,
+        "std_return": 19.761463734736715,
+        "success_rate": 1.0,
+        "success_count": 20,
+        "mean_episode_length": 200.0,
+        "episodes": 20,
+        "horizon": 200,
+        "seeds": [
+          10000,
+          10001,
+          10002,
+          10003,
+          10004,
+          10005,
+          10006,
+          10007,
+          10008,
+          10009,
+          10010,
+          10011,
+          10012,
+          10013,
+          10014,
+          10015,
+          10016,
+          10017,
+          10018,
+          10019
+        ],
+        "episode_returns": [
+          1766.9922345721725,
+          1770.6524279064843,
+          1785.1075131746452,
+          1754.253137318176,
+          1719.6165465356835,
+          1731.600151008466,
+          1765.2896297372486,
+          1760.1675481014336,
+          1783.3887774030538,
+          1774.7342261751728,
+          1714.51038584591,
+          1761.5836268121564,
+          1772.1182767818796,
+          1777.7023632212008,
+          1740.3919636130424,
+          1736.4168601641682,
+          1772.2187446313167,
+          1762.4885728790623,
+          1752.95112859855,
+          1745.3429610639537
+        ],
+        "episode_lengths": [
+          200,
+          200,
+          200,
+          200,
+          200,
+          200,
+          200,
+          200,
+          200,
+          200,
+          200,
+          200,
+          200,
+          200,
+          200,
+          200,
+          200,
+          200,
+          200,
+          200
+        ],
+        "episode_successes": [
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true
+        ],
+        "deterministic": true,
+        "evaluation_mode": "fixed-tasks",
+        "task_set_seed": 10000,
+        "task_bank_size": 50,
+        "episode_provenance": [
+          {
+            "task_index": 0,
+            "task_env_name": "faucet-close-v3",
+            "task_data_sha256": "13f5f2ce30750cd20099a61dd177656cff533483be7c79a919fa9bd88aaf8d7e",
+            "reset_seed": 10000,
+            "episode_return": 1766.9922345721725,
+            "success": true
+          },
+          {
+            "task_index": 1,
+            "task_env_name": "faucet-close-v3",
+            "task_data_sha256": "843d7c9e761fe5554c8b545b23789d4219d48632449bc6562d5e89d04f3a7f15",
+            "reset_seed": 10001,
+            "episode_return": 1770.6524279064843,
+            "success": true
+          },
+          {
+            "task_index": 2,
+            "task_env_name": "faucet-close-v3",
+            "task_data_sha256": "81cac5c18869a11ea4dc5ff5f2037c6eaf74b8864b37f64e4cb5489c2a7793d8",
+            "reset_seed": 10002,
+            "episode_return": 1785.1075131746452,
+            "success": true
+          },
+          {
+            "task_index": 3,
+            "task_env_name": "faucet-close-v3",
+            "task_data_sha256": "f34c86cf84397cd5b37e6222c0792dd82e59789b7f8bd2c119cbc72144f362fa",
+            "reset_seed": 10003,
+            "episode_return": 1754.253137318176,
+            "success": true
+          },
+          {
+            "task_index": 4,
+            "task_env_name": "faucet-close-v3",
+            "task_data_sha256": "93e98f06b6b2a7845a1a99ccbbb416f8cbbb034f342b1f891152ffd30a8476be",
+            "reset_seed": 10004,
+            "episode_return": 1719.6165465356835,
+            "success": true
+          },
+          {
+            "task_index": 5,
+            "task_env_name": "faucet-close-v3",
+            "task_data_sha256": "39ac5d7ac2639d70e70b6271550019d8202432898756dc9d8cc64adb2c2af952",
+            "reset_seed": 10005,
+            "episode_return": 1731.600151008466,
+            "success": true
+          },
+          {
+            "task_index": 6,
+            "task_env_name": "faucet-close-v3",
+            "task_data_sha256": "54b5361ee9daad7198ddbefee959bd1560434def3da6df7115db3d484a87929b",
+            "reset_seed": 10006,
+            "episode_return": 1765.2896297372486,
+            "success": true
+          },
+          {
+            "task_index": 7,
+            "task_env_name": "faucet-close-v3",
+            "task_data_sha256": "a50e98acc1272a7a6a883ba0c83d0ec0a30c722482756f2e3b64daffbd2a4346",
+            "reset_seed": 10007,
+            "episode_return": 1760.1675481014336,
+            "success": true
+          },
+          {
+            "task_index": 8,
+            "task_env_name": "faucet-close-v3",
+            "task_data_sha256": "7c84e64884414ee63f353c1335466bf702056959b47fe312a00e6972722a8c8a",
+            "reset_seed": 10008,
+            "episode_return": 1783.3887774030538,
+            "success": true
+          },
+          {
+            "task_index": 9,
+            "task_env_name": "faucet-close-v3",
+            "task_data_sha256": "54d86cc56f569adc0d3ca47de3000cf02ec6fac75057afdf8012daa051c90e51",
+            "reset_seed": 10009,
+            "episode_return": 1774.7342261751728,
+            "success": true
+          },
+          {
+            "task_index": 10,
+            "task_env_name": "faucet-close-v3",
+            "task_data_sha256": "37025bb7d33f3d191dea3d1479a57464de8f0169369d38eb4693bdfb9237c466",
+            "reset_seed": 10010,
+            "episode_return": 1714.51038584591,
+            "success": true
+          },
+          {
+            "task_index": 11,
+            "task_env_name": "faucet-close-v3",
+            "task_data_sha256": "6da3a7643d46d522814f4a1d14f14adae6eacca7807bd5e4cdfea65eadc85063",
+            "reset_seed": 10011,
+            "episode_return": 1761.5836268121564,
+            "success": true
+          },
+          {
+            "task_index": 12,
+            "task_env_name": "faucet-close-v3",
+            "task_data_sha256": "92af8675f0d5533c2c6299d81923f1f8184b157fa7207293f6f2e9a5b66b5101",
+            "reset_seed": 10012,
+            "episode_return": 1772.1182767818796,
+            "success": true
+          },
+          {
+            "task_index": 13,
+            "task_env_name": "faucet-close-v3",
+            "task_data_sha256": "1659c54034ba508183ce180803179385c9eb1aaf0ef937d7f1a0288108b8024e",
+            "reset_seed": 10013,
+            "episode_return": 1777.7023632212008,
+            "success": true
+          },
+          {
+            "task_index": 14,
+            "task_env_name": "faucet-close-v3",
+            "task_data_sha256": "63653469c28b4013290be203f76387a6b259c78ffab26d449213545d3dba9d89",
+            "reset_seed": 10014,
+            "episode_return": 1740.3919636130424,
+            "success": true
+          },
+          {
+            "task_index": 15,
+            "task_env_name": "faucet-close-v3",
+            "task_data_sha256": "e19603078d4e109cbc212187aea41179f9e5d08e2a9240311e1ddea47a95a335",
+            "reset_seed": 10015,
+            "episode_return": 1736.4168601641682,
+            "success": true
+          },
+          {
+            "task_index": 16,
+            "task_env_name": "faucet-close-v3",
+            "task_data_sha256": "7b6edc3843b9d1285faee506aa3fdcdb5344ff06276d572cba1320af55250ac1",
+            "reset_seed": 10016,
+            "episode_return": 1772.2187446313167,
+            "success": true
+          },
+          {
+            "task_index": 17,
+            "task_env_name": "faucet-close-v3",
+            "task_data_sha256": "d0caaae670fcf39dbd85d4cc29fdba3f4ae54afab44538214daa4d85cd443086",
+            "reset_seed": 10017,
+            "episode_return": 1762.4885728790623,
+            "success": true
+          },
+          {
+            "task_index": 18,
+            "task_env_name": "faucet-close-v3",
+            "task_data_sha256": "3e9b06b2ec14f91a864c1362cedc3dfb5dac0ad3e8d46e651a7a0be5116b3735",
+            "reset_seed": 10018,
+            "episode_return": 1752.95112859855,
+            "success": true
+          },
+          {
+            "task_index": 19,
+            "task_env_name": "faucet-close-v3",
+            "task_data_sha256": "96e6a3686b65e725cf53144ea2d50e261001f9afc5397d604ea944a4f1fc35b8",
+            "reset_seed": 10019,
+            "episode_return": 1745.3429610639537,
+            "success": true
+          }
+        ]
+      }
+    ]
+  ]
+}

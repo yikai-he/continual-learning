@@ -1,0 +1,17 @@
+{
+  "structured_shape": [
+    8,
+    200,
+    22
+  ],
+  "physical_shape": [
+    8,
+    200,
+    43
+  ],
+  "seconds": 0.013224041998910252,
+  "nfe": 2,
+  "seed": 100000,
+  "checkpoint": "/home/yikai/Documents/Code/Thesis/continual-learning/runs/flow_matching_ablation/button_press_v3_seed0/integration_steps_50_debug/training_attempt_1793286880450556674/flow_matching.pt",
+  "checkpoint_sha256": "9632505a373538b49ebf547a8682374a25ca3eaa417e64e5a7f47a64fa701a10"
+}

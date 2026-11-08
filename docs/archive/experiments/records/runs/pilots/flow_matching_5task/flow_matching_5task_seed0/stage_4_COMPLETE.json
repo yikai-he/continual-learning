@@ -1,0 +1,27 @@
+{
+  "schema_version": 1,
+  "stage": 4,
+  "task": "window-close-v3",
+  "artifacts": {
+    "policy": {
+      "path": "general_policy_after_task_4_window-close-v3.pt",
+      "sha256": "6116abe76d4958d1f6291ce715e0d8d3723cb5bd038d15cd2c2657212ab8930e"
+    },
+    "stage_state": {
+      "path": "stage_state_after_task_4_window-close-v3.pt",
+      "sha256": "7e73a41023e5199ce8a8902df6cfce84330b58f2a6dd6dbb682638243e90e51c"
+    },
+    "report": {
+      "path": "stage_4_window-close-v3/report.json",
+      "sha256": "0df45b6186dcd9639c1669e691f56940e8b64dcd802fc82835e2c9aeda7c97ee"
+    },
+    "evaluation_matrix": {
+      "path": "stage_4_window-close-v3/evaluation_matrix.json",
+      "sha256": "237c368e17c8178dc56bbae5e7a20580ec2e377f8b998276be6f30f47ebc3c2a"
+    },
+    "flow_matching": {
+      "path": "flow_matching_after_task_4_window-close-v3.pt",
+      "sha256": "168e5fa630d121fef3ec27dcf5fb4951b66156b9e5bef7d9db7341af4ea3d081"
+    }
+  }
+}

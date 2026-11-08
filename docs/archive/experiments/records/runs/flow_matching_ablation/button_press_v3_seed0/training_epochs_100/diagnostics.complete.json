@@ -1,0 +1,11 @@
+{
+  "kind": "flow_matching_ablation_completion_v1",
+  "stage": "diagnostics",
+  "config_sha256": "c246bcc7a82323ffc6b6f6da79836fa6a752d9e355229ff9474a939c464b93b1",
+  "artifacts": {
+    "diagnostics": {
+      "path": "/home/yikai/Documents/Code/Thesis/continual-learning/runs/flow_matching_ablation/button_press_v3_seed0/training_epochs_100/diagnostics_attempt_1793287457886398934/diagnostics.json",
+      "sha256": "d3d0b394693453270624de920326fe54beff64d93014c0c429ef0d12c90db285"
+    }
+  }
+}

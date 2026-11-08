@@ -1,0 +1,13 @@
+condition,seed,source_run,final_ap_pct,average_forgetting_pp,final_button-press-v3_pct,final_faucet-close-v3_pct,final_hammer-v3_pct,final_handle-press-side-v3_pct,final_window-close-v3_pct
+No Replay + None,0,runs/formal/diffcrl_5task_no_replay_200traj/diffcrl_5task_no_replay_200traj_seed0,22.800000000000004,77.2,0.0,0.0,14.000000000000002,0.0,100.0
+No Replay + None,1,runs/formal/diffcrl_5task_no_replay_200traj/diffcrl_5task_no_replay_200traj_seed1,29.2,70.39999999999999,16.0,30.0,0.0,0.0,100.0
+No Replay + None,2,runs/formal/diffcrl_5task_no_replay_200traj/diffcrl_5task_no_replay_200traj_seed2,37.2,61.999999999999986,26.0,40.0,16.0,4.0,100.0
+No Replay + One-hot,0,runs/formal/no_replay_5task_task_conditioned/seed_0,24.0,76.0,0.0,0.0,0.0,20.0,100.0
+No Replay + One-hot,1,runs/formal/no_replay_5task_task_conditioned/seed_1,29.2,70.39999999999999,44.0,0.0,0.0,2.0,100.0
+No Replay + One-hot,2,runs/formal/no_replay_5task_task_conditioned/seed_2,20.0,80.0,0.0,0.0,0.0,0.0,100.0
+DiffCRL + None,0,runs/formal/diffcrl_5task_200traj/diffcrl_5task_200traj_seed0,95.19999999999999,4.8,100.0,100.0,80.0,96.0,100.0
+DiffCRL + None,1,runs/formal/diffcrl_5task_200traj/diffcrl_5task_200traj_seed1,97.6,0.40000000000000036,100.0,100.0,96.0,92.0,100.0
+DiffCRL + None,2,runs/formal/diffcrl_5task_200traj/diffcrl_5task_200traj_seed2,97.6,1.1999999999999988,100.0,100.0,88.0,100.0,100.0
+DiffCRL + One-hot,0,runs/formal/diffcrl_5task_task_conditioned/seed_0,95.19999999999999,4.3999999999999995,100.0,100.0,78.0,98.0,100.0
+DiffCRL + One-hot,1,runs/formal/diffcrl_5task_task_conditioned/seed_1,96.0,3.599999999999999,100.0,100.0,80.0,100.0,100.0
+DiffCRL + One-hot,2,runs/formal/diffcrl_5task_task_conditioned/seed_2,97.6,1.5999999999999994,100.0,100.0,88.0,100.0,100.0

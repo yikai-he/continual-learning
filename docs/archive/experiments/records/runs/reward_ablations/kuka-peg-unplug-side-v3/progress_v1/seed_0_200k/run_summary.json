@@ -1,0 +1,38 @@
+{
+  "task": "kuka-peg-unplug-side-v3",
+  "backend": "kuka-v3",
+  "seed": 0,
+  "total_timesteps": 200000,
+  "reward_function_version": "v2",
+  "horizon": 200,
+  "initial": {
+    "success_rate": 0.0,
+    "mean_return": 11.003871243012178,
+    "return_std": 2.924101477355071
+  },
+  "final": {
+    "step": 200000,
+    "success_rate": 0.86,
+    "mean_return": 406.34688339818973,
+    "return_std": 260.36284976949014
+  },
+  "best_success": {
+    "step": 200000,
+    "success_rate": 0.86,
+    "mean_return": 406.34688339818973,
+    "return_std": 260.36284976949014,
+    "model_path": "best_success_model/best_success_model.zip"
+  },
+  "best_return": {
+    "step": 180000,
+    "success_rate": 0.74,
+    "mean_return": 729.9165674099418,
+    "return_std": 409.60691343762505,
+    "model_path": "best_model/best_model.zip"
+  },
+  "artifacts": {
+    "final_model": "final_model.zip",
+    "evaluations_npz": "evaluations/evaluations.npz",
+    "tensorboard": "tensorboard"
+  }
+}

@@ -1,0 +1,135 @@
+{
+  "fit": {
+    "initial": {
+      "train_loss": 0.5334154367446899,
+      "validation_loss": 0.5321051478385925,
+      "train_action_mse": 0.5334154367446899,
+      "validation_action_mse": 0.5321051478385925
+    },
+    "best_epoch": 1,
+    "train_loss": 0.3025102913379669,
+    "validation_loss": 0.28650543093681335,
+    "train_action_mse": 0.3025102913379669,
+    "validation_action_mse": 0.28650543093681335,
+    "history": [
+      {
+        "epoch": 1,
+        "train_loss": 0.3025102913379669,
+        "validation_loss": 0.28650543093681335,
+        "train_action_mse": 0.3025102913379669,
+        "validation_action_mse": 0.28650543093681335
+      },
+      {
+        "epoch": 2,
+        "train_loss": 0.3095712661743164,
+        "validation_loss": 0.2936754524707794,
+        "train_action_mse": 0.3095712661743164,
+        "validation_action_mse": 0.2936754524707794
+      }
+    ]
+  },
+  "evaluation": {
+    "mean_return": 522.0963472370489,
+    "std_return": 259.53477634278374,
+    "success_rate": 0.5,
+    "success_count": 1,
+    "mean_episode_length": 200.0,
+    "episodes": 2,
+    "horizon": 200,
+    "seeds": [
+      10000,
+      10001
+    ],
+    "episode_returns": [
+      262.5615708942651,
+      781.6311235798327
+    ],
+    "episode_lengths": [
+      200,
+      200
+    ],
+    "episode_successes": [
+      false,
+      true
+    ],
+    "deterministic": true,
+    "evaluation_mode": "fixed-tasks",
+    "environment_backend": "metaworld-v3",
+    "task_set_seed": 10000,
+    "task_bank_size": 50,
+    "ordered_task_hashes": [
+      "cd4363773babe136a834fa655a5f1b845beecd3faf3b5bf9617f46afce23a735",
+      "955eb36c4d40df83eff38eb400bd3a75e7ec9466398f8aae05133b2e12ce83bd",
+      "0225e8361434aa4d204c736eff460f3e314add782e3f9e3740c5cb6991db1877",
+      "e89c8453f5a9f86b9c11a3c635fce716d7d24a0b2912360279522fc2b40e3ae9",
+      "739150ec165b9925cd88453d9635b1b5e2738a1bca9c7447db7603a62a88b5ba",
+      "885eb07540cadf8d7b118ce3ec997be1411128ad44648d88b7ce1b0f44ce4b7b",
+      "4cf2cd8e68fc054d54e0ffce59beb5b273caaeed4f7dd10976b7d009365fc5de",
+      "0bf6847a452937c42ca4a94fdf019679090e6b8e3c2af4f58a1404cc9c65b8f3",
+      "de8a5357dcb0b32b79efa46e28be02bdfc5865164914383cc2132a0b474fc64d",
+      "d12737a3c23d912312544ab7c353e14b4f6899a817a61b765487ecb629f502ee",
+      "bee9255b466b2d3f4a737c15573a3c8e7b7c7ee7d9f3c7ed0a2c08f97a5b1c2a",
+      "e37c9ba086424e333eef5022449595ddae6d55b2f704ec9229781fdb05472fa6",
+      "6473a433b287a99e0ee664479f1ec93aa4e5ed6d5b02b9e03a7e23964c15133f",
+      "b9f029919baed0afa678c71129abb8553b9c291783f7b398593d136048344d59",
+      "f52c92b94ce2ffc0da4d52e25873c5f3ee0896dc35750f5d892c3a15aeea1782",
+      "7fc7822b899965c171fe8118b69037b3f30297e9d560b2e75080f3e070a872ff",
+      "a71932de9225a7272b36ea1e9a40492dccb15e8952b4039b7f42856ddb1d88b2",
+      "e2017d9434063c658a2b3bdf2dc11acde87d0ec710eeb4f565ce8534a07c45b7",
+      "d5f92e0b063f1a9f8757214a52fff73983ec8e46cd5c94c04525de083654fa06",
+      "b5dd36a9f7680df2b72823ab1fa1680f367f0fdb1127c14d4901bf36e39e89b0",
+      "b93beceec1c68786a3a9d2d492253639abf78c93335180a2285503c0c929ca7b",
+      "599c6761e80db46c9b5f262ee5193abd2e2bafedcd2f779de68075f1954bbc85",
+      "989313a0ae8ee94510ee51e78570c41d63627a46976950f580e8e0c62a5f7f07",
+      "54baba4b57747a107f508debcc5591e6a196a75f421b8c67a02d117a83016de6",
+      "cac140256c144392c22fc87d0ab191678f33621e0c7c992af8f40eb9952dc01c",
+      "37334fc8bd6612c608a48223e135b396eb2f895c03665f1f7593d1c03c6e5f6b",
+      "3a09c2acd6ce79e4b222f570b02834e054c9f27b06a4a63aa2f7612449824789",
+      "0b6d8e03498fd1096ba03aaf0986167a08e6c1c3fbcb601d7f0206c0e90f526d",
+      "d6986f91d4623c5573eda6864df2ae2da83ee7c16fed915e0c86c7c2081d097d",
+      "0cc7c147c56445afc583f9cece453dc67d75f87b26187529b71580e42b14ef2b",
+      "d50feeeccd43c02dc3b2b0fc87d30ebde64a4d225dd236fcfd87787f6e8dbdd8",
+      "c7b04a300ac73b13f60fd6ccb8b02fc80197cfbf263c2b0f1b910e9a5079fe80",
+      "24350e7b99844f5116d8a56089980df2b67d0c31107b119b4c1697ff78884d78",
+      "d27be9bb4b8a6914e46cdc116184e5f841590ff45de7e0c4fbfc81098bee4b1f",
+      "403753520326a2d32e0dbf4ecb57bb4dfa9521d475999cdfe2d96a1fbe4a3003",
+      "6d6e5b02158265ec9070eaf8d5535f3847c552e2c65b92d88fd234ce5b862a54",
+      "939644f1a9c17bfc1f939273f2a8c0fe44e382e37b6ac66e27d97bbb73d8adc0",
+      "a6f5af3fdb5ad83f074a54551d0e134fe6ffe28c5bfa759ce3a0f4452342cad0",
+      "e9d485fff10065bb09e8167d2d226ae17b18e283b36c026222d9b36902368b2d",
+      "ae06867c6680ec1b59b809e58b3b5e13ab54393580741da8557b67d9a160fe58",
+      "cc6b88dbb6507dcb0e4e21134f2dae01e33f3c3ea4ff1375021181c6cf793e09",
+      "9a560eb200497759efb1d52a4a3bfa1edc8f0f79b71d15d23ac665225ff0ad4e",
+      "9d79cc18c346eaaf30185fbe5a7dc76ba7244594120f1b2817edca7f669740a8",
+      "0c4eaec5958c9e56a379cb16d077f2b8d3d8fc1f33fb3cf617b0347013230a80",
+      "7d6330c8a9413a1c92ecbc5071d09e7f301926bfcc6a60d5694be210d2da1854",
+      "8d7d02fec9818c6bb284909490f8c029d8484559715a0a9c09bbd68a46cc9080",
+      "73a73cad42726173755c9126a467072eebf04d7bbba0c7f1d55d0b03abe46a89",
+      "578f2fd40129105f4f954bdb085a9915ab41a777bd7a79bf53451c2369a2c6bc",
+      "fbf524e97051051296569271031e1315a124630c0dca30ec44789bd40996cb4a",
+      "cef526380d88d098fb2e6bb099fe3d791df57b78c519c45d4c07d99e3414d0ce"
+    ],
+    "episode_provenance": [
+      {
+        "task_index": 0,
+        "task_bank_index": 0,
+        "task_env_name": "button-press-v3",
+        "task_data_sha256": "cd4363773babe136a834fa655a5f1b845beecd3faf3b5bf9617f46afce23a735",
+        "task_hash": "cd4363773babe136a834fa655a5f1b845beecd3faf3b5bf9617f46afce23a735",
+        "reset_seed": 10000,
+        "episode_return": 262.5615708942651,
+        "success": false
+      },
+      {
+        "task_index": 1,
+        "task_bank_index": 1,
+        "task_env_name": "button-press-v3",
+        "task_data_sha256": "955eb36c4d40df83eff38eb400bd3a75e7ec9466398f8aae05133b2e12ce83bd",
+        "task_hash": "955eb36c4d40df83eff38eb400bd3a75e7ec9466398f8aae05133b2e12ce83bd",
+        "reset_seed": 10001,
+        "episode_return": 781.6311235798327,
+        "success": true
+      }
+    ]
+  }
+}

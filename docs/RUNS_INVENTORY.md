@@ -1,3 +1,9 @@
+---
+status: current
+last_verified: 2026-11-07
+applies_to: continual-learning
+---
+
 # Canonical Runs Inventory
 
 Updated 2026-10-30 after large-artifact cleanup. Only three run families are

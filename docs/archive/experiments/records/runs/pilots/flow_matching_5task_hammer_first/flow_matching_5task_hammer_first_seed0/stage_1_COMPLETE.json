@@ -1,0 +1,27 @@
+{
+  "schema_version": 1,
+  "stage": 1,
+  "task": "button-press-v3",
+  "artifacts": {
+    "policy": {
+      "path": "general_policy_after_task_1_button-press-v3.pt",
+      "sha256": "a26b375412a4cc6c96de135e4c6ca10fb616829da17e712233668771b3509bcc"
+    },
+    "stage_state": {
+      "path": "stage_state_after_task_1_button-press-v3.pt",
+      "sha256": "6b2ec1c69f8d3ec31eda439b321d007f543b6fb9fb1fe171309556d459443b69"
+    },
+    "report": {
+      "path": "stage_1_button-press-v3/report.json",
+      "sha256": "682a7fd22c814b26ee5da620e7bd898b5327f04dde162293389b202ba5e3a325"
+    },
+    "evaluation_matrix": {
+      "path": "stage_1_button-press-v3/evaluation_matrix.json",
+      "sha256": "626232a2fbdd6b4dd26321dd8713431e7e6749cb92286c3a823b4cd9fa14c80c"
+    },
+    "flow_matching": {
+      "path": "flow_matching_after_task_1_button-press-v3.pt",
+      "sha256": "800f32a7766b5ad3f08bf3a599ccfb4a4cac85ce135239a5ee6423946a4e2595"
+    }
+  }
+}
