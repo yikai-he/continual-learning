@@ -27,6 +27,7 @@ conda-env/
 # --------------------
 # IDE / OS
 # --------------------
+/AGENTS.md
 .vscode/
 .idea/
 .DS_Store
