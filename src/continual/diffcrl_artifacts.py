@@ -172,13 +172,12 @@ def stage_checkpoint_paths(
 
 def validate_finite_model_state(*models) -> None:
     """Reject a selected model set containing any nonfinite state tensor."""
-    if not all(
-        torch.isfinite(value).all()
-        for model in models
-        if model is not None
-        for value in model.state_dict().values()
-    ):
-        raise ValueError("Nonfinite trained state.")
+    for model in models:
+        if model is None:
+            continue
+        for value in model.state_dict().values():
+            if not torch.isfinite(value).all():
+                raise ValueError("Nonfinite trained state.")
 
 
 def save_stage_checkpoints(coordinator, context, generator_training, policy_training):
@@ -188,7 +187,6 @@ def save_stage_checkpoints(coordinator, context, generator_training, policy_trai
     task = context.task
     normalizer = generator_training.normalizer
     goal_normalizer = generator_training.goal_normalizer
-    bc_losses = policy_training
     validate_finite_model_state(
         coordinator.policy, coordinator.diffusion, coordinator.flow_matching
     )
@@ -199,17 +197,20 @@ def save_stage_checkpoints(coordinator, context, generator_training, policy_trai
         has_diffusion=coordinator.diffusion is not None,
         has_flow_matching=coordinator.flow_matching is not None,
     )
+    generator_metadata = {
+        "task_order": coordinator.sequence.task_names,
+        "task_conditioning": "integer task embedding plus projected normalized 3D goal",
+        "training_banks": coordinator.training_banks,
+        "train_configurations": coordinator.train_configurations,
+        "generated_action_projection": cfg.diffusion.generated_action_projection,
+    }
     if coordinator.diffusion is not None:
         coordinator.diffusion.save(
             diffusion_path,
             normalizer,
             goal_normalizer,
             {
-                "task_order": coordinator.sequence.task_names,
-                "task_conditioning": "integer task embedding plus projected normalized 3D goal",
-                "training_banks": coordinator.training_banks,
-                "train_configurations": coordinator.train_configurations,
-                "generated_action_projection": cfg.diffusion.generated_action_projection,
+                **generator_metadata,
                 "diffusion_action_space": cfg.diffusion.action_space,
                 "diffusion_action_clamp_epsilon": cfg.diffusion.action_clamp_epsilon,
                 "diffusion_fit": {
@@ -228,11 +229,7 @@ def save_stage_checkpoints(coordinator, context, generator_training, policy_trai
                 "stage": stage,
                 "task": task.task_name,
                 "seed": cfg.runtime.seed,
-                "task_order": coordinator.sequence.task_names,
-                "task_conditioning": "integer task embedding plus projected normalized 3D goal",
-                "training_banks": coordinator.training_banks,
-                "train_configurations": coordinator.train_configurations,
-                "generated_action_projection": cfg.diffusion.generated_action_projection,
+                **generator_metadata,
                 "action_space": cfg.diffusion.action_space,
                 "action_clamp_epsilon": cfg.diffusion.action_clamp_epsilon,
                 "flow_matching_fit": asdict(cfg.flow_matching),
@@ -243,7 +240,7 @@ def save_stage_checkpoints(coordinator, context, generator_training, policy_trai
         "task": task.task_name,
         "tasks": coordinator.sequence.task_names,
         "seed": cfg.runtime.seed,
-        "best_epoch": bc_losses["best_epoch"],
+        "best_epoch": policy_training["best_epoch"],
         "bc_loss": cfg.bc.loss,
         "bc_objective": coordinator.policy.objective,
         "bc_initial_log_std": cfg.bc.initial_log_std,
@@ -269,9 +266,9 @@ def save_stage_checkpoints(coordinator, context, generator_training, policy_trai
                 if authoritative_selection != "validation_nll"
                 else {}
             ),
-            "selected_epoch": bc_losses["best_epoch"],
-            "validation_nll": bc_losses["validation_loss"],
-            "validation_action_mse": bc_losses["validation_action_mse"],
+            "selected_epoch": policy_training["best_epoch"],
+            "validation_nll": policy_training["validation_loss"],
+            "validation_action_mse": policy_training["validation_action_mse"],
             "shared_training_trajectory_id": selection_id,
         }
     if cfg.bc.task_conditioning == "one_hot":
@@ -292,7 +289,7 @@ def save_stage_checkpoints(coordinator, context, generator_training, policy_trai
         alternative = deepcopy(coordinator.policy)
         alternative.load_state_dict(coordinator.best_mse_policy_state)
         validate_finite_model_state(alternative)
-        best_mse = bc_losses["best_mse_checkpoint"]
+        best_mse = policy_training["best_mse_checkpoint"]
         alternative.save(
             best_mse_policy_path,
             metadata={
@@ -336,15 +333,17 @@ def finish_stage(
     flow_matching_path = artifacts.flow_matching_path
     policy_path = artifacts.policy_path
     best_mse_policy_path = artifacts.best_mse_policy_path
-    checkpoint_hashes = {
-        "policy": file_hash(policy_path),
+    checkpoint_paths = {
+        "policy": policy_path,
+        "diffusion": diffusion_path,
+        "flow_matching": flow_matching_path,
+        "best_mse_policy": best_mse_policy_path,
     }
-    if diffusion_path is not None:
-        checkpoint_hashes["diffusion"] = file_hash(diffusion_path)
-    if flow_matching_path is not None:
-        checkpoint_hashes["flow_matching"] = file_hash(flow_matching_path)
-    if best_mse_policy_path is not None:
-        checkpoint_hashes["best_mse_policy"] = file_hash(best_mse_policy_path)
+    checkpoint_hashes = {
+        name: file_hash(path)
+        for name, path in checkpoint_paths.items()
+        if path is not None
+    }
     report = build_diffcrl_stage_report(
         cfg,
         context,
@@ -386,13 +385,15 @@ def finish_stage(
             "and provenance preparation; excludes final artifact serialization"
         )
     write_json(directory / "report.json", report)
-    write_json(directory / "evaluation_matrix.json", coordinator.matrix.to_dict())
+    matrix_payload = coordinator.matrix.to_dict()
+    write_json(directory / "evaluation_matrix.json", matrix_payload)
     if best_mse_matrix is not None:
         best_mse_matrix_path = directory / "evaluation_matrix_best_mse.json"
-        write_json(best_mse_matrix_path, best_mse_matrix.to_dict())
+        best_mse_matrix_payload = best_mse_matrix.to_dict()
+        write_json(best_mse_matrix_path, best_mse_matrix_payload)
         atomic_replace_json(
             coordinator.output / "evaluation_matrix_best_mse.json",
-            best_mse_matrix.to_dict(),
+            best_mse_matrix_payload,
             allow_nan=False,
         )
     for name, path in coordinator.experts.items():

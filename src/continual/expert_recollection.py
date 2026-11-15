@@ -7,7 +7,6 @@ import time
 from dataclasses import dataclass
 from pathlib import Path
 
-import numpy as np
 import torch
 from stable_baselines3 import SAC
 
@@ -121,8 +120,12 @@ def collect_historical_expert_replay(
         if torch.any(actions < -1) or torch.any(actions > 1):
             raise ValueError("Recollected expert actions exceed environment bounds.")
         hashes = [_trajectory_hash(values) for values in group]
+        successes = [bool(trajectory.success) for trajectory in trajectories]
+        final_successes = [
+            bool(trajectory.final_success) for trajectory in trajectories
+        ]
         returns = [float(trajectory.episode_return) for trajectory in trajectories]
-        goals = group[:, 0, 36:39].tolist()
+        reference_goals = group[:, 0, 36:39].tolist()
         sources[task_name] = {
             "kind": "expert_recollection",
             "historical_task": task_name,
@@ -144,24 +147,21 @@ def collect_historical_expert_replay(
             "unique_configuration_count": len(
                 {configuration["task_data_sha256"] for configuration in configurations}
             ),
-            "goals": goals,
-            "success_count": sum(bool(t.success) for t in trajectories),
-            "success_rate": float(np.mean([t.success for t in trajectories])),
-            "final_success_count": sum(bool(t.final_success) for t in trajectories),
-            "final_success_rate": float(
-                np.mean([t.final_success for t in trajectories])
-            ),
+            "success_count": sum(successes),
+            "success_rate": collection["selected_success_fraction"],
+            "final_success_count": sum(final_successes),
+            "final_success_rate": sum(final_successes) / len(final_successes),
             "episode_lengths": [int(t.length) for t in trajectories],
             "episode_returns": returns,
-            "mean_return": float(np.mean(returns)),
-            "std_return": float(np.std(returns)),
+            "mean_return": collection["selected_mean_return"],
+            "std_return": collection["selected_return_std"],
             "collection_seconds": time.perf_counter() - started,
             "collection": {
                 key: value
                 for key, value in collection.items()
                 if key not in ("selected_attempt_indices", "selected_seeds")
             },
-            "reference_goals": goals,
+            "reference_goals": reference_goals,
         }
         groups[task_index] = group
     return groups, sources

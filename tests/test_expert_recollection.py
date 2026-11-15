@@ -127,6 +127,10 @@ def test_recollection_uses_fresh_deterministic_rollouts_and_records_provenance(t
     assert source["final_success_count"] == 0
     assert source["unique_configuration_count"] == 3
     assert len(source["trajectory_sha256"]) == 3
+    np.testing.assert_allclose(
+        source["reference_goals"], [[0.1, 0.2, 0.3]] * 3
+    )
+    assert "goals" not in source
     load.assert_called_once_with(request(tmp_path).experts[TASKS[0]], device="cpu")
     make.assert_called_once_with("metaworld-v3", TASKS[0], 7, reward_function_version="v2")
     bank.assert_called_once_with(TASKS[0], 7, backend="metaworld-v3")
