@@ -1,4 +1,4 @@
-"""Conditional Flow Matching for normalized 22D full-trajectory generation."""
+"""Conditional Flow Matching for normalized direct 43D trajectories."""
 
 from __future__ import annotations
 
@@ -10,15 +10,19 @@ from src.support.io import atomic_torch_save
 from torch import nn
 from torchdiffeq import odeint
 
-from .diffusion_data import DIFFUSION_FEATURES
+from .diffusion_data import GENERATOR_FEATURES
 from .generator_normalization import FeatureNormalizer
 from .generator_training import (
     fit_generator,
     generator_checkpoint_payload,
     run_cpu_inputs_on_module_device,
 )
+from .temporal_unet import make_temporal_unet_layers, temporal_unet_forward
 
-CHECKPOINT_KIND = "trajectory_flow_matching_22_v1"
+LEGACY_CHECKPOINT_KIND = "trajectory_flow_matching_43_v2"
+CHECKPOINT_KIND = "trajectory_flow_matching_43_v3"
+BACKBONE_SPEC_VERSION = 1
+FLOW_MATCHING_BACKBONES = ("temporal_cnn", "temporal_unet1d")
 
 
 @dataclass(frozen=True)
@@ -26,7 +30,9 @@ class FlowMatchingConfig:
     """Serialized dimensions and numerical settings for trajectory flow matching."""
 
     horizon: int = 200
-    features: int = DIFFUSION_FEATURES
+    features: int = GENERATOR_FEATURES
+    backbone: str = "temporal_cnn"
+    backbone_spec_version: int = BACKBONE_SPEC_VERSION
     width: int = 64
     num_tasks: int = 0
     integration_steps: int = 100
@@ -145,24 +151,66 @@ class TemporalVelocityModel(nn.Module):
         return self.output(hidden).transpose(1, 2)
 
 
+class TemporalUNetVelocityModel(nn.Module):
+    """Three-scale conditional 1D U-Net for complete trajectory velocities."""
+
+    def __init__(self, config: FlowMatchingConfig) -> None:
+        super().__init__()
+        width = config.width
+        widths = (width, 2 * width, 4 * width)
+        self.task_embedding = (
+            nn.Embedding(config.num_tasks, width) if config.num_tasks else None
+        )
+        self.input = nn.Conv1d(config.features + 1, widths[0], 1)
+        self.time_embedding = ContinuousTimeEmbedding(
+            width, config.time_embedding_scale
+        )
+        self.goal_projection = nn.Linear(3, width)
+        (
+            self.condition_projections,
+            self.encoder_blocks,
+            self.downsamples,
+            self.bottleneck_blocks,
+            self.upsample_convolutions,
+            self.decoder_blocks,
+        ) = make_temporal_unet_layers(width)
+        self.output = nn.Conv1d(widths[0], config.features, 1)
+
+    def forward(self, x, time, task_ids, goals):
+        condition = self.time_embedding(time)
+        if self.task_embedding is not None:
+            condition = condition + self.task_embedding(task_ids)
+        condition = condition + self.goal_projection(goals)
+        return temporal_unet_forward(self, x, condition)
+
+
 class TrajectoryFlowMatching(nn.Module):
-    """Conditional velocity model for normalized current18/action4 trajectories."""
+    """Conditional velocity model for normalized 43D physical trajectories."""
 
     def __init__(self, config: FlowMatchingConfig = FlowMatchingConfig()) -> None:
         super().__init__()
         if (
             config.horizon < 1
-            or config.features != DIFFUSION_FEATURES
+            or config.features != GENERATOR_FEATURES
+            or config.backbone not in FLOW_MATCHING_BACKBONES
+            or config.backbone_spec_version != BACKBONE_SPEC_VERSION
             or config.width < 4
             or config.width % 4
             or config.num_tasks < 0
             or config.integration_steps < 1
             or not math.isfinite(config.time_embedding_scale)
             or config.time_embedding_scale <= 0
+            or config.backbone == "temporal_unet1d"
+            and config.horizon < 4
         ):
             raise ValueError("Invalid flow matching configuration.")
         self.config = config
-        self.velocity_model = TemporalVelocityModel(config)
+        self.velocity_model = (
+            TemporalVelocityModel(config)
+            if config.backbone == "temporal_cnn"
+            else TemporalUNetVelocityModel(config)
+        )
+        self.checkpoint_kind = CHECKPOINT_KIND
         self.last_sample_nfe = 0
 
     def _validate(self, x: torch.Tensor) -> None:
@@ -321,15 +369,39 @@ class TrajectoryFlowMatching(nn.Module):
     ):
         """Restore and validate a CPU Flow checkpoint and fitted normalizers."""
         data = torch.load(path, map_location="cpu", weights_only=True)
-        if data.get("kind") != CHECKPOINT_KIND:
-            raise ValueError(f"Checkpoint is not {CHECKPOINT_KIND}.")
+        checkpoint_kind = data.get("kind")
+        if checkpoint_kind not in (LEGACY_CHECKPOINT_KIND, CHECKPOINT_KIND):
+            raise ValueError(
+                "Checkpoint is incompatible: expected direct-43D format "
+                f"{LEGACY_CHECKPOINT_KIND} or {CHECKPOINT_KIND}; "
+                "legacy 22D checkpoints are unsupported."
+            )
         try:
-            config = FlowMatchingConfig(**data["config"])
+            serialized_config = dict(data["config"])
+            if checkpoint_kind == LEGACY_CHECKPOINT_KIND:
+                if serialized_config.get("backbone", "temporal_cnn") != "temporal_cnn":
+                    raise ValueError(
+                        "Flow Matching v2 checkpoints support temporal_cnn only."
+                    )
+                serialized_config.setdefault("backbone", "temporal_cnn")
+                serialized_config.setdefault(
+                    "backbone_spec_version", BACKBONE_SPEC_VERSION
+                )
+            elif (
+                "backbone" not in serialized_config
+                or "backbone_spec_version" not in serialized_config
+            ):
+                raise ValueError(
+                    "Flow Matching v3 checkpoint lacks explicit backbone identity."
+                )
+            config = FlowMatchingConfig(**serialized_config)
             metadata = data["metadata"]
             dynamic = FeatureNormalizer(data["dynamic_mean"], data["dynamic_scale"])
             goal = FeatureNormalizer(data["goal_mean"], data["goal_scale"])
         except (KeyError, TypeError) as error:
             raise ValueError("Flow Matching checkpoint is incomplete.") from error
+        if config.features != GENERATOR_FEATURES:
+            raise ValueError("Flow Matching checkpoint must model exactly 43 features.")
         required_metadata = {
             "task_order",
             "training_banks",
@@ -387,8 +459,19 @@ class TrajectoryFlowMatching(nn.Module):
             and metadata.get("task") != expected_task
         ):
             raise ValueError("Flow Matching checkpoint metadata differs from run.")
-        model = cls(config)
-        model.load_state_dict(data["state_dict"])
+        try:
+            model = cls(config)
+        except ValueError as error:
+            raise ValueError(
+                "Flow Matching checkpoint backbone configuration is incompatible."
+            ) from error
+        try:
+            model.load_state_dict(data["state_dict"], strict=True)
+        except RuntimeError as error:
+            raise ValueError(
+                "Flow Matching checkpoint model state is incompatible with its backbone."
+            ) from error
+        model.checkpoint_kind = checkpoint_kind
         model.eval()
         return (
             model,

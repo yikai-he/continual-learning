@@ -1,0 +1,53 @@
+experiment: diffcrl
+environment:
+  backend: kuka-v3
+  reward_function_version: v2
+bc:
+  epochs: 100
+  batch_size: 256
+  learning_rate: 0.001
+  loss: post-tanh-mse
+  task_conditioning: none
+diffusion:
+  epochs: 100
+  batch_size: 8
+  learning_rate: 0.001
+  steps: 100
+  width: 64
+  action_space: raw
+  action_clamp_epsilon: 0.0001
+  generated_action_projection: none
+  trajectory_representation: full_43d
+flow_matching:
+  epochs: 100
+  batch_size: 8
+  learning_rate: 0.001
+  width: 64
+  time_embedding_scale: 100.0
+  integration_steps: 10
+  ode_solver: euler
+  rtol: 0.00001
+  atol: 0.00001
+  trajectory_representation: full_43d
+continual:
+  tasks: [kuka-hammer-v3, kuka-handle-press-side-v3, kuka-button-press-v3, kuka-reach-v3]
+  experts:
+    kuka-hammer-v3: runs/experts/kuka-v3/hammer-v3/policy.zip
+    kuka-handle-press-side-v3: runs/experts/kuka-v3/handle-press-side-v3/policy.zip
+    kuka-button-press-v3: runs/experts/kuka-v3/button-press-v3/policy.zip
+    kuka-reach-v3: runs/experts/kuka-v3/reach-v3/policy.zip
+  trajectories_per_task: 200
+  replay_mode: flow-matching
+  replay_allocation: fixed-total
+  replay_budget: 200
+  historical_replay_training_only: true
+evaluation:
+  episodes: 20
+  seed: 10000
+  mode: fixed-tasks
+  task_set_seed: 10000
+runtime:
+  seed: 0
+  device: cpu
+  output: runs/generator_comparison/four_stage_200plus200
+  run_name: fm_full_43d_seed0

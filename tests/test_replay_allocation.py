@@ -2,7 +2,11 @@
 
 import pytest
 
-from src.continual.replay_allocation import allocate_replay, replay_counts
+from src.continual.replay_allocation import (
+    allocate_replay,
+    allocate_weighted_replay,
+    replay_counts,
+)
 
 
 @pytest.mark.parametrize(
@@ -58,3 +62,45 @@ def test_generator_default_preserves_legacy_allocation():
         1: 17,
         2: 16,
     }
+
+
+@pytest.mark.parametrize(
+    ("tasks", "weights", "expected"),
+    [
+        ([0], [1.0], {0: 100}),
+        ([0, 1], [1.0, 2.0], {0: 33, 1: 67}),
+        ([0, 1, 2], [1.0, 2.0, 2.0], {0: 20, 1: 40, 2: 40}),
+        ([0, 1, 2], [1.0, 1.0, 1.0], {0: 34, 1: 33, 2: 33}),
+        ([0, 1, 2], [0.0, 1.0, 0.0], {0: 0, 1: 100, 2: 0}),
+    ],
+)
+def test_weighted_allocation_is_exact_and_deterministic(tasks, weights, expected):
+    assert allocate_weighted_replay(tasks, 100, weights) == expected
+    assert allocate_weighted_replay(tasks, 100, weights) == expected
+    assert sum(expected.values()) == 100
+
+
+@pytest.mark.parametrize("generator", ["diffusion", "flow-matching"])
+def test_fixed_weighted_allocation_is_shared_by_generators(generator):
+    assert replay_counts(
+        range(2),
+        generator=generator,
+        allocation="fixed-weighted",
+        trajectories_per_task=100,
+        total_budget=100,
+        task_weights=[1.0, 2.0],
+    ) == {0: 33, 1: 67}
+
+
+@pytest.mark.parametrize(
+    ("tasks", "weights", "message"),
+    [
+        ([0, 1], [1.0], "one weight"),
+        ([0], [-1.0], "finite nonnegative"),
+        ([0], [float("nan")], "finite nonnegative"),
+        ([0, 1], [0.0, 0.0], "positive sum"),
+    ],
+)
+def test_invalid_weighted_allocations_are_rejected(tasks, weights, message):
+    with pytest.raises(ValueError, match=message):
+        allocate_weighted_replay(tasks, 100, weights)

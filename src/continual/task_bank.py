@@ -1,140 +1,52 @@
 """Passive MT1 collection identity and deterministic training-bank goal replay."""
 
-import hashlib
 import pickle
 from importlib.metadata import version
 
 import numpy as np
-from src.env_adapters.kuka_v3 import kuka_v3_tasks
-from src.envs import (
+from continual_manipulation.environments import (
     GOAL_SLICE,
     make_env,
     make_metaworld_env,
     target_position,
     task_configuration,
 )
-
-
-def bank_hashes(tasks):
-    return [hashlib.sha256(task.data).hexdigest() for task in tasks]
-
-
-def mt1_tasks(task_name, seed):
-    import metaworld
-
-    return metaworld.MT1(task_name, seed=seed).train_tasks
-
-
-def backend_tasks(task_name, seed, *, backend="metaworld-v3"):
-    """Build the backend's ordered deterministic task bank."""
-    if backend == "metaworld-v3":
-        return mt1_tasks(task_name, seed)
-    if backend == "kuka-v3":
-        return kuka_v3_tasks(task_name, seed)
-    raise ValueError(f"Backend {backend!r} has no deterministic task bank.")
-
-
-def task_identities(tasks, task_name):
-    """Return stable ordered identities and reject malformed task banks."""
-    hashes = bank_hashes(tasks)
-    identities = [
-        {
-            "task_index": index,
-            "task_bank_index": index,
-            "task_env_name": task.env_name,
-            "task_data_sha256": digest,
-            "task_hash": digest,
-        }
-        for index, (task, digest) in enumerate(zip(tasks, hashes))
-    ]
-    if any(identity["task_env_name"] != task_name for identity in identities):
-        raise ValueError("Task bank contains a different environment.")
-    if len(set(hashes)) != len(tasks):
-        raise ValueError("Task bank contains duplicate configurations.")
-    return identities
-
-
-def _task_wrapper(env):
-    """Locate the MetaWorld task-selection wrapper in an adapter stack."""
-    cursor = env
-    while cursor is not None:
-        if hasattr(cursor, "tasks") and hasattr(cursor, "toggle_sample_tasks_on_reset"):
-            return cursor
-        cursor = getattr(cursor, "env", None)
-    raise ValueError("MetaWorld task-selection wrapper is missing.")
-
-
-def _task_rand_vec(task):
-    data = pickle.loads(task.data)
-    if "rand_vec" not in data:
-        raise ValueError("Serialized MetaWorld task has no rand_vec.")
-    return np.asarray(data["rand_vec"], dtype=np.float64)
-
-
-def verify_disjoint_task_banks(
-    task_name,
-    training_seed,
-    evaluation_seed,
-    *,
-    task_provider=mt1_tasks,
-    backend="metaworld-v3",
-):
-    """Build two MT1 banks and prove their serialized task identities are disjoint."""
-    if task_provider is mt1_tasks:
-        task_provider = lambda name, seed: backend_tasks(name, seed, backend=backend)
-    training = task_provider(task_name, training_seed)
-    evaluation = task_provider(task_name, evaluation_seed)
-    training_hashes = bank_hashes(training)
-    evaluation_hashes = bank_hashes(evaluation)
-    overlap = sorted(set(training_hashes) & set(evaluation_hashes))
-    if overlap:
-        raise ValueError(
-            f"Training/evaluation task-bank overlap for {task_name}: "
-            f"{len(overlap)} overlapping configuration hash(es): {overlap}"
-        )
-    return {
-        "task_name": task_name,
-        "backend": backend,
-        "training_bank_seed": training_seed,
-        "evaluation_bank_seed": evaluation_seed,
-        "ordered_training_task_hashes": training_hashes,
-        "ordered_evaluation_task_hashes": evaluation_hashes,
-        "overlapping_task_hashes": [],
-        "disjoint": True,
-    }
+from continual_manipulation.task_banks import (
+    backend_tasks as _backend_tasks,
+)
+from continual_manipulation.task_banks import (
+    bank_hashes as _bank_hashes,
+)
+from continual_manipulation.task_banks import (
+    task_rand_vec as _task_rand_vec,
+)
+from continual_manipulation.task_banks import (
+    task_wrapper as _task_wrapper,
+)
 
 
 def training_bank(task_name, seed, *, backend="metaworld-v3"):
     """Record identities needed to verify and reconstruct replay goals."""
-    if backend == "kuka-v3":
-        tasks = backend_tasks(task_name, seed, backend=backend)
-        return {
-            "backend": backend,
-            "task_name": task_name,
-            "bank_seed": seed,
-            "ordered_task_hashes": bank_hashes(tasks),
-            "metaworld_version": version("metaworld"),
-            "reset_seeds": [],
-            "goals": [],
-            "configuration_records": {},
-        }
-    if backend != "metaworld-v3":
+    if backend not in ("metaworld-v3", "kuka-v3"):
         raise ValueError(f"Unsupported environment backend: {backend!r}.")
-    tasks = backend_tasks(task_name, seed, backend=backend)
-    return {
+    tasks = _backend_tasks(task_name, seed, backend=backend)
+    bank = {
         "backend": backend,
         "task_name": task_name,
         "bank_seed": seed,
-        "ordered_task_hashes": bank_hashes(tasks),
+        "ordered_task_hashes": _bank_hashes(tasks),
         "metaworld_version": version("metaworld"),
     }
+    if backend == "kuka-v3":
+        bank.update(reset_seeds=[], goals=[], configuration_records={})
+    return bank
 
 
-def selected_configuration(env, bank, observation, episode_id):
+def selected_configuration(env, bank, observation, episode_id, *, reset_seed=None):
     """Read the already selected frozen rand_vec; never draw from wrapper RNG."""
     if bank.get("backend") == "kuka-v3":
         wrapper = _task_wrapper(env)
-        hashes = bank_hashes(wrapper.tasks)
+        hashes = _bank_hashes(wrapper.tasks)
         if hashes != bank["ordered_task_hashes"]:
             raise ValueError(
                 "Collection wrapper task bank differs from recorded KUKA bank."
@@ -154,15 +66,17 @@ def selected_configuration(env, bank, observation, episode_id):
         target = target_position(env, "kuka-v3")
         if not np.allclose(goal, target, rtol=1e-6, atol=1e-7):
             raise ValueError("Collection goal disagrees with environment target.")
-        reset_seed = bank["bank_seed"] + episode_id
-        bank["reset_seeds"].append(reset_seed)
+        actual_reset_seed = (
+            bank["bank_seed"] + episode_id if reset_seed is None else reset_seed
+        )
+        bank["reset_seeds"].append(actual_reset_seed)
         bank["goals"].append(goal.tolist())
         record = {
             "task_bank_index": index,
             "task_hash": hashes[index],
             "recorded_goal": goal.tolist(),
             "last_rand_vec": configuration.tolist(),
-            "reset_seed": reset_seed,
+            "reset_seed": actual_reset_seed,
         }
         prior = bank["configuration_records"].setdefault(str(index), record)
         if prior["task_hash"] != record["task_hash"] or not np.array_equal(
@@ -177,7 +91,7 @@ def selected_configuration(env, bank, observation, episode_id):
             "task_name": bank["task_name"],
             "env_name": wrapper.tasks[index].env_name,
             "bank_seed": bank["bank_seed"],
-            "reset_seed": reset_seed,
+            "reset_seed": actual_reset_seed,
             "recorded_goal": goal.tolist(),
             "last_rand_vec": configuration.tolist(),
             "episode_id": episode_id,
@@ -185,7 +99,7 @@ def selected_configuration(env, bank, observation, episode_id):
     cursor = env
     while cursor is not None and not hasattr(cursor, "tasks"):
         cursor = getattr(cursor, "env", None)
-    if cursor is None or bank_hashes(cursor.tasks) != bank["ordered_task_hashes"]:
+    if cursor is None or _bank_hashes(cursor.tasks) != bank["ordered_task_hashes"]:
         raise ValueError("Collection wrapper task bank differs from recorded MT1 bank.")
     selected = np.asarray(env.unwrapped._last_rand_vec)
     matches = [
@@ -209,6 +123,7 @@ def selected_configuration(env, bank, observation, episode_id):
         "task_name": bank["task_name"],
         "env_name": cursor.tasks[index].env_name,
         "bank_seed": bank["bank_seed"],
+        "reset_seed": reset_seed,
         "episode_id": episode_id,
     }
 
@@ -246,8 +161,8 @@ def reconstruct_goals(
             raise ValueError(
                 "MetaWorld version differs from KUKA training bank provenance."
             )
-        tasks = kuka_v3_tasks(bank["task_name"], bank["bank_seed"])
-        hashes = bank_hashes(tasks)
+        tasks = _backend_tasks(bank["task_name"], bank["bank_seed"], backend=backend)
+        hashes = _bank_hashes(tasks)
         if hashes != bank["ordered_task_hashes"]:
             raise ValueError("Recreated KUKA task-bank hash order differs.")
         env = make_env(
@@ -258,7 +173,7 @@ def reconstruct_goals(
         )
         try:
             wrapper = _task_wrapper(env)
-            if bank_hashes(wrapper.tasks) != hashes:
+            if _bank_hashes(wrapper.tasks) != hashes:
                 raise ValueError("Recreated KUKA wrapper task bank differs.")
             wrapper.toggle_sample_tasks_on_reset(False)
             goals = []
@@ -277,7 +192,7 @@ def reconstruct_goals(
                     raise ValueError(
                         "Recreated KUKA rand_vec differs from selected task."
                     )
-                actual_hash = hashlib.sha256(tasks[index].data).hexdigest()
+                actual_hash = hashes[index]
                 if actual_hash != bank["ordered_task_hashes"][index]:
                     raise ValueError(
                         "Recreated KUKA task identity differs from training bank."
@@ -301,8 +216,8 @@ def reconstruct_goals(
         raise ValueError("Replay bank backend differs from requested backend.")
     if bank["metaworld_version"] != version("metaworld"):
         raise ValueError("MetaWorld version differs from training bank provenance.")
-    tasks = mt1_tasks(bank["task_name"], bank["bank_seed"])
-    if bank_hashes(tasks) != bank["ordered_task_hashes"]:
+    tasks = _backend_tasks(bank["task_name"], bank["bank_seed"], backend=backend)
+    if _bank_hashes(tasks) != bank["ordered_task_hashes"]:
         raise ValueError("Recreated MT1 training bank hash order differs.")
     env = make_metaworld_env(
         bank["task_name"],

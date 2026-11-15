@@ -6,7 +6,7 @@ import os
 import shutil
 from pathlib import Path
 
-from src.continual.resume import completed_stage_markers, marker_path
+from src.continual.diffcrl_artifacts import completed_stage_markers, marker_path
 from src.support.reproducibility import file_hash
 
 REQUIRED_RUN_METADATA = ("config.yaml", "config.json", "run_manifest.json")
@@ -72,13 +72,10 @@ def sync_completed_stage(source_run, destination_run, task_names, stage: int) ->
         if not path.is_file():
             raise FileNotFoundError(f"Required run metadata is missing: {path}")
         _copy_verified(path, destination / name)
-    # A restored incomplete run must retain the lifecycle marker expected by resume.
     if (source / "RUNNING").is_file():
         _copy_verified(source / "RUNNING", destination / "RUNNING")
     elif (source / "RUN_COMPLETE").is_file():
-        # A retry may run after local completion.  Until the synchronized
-        # prefix itself is finalized, it must retain resumable-run semantics.
-        _copy_verified(source / "RUN_COMPLETE", destination / "RUNNING")
+        _copy_verified(source / "RUN_COMPLETE", destination / "RUN_COMPLETE")
     else:
         raise FileNotFoundError("Source run has no lifecycle marker.")
 
@@ -109,7 +106,7 @@ def sync_all_completed(source_run, destination_run, task_names) -> int:
 
 
 def restore_backup(source_run, destination_run, task_names) -> int:
-    """Restore the latest validated prefix into a fresh local run directory."""
+    """Restore validated experiment artifacts into a fresh local directory."""
     source = Path(source_run).resolve()
     destination = Path(destination_run).resolve()
     markers = validate_backup(source, task_names)

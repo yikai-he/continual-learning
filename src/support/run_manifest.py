@@ -12,8 +12,7 @@ from pathlib import Path
 
 import torch
 
-from src.config import REPLAY_PRIORITY_STRATEGY, config_to_dict
-from src.support.reproducibility import git_output
+from src.support.reproducibility import file_hash, git_output
 
 
 def _now() -> str:
@@ -74,14 +73,6 @@ def _environment(config) -> dict:
     }
 
 
-def _canonical_config(config) -> tuple[dict, str]:
-    resolved = config_to_dict(config)
-    encoded = json.dumps(
-        resolved, sort_keys=True, separators=(",", ":"), allow_nan=False
-    ).encode()
-    return resolved, hashlib.sha256(encoded).hexdigest()
-
-
 def create_run_manifest(
     run_dir: str | Path,
     config,
@@ -91,7 +82,12 @@ def create_run_manifest(
 ) -> dict:
     """Create a new manifest and RUNNING marker; never overwrite existing state."""
     run_dir = Path(run_dir)
-    resolved, config_hash = _canonical_config(config)
+    config_path = run_dir / "config.yaml"
+    if not config_path.is_file():
+        raise FileNotFoundError(f"Resolved configuration is missing: {config_path}")
+    evaluation_seed = getattr(config.evaluation, "seed", None)
+    if evaluation_seed is None:
+        evaluation_seed = config.runtime.seed + config.evaluation.seed_offset
     manifest = {
         "schema_version": 1,
         "status": "running",
@@ -101,24 +97,12 @@ def create_run_manifest(
         "environment": _environment(config),
         "experiment": {
             "name": config.experiment,
-            "resolved_config": resolved,
-            "canonical_config_sha256": config_hash,
+            "config_path": "config.yaml",
+            "config_sha256": file_hash(config_path),
             "task_sequence": list(config.continual.tasks),
             "runtime_seed": config.runtime.seed,
-            "evaluation_seed": config.evaluation.seed,
+            "evaluation_seed": evaluation_seed,
             "task_set_seed": config.evaluation.task_set_seed,
-            "replay_mode": config.continual.replay_mode,
-            "trajectory_count": config.continual.trajectories_per_task,
-            "historical_replay_budget": config.continual.replay_budget,
-            "replay_priority_strategy": REPLAY_PRIORITY_STRATEGY,
-            "bc": resolved.get("bc"),
-            "diffusion": resolved.get("diffusion"),
-            "normalization": "layer-norm",
-            "use_layer_norm": True,
-            "action_representation": getattr(config.diffusion, "action_space", None),
-            "action_projection": getattr(
-                config.diffusion, "generated_action_projection", None
-            ),
         },
         "experts": experts or {},
         "task_banks": task_banks or {},

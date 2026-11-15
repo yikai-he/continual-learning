@@ -7,8 +7,8 @@ from copy import deepcopy
 from pathlib import Path
 from unittest.mock import patch
 
-from src.continual.evaluation import EvaluationMatrix, evaluate_stage
-from src.continual.task_sequence import TaskSequence
+from continual_manipulation.evaluation import EvaluationMatrix, evaluate_stage
+from continual_manipulation.sequences import TaskSequence
 
 
 def evaluation_result(*, mode="fixed-tasks", seed=10000, task_set_seed=10000):
@@ -56,7 +56,7 @@ class EvaluationContractTests(unittest.TestCase):
         )
         for overrides, message in cases:
             with self.subTest(overrides=overrides), patch(
-                "src.continual.evaluation.evaluate_task"
+                "continual_manipulation.evaluation.protocols.evaluate_task"
             ) as evaluate:
                 matrix = deepcopy(base)
                 with self.assertRaisesRegex(ValueError, message):

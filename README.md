@@ -1,6 +1,6 @@
 ---
 status: current
-last_verified: 2026-11-07
+last_verified: 2026-11-13
 applies_to: continual-learning
 ---
 
@@ -13,23 +13,29 @@ policy learns a sequence of simulated tasks.
 
 ## SAC training
 
-`train_sac.py` is the preferred entry point for new single-task SAC experts. New
-runs default to low-disk checkpointing: `best_model.zip` is the validation
-checkpoint maximizing `(success_rate, mean_return)` lexicographically, and
-`latest_model.zip` is the most recently persisted policy. Exact ties retain the
-existing best checkpoint.
+`train_sac.py` is the preferred entry point for new single-task SAC experts. It
+uses a low-disk workflow: `best_model.zip` is the validation
+checkpoint maximizing `(success_rate, mean_return)` lexicographically. Exact
+ties retain the existing best checkpoint. The trainer does not create a second
+return-best or periodic inference-only checkpoint.
 
-Low-disk mode does not save replay buffers and therefore does not support exact
-training continuation. Set `sac.checkpoint_mode: full` when replay-backed resume
-or the historical periodic checkpoint layout is required. Historical
-`best_model.zip` files may be return-best and must not be reinterpreted under the
-new naming convention.
+Standalone SAC does not save replay buffers or support training continuation.
+Historical SAC artifacts remain untouched but are not current workflow inputs.
 
 Optimization uses the `runtime.seed` bank, validation defaults to bank `10000`,
 and post-selection final tests default to banks `20000` and `20001`. Serialized
 task identities are checked for pairwise disjointness before training.
-The SAC entropy mode and four-layer 256-unit network are fixed implementation
-choices and therefore are not YAML options.
+The SAC entropy mode and network are fixed implementation choices. New formal
+runs also reproduce the Legacy schedule: random actions through timestep
+10,000, optimization from timestep 1,000, 50 updates every 50 steps, and the
+Gaussian entropy target corresponding to output standard deviation `0.089`.
+New experts use the Legacy `continual_diff_pytorch`
+four-layer 256-unit actor/critic core: the first linear layer is followed by
+LayerNorm and Tanh, and the remaining layers use LeakyReLU (`0.01`). Stable-
+Baselines3 still owns squashed-Gaussian sampling, twin/target critics, entropy
+tuning, replay, and optimization. Existing standard-SB3 checkpoints retain
+their original serialized policy class; new and old weights are not
+interchangeable.
 
 ```bash
 python train_sac.py --config configs/sac/sac.yaml --seed 0 --device cpu
@@ -42,19 +48,39 @@ trains independent single-task SAC experts, collects their trajectories, and
 continually distils those trajectories into one persistent behavior-cloning
 policy. Diffusion or Flow Matching models provide old-task replay.
 
+The recommended pipeline collects every requested expert episode with the
+deterministic action from each frozen SAC expert, combines current data with No,
+Real, DDPM, or Flow Matching replay, trains the persistent `GeneralPolicy` with
+physical-action MSE, and evaluates it deterministically on fixed task banks.
+The canonical `configs/diffcrl/diffcrl.yaml` makes the key choices explicit:
+
+```yaml
+continual:
+  expert_action_mode: deterministic
+  collection_mode: all
+bc:
+  loss: deterministic_mse
+evaluation:
+  mode: fixed-tasks
+```
+
+Squashed-Gaussian NLL, stochastic expert collection, success-preferred
+collection, and stochastic NLL execution remain supported for reproducing the
+corresponding controlled ablations; they are not the recommended defaults.
+
 ## Documentation
 
 | Document | Purpose | Status | Last verified |
 |---|---|---|---|
-| [Architecture](docs/ARCHITECTURE.md) | Current pipeline, module, data, evaluation, and resume contracts | current | 2026-11-07 |
-| [Development status](docs/DEVELOPMENT_STATUS.md) | Implemented and validated scope, limitations, and remaining work | current | 2026-11-07 |
+| [Architecture](docs/ARCHITECTURE.md) | Current pipeline, module, data, evaluation, and artifact contracts | current | 2026-11-11 |
+| [Direct 43D migration](docs/DIRECT_43D_MIGRATION.md) | Generator migration contract and completed acceptance evidence | current | 2026-11-11 |
+| [Development status](docs/DEVELOPMENT_STATUS.md) | Implemented and validated scope, limitations, and remaining work | current | 2026-11-11 |
 | [SAC training](docs/SAC_TRAINING.md) | Expert training, evaluation, checkpoints, and smoke validation | current | 2026-11-07 |
-| [Workflow index](docs/WORKFLOW_INDEX.md) | Supported entry points and configuration families | current | 2026-11-07 |
-| [Flow replay architecture](docs/FLOW_REPLAY_ARCHITECTURE.md) | Flow Matching replay and allocation contract | current | 2026-11-07 |
-| [Forward transfer](docs/FORWARD_TRANSFER_EXPERIMENT.md) | Supported GeneralPolicy-to-SAC transfer experiment | current | 2026-11-07 |
+| [Workflow index](docs/WORKFLOW_INDEX.md) | Supported entry points and configuration families | current | 2026-11-11 |
+| [Flow replay architecture](docs/FLOW_REPLAY_ARCHITECTURE.md) | Flow Matching replay and allocation contract | current | 2026-11-11 |
 | [Runs inventory](docs/RUNS_INVENTORY.md) | Retained canonical artifact families | current | 2026-11-07 |
 | [Research code standards](docs/RESEARCH_CODE_STANDARDS.md) | Local quality priorities and proportional acceptance checks | current | 2026-11-07 |
-| [Documentation archive](docs/archive/README.md) | Historical reports, provenance, and archive conventions | current index | 2026-11-07 |
+| [Documentation archive](docs/archive/README.md) | Historical reports, provenance, and archive conventions | current index | 2026-11-11 |
 
 Historical documents describe their original project state and are not current
 operating instructions.
@@ -86,19 +112,25 @@ fields are intentionally not part of this repository's environment API.
 
 - **Single-task SAC experts**: one independent Stable-Baselines3 SAC policy per
   task.
-- **Sequential SAC**: one SAC learner carried across MetaWorld tasks, with its
-  replay buffer reset at task boundaries.
 - **No Replay**: persistent `GeneralPolicy` trained only on current expert data.
-- **Real Replay**: current expert data plus sampled stored trajectories from
-  previous tasks.
+- **Expert Recollection**: fresh deterministic rollouts from frozen historical
+  SAC experts in their task environments. This is a privileged reference with
+  historical expert and environment access, not memory-based replay.
 - **Diffusion Replay**: current expert data plus task- and goal-conditioned DDPM
   trajectory replay.
 - **Flow Matching Replay**: current expert data plus trajectories produced by a
   task- and goal-conditioned conditional flow model.
 
-The four DiffCRL replay modes are `none`, `real`, `diffusion`, and
-`flow-matching`. Forward-transfer utilities exist for aligned learning curves;
-forward transfer is not inferred from the endpoint evaluation matrix.
+Both generators model the complete 43D physical trajectory directly (39D
+observation plus 4D action) while retaining separate task and goal conditions.
+Generated previous-state and goal coordinates are not reconstructed or replaced.
+
+The four active DiffCRL replay modes are `none`, `expert-recollection`,
+`diffusion`, and `flow-matching`. Historical YAML using `real` records the
+retired stored-trajectory protocol and is intentionally rejected by the active
+loader rather than reinterpreted. The ContinualManipulation Forward Transfer metric requires
+explicitly aligned learning and reference curves; it is not inferred from the endpoint evaluation
+matrix.
 
 ## Repository structure
 
@@ -106,14 +138,11 @@ forward transfer is not inferred from the endpoint evaluation matrix.
 continual-learning/
 ├── train_sac.py                 # single-task SAC experts
 ├── train_diffcrl.py             # expert-driven continual BC and replay
-├── train_continual_sac.py       # sequential SAC baseline
-├── run_replay_comparison.py     # no/real/DDPM comparison runner
+├── run_replay_comparison.py     # no/recollection/DDPM comparison runner
 ├── manage_diffcrl_sync.py       # validated stage backup/restore
 ├── configs/                     # active, experimental, and archived YAML
 ├── src/
-│   ├── env_adapters/            # MetaWorld/KUKA integration
-│   ├── continual/               # BC, replay, generators, evaluation, resume
-│   ├── sac/                     # SAC checkpoint and transfer utilities
+│   ├── continual/               # BC, replay, generators, evaluation, artifacts
 │   └── support/                 # manifests, hashing, persistence, sync
 ├── scripts/                     # collection and evaluation entry points
 ├── tests/                       # unit, regression, and integration tests
@@ -165,9 +194,6 @@ experiment:
 python train_sac.py --config configs/sac/sac_smoke.yaml --seed 0
 python train_diffcrl.py --config configs/diffcrl/diffcrl_smoke.yaml \
   --seed 0 --run-name smoke-seed0
-python train_continual_sac.py \
-  --config configs/continual_sac/continual_sac_smoke.yaml \
-  --run-name smoke-seed0
 ```
 
 These commands still create environments and train models. They are pipeline
@@ -192,6 +218,14 @@ python -u train_diffcrl.py \
   --run-name diffusion-seed0
 ```
 
+New MetaWorld curricula may use `continual.sequence: cm1`, `cm3`, `cm5`, or
+`cm10` instead of an explicit `continual.tasks` list. The names select exact
+prefixes of the project-defined, Continual World-inspired CM10 order documented in
+[Architecture](docs/ARCHITECTURE.md#61-named-task-sequences). A configuration
+must not set both fields. Resolved run configurations always store the explicit
+task list, so named and equivalent explicit curricula have the same scientific
+identity. Expert paths remain explicit for every selected DiffCRL task.
+
 Use `configs/diffcrl/diffcrl_no_replay.yaml` for the no-replay ablation. Flow
 Matching, Real Replay, KUKA, fixed-budget, and pilot configurations are kept in
 the same directory and are labelled by filename and comments. Inspect a YAML
@@ -202,17 +236,6 @@ Flow Matching sampling uses `torchdiffeq.odeint`. Configure `ode_solver` as
 the fixed step size for the first four methods, while `rtol` and `atol` control
 adaptive `dopri5`. Replay reports record the velocity network's actual function
 evaluation count rather than inferring NFE from the configured step count.
-
-### Sequential SAC
-
-```bash
-python -u train_continual_sac.py \
-  --config configs/continual_sac/continual_sac.yaml \
-  --run-name sequential-sac-seed0
-```
-
-The current sequential SAC implementation constructs MetaWorld environments
-directly. KUKA DiffCRL is implemented, but KUKA sequential SAC is not.
 
 ### Collection and evaluation
 
@@ -235,22 +258,22 @@ computed.
 
 ## Configuration
 
-`src/config.py` loads strict YAML sections for `environment`, `sac`, `bc`,
-`diffusion`, `flow_matching`, `continual`, `evaluation`, and `runtime`. Unknown
-keys and incompatible experiment sections are rejected. CLI flags can override
-seed, device, output/run naming, and entry-point-specific resume options.
+`src/config/` provides separate top-level schemas for standalone SAC and
+DiffCRL. Each YAML exposes only the sections meaningful to
+that experiment; unknown keys and incompatible sections are rejected. CLI flags
+can override seed, device, run naming, and narrowly scoped entry-point options.
+Resolved configs serialize the complete selected schema, including defaults.
 
 Maintained starting points are:
 
 - `configs/sac/sac.yaml`
 - `configs/diffcrl/diffcrl.yaml`
 - `configs/diffcrl/diffcrl_no_replay.yaml`
-- `configs/continual_sac/continual_sac.yaml`
 
 The corresponding smoke YAML files are developer presets. Configurations under
 an `archive/` directory are retained for historical reproducibility.
 
-## Outputs, resume, and reproducibility
+## Outputs and reproducibility
 
 Runs normally write beneath `runtime.output`. New run directories are
 collision-protected; existing results are not overwritten. DiffCRL writes
@@ -259,17 +282,10 @@ datasets and reports, evaluation-matrix snapshots, and a hash-validated
 `stage_<index>_COMPLETE.json` marker. `RUN_COMPLETE` marks a fully completed
 run.
 
-Resume a marker-based DiffCRL run with its original scientific configuration:
-
-```bash
-python -u train_diffcrl.py \
-  --config path/to/original.yaml \
-  --resume-from /path/to/existing/run
-```
-
-Completed artifacts and expert hashes are validated before stages are skipped.
-Interrupted-stage outputs are not overwritten. Periodic SAC resume requires
-both the model checkpoint and its replay-buffer sidecar. See
+DiffCRL runs always start in a fresh, collision-protected directory. Stage
+markers authenticate completed checkpoints, reports, and evaluation matrices
+for artifact synchronization and offline analysis; they are not restart points.
+See
 [Architecture](docs/ARCHITECTURE.md#8-configuration-and-reproducibility) for
 the full contract and [Runs inventory](docs/RUNS_INVENTORY.md) for retained
 artifact policy.
@@ -290,7 +306,9 @@ models even when saved RNG state is restored.
 Run lightweight and integration tests with the intended environment:
 
 ```bash
-PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 python -m pytest -q
+conda run --no-capture-output -n metaworld \
+  env PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 \
+  python -m pytest tests/ -q
 ```
 
 Disabling plugin autoload avoids unrelated ROS/system pytest plugins. Tests that
@@ -298,17 +316,22 @@ need the local KUKA fork, CUDA, or retained large artifacts
 may skip or require additional resources. No test result substitutes for a
 multi-seed scientific evaluation.
 
+The maintained two-task integration presets are
+`configs/diffcrl/diffcrl_smoke.yaml` and
+`configs/diffcrl/flow_matching_smoke.yaml`. Always provide a fresh
+`--run-name`; see [Direct 43D migration](docs/DIRECT_43D_MIGRATION.md#completed-verification)
+for verified commands, outputs, and interpretation limits.
+
 ## Status and limitations
 
 - The repository targets simulation; no real-robot deployment path is present.
 - DiffCRL is expert-driven continual imitation/distillation, not the original
   DISTR online Immediate Policy algorithm.
-- KUKA sequential SAC is not implemented.
 - CUDA device-native DDPM replay sampling is implemented and
   CPU-equivalence-tested, but CUDA correctness/performance is not yet validated
   in this repository.
-- Flow Matching and forward-transfer workflows remain experimental; documented
-  results must be read with their protocol and limitations.
+- Flow Matching workflows remain experimental; documented results must be read
+  with their protocol and limitations.
 
 See [Development status](docs/DEVELOPMENT_STATUS.md) for the complete
 implemented/validated/experimental classification.

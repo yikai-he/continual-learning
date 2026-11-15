@@ -1,5 +1,6 @@
 """Training entry points consume typed YAML settings and persist runtime overrides."""
 
+import json
 import tempfile
 import unittest
 from dataclasses import replace
@@ -7,26 +8,69 @@ from pathlib import Path
 from unittest.mock import MagicMock, patch
 
 import numpy as np
+import pytest
 import torch
 import yaml
 from torch.utils.data import TensorDataset
 
-import train_continual_sac
 import train_diffcrl
 import train_sac
 from src.config import config_from_dict, config_to_dict, default_config, load_config
-from src.continual import sequential_sac
 from src.continual.bc_policy import GeneralPolicy, fit_bc
-from src.continual.trajectory_diffusion import DiffusionConfig, TrajectoryDiffusion
+from src.continual.trajectory_diffusion import (
+    DiffusionConfig,
+    FeatureNormalizer,
+    TrajectoryDiffusion,
+)
+from src.continual.trajectory_flow_matching import (
+    FlowMatchingConfig,
+    TrajectoryFlowMatching,
+)
+from src.support.expert_manifest import validate_expert_checkpoint
 
 
 class TrainingConfigTests(unittest.TestCase):
     def test_sac_defaults_to_low_disk_with_separate_final_banks(self):
         config = default_config("sac")
-        self.assertEqual(config.sac.checkpoint_mode, "low_disk")
         self.assertEqual(config.evaluation.task_set_seed, 10_000)
         self.assertEqual(config.evaluation.final_task_set_seeds, [20_000, 20_001])
         self.assertEqual(config.evaluation.final_reset_seed, 30_000)
+
+    def test_sac_final_evaluation_uses_independent_banks_and_reset_seeds(self):
+        config = default_config("sac")
+        config = replace(
+            config,
+            evaluation=replace(
+                config.evaluation,
+                episodes=2,
+                final_task_set_seeds=[20_000, 20_001],
+                final_reset_seed=30_000,
+            ),
+        )
+        with patch.object(
+            train_sac, "evaluate_task", side_effect=[{"bank": 0}, {"bank": 1}]
+        ) as evaluate:
+            model = MagicMock()
+            model.observation_space.shape = (39,)
+            model.action_space.shape = (4,)
+            self.assertEqual(
+                train_sac.final_test(config, model),
+                [{"bank": 0}, {"bank": 1}],
+            )
+        self.assertEqual(
+            [call.kwargs["task_set_seed"] for call in evaluate.call_args_list],
+            [20_000, 20_001],
+        )
+        self.assertEqual(
+            [call.kwargs["seed"] for call in evaluate.call_args_list],
+            [30_000, 30_002],
+        )
+        self.assertTrue(
+            all(
+                call.kwargs["evaluation_mode"] == "fixed-tasks"
+                for call in evaluate.call_args_list
+            )
+        )
 
     def test_sac_early_stopping_defaults_disabled_and_parses_optional_block(self):
         default = default_config("sac")
@@ -41,11 +85,6 @@ class TrainingConfigTests(unittest.TestCase):
         parsed = config_from_dict(values, expected_experiment="sac")
         self.assertTrue(parsed.sac.early_stopping.enabled)
         self.assertEqual(parsed.sac.early_stopping.min_steps, 100_000)
-
-    def test_continual_sac_requires_explicit_config(self):
-        with self.assertRaises(SystemExit) as error:
-            train_continual_sac.parse_args([])
-        self.assertEqual(error.exception.code, 2)
 
     def test_diffcrl_entrypoint_passes_overrides(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -90,8 +129,6 @@ class TrainingConfigTests(unittest.TestCase):
                     learning_rate=0.002,
                     gamma=0.95,
                     batch_size=17,
-                    checkpoint_freq=3,
-                    checkpoint_mode="full",
                 ),
                 evaluation=replace(
                     c.evaluation, frequency=4, episodes=2, seed_offset=123
@@ -100,16 +137,31 @@ class TrainingConfigTests(unittest.TestCase):
             )
             path = Path(tmp) / "input.yaml"
             path.write_text(yaml.safe_dump(config_to_dict(c)))
-            with patch.object(train_sac, "SAC") as sac, patch.object(
+            with patch.object(train_sac, "LegacyScheduleSAC") as sac, patch.object(
+                train_sac.SAC, "load"
+            ) as load, patch.object(
                 train_sac, "make_env"
             ) as env, patch.object(
                 train_sac, "Monitor", side_effect=lambda e: e
-            ), patch.object(train_sac, "CallbackList"), patch.object(
-                train_sac, "FixedSeedEvalCallback"
-            ) as evaluation, patch.object(
-                train_sac, "GlobalCheckpointCallback"
-            ) as checkpoint:
+            ), patch.object(train_sac, "FixedSeedEvalCallback") as evaluation, patch.object(
+                train_sac, "final_test", return_value=[{"success_rate": 1.0}]
+            ):
                 sac.return_value.num_timesteps = 7
+                load.return_value = sac.return_value
+                env.return_value.action_space.shape = (4,)
+                evaluation.return_value.results = [[1.0, 2.0]]
+                evaluation.return_value.successes = [[True, False]]
+                evaluation.return_value.return_stddevs = [0.5]
+                evaluation.return_value.task_hashes = ("a", "b")
+
+                def learn(**_kwargs):
+                    selected = (
+                        Path(tmp)
+                        / "trial/best_model.zip"
+                    )
+                    selected.write_bytes(b"selected")
+
+                sac.return_value.learn.side_effect = learn
                 train_sac.main(
                     [
                         "--config",
@@ -127,9 +179,16 @@ class TrainingConfigTests(unittest.TestCase):
                     (kwargs["gamma"], kwargs["learning_rate"], kwargs["batch_size"]),
                     (0.95, 0.002, 17),
                 )
-                self.assertEqual(kwargs["policy_kwargs"], {"net_arch": [256, 256, 256, 256]})
+                from src.sac_policy import LegacySACPolicy
+
+                self.assertIs(sac.call_args.args[0], LegacySACPolicy)
+                self.assertNotIn("policy_kwargs", kwargs)
                 self.assertEqual((kwargs["seed"], kwargs["device"]), (3, "cpu"))
                 self.assertEqual(kwargs["verbose"], 0)
+                self.assertEqual(kwargs["random_exploration_steps"], 10_000)
+                self.assertEqual(kwargs["update_interval"], 50)
+                self.assertEqual(kwargs["gradient_steps"], 50)
+                self.assertAlmostEqual(kwargs["target_entropy"], -4.000721504181298)
                 self.assertEqual(
                     sac.return_value.learn.call_args.kwargs["total_timesteps"], 7
                 )
@@ -152,14 +211,14 @@ class TrainingConfigTests(unittest.TestCase):
                 self.assertEqual(evaluation.call_args.kwargs["seed"], 126)
                 self.assertEqual(
                     evaluation.call_args.kwargs["best_success_model_save_path"],
-                    Path(tmp) / "trial/best_success_model",
+                    Path(tmp) / "trial",
                 )
-                self.assertEqual(checkpoint.call_args.kwargs["save_freq"], 3)
-                self.assertTrue(
-                    checkpoint.call_args.kwargs["save_replay_buffer"]
+                self.assertIs(
+                    sac.return_value.learn.call_args.kwargs["callback"],
+                    evaluation.return_value,
                 )
-                self.assertTrue(
-                    sac.return_value.learn.call_args.kwargs["reset_num_timesteps"]
+                self.assertNotIn(
+                    "reset_num_timesteps", sac.return_value.learn.call_args.kwargs
                 )
             resolved = load_config(Path(tmp) / "trial/config.yaml")
             self.assertEqual(
@@ -171,67 +230,34 @@ class TrainingConfigTests(unittest.TestCase):
                 (3, "cpu", "trial"),
             )
             self.assertEqual(resolved.runtime.run_dir, str(Path(tmp) / "trial"))
-
-    def test_continual_sac_wires_settings(self):
-        with tempfile.TemporaryDirectory() as tmp:
-            c = default_config("continual_sac")
-            c = replace(
-                c,
-                sac=replace(
-                    c.sac, learning_rate=0.002, gamma=0.9, batch_size=7
-                ),
-                continual=replace(c.continual, tasks=["reach-v3"], steps_per_task=3),
-                evaluation=replace(c.evaluation, episodes=1),
-                runtime=replace(
-                    c.runtime, output=str(Path(tmp) / "run"), device="cpu", seed=4
-                ),
+            results = json.loads((Path(tmp) / "trial/results.json").read_text())
+            self.assertEqual(
+                results["selected_expert"]["path"],
+                "best_model.zip",
             )
-            model = MagicMock()
-            model.num_timesteps = 0
-            model.observation_space.shape = (39,)
-            model.action_space.shape = (4,)
-            model.policy.parameters.return_value = [torch.tensor([1.0])]
-            model.log_ent_coef = torch.tensor([0.0])
-            model.learning_starts = c.sac.learning_starts
-            model.replay_buffer.size.return_value = 3
-
-            def learn(**kwargs):
-                model.num_timesteps += kwargs["total_timesteps"]
-
-            def save(path):
-                Path(path).write_bytes(b"checkpoint")
-
-            model.learn.side_effect = learn
-            model.save.side_effect = save
-            with patch.object(
-                sequential_sac, "SAC", return_value=model
-            ) as sac, patch.object(
-                sequential_sac, "make_metaworld_env"
-            ), patch.object(
-                sequential_sac, "Monitor", side_effect=lambda e: e
-            ), patch.object(
-                sequential_sac, "evaluate_stage"
-            ) as evaluation:
-                train_continual_sac.run(c)
-                kwargs = sac.call_args.kwargs
-                self.assertEqual(
-                    (kwargs["gamma"], kwargs["learning_rate"], kwargs["batch_size"]),
-                    (0.9, 0.002, 7),
-                )
-                self.assertEqual(kwargs["policy_kwargs"], {"net_arch": [256, 256, 256, 256]})
-                self.assertEqual((kwargs["seed"], kwargs["device"]), (4, "cpu"))
-                self.assertTrue(model.learn.call_args.kwargs["progress_bar"])
-                self.assertEqual(
-                    evaluation.call_args.kwargs["evaluation_mode"], "sampled"
-                )
-                self.assertEqual(
-                    evaluation.call_args.kwargs["reward_function_version"], "v2"
-                )
-                self.assertTrue(evaluation.call_args.kwargs["progress"])
-                evaluation.assert_called_once()
-            resolved = load_config(Path(tmp) / "run/config.yaml")
-            self.assertEqual(resolved.runtime.seed, 4)
-            self.assertEqual(resolved.continual.steps_per_task, 3)
+            self.assertEqual(results["final_evaluation"], [{"success_rate": 1.0}])
+            self.assertFalse((Path(tmp) / "trial/config.json").exists())
+            selected = Path(tmp) / "trial/best_model.zip"
+            identity = validate_expert_checkpoint(
+                selected,
+                expected_task="reach-v3",
+                expected_backend="metaworld-v3",
+                expected_reward_function_version="v2",
+                expected_observation_shape=(39,),
+                expected_action_shape=(4,),
+                expected_horizon=200,
+                allow_legacy=False,
+            )
+            self.assertFalse(identity.legacy)
+            for removed in (
+                "evaluation_history.csv",
+                "run_summary.json",
+                "EXPERIMENT_SUMMARY.md",
+            ):
+                self.assertFalse((Path(tmp) / "trial" / removed).exists())
+            self.assertFalse((Path(tmp) / "trial/final_model.zip.manifest.json").exists())
+            self.assertFalse((Path(tmp) / "trial/final_model.zip").exists())
+            self.assertFalse((Path(tmp) / "trial/checkpoints").exists())
 
     def test_sac_directory_collision_preserved(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -244,13 +270,14 @@ class TrainingConfigTests(unittest.TestCase):
             self.assertEqual(first.parent, second.parent)
 
     @unittest.skipUnless(torch.cuda.is_available(), "CUDA is unavailable")
+    @pytest.mark.integration
     def test_cuda_diffcrl_execution_and_gradients(self):
         torch.manual_seed(0)
         model = TrajectoryDiffusion(
             DiffusionConfig(horizon=4, steps=2, width=8, num_tasks=1)
         )
         model.denoiser.to("cuda")
-        data = torch.randn(2, 4, 22)
+        data = torch.randn(2, 4, 43)
         ids = torch.zeros(2, dtype=torch.long)
         goals = torch.randn(2, 3)
         loss = model.loss(
@@ -259,12 +286,116 @@ class TrainingConfigTests(unittest.TestCase):
         loss.backward()
         self.assertEqual(next(model.denoiser.parameters()).grad.device.type, "cuda")
         sample = model.sample(2, task_ids=ids, goals=goals)
-        self.assertEqual((sample.device.type, sample.shape), ("cpu", (2, 4, 22)))
+        self.assertEqual((sample.device.type, sample.shape), ("cpu", (2, 4, 43)))
         policy = GeneralPolicy(-np.ones(4), np.ones(4)).to("cuda")
         dataset = TensorDataset(torch.randn(4, 39), torch.zeros(4, 4))
         result = fit_bc(policy, dataset, dataset, epochs=1, batch_size=2)
         self.assertTrue(np.isfinite(result["train_loss"]))
         self.assertEqual(policy.act(np.zeros(39)).shape, (4,))
+
+    @unittest.skipUnless(torch.cuda.is_available(), "CUDA is unavailable")
+    @pytest.mark.integration
+    def test_cuda_flow_matching_backbones_training_checkpoint_and_sampling(self):
+        for backbone, width in (("temporal_cnn", 64), ("temporal_unet1d", 32)):
+            with self.subTest(backbone=backbone), tempfile.TemporaryDirectory() as tmp:
+                config = FlowMatchingConfig(
+                    horizon=200,
+                    width=width,
+                    num_tasks=4,
+                    integration_steps=10,
+                    backbone=backbone,
+                )
+                model = TrajectoryFlowMatching(config)
+                model.velocity_model.to("cuda")
+                optimizer = torch.optim.Adam(model.parameters(), lr=1e-3)
+                data = torch.randn(2, 200, 43)
+                task_ids = torch.tensor([0, 1])
+                goals = torch.randn(2, 3)
+                optimizer.zero_grad()
+                loss = model.loss(
+                    data,
+                    generator=torch.Generator().manual_seed(1),
+                    task_ids=task_ids,
+                    goals=goals,
+                )
+                loss.backward()
+                optimizer.step()
+                self.assertEqual(next(model.parameters()).device.type, "cuda")
+                self.assertTrue(
+                    all(
+                        parameter.grad is not None
+                        and parameter.grad.device.type == "cuda"
+                        for parameter in model.parameters()
+                    )
+                )
+                sample = model.sample(2, seed=2, task_ids=task_ids, goals=goals)
+                self.assertEqual(
+                    (sample.device.type, sample.dtype, sample.shape),
+                    ("cpu", torch.float32, (2, 200, 43)),
+                )
+                self.assertEqual(model.last_sample_nfe, 10)
+
+                path = Path(tmp) / "flow.pt"
+                model.save(
+                    path,
+                    FeatureNormalizer(torch.zeros(43), torch.ones(43)),
+                    FeatureNormalizer(torch.zeros(3), torch.ones(3)),
+                    {
+                        "task_order": ["a", "b", "c", "d"],
+                        "training_banks": {},
+                        "train_configurations": {},
+                        "generated_action_projection": "none",
+                        "action_space": "raw",
+                        "action_clamp_epsilon": 1e-4,
+                    },
+                )
+                loaded, _, _, _ = TrajectoryFlowMatching.load(
+                    path, expected_config=config
+                )
+                loaded.velocity_model.to("cuda")
+                loaded_sample = loaded.sample(
+                    2, seed=2, task_ids=task_ids, goals=goals
+                )
+                self.assertEqual(
+                    (loaded_sample.device.type, loaded_sample.shape),
+                    ("cpu", (2, 200, 43)),
+                )
+
+    @unittest.skipUnless(torch.cuda.is_available(), "CUDA is unavailable")
+    @pytest.mark.integration
+    def test_cuda_diffusion_unet_training_and_sampling(self):
+        model = TrajectoryDiffusion(
+            DiffusionConfig(
+                horizon=4,
+                steps=2,
+                backbone="temporal_unet1d",
+                width=4,
+                num_tasks=1,
+            )
+        )
+        model.denoiser.to("cuda")
+        optimizer = torch.optim.Adam(model.parameters(), lr=1e-3)
+        data = torch.randn(1, 4, 43)
+        task_ids = torch.zeros(1, dtype=torch.long)
+        goals = torch.zeros(1, 3)
+        optimizer.zero_grad()
+        loss = model.loss(
+            data,
+            generator=torch.Generator().manual_seed(1),
+            task_ids=task_ids,
+            goals=goals,
+        )
+        loss.backward()
+        optimizer.step()
+        self.assertEqual(next(model.parameters()).device.type, "cuda")
+        sample = model.sample(
+            1,
+            seed=2,
+            task_ids=task_ids,
+            goals=goals,
+            execution_mode="device-native",
+        )
+        self.assertEqual((sample.device.type, sample.shape), ("cpu", (1, 4, 43)))
 
 
 if __name__ == "__main__":

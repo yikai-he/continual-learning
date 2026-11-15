@@ -3,13 +3,14 @@
 import unittest
 from copy import deepcopy
 
-from src.continual.evaluation import EvaluationMatrix, running_evaluation_statistics
-from src.continual.reporting import (
+from continual_manipulation.evaluation import (
+    EvaluationMatrix,
     format_evaluation_result,
     format_final_report,
     format_stage_report,
+    running_evaluation_statistics,
 )
-from src.continual.task_sequence import TaskSequence
+from continual_manipulation.sequences import TaskSequence
 
 
 def result(success, mean_return):

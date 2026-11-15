@@ -5,14 +5,15 @@ sac:
   steps: 500000
   learning_rate: 0.001
   buffer_size: 1000000
-  learning_starts: 10000
+  learning_starts: 1000
+  random_exploration_steps: 10000
+  target_output_std: 0.089
   batch_size: 128
   gamma: 0.99
   tau: 0.005
-  train_freq: 1
-  gradient_steps: 1
-  checkpoint_freq: 50000
+  train_freq: 50
+  gradient_steps: 50
   early_stopping: {enabled: true, min_steps: 100000, success_threshold: 0.95, patience: 3}
 continual: {tasks: [kuka-window-close-v3]}
-evaluation: {episodes: 20, frequency: 20000, seed_offset: 10000, mode: fixed-tasks}
+evaluation: {episodes: 20, frequency: 40000, seed_offset: 10000, mode: fixed-tasks}
 runtime: {seed: 0, device: auto, output: runs/dev}

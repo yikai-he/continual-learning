@@ -204,6 +204,7 @@ def write_expert_manifest(
     action_shape: tuple[int, ...],
     horizon: int | None = None,
     qualification: dict | None,
+    policy_architecture: str | None = None,
 ) -> Path:
     """Write the checkpoint-specific sidecar consumed by validation."""
     checkpoint = Path(checkpoint).resolve()
@@ -228,6 +229,8 @@ def write_expert_manifest(
         else "not-qualified",
         "qualification": qualification,
     }
+    if policy_architecture is not None:
+        value["policy_architecture"] = policy_architecture
     with path.open("x", encoding="utf-8") as stream:
         json.dump(value, stream, indent=2, allow_nan=False)
         stream.write("\n")

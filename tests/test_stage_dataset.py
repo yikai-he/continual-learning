@@ -4,6 +4,7 @@ import tempfile
 import unittest
 from pathlib import Path
 from types import SimpleNamespace
+from unittest.mock import patch
 
 import numpy as np
 import torch
@@ -14,7 +15,7 @@ from src.continual.diffcrl import (
     StageContext,
     StageRawData,
 )
-from src.continual.task_sequence import TaskSequence
+from continual_manipulation.sequences import TaskSequence
 from src.continual.stage_dataset import (
     bc_dataset,
     concatenate_trajectory_groups,
@@ -43,6 +44,65 @@ def fixture_groups():
 
 
 class StageDatasetTests(unittest.TestCase):
+    def test_weighted_50_current_stage_has_exact_whole_episode_counts(self):
+        groups = {
+            0: torch.zeros((33, 200, 43)),
+            1: torch.zeros((67, 200, 43)),
+            2: torch.zeros((50, 200, 43)),
+        }
+        names = ["drawer-v3", "window-v3", "door-v3"]
+        prepared = prepare_stage_groups(
+            groups,
+            {name: {"kind": "fixture"} for name in names},
+            names,
+            stage=2,
+            horizon=200,
+            runtime_seed=0,
+            historical_replay_training_only=False,
+        )
+
+        self.assertEqual(
+            [len(prepared.preparations[index].train_ids) for index in groups],
+            [26, 54, 40],
+        )
+        self.assertEqual(
+            [len(prepared.preparations[index].validation_ids) for index in groups],
+            [7, 13, 10],
+        )
+        self.assertEqual(prepared.dataset.train.shape, (120, 200, 43))
+        self.assertEqual(prepared.dataset.validation.shape, (30, 200, 43))
+
+    def test_stage_context_uses_schedule_or_global_compatibility_count(self):
+        sequence = TaskSequence.from_names(["reach-v3", "hammer-v3"])
+        with tempfile.TemporaryDirectory() as tmp:
+            trainer = object.__new__(DiffCRLTrainer)
+            trainer.config = SimpleNamespace(
+                runtime=SimpleNamespace(device="cpu"),
+                continual=SimpleNamespace(
+                    trajectories_per_task=100,
+                    current_trajectory_schedule=[100, 50],
+                ),
+            )
+            trainer.sequence = sequence
+            trainer.output = Path(tmp)
+            trainer.progress = False
+            trainer.next_stage = 0
+            trainer.policy = None
+            trainer.diffusion = None
+            trainer.flow_matching = None
+            first, _ = trainer._begin_stage(0)
+            self.assertEqual(first.trajectory_count, 100)
+            trainer.next_stage = 1
+            second, _ = trainer._begin_stage(1)
+            self.assertEqual(second.trajectory_count, 50)
+
+        with tempfile.TemporaryDirectory() as tmp:
+            trainer.output = Path(tmp)
+            trainer.next_stage = 1
+            trainer.config.continual.current_trajectory_schedule = []
+            global_count, _ = trainer._begin_stage(1)
+            self.assertEqual(global_count.trajectory_count, 100)
+
     def test_stateless_stage_group_preparation_matches_exact_legacy_products(self):
         groups = fixture_groups()
         sources = {
@@ -58,9 +118,6 @@ class StageDatasetTests(unittest.TestCase):
             stage=1,
             horizon=200,
             runtime_seed=17,
-            action_low=-torch.ones(4),
-            action_high=torch.ones(4),
-            clamp_epsilon=1e-4,
             historical_replay_training_only=False,
         )
 
@@ -108,9 +165,6 @@ class StageDatasetTests(unittest.TestCase):
             stage=1,
             horizon=200,
             runtime_seed=17,
-            action_low=-torch.ones(4),
-            action_high=torch.ones(4),
-            clamp_epsilon=1e-4,
             historical_replay_training_only=True,
         )
         self.assertEqual(result.preparations[0].train_ids, [0, 1, 2, 3, 4])
@@ -119,29 +173,22 @@ class StageDatasetTests(unittest.TestCase):
         self.assertEqual(result.splits["reach-v3"]["train_samples"], 1000)
         self.assertEqual(result.splits["reach-v3"]["validation_samples"], 0)
 
-    def test_group_preparation_preserves_split_and_clip_diagnostic(self):
+    def test_group_preparation_preserves_split(self):
         values = fixture_groups()[1]
         result = prepare_trajectory_group(
             values,
             count=5,
             seed=1018,
-            action_low=-torch.ones(4),
-            action_high=torch.ones(4),
-            clamp_epsilon=1e-4,
         )
         train_ids, validation_ids = split_indices(5, 1018)
         self.assertEqual(result.train_ids, train_ids)
         self.assertEqual(result.validation_ids, validation_ids)
-        self.assertEqual(result.bc_target_clip_fraction, 0.75)
 
     def test_single_allocated_replay_trajectory_is_training_only(self):
         result = prepare_trajectory_group(
             fixture_groups()[0][:1],
             count=1,
             seed=17,
-            action_low=-torch.ones(4),
-            action_high=torch.ones(4),
-            clamp_epsilon=1e-4,
         )
         self.assertEqual(result.train_ids, [0])
         self.assertEqual(result.validation_ids, [])
@@ -153,9 +200,6 @@ class StageDatasetTests(unittest.TestCase):
                 values,
                 count=5,
                 seed=17 + 1000 + index,
-                action_low=-torch.ones(4),
-                action_high=torch.ones(4),
-                clamp_epsilon=1e-4,
             )
             for index, values in groups.items()
         }
@@ -179,7 +223,10 @@ class StageDatasetTests(unittest.TestCase):
         groups = fixture_groups()
         sequence = TaskSequence.from_names(["reach-v3", "hammer-v3"])
         trainer = object.__new__(DiffCRLTrainer)
-        trainer.config = SimpleNamespace(runtime=SimpleNamespace(seed=17))
+        trainer.config = SimpleNamespace(
+            runtime=SimpleNamespace(seed=17),
+            continual=SimpleNamespace(historical_replay_training_only=False),
+        )
         trainer.sequence = sequence
         trainer.policy = SimpleNamespace(
             action_low=-torch.ones(4), action_high=torch.ones(4)
@@ -196,7 +243,6 @@ class StageDatasetTests(unittest.TestCase):
             collected_configurations=[
                 {"configuration_index": 30 + i} for i in range(5)
             ],
-            real_encode_clip_fraction=0.125,
         )
         with tempfile.TemporaryDirectory() as tmp:
             directory = Path(tmp)
@@ -208,7 +254,15 @@ class StageDatasetTests(unittest.TestCase):
                 policy_before_hash="policy-before",
                 diffusion_before_hash="diffusion-before",
             )
-            data = trainer._prepare_stage_data(context, raw, current)
+            from src.continual import stage_dataset
+
+            with patch.object(
+                stage_dataset,
+                "validate_stage_group",
+                wraps=stage_dataset.validate_stage_group,
+            ) as validated:
+                data = trainer._prepare_stage_data(context, raw, current)
+            self.assertEqual(validated.call_count, len(groups))
             self.assertEqual(
                 sorted(path.name for path in directory.glob("*.npy")),
                 ["data_task_0.npy", "data_task_1.npy"],
@@ -241,8 +295,51 @@ class StageDatasetTests(unittest.TestCase):
                     },
                 },
             )
-            self.assertEqual(raw.sources["reach-v3"]["bc_target_clip_fraction"], 0.5)
-            self.assertEqual(raw.sources["hammer-v3"]["bc_target_clip_fraction"], 0.75)
+            expected = prepare_stage_groups(
+                groups,
+                {name: {"kind": "fixture"} for name in sequence.task_names},
+                sequence.task_names,
+                stage=1,
+                horizon=200,
+                runtime_seed=17,
+                historical_replay_training_only=False,
+            )
+            torch.testing.assert_close(data.train, expected.dataset.train, rtol=0, atol=0)
+            torch.testing.assert_close(
+                data.validation, expected.dataset.validation, rtol=0, atol=0
+            )
+            torch.testing.assert_close(
+                data.train_labels, expected.dataset.train_labels, rtol=0, atol=0
+            )
+            torch.testing.assert_close(
+                data.validation_labels,
+                expected.dataset.validation_labels,
+                rtol=0,
+                atol=0,
+            )
+            self.assertEqual(data.splits, expected.splits)
+            expected_train_goals = torch.cat(
+                [
+                    values[expected.preparations[index].train_ids, 0, 36:39]
+                    for index, values in groups.items()
+                ]
+            )
+            expected_validation_goals = torch.cat(
+                [
+                    values[expected.preparations[index].validation_ids, 0, 36:39]
+                    for index, values in groups.items()
+                ]
+            )
+            torch.testing.assert_close(
+                data.train_reference_goals, expected_train_goals, rtol=0, atol=0
+            )
+            torch.testing.assert_close(
+                data.validation_reference_goals,
+                expected_validation_goals,
+                rtol=0,
+                atol=0,
+            )
+            self.assertIs(data.sources, raw.sources)
             self.assertEqual(
                 trainer.train_configurations,
                 {
@@ -257,12 +354,20 @@ class StageDatasetTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "Invalid physical stage data"):
             validate_trajectory_group(torch.zeros(5, 199, 43), count=5)
 
+        values = torch.zeros(5, 200, 43)
+        values[0, 0, 0] = float("nan")
+        with self.assertRaisesRegex(ValueError, "Invalid physical stage data"):
+            validate_trajectory_group(values, count=5)
+
     def test_stage_preparation_accepts_different_group_sizes(self):
         groups = fixture_groups()
         groups[0] = groups[0][:3]
         sequence = TaskSequence.from_names(["reach-v3", "hammer-v3"])
         trainer = object.__new__(DiffCRLTrainer)
-        trainer.config = SimpleNamespace(runtime=SimpleNamespace(seed=17))
+        trainer.config = SimpleNamespace(
+            runtime=SimpleNamespace(seed=17),
+            continual=SimpleNamespace(historical_replay_training_only=False),
+        )
         trainer.sequence = sequence
         trainer.policy = SimpleNamespace(
             action_low=-torch.ones(4), action_high=torch.ones(4)
@@ -279,7 +384,6 @@ class StageDatasetTests(unittest.TestCase):
             collected_configurations=[
                 {"configuration_index": 30 + i} for i in range(5)
             ],
-            real_encode_clip_fraction=0.0,
         )
         with tempfile.TemporaryDirectory() as tmp:
             data = trainer._prepare_stage_data(
@@ -297,12 +401,15 @@ class StageDatasetTests(unittest.TestCase):
         self.assertEqual(data.splits["reach-v3"]["trajectories"], 3)
         self.assertEqual(data.splits["hammer-v3"]["trajectories"], 5)
 
-    def test_later_invalid_group_preserves_earlier_partial_artifact(self):
+    def test_invalid_group_is_rejected_before_stage_artifacts_are_written(self):
         groups = fixture_groups()
         groups[1] = groups[1][:, :-1]
         sequence = TaskSequence.from_names(["reach-v3", "hammer-v3"])
         trainer = object.__new__(DiffCRLTrainer)
-        trainer.config = SimpleNamespace(runtime=SimpleNamespace(seed=17))
+        trainer.config = SimpleNamespace(
+            runtime=SimpleNamespace(seed=17),
+            continual=SimpleNamespace(historical_replay_training_only=False),
+        )
         trainer.sequence = sequence
         trainer.policy = SimpleNamespace(
             action_low=-torch.ones(4), action_high=torch.ones(4)
@@ -319,7 +426,6 @@ class StageDatasetTests(unittest.TestCase):
             collected_configurations=[
                 {"configuration_index": 30 + index} for index in range(5)
             ],
-            real_encode_clip_fraction=0.0,
         )
         with tempfile.TemporaryDirectory() as tmp:
             directory = Path(tmp)
@@ -333,9 +439,9 @@ class StageDatasetTests(unittest.TestCase):
             )
             with self.assertRaisesRegex(ValueError, "Invalid physical stage data"):
                 trainer._prepare_stage_data(context, raw, current)
-            self.assertTrue((directory / "data_task_0.npy").is_file())
+            self.assertFalse((directory / "data_task_0.npy").exists())
             self.assertFalse((directory / "data_task_1.npy").exists())
-            self.assertIn("data_sha256", raw.sources["reach-v3"])
+            self.assertNotIn("data_sha256", raw.sources["reach-v3"])
             self.assertNotIn("data_sha256", raw.sources["hammer-v3"])
 
 

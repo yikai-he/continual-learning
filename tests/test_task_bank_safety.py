@@ -3,7 +3,7 @@ from dataclasses import dataclass
 
 import pytest
 
-from src.continual.task_bank import verify_disjoint_task_banks
+from continual_manipulation.task_banks import verify_disjoint_task_banks
 
 
 @dataclass

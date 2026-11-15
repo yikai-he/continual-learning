@@ -1,6 +1,6 @@
 ---
 status: current
-last_verified: 2026-11-07
+last_verified: 2026-11-11
 applies_to: continual-learning
 ---
 
@@ -16,19 +16,20 @@ it does not imply scientific superiority or real-world validation.
 - Strict YAML configuration loading and experiment-specific validation.
 - MetaWorld-v3 environment construction, 39D observation/4D action contracts,
   task switching, episode success accumulation, and fixed task banks.
-- Single-task SAC training, fixed-bank evaluation, checkpoint manifests,
-  replay-buffer-aware resume, and success-based checkpoint qualification.
+- Single-task SAC training, fixed-bank evaluation, checkpoint manifests, and
+  success-based checkpoint qualification.
 - Expert trajectory collection with episode, task, goal, and provenance checks.
-- Persistent four-layer `GeneralPolicy` behavior cloning.
+- Persistent four-layer Squashed-Gaussian `GeneralPolicy` trained by NLL behavior cloning.
 - DiffCRL modes: No Replay, Real Replay, DDPM Diffusion Replay, and conditional
   Flow Matching Replay.
+- Direct 43D DDPM and Flow Matching generation with external task/goal
+  conditioning, 43-feature normalization, structural diagnostics, and strict
+  rejection of legacy generator checkpoints.
 - Whole-episode splitting, per-feature generator normalization, replay
-  allocation, checkpoint persistence, completed-stage resume, and validated
-  stage synchronization.
+  allocation, checkpoint persistence, authenticated completion markers, and
+  validated stage synchronization.
 - Continual evaluation matrices, Average Performance, and end-of-task
   forgetting.
-- MetaWorld sequential SAC with learner state retained and replay reset at task
-  boundaries.
 
 ## Implemented with backend or resource constraints
 
@@ -40,7 +41,6 @@ it does not imply scientific superiority or real-world validation.
 ## Experimental workflows
 
 - Flow Matching replay and fixed-total replay-budget comparisons.
-- GeneralPolicy-to-SAC actor transfer and forward-transfer experiments.
 
 Experimental means the code/configuration exists; consult the relevant protocol
 and retained artifacts before treating a result as thesis evidence.
@@ -51,8 +51,6 @@ and retained artifacts before treating a result as thesis evidence.
   deployment interface in this repository.
 - DiffCRL uses pretrained frozen SAC experts and BC. It does not reproduce
   DISTR’s online Immediate Policy training process.
-- Sequential SAC supports MetaWorld-v3 only, despite broader environment support
-  in the shared factory.
 - Forward transfer is computed only from explicitly aligned learning/reference
   curves. Endpoint matrices serialize it as `null`.
 - Formal trajectory packing requires full-horizon episodes.
@@ -81,8 +79,7 @@ and retained artifacts before treating a result as thesis evidence.
    platform.
 4. Define and test the real-robot observation/action/safety boundary in the
    separate deployment project before claiming real-world readiness.
-5. Add KUKA sequential SAC only if it is required as a matched thesis baseline;
-   doing so changes experimental scope and should not be an organizational edit.
 
-For implementation details see [Architecture](ARCHITECTURE.md); for workflow
-classification see [Workflow index](WORKFLOW_INDEX.md).
+For implementation details see [Architecture](ARCHITECTURE.md), for migration
+and acceptance evidence see [Direct 43D migration](DIRECT_43D_MIGRATION.md), and
+for workflow classification see [Workflow index](WORKFLOW_INDEX.md).

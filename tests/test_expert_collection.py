@@ -14,7 +14,7 @@ import yaml
 from gymnasium.spaces import Box
 from stable_baselines3 import SAC
 
-from src.continual.collector import collect_trajectory
+from continual_manipulation.evaluation.rollout import collect_trajectory
 from src.continual.expert_collection import (
     CollectionConfig,
     collect_expert_dataset,
@@ -22,11 +22,28 @@ from src.continual.expert_collection import (
     load_collection_config,
 )
 from src.continual.policy_adapter import SB3SACPolicy
-from src.continual.schema import Trajectory, validate_trajectory
-from src.envs import GOAL_SLICE, make_env
+from continual_manipulation.evaluation.rollout import Trajectory, validate_trajectory
+from continual_manipulation.environments import GOAL_SLICE, make_env
 
 
 KUKA_EXPERT_CHECKPOINT = os.environ.get("KUKA_EXPERT_CHECKPOINT")
+
+
+def test_sac_policy_adapter_forwards_stochastic_selection() -> None:
+    observation_space = Box(low=-np.inf, high=np.inf, shape=(39,), dtype=np.float32)
+    action_space = Box(low=-1.0, high=1.0, shape=(4,), dtype=np.float32)
+    model = SimpleNamespace(
+        observation_space=observation_space,
+        action_space=action_space,
+        predict=lambda observation, deterministic: (
+            np.zeros(4, dtype=np.float32),
+            None,
+        ),
+    )
+    with patch.object(model, "predict", wraps=model.predict) as predict:
+        action = SB3SACPolicy(model).act(np.zeros(39, dtype=np.float32), deterministic=False)
+    assert action.shape == (4,)
+    assert predict.call_args.kwargs["deterministic"] is False
 
 
 def trajectory(*, success: bool, final_success: bool) -> Trajectory:
@@ -199,6 +216,7 @@ def test_saved_dataset_excludes_failure_but_ledger_retains_attempt(
     not KUKA_EXPERT_CHECKPOINT or not Path(KUKA_EXPERT_CHECKPOINT).is_file(),
     reason="set KUKA_EXPERT_CHECKPOINT to run the KUKA integration test",
 )
+@pytest.mark.integration
 def test_kuka_expert_collects_one_complete_valid_trajectory() -> None:
     model = SAC.load(Path(KUKA_EXPERT_CHECKPOINT), device="cpu")
     policy = SB3SACPolicy(model)

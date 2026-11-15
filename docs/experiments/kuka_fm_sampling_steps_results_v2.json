@@ -1,0 +1,78 @@
+{
+  "schema_version": "kuka_fm_sampling_steps_scientific_analysis_v2",
+  "status": "complete_with_unavailable_metrics",
+  "source_inventory": {
+    "root": "runs/diagnostics/fm_sampling_steps",
+    "path_template": "{method}_seed{seed}/steps_{steps}.json",
+    "methods": ["fm_structured_22d", "fm_full_43d"],
+    "seeds": [0, 1, 2, 3, 4],
+    "steps": [10, 25, 50, 100, 200, 400],
+    "file_count": 60,
+    "ordered_path_and_sha256_inventory_hash": "9c2a910f6b61558c02a0195ff6ed0ecb59734eefc8fb7a179b4ea40832165a77"
+  },
+  "audit": {
+    "valid_cells": 60,
+    "expected_cells": 60,
+    "missing": 0,
+    "incomplete": 0,
+    "invalid": 0,
+    "scientifically_incomparable": 0,
+    "paired_method_seed_stage_task_groups": 60,
+    "pairing_fields": ["checkpoint_path", "checkpoint_sha256", "model_state_hash", "sampling_seed", "task", "training_configuration_indices", "training_configuration_hashes"],
+    "allocation": {"stage_1": [20], "stage_2": [10, 10], "stage_3": [7, 7, 6]},
+    "decoded_contract": {"horizon": 200, "observation_features": 39, "action_features": 4, "physical_features": 43},
+    "nan_count": 0,
+    "inf_count": 0,
+    "invalid_shape_groups": 0
+  },
+  "expert_checkpoint_sha256": {
+    "kuka-hammer-v3": "1900fe4dd8d3150f7d484f7f8886f4e65616bf11fa681d5a29ae6b7a06696c8c",
+    "kuka-handle-press-side-v3": "090824e59d5dcfe3a3be0700a020877b97e5545b3bf9e507a02d1b132dc47049",
+    "kuka-button-press-v3": "ee92f679f342a3609fdc56c4379641d7e60123fc3443e558203685577674f2f0",
+    "kuka-reach-v3": "2be77e7884b1fdf0b29d364ec0a5dcfdae51b0abb34b56f7ecaded5e6be32792"
+  },
+  "aggregation": {
+    "primary": "trajectory_weighted; equivalent to global timestep weighting because every trajectory has horizon 200",
+    "cells_per_method_step": 5,
+    "groups_per_method_step": 30,
+    "trajectories_per_method_step": 300,
+    "timesteps_per_method_step": 60000,
+    "paired_sd": "sample SD across five seeds, ddof=1"
+  },
+  "summary_rows": [
+    {"method":"fm_structured_22d","steps":10,"goal_mean":0,"previous_mean":0,"action_component_oob":0.110637,"action_timestep_oob":0.358667,"action_max_violation":1.07353,"seconds":1.449991,"nfe":300,"timesteps_per_second":41380},
+    {"method":"fm_structured_22d","steps":25,"goal_mean":0,"previous_mean":0,"action_component_oob":0.115337,"action_timestep_oob":0.371867,"action_max_violation":1.09454,"seconds":3.502246,"nfe":750,"timesteps_per_second":17132},
+    {"method":"fm_structured_22d","steps":50,"goal_mean":0,"previous_mean":0,"action_component_oob":0.116925,"action_timestep_oob":0.376633,"action_max_violation":1.10173,"seconds":7.162788,"nfe":1500,"timesteps_per_second":8377},
+    {"method":"fm_structured_22d","steps":100,"goal_mean":0,"previous_mean":0,"action_component_oob":0.117650,"action_timestep_oob":0.378817,"action_max_violation":1.10551,"seconds":13.970541,"nfe":3000,"timesteps_per_second":4295},
+    {"method":"fm_structured_22d","steps":200,"goal_mean":0,"previous_mean":0,"action_component_oob":0.118033,"action_timestep_oob":0.379933,"action_max_violation":1.10740,"seconds":27.918184,"nfe":6000,"timesteps_per_second":2149},
+    {"method":"fm_structured_22d","steps":400,"goal_mean":0,"previous_mean":0,"action_component_oob":0.118225,"action_timestep_oob":0.380517,"action_max_violation":1.10835,"seconds":58.654989,"nfe":12000,"timesteps_per_second":1023},
+    {"method":"fm_full_43d","steps":10,"goal_mean":0.0249015,"goal_max":0.0840825,"goal_variation":0.0359066,"goal_tolerance_fraction":0.891417,"previous_mean":0.467056,"previous_max":1.10935,"previous_tolerance_fraction":1.0,"previous_reset":0.500022,"action_component_oob":0.165554,"action_timestep_oob":0.504817,"action_max_violation":1.55794,"seconds":1.493609,"nfe":300,"timesteps_per_second":40171},
+    {"method":"fm_full_43d","steps":25,"goal_mean":0.0255862,"goal_max":0.0863051,"goal_variation":0.0369101,"goal_tolerance_fraction":0.892200,"previous_mean":0.472229,"previous_max":1.11959,"previous_tolerance_fraction":1.0,"previous_reset":0.505095,"action_component_oob":0.167975,"action_timestep_oob":0.510483,"action_max_violation":1.57819,"seconds":3.743744,"nfe":750,"timesteps_per_second":16027},
+    {"method":"fm_full_43d","steps":50,"goal_mean":0.0258245,"goal_max":0.0870419,"goal_variation":0.0372435,"goal_tolerance_fraction":0.892450,"previous_mean":0.473948,"previous_max":1.12285,"previous_tolerance_fraction":1.0,"previous_reset":0.506793,"action_component_oob":0.168779,"action_timestep_oob":0.512117,"action_max_violation":1.58357,"seconds":7.092735,"nfe":1500,"timesteps_per_second":8459},
+    {"method":"fm_full_43d","steps":100,"goal_mean":0.0259423,"goal_max":0.0874041,"goal_variation":0.0374077,"goal_tolerance_fraction":0.892683,"previous_mean":0.474805,"previous_max":1.12444,"previous_tolerance_fraction":1.0,"previous_reset":0.507644,"action_component_oob":0.169229,"action_timestep_oob":0.512933,"action_max_violation":1.58629,"seconds":13.378472,"nfe":3000,"timesteps_per_second":4485},
+    {"method":"fm_full_43d","steps":200,"goal_mean":0.0260011,"goal_max":0.0875838,"goal_variation":0.0374893,"goal_tolerance_fraction":0.892767,"previous_mean":0.475232,"previous_max":1.12530,"previous_tolerance_fraction":1.0,"previous_reset":0.508070,"action_component_oob":0.169471,"action_timestep_oob":0.513467,"action_max_violation":1.58766,"seconds":29.228556,"nfe":6000,"timesteps_per_second":2053},
+    {"method":"fm_full_43d","steps":400,"goal_mean":0.0260304,"goal_max":0.0876733,"goal_variation":0.0375300,"goal_tolerance_fraction":0.892817,"previous_mean":0.475446,"previous_max":1.12580,"previous_tolerance_fraction":1.0,"previous_reset":0.508284,"action_component_oob":0.169608,"action_timestep_oob":0.513783,"action_max_violation":1.58834,"seconds":59.287530,"nfe":12000,"timesteps_per_second":1012}
+  ],
+  "paired_10_minus_100": {
+    "fm_structured_22d": {"action_component_oob":{"per_seed":[-0.0109375,-0.00485417,-0.00583333,-0.00695833,-0.00647916],"mean":-0.00701250,"sample_sd":0.00233141,"relative_percent":-5.96048}},
+    "fm_full_43d": {
+      "goal_mean":{"per_seed":[-0.00109315,-0.00103883,-0.000982919,-0.00127159,-0.000817794],"mean":-0.00104086,"sample_sd":0.000165145,"relative_percent":-4.01220},
+      "previous_mean":{"per_seed":[-0.00833645,-0.00754521,-0.00745691,-0.00800375,-0.00740466],"mean":-0.00774939,"sample_sd":0.000404788,"relative_percent":-1.63212},
+      "action_component_oob":{"per_seed":[-0.00197917,-0.00514583,-0.00379167,-0.00343750,-0.00402083],"mean":-0.00367500,"sample_sd":0.00114333,"relative_percent":-2.17161}
+    }
+  },
+  "runtime_speedup_ratio_of_totals": {
+    "fm_structured_22d": {"100_over_10":9.63491,"400_over_10":40.45196},
+    "fm_full_43d": {"100_over_10":8.95715,"400_over_10":39.69415}
+  },
+  "unavailable": {
+    "expert_action_disagreement": "not serialized; generated tensors and expert predictions unavailable",
+    "per_action_dimension_mse": "not serialized",
+    "sample_level_numerical_convergence": "trajectory SHA-256 values establish identity only and cannot recover distances"
+  },
+  "conclusion": {
+    "ten_steps": "promising efficiency candidate, not established downstream-equivalent",
+    "integration_resolution": "does not explain or repair the observed FM 43D structural errors",
+    "velocity_field_limitation": "supported as a more plausible descriptive hypothesis, not causally proven"
+  }
+}

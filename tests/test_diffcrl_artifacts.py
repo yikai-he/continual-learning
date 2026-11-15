@@ -16,7 +16,7 @@ from src.continual.diffcrl_artifacts import (
     stage_checkpoint_paths,
     validate_finite_model_state,
 )
-from src.continual.task_sequence import TaskSequence
+from continual_manipulation.sequences import TaskSequence
 from src.continual.trajectory_diffusion import DiffusionConfig, TrajectoryDiffusion
 from src.continual.trajectory_flow_matching import (
     FlowMatchingConfig,
@@ -76,8 +76,10 @@ def test_initial_summary_preserves_schema_order_values_and_rng(tmp_path):
     assert result["bc"]["use_layer_norm"] is True
     assert result["diffusion"] == {
         "horizon": 200,
-        "features": 22,
+        "features": 43,
         "steps": 4,
+            "backbone": "temporal_cnn",
+            "backbone_spec_version": 1,
         "width": 4,
         "num_tasks": 2,
         "diffusion_action_space": "raw",
@@ -109,7 +111,9 @@ def test_initial_summary_adds_only_flow_specific_sections():
     assert result["diffusion"] is None
     assert result["flow_matching"] == {
         "horizon": 200,
-        "features": 22,
+        "features": 43,
+        "backbone": "temporal_cnn",
+        "backbone_spec_version": 1,
         "width": 4,
         "num_tasks": 1,
         "integration_steps": 2,
@@ -135,10 +139,16 @@ def test_new_run_keeps_configuration_manifest_and_summary_write_order(tmp_path):
         runtime=replace(base.runtime, output=str(tmp_path / "run"), device="cpu"),
     )
     events = []
-    identity = SimpleNamespace(to_dict=lambda: {"checkpoint_sha256": "expert"})
+    identity = SimpleNamespace(
+        checkpoint_sha256="expert",
+        to_dict=lambda: {"checkpoint_sha256": "expert"},
+    )
 
     with patch(
         "src.continual.diffcrl.validate_expert_checkpoint", return_value=identity
+    ), patch(
+        "src.continual.diffcrl.file_hash",
+        side_effect=AssertionError("expert checkpoint was hashed twice"),
     ), patch(
         "src.continual.diffcrl.save_resolved_config",
         side_effect=lambda *_: events.append("resolved-config"),
@@ -154,7 +164,7 @@ def test_new_run_keeps_configuration_manifest_and_summary_write_order(tmp_path):
             ("write-summary", path.name, value)
         ),
     ):
-        DiffCRLTrainer(config, progress=False)
+        trainer = DiffCRLTrainer(config, progress=False)
 
     assert events == [
         "resolved-config",
@@ -162,26 +172,14 @@ def test_new_run_keeps_configuration_manifest_and_summary_write_order(tmp_path):
         "build-summary",
         ("write-summary", "config.json", {"schema": "same"}),
     ]
+    assert trainer.expert_hashes == {"reach-v3": "expert"}
 
 
-def test_stage_checkpoint_paths_preserve_all_legacy_names_and_suffixes(tmp_path):
+def test_stage_checkpoint_paths_preserve_canonical_names(tmp_path):
     assert stage_checkpoint_paths(
         tmp_path,
         stage=2,
         task="hammer-v3",
-        artifact_suffix=".resume_3",
-        has_diffusion=True,
-        has_flow_matching=False,
-    ) == (
-        tmp_path / "diffusion_after_task_2_hammer-v3.resume_3.pt",
-        tmp_path / "general_policy_after_task_2_hammer-v3.resume_3.pt",
-        None,
-    )
-    assert stage_checkpoint_paths(
-        tmp_path,
-        stage=2,
-        task="hammer-v3",
-        artifact_suffix="",
         has_diffusion=False,
         has_flow_matching=True,
     ) == (

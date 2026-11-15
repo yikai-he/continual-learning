@@ -1,0 +1,20 @@
+# CW10-inspired five-task KUKA-v3 Flow Matching arm; current maintained rewards.
+experiment: diffcrl
+environment: {backend: kuka-v3, reward_function_version: v2}
+bc: {epochs: 100, batch_size: 256, learning_rate: 0.001, loss: squashed-gaussian-nll, initial_log_std: -1.0}
+diffusion: {epochs: 300, batch_size: 8, learning_rate: 0.001, steps: 100, width: 64, action_space: raw, action_clamp_epsilon: 0.0001, generated_action_projection: none}
+flow_matching: {epochs: 300, batch_size: 8, learning_rate: 0.001, width: 64, time_embedding_scale: 100.0, integration_steps: 10, ode_solver: euler, rtol: 0.00001, atol: 0.00001}
+continual:
+  sequence: kuka_cw10_inspired_5
+  experts:
+    kuka-hammer-v3: runs/experts/kuka-v3/hammer-v3/policy.zip
+    kuka-faucet-close-v3: runs/experts/kuka-v3/faucet-close-v3/policy.zip
+    kuka-handle-press-side-v3: runs/experts/kuka-v3/handle-press-side-v3/policy.zip
+    kuka-window-close-v3: runs/experts/kuka-v3/window-close-v3/policy.zip
+    kuka-peg-unplug-side-v3: runs/experts/kuka-v3/peg-unplug-side-v3/policy.zip
+  trajectories_per_task: 30
+  replay_mode: flow-matching
+  replay_allocation: fixed-total
+  replay_budget: 30
+evaluation: {episodes: 50, seed: 10000, mode: fixed-tasks, task_set_seed: 10000}
+runtime: {seed: 2, device: cpu, output: runs/kuka_cw10_inspired_5_ddpm_vs_fm_30plus30/flow_matching_fm10, run_name: seed_2}

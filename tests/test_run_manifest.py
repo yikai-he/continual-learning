@@ -1,13 +1,14 @@
 import json
 from dataclasses import replace
 
-from src.config import default_config
+from src.config import default_config, save_resolved_config
 from src.support.run_manifest import complete_run, create_run_manifest
 
 
 def test_manifest_required_fields_and_completion_markers(tmp_path):
     config = default_config("diffcrl")
     config = replace(config, runtime=replace(config.runtime, output=str(tmp_path)))
+    save_resolved_config(config, tmp_path)
     create_run_manifest(
         tmp_path,
         config,
@@ -18,7 +19,9 @@ def test_manifest_required_fields_and_completion_markers(tmp_path):
     assert manifest["status"] == "running"
     assert manifest["repository"]["commit"]
     assert manifest["environment"]["python_version"]
-    assert manifest["experiment"]["canonical_config_sha256"]
+    assert manifest["experiment"]["config_path"] == "config.yaml"
+    assert manifest["experiment"]["config_sha256"]
+    assert "resolved_config" not in manifest["experiment"]
     assert manifest["experts"]["reach-v3"]["checkpoint_sha256"] == "abc"
     assert (tmp_path / "RUNNING").is_file()
     assert not (tmp_path / "RUN_COMPLETE").exists()

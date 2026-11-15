@@ -1,0 +1,39 @@
+# Controlled BC-objective ablation: Squashed-Gaussian NLL with DDPM replay.
+experiment: diffcrl
+environment: {backend: kuka-v3, reward_function_version: v2}
+bc:
+  epochs: 100
+  batch_size: 256
+  learning_rate: 0.001
+  loss: squashed_gaussian_nll
+  task_conditioning: none
+  initial_log_std: -3.0
+  activation: relu
+  hidden_dim: 256
+diffusion:
+  epochs: 300
+  batch_size: 8
+  learning_rate: 0.001
+  steps: 100
+  width: 64
+  action_space: raw
+  action_clamp_epsilon: 0.0001
+  generated_action_projection: none
+continual:
+  tasks: [kuka-drawer-close-v3, kuka-window-close-v3, kuka-door-open-v3, kuka-peg-unplug-side-v3]
+  experts:
+    kuka-drawer-close-v3: runs/sac_kuka_remaining_4task_1m/drawer-close-v3/seed_0/best_model.zip
+    kuka-window-close-v3: runs/sac_kuka_remaining_4task_1m/window-close-v3/seed_0/best_model.zip
+    kuka-door-open-v3: runs/sac_kuka_remaining_4task_1m/door-open-v3/seed_0/best_model.zip
+    kuka-peg-unplug-side-v3: runs/sac_kuka_remaining_4task_1m/peg-unplug-side-v3/seed_0/best_model.zip
+  trajectories_per_task: 30
+  replay_mode: diffusion
+  replay_allocation: fixed-total
+  replay_budget: 30
+  historical_replay_training_only: false
+evaluation: {episodes: 50, seed: 10000, mode: fixed-tasks, task_set_seed: 10000}
+runtime:
+  seed: 0
+  device: cpu
+  output: runs/bc_objective_ablation/kuka_4task_ddpm_replay
+  run_name: squashed_gaussian_nll_seed0

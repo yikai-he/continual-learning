@@ -1,4 +1,4 @@
-"""Run matched No Replay, Real Replay, and DDPM Replay policy experiments."""
+"""Run matched No Replay, Expert Recollection, and DDPM Replay experiments."""
 
 from __future__ import annotations
 
@@ -20,15 +20,15 @@ ARM_SETTINGS = {
         "replay_budget": 200,
         "historical_replay_training_only": False,
     },
-    "real_replay": {
-        "replay_mode": "real",
+    "expert_recollection": {
+        "replay_mode": "expert-recollection",
         "replay_allocation": "fixed-total",
-        "historical_replay_training_only": True,
+        "historical_replay_training_only": False,
     },
     "ddpm_replay": {
         "replay_mode": "diffusion",
         "replay_allocation": "fixed-total",
-        "historical_replay_training_only": True,
+        "historical_replay_training_only": False,
     },
 }
 
@@ -77,7 +77,7 @@ def run_comparison(base, output_root: Path, *, progress=True):
         if stage:
             paired = {
                 name: _stage_report(trainers[name], stage)
-                for name in ("real_replay", "ddpm_replay")
+                for name in ("expert_recollection", "ddpm_replay")
             }
             task_names = base.continual.tasks[:stage]
             allocations = {
@@ -101,13 +101,8 @@ def run_comparison(base, output_root: Path, *, progress=True):
                 raise RuntimeError(f"Historical allocations differ: {allocations}")
             if len(set(train_counts.values())) != 1:
                 raise RuntimeError(f"BC training counts differ: {train_counts}")
-            if validation_ids["real_replay"] != validation_ids["ddpm_replay"]:
+            if validation_ids["expert_recollection"] != validation_ids["ddpm_replay"]:
                 raise RuntimeError(f"Validation splits differ: {validation_ids}")
-            for name, values in validation_ids.items():
-                if any(values[task] for task in task_names):
-                    raise RuntimeError(
-                        f"Historical validation leakage in {name}: {values}"
-                    )
         if stage == 0:
             policy_hashes = {name: state_hash(t.policy) for name, t in trainers.items()}
             if len(set(policy_hashes.values())) != 1:

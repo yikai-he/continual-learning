@@ -11,7 +11,7 @@ bc:
   epochs: 2
   batch_size: 256
   learning_rate: 0.001
-  loss: post-tanh-mse
+  loss: squashed-gaussian-nll
 
 diffusion:
   # Only enough to execute training + sampling.

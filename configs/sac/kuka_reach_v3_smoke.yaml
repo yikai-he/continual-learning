@@ -8,12 +8,13 @@ sac:
   learning_rate: 0.001
   buffer_size: 1000000
   learning_starts: 1000
+  random_exploration_steps: 1000
+  target_output_std: 0.089
   batch_size: 128
   gamma: 0.99
   tau: 0.005
   train_freq: 1
   gradient_steps: 1
-  checkpoint_freq: 1000
 continual:
   tasks:
   - kuka-reach-v3

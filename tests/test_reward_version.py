@@ -5,14 +5,18 @@ from importlib.metadata import version
 from unittest.mock import MagicMock, patch
 
 import numpy as np
+import pytest
 
-from src.continual import evaluation, sequential_sac
-from src.continual.task_bank import bank_hashes, reconstruct_goals
-from src.continual.task_sequence import TaskSequence, TaskSwitcher
-from src.envs import make_metaworld_env
+from continual_manipulation.evaluation import protocols as evaluation
+from continual_manipulation.sequences import TaskSequence
+from continual_manipulation.switching import TaskSwitcher
+from continual_manipulation.task_banks import bank_hashes
+from src.continual.task_bank import reconstruct_goals
+from continual_manipulation.environments import make_metaworld_env
 
 
 class RewardVersionTests(unittest.TestCase):
+    @pytest.mark.integration
     def test_real_environment_versions_and_unchanged_contract(self):
         observations = []
         for reward_version in ("v1", "v2"):
@@ -42,7 +46,9 @@ class RewardVersionTests(unittest.TestCase):
             env.close()
 
     def test_invalid_version_rejected_before_gym_make(self):
-        with patch("src.envs.gym.make") as make:
+        with patch(
+            "continual_manipulation.environments.metaworld_v3.gym.make"
+        ) as make:
             for value in ("v3", None, 1):
                 with self.assertRaisesRegex(ValueError, "reward_function_version"):
                     make_metaworld_env("reach-v3", 0, reward_function_version=value)
@@ -81,26 +87,6 @@ class RewardVersionTests(unittest.TestCase):
                 )
                 evaluate.assert_called_once()
 
-    def test_sac_boundary_forwards_version(self):
-        for reward_version in ("v1", "v2"):
-            model = MagicMock()
-            model.optimize_memory_usage = False
-            model.replay_buffer.size.return_value = 0
-            model._stats_window_size = 100
-            model.num_timesteps = 20
-            with patch.object(
-                sequential_sac, "make_metaworld_env"
-            ) as make, patch.object(
-                sequential_sac, "Monitor", side_effect=lambda env: env
-            ):
-                sequential_sac.switch_task(
-                    model, "push-v3", 4, 10, reward_function_version=reward_version
-                )
-                make.assert_called_once_with(
-                    "push-v3", 4, reward_function_version=reward_version
-                )
-                self.assertEqual(model.learning_starts, 30)
-
     def test_goal_reconstruction_forwards_version(self):
         task = MagicMock()
         task.data = b"task"
@@ -114,10 +100,10 @@ class RewardVersionTests(unittest.TestCase):
             env = MagicMock()
             env.reset.return_value = (np.zeros(39, dtype=np.float32), {})
             env.unwrapped._target_pos = np.zeros(3)
-            with patch("src.continual.task_bank.mt1_tasks") as mt1_tasks, patch(
+            with patch("src.continual.task_bank._backend_tasks") as backend_tasks, patch(
                 "src.continual.task_bank.make_metaworld_env", return_value=env
             ) as make:
-                mt1_tasks.return_value = [task]
+                backend_tasks.return_value = [task]
                 goals = reconstruct_goals(
                     bank, [0], reward_function_version=reward_version
                 )

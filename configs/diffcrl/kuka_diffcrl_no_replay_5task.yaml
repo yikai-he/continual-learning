@@ -7,7 +7,7 @@ bc:
   epochs: 100
   batch_size: 256
   learning_rate: 0.001
-  loss: post-tanh-mse
+  loss: squashed-gaussian-nll
 continual:
   tasks:
   - kuka-reach-v3

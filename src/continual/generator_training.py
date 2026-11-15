@@ -7,10 +7,9 @@ from dataclasses import asdict
 from typing import Any
 
 import torch
+from src.config import GENERATOR_GRADIENT_CLIP_NORM, GENERATOR_VALIDATION_DRAWS
 from torch import nn
 from tqdm.auto import tqdm
-
-from src.config import GENERATOR_GRADIENT_CLIP_NORM, GENERATOR_VALIDATION_DRAWS
 
 
 def run_cpu_inputs_on_module_device(module: nn.Module, *inputs):

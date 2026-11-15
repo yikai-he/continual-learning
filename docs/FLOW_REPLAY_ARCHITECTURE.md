@@ -1,6 +1,6 @@
 ---
 status: current
-last_verified: 2026-11-07
+last_verified: 2026-11-11
 applies_to: continual-learning
 ---
 
@@ -16,9 +16,12 @@ shared role, while this document specifically describes Flow Matching.
 For stage `k`, configuration selects the ordered task sequence and current SAC
 expert. Before accessing the current task, `replay_allocation.py` divides the
 fixed total historical budget among task IDs `0..k-1`. The previous completed
-Flow checkpoint then generates that allocation from scratch, preserving task
-labels, reconstructed goals, deterministic seeds, trajectory validation, and
-checkpoint hashes. The current expert trajectories are collected separately.
+Flow checkpoint then generates that allocation from scratch as direct
+`(N,T,43)` physical trajectories. Task labels and normalized 3D reference goals
+condition generation; goal coordinates also remain inside the generated tensor.
+Historical task-bank goals, deterministic seeds, trajectory diagnostics, and
+checkpoint hashes are recorded. Current expert trajectories are collected
+separately.
 
 The historical and current groups are split as whole episodes and combined.
 The same combined training and validation tensors update the Flow model and the
@@ -52,21 +55,34 @@ canonical fixed-budget configurations use fixed-step Euler integration. Solver,
 step count, tolerances, and neural-function-evaluation metadata are recorded in
 replay provenance.
 
+The 43 generated coordinates are current state (18), previous state (18), goal
+(3), and action (4). Per-feature z-score statistics are fitted on the stage
+training split. Sampling denormalizes all 43 features directly. Raw or
+pre-`tanh` action representation and optional action projection affect only the
+last four coordinates; previous states and goals are never reconstructed or
+overwritten. The checkpoint kind is `trajectory_flow_matching_43_v2`.
+
 `allocate_replay` is independent of environments, models, generation, and
 training. A future prioritization method can extend its strategy input once a
 scientifically specified score contract exists.
 
-## Reproducibility and resume
+## Reproducibility
 
 Replay comes only from the previous completed Flow checkpoint. Sampling seeds
 remain a deterministic function of run seed, stage, and task ID. Reports record
 the checkpoint identity, per-task allocation, sampled task configurations, and
-generation diagnostics. Resume validates completed marker hashes and restores
-Flow and policy weights, task-bank metadata, evaluation state, and RNG state.
-It regenerates replay for the next stage using the same allocation and source
-checkpoint. Persistent synthetic snapshots are not part of the architecture.
+generation diagnostics. Stage completion markers authenticate the Flow and
+policy checkpoints, report, and evaluation snapshot for synchronization and
+offline analysis. Interrupted training runs are restarted as fresh runs.
+Persistent synthetic snapshots are not part of the architecture.
 
 ## Scientific limitations
+
+Direct generation does not guarantee previous-state alignment, constant goals,
+agreement with the conditioning goal, or physical/dynamical consistency. These
+properties are reported as diagnostics. Structural consistency, environment
+dynamics, and downstream BC performance are distinct questions; none implies
+the others.
 
 A fixed total budget controls historical data quantity as the curriculum grows,
 but each individual task receives fewer trajectories at later stages. It does

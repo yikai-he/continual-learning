@@ -1,17 +1,18 @@
 from pathlib import Path
 from unittest.mock import patch
 
+import pytest
+
 from src.config import REPLAY_PRIORITY_STRATEGY, load_config
 from src.continual.diffcrl import DiffCRLTrainer, StageContext
 from src.continual.replay_allocation import replay_counts
-from src.continual.task_sequence import TaskSequence
+from continual_manipulation.sequences import TaskSequence
 from src.support.expert_manifest import validate_expert_checkpoint
 
 
 ROOT = Path(__file__).resolve().parents[1]
 CONFIGS = {
     "none": ROOT / "configs/diffcrl/kuka_4task_no_replay_30.yaml",
-    "real": ROOT / "configs/diffcrl/kuka_4task_real_replay_30plus30.yaml",
     "diffusion": ROOT / "configs/diffcrl/kuka_4task_ddpm_30plus30.yaml",
     "flow-matching": ROOT / "configs/diffcrl/kuka_4task_flow_matching_30plus30.yaml",
 }
@@ -31,7 +32,6 @@ def test_replay_comparison_configs_are_matched_qualified_and_isolated():
     reference = loaded["diffusion"]
     expected_outputs = {
         "none": "no_replay",
-        "real": "real_replay",
         "diffusion": "ddpm",
         "flow-matching": "flow_matching",
     }
@@ -69,12 +69,12 @@ def test_replay_comparison_configs_are_matched_qualified_and_isolated():
 
 def test_replay_allocations_match_and_no_replay_is_effectively_zero(tmp_path):
     expected = ({0: 30}, {0: 15, 1: 15}, {0: 10, 1: 10, 2: 10})
-    for mode in ("real", "diffusion", "flow-matching"):
+    for mode in ("diffusion", "flow-matching"):
         config = load_config(CONFIGS[mode], expected_experiment="diffcrl")
         actual = tuple(
             replay_counts(
                 range(stage),
-                generator="diffusion" if mode == "real" else mode,
+                generator=mode,
                 allocation=config.continual.replay_allocation,
                 trajectories_per_task=30,
                 total_budget=30,
@@ -101,6 +101,14 @@ def test_replay_allocations_match_and_no_replay_is_effectively_zero(tmp_path):
     assert replay.groups == {}
     assert replay.sources == {}
     allocator.assert_not_called()
+
+
+def test_archival_30_plus_30_real_replay_config_is_rejected():
+    with pytest.raises(ValueError, match="retired stored-trajectory protocol"):
+        load_config(
+            ROOT / "configs/diffcrl/kuka_4task_real_replay_30plus30.yaml",
+            expected_experiment="diffcrl",
+        )
 
 
 def test_current_task_collection_protocol_is_identical_across_methods():

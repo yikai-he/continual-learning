@@ -1,4 +1,4 @@
-"""22D trajectory DDPM conditioned on task IDs and normalized 3D goals."""
+"""Direct 43D trajectory DDPM conditioned on task IDs and normalized goals."""
 
 from __future__ import annotations
 
@@ -9,13 +9,19 @@ from src.config import DiffusionModelConfig as DiffusionConfig
 from src.support.io import atomic_torch_save
 from torch import nn
 
-from .diffusion_data import DIFFUSION_FEATURES
+from .diffusion_data import GENERATOR_FEATURES
 from .generator_normalization import FeatureNormalizer, validate_cpu_feature_batch
 from .generator_training import (
     fit_generator,
     generator_checkpoint_payload,
     run_cpu_inputs_on_module_device,
 )
+from .temporal_unet import make_temporal_unet_layers, temporal_unet_forward
+
+LEGACY_CHECKPOINT_KIND = "trajectory_diffusion_43_v2"
+CHECKPOINT_KIND = "trajectory_diffusion_43_v3"
+BACKBONE_SPEC_VERSION = 1
+DIFFUSION_BACKBONES = ("temporal_cnn", "temporal_unet1d")
 
 
 def _finite_batch(x: torch.Tensor) -> None:
@@ -55,7 +61,7 @@ class TemporalDenoiser(nn.Module):
         )
 
         # Preserve seeded weights and RNG state from the pre-goal-conditioning
-        # 22D implementation before constructing the new goal projection.
+        # Preserve the established seeded initialization order.
         for module in self.modules():
             if isinstance(module, (nn.Embedding, nn.Conv1d, nn.Linear, nn.GroupNorm)):
                 module.reset_parameters()
@@ -76,25 +82,82 @@ class TemporalDenoiser(nn.Module):
         return self.output(h).transpose(1, 2)
 
 
+class DiscreteTimeEmbedding(nn.Module):
+    """Existing DDPM sinusoidal timestep encoding with a learned projection."""
+
+    def __init__(self, width: int) -> None:
+        super().__init__()
+        self.register_buffer(
+            "frequencies",
+            torch.exp(-math.log(10000) * torch.arange(width // 2) / (width // 2 - 1)),
+        )
+        self.projection = nn.Sequential(
+            nn.Linear(width, width), nn.SiLU(), nn.Linear(width, width)
+        )
+
+    def forward(self, timestep):
+        angles = timestep[:, None] * self.frequencies[None]
+        return self.projection(torch.cat((angles.sin(), angles.cos()), dim=-1))
+
+
+class TemporalUNetDenoiser(nn.Module):
+    """Three-scale temporal U-Net predicting normalized clean trajectories."""
+
+    def __init__(self, config: DiffusionConfig) -> None:
+        super().__init__()
+        width = config.width
+        self.task_embedding = (
+            nn.Embedding(config.num_tasks, width) if config.num_tasks else None
+        )
+        self.input = nn.Conv1d(config.features + 1, width, 1)
+        self.time_embedding = DiscreteTimeEmbedding(width)
+        self.goal_projection = nn.Linear(3, width)
+        (
+            self.condition_projections,
+            self.encoder_blocks,
+            self.downsamples,
+            self.bottleneck_blocks,
+            self.upsample_convolutions,
+            self.decoder_blocks,
+        ) = make_temporal_unet_layers(width)
+        self.output = nn.Conv1d(width, config.features, 1)
+
+    def forward(self, x, timestep, task_ids, goals):
+        condition = self.time_embedding(timestep)
+        if self.task_embedding is not None:
+            condition = condition + self.task_embedding(task_ids)
+        condition = condition + self.goal_projection(goals)
+        return temporal_unet_forward(self, x, condition)
+
+
 class TrajectoryDiffusion(nn.Module):
-    """Predict current18/action4 trajectories with clean goal conditioning."""
+    """Predict complete 43D physical trajectories with clean goal conditioning."""
 
     def __init__(self, config: DiffusionConfig = DiffusionConfig()) -> None:
         super().__init__()
         if (
             config.horizon < 1
-            or config.features != DIFFUSION_FEATURES
+            or config.features != GENERATOR_FEATURES
             or config.steps < 2
+            or config.backbone not in DIFFUSION_BACKBONES
+            or config.backbone_spec_version != BACKBONE_SPEC_VERSION
             or config.width < 4
             or config.width % 4
             or config.num_tasks < 0
             or config.diffusion_action_space not in ("raw", "pre-tanh")
             or not math.isfinite(config.diffusion_action_clamp_epsilon)
             or not 0 < config.diffusion_action_clamp_epsilon < 1
+            or config.backbone == "temporal_unet1d"
+            and config.horizon < 4
         ):
             raise ValueError("Invalid diffusion dimensions, steps, or width.")
         self.config = config
-        self.denoiser = TemporalDenoiser(config)
+        self.denoiser = (
+            TemporalDenoiser(config)
+            if config.backbone == "temporal_cnn"
+            else TemporalUNetDenoiser(config)
+        )
+        self.checkpoint_kind = CHECKPOINT_KIND
         # Adapted cosine schedule: beta cap prevents singular posterior arithmetic.
         grid = torch.linspace(0, config.steps, config.steps + 1, dtype=torch.float64)
         cumulative = torch.cos((grid / config.steps + 0.008) / 1.008 * math.pi / 2) ** 2
@@ -196,7 +259,7 @@ class TrajectoryDiffusion(nn.Module):
 
         generator = torch.Generator().manual_seed(seed)
         x = torch.randn(
-            (count, self.config.horizon, DIFFUSION_FEATURES), generator=generator
+            (count, self.config.horizon, self.config.features), generator=generator
         )
         for step in reversed(range(self.config.steps)):
             timestep = torch.full((count,), step, dtype=torch.long)
@@ -219,7 +282,7 @@ class TrajectoryDiffusion(nn.Module):
         posterior_xt = self.posterior_xt.to(device)
         posterior_variance = self.posterior_variance.to(device)
         x = torch.randn(
-            (count, self.config.horizon, DIFFUSION_FEATURES),
+            (count, self.config.horizon, self.config.features),
             generator=generator,
             device=device,
         )
@@ -240,7 +303,7 @@ class TrajectoryDiffusion(nn.Module):
         atomic_torch_save(
             path,
             generator_checkpoint_payload(
-                kind="trajectory_diffusion_22_v1",
+                kind=CHECKPOINT_KIND,
                 config=self.config,
                 state_dict=self.state_dict(),
                 dynamic_normalizer=dynamic_normalizer,
@@ -262,9 +325,36 @@ class TrajectoryDiffusion(nn.Module):
     ):
         """Restore a CPU replay checkpoint after validating its run contract."""
         data = torch.load(path, map_location="cpu", weights_only=True)
-        if data.get("kind") != "trajectory_diffusion_22_v1":
-            raise ValueError("Checkpoint is not trajectory_diffusion_22_v1.")
-        config = DiffusionConfig(**data["config"])
+        checkpoint_kind = data.get("kind")
+        if checkpoint_kind not in (LEGACY_CHECKPOINT_KIND, CHECKPOINT_KIND):
+            raise ValueError(
+                "Checkpoint is incompatible: expected direct-43D format "
+                f"{LEGACY_CHECKPOINT_KIND} or {CHECKPOINT_KIND}; "
+                "legacy 22D checkpoints are unsupported."
+            )
+        try:
+            serialized_config = dict(data["config"])
+            if checkpoint_kind == LEGACY_CHECKPOINT_KIND:
+                if serialized_config.get("backbone", "temporal_cnn") != "temporal_cnn":
+                    raise ValueError("Diffusion v2 checkpoints support temporal_cnn only.")
+                serialized_config.setdefault("backbone", "temporal_cnn")
+                serialized_config.setdefault(
+                    "backbone_spec_version", BACKBONE_SPEC_VERSION
+                )
+            elif (
+                "backbone" not in serialized_config
+                or "backbone_spec_version" not in serialized_config
+            ):
+                raise ValueError(
+                    "Diffusion v3 checkpoint lacks explicit backbone identity."
+                )
+            config = DiffusionConfig(**serialized_config)
+        except (KeyError, TypeError) as error:
+            raise ValueError(
+                "Diffusion checkpoint configuration is incompatible."
+            ) from error
+        if config.features != GENERATOR_FEATURES:
+            raise ValueError("Diffusion checkpoint must model exactly 43 features.")
         metadata = data["metadata"]
         if expected_config is not None and config != expected_config:
             raise ValueError("Diffusion checkpoint model configuration differs from run.")
@@ -279,7 +369,12 @@ class TrajectoryDiffusion(nn.Module):
             and metadata["task_order"] != list(expected_task_order)
         ):
             raise ValueError("Diffusion checkpoint configuration differs from run.")
-        model = cls(config)
+        try:
+            model = cls(config)
+        except ValueError as error:
+            raise ValueError(
+                "Diffusion checkpoint backbone configuration is incompatible."
+            ) from error
         dynamic = FeatureNormalizer(data["dynamic_mean"], data["dynamic_scale"])
         goal = FeatureNormalizer(data["goal_mean"], data["goal_scale"])
         for name, normalizer, features in (
@@ -313,6 +408,7 @@ class TrajectoryDiffusion(nn.Module):
             model.load_state_dict(state_dict, strict=True)
         except RuntimeError as error:
             raise ValueError("Diffusion checkpoint model state is incompatible.") from error
+        model.checkpoint_kind = checkpoint_kind
         model.eval()
         return (
             model,

@@ -89,9 +89,6 @@ def test_both_generators_build_the_same_100_trajectory_stage_dataset():
                 group,
                 count=len(group),
                 seed=1000 + task_id,
-                action_low=-torch.ones(4),
-                action_high=torch.ones(4),
-                clamp_epsilon=1e-4,
             )
         stage = concatenate_trajectory_groups(groups, preparations)
         train_bc = bc_dataset(stage.train)

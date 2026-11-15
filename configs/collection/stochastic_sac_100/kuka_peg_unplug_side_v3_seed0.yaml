@@ -1,0 +1,14 @@
+experiment: trajectory_collection
+environment: {backend: kuka-v3, reward_function_version: v2}
+continual:
+  tasks: [kuka-peg-unplug-side-v3]
+  experts:
+    kuka-peg-unplug-side-v3: runs/sac_kuka_remaining_4task_1m/peg-unplug-side-v3/seed_0/best_model.zip
+  trajectories_per_task: 100
+  expert_action_mode: stochastic
+  collection_mode: all
+collection: {horizon: 200, successful_only: false}
+runtime:
+  seed: 0
+  device: cpu
+  output: runs/expert_collection/stochastic_all_100_seed0/kuka-peg-unplug-side-v3

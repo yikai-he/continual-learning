@@ -17,7 +17,7 @@ maintained:
 
 Formal directories retain configurations, evaluation matrices, stage-wise
 GeneralPolicy and diffusion checkpoints, completion markers, manifests,
-datasets, and provenance required by supported resume and analysis workflows.
+datasets, and provenance required by synchronization and analysis workflows.
 Historical records are indexed in `docs/archive/experiments/README.md`; their
 deleted checkpoints and datasets are not recoverable from this repository.
 

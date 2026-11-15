@@ -9,10 +9,13 @@ from typing import Any
 
 import numpy as np
 import yaml
-from src.continual.collector import collect_trajectories, collect_trajectory
+from continual_manipulation.evaluation.rollout import collect_trajectory
+from src.continual.collector import collect_trajectories
 from src.continual.diffusion_data import pack_trajectories, unpack_trajectories
 from src.continual.policy_adapter import SB3SACPolicy
-from src.envs import GOAL_SLICE, horizon_for_backend, make_env
+from continual_manipulation.environments import (
+    GOAL_SLICE, horizon_for_backend, make_env,
+)
 from stable_baselines3 import SAC
 from tqdm.auto import tqdm
 
@@ -54,6 +57,14 @@ def load_collection_config(path: str | Path) -> CollectionConfig:
         raise ValueError("continual.tasks must contain exactly one task.")
     if not isinstance(experts, dict) or not isinstance(experts.get(tasks[0]), str):
         raise ValueError("continual.experts must map the task to its expert path.")
+    collection_mode = continual.get("collection_mode", "all")
+    if collection_mode not in ("all", "success_preferred"):
+        raise ValueError("continual.collection_mode must be all or success_preferred.")
+    if collection_mode == "success_preferred":
+        raise ValueError(
+            "Standalone collection currently supports collection_mode=all; "
+            "use DiffCRL for bounded success_preferred collection."
+        )
     config = CollectionConfig(
         task=tasks[0],
         backend=environment.get("backend"),
@@ -62,7 +73,10 @@ def load_collection_config(path: str | Path) -> CollectionConfig:
         trajectories=continual.get("trajectories_per_task"),
         initial_seed=runtime.get("seed"),
         horizon=collection.get("horizon"),
-        deterministic=collection.get("deterministic"),
+        deterministic=continual.get(
+            "expert_action_mode",
+            "deterministic" if collection.get("deterministic", True) else "stochastic",
+        ) == "deterministic",
         successful_only=collection.get("successful_only", False),
         device=runtime.get("device"),
         output=Path(runtime.get("output", "")).expanduser().resolve(),
@@ -85,8 +99,11 @@ def load_collection_config(path: str | Path) -> CollectionConfig:
         raise ValueError("runtime.seed must be an integer.")
     if config.horizon != horizon_for_backend(config.backend):
         raise ValueError("collection.horizon must match the selected backend.")
-    if config.deterministic is not True:
-        raise ValueError("collection.deterministic must be true.")
+    action_mode = continual.get("expert_action_mode")
+    if action_mode is not None and action_mode not in ("deterministic", "stochastic"):
+        raise ValueError(
+            "continual.expert_action_mode must be deterministic or stochastic."
+        )
     if not isinstance(config.successful_only, bool):
         raise ValueError("collection.successful_only must be boolean.")
     if not isinstance(config.device, str) or not config.device:
@@ -232,13 +249,20 @@ def collect_expert_dataset(config: CollectionConfig) -> dict[str, Any]:
         "backend": config.backend,
         "expert": str(config.expert),
         "deterministic": config.deterministic,
+        "expert_action_mode": "deterministic" if config.deterministic else "stochastic",
         "collection_mode": (
-            "successful-only" if config.successful_only else "fixed-attempts"
+            "successful-only" if config.successful_only else "all"
         ),
         "target_trajectories": config.trajectories,
         "initial_seed": config.initial_seed,
         "accepted_seeds": accepted_seeds,
         "attempt_count": len(attempts),
+        "successful_attempt_count": int(
+            sum(bool(item.success) for _, item, _ in attempts)
+        ),
+        "failed_attempt_count": int(
+            sum(not bool(item.success) for _, item, _ in attempts)
+        ),
         "rejected_attempt_count": len(attempts) - len(trajectories),
         "trajectory_count": len(trajectories),
         "success_count": int(successes.sum()),
@@ -257,6 +281,11 @@ def collect_expert_dataset(config: CollectionConfig) -> dict[str, Any]:
         "nonfinite_observation_count": nonfinite_observations,
         "nonfinite_action_count": nonfinite_actions,
         "action_out_of_bounds_count": int(action_oob.sum()),
+        "action_mean_by_coordinate": action_values.mean(axis=(0, 1)).tolist(),
+        "action_std_by_coordinate": action_values.std(axis=(0, 1)).tolist(),
+        "action_min_by_coordinate": action_values.min(axis=(0, 1)).tolist(),
+        "action_max_by_coordinate": action_values.max(axis=(0, 1)).tolist(),
+        "observation_std_mean": float(observation_values.std(axis=(0, 1)).mean()),
         "distinct_goal_count": int(np.unique(goals, axis=0).shape[0]),
         "observation_contract": {
             "current_frame": "obs[0:18]",

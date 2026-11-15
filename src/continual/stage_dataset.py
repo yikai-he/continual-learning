@@ -12,17 +12,16 @@ from src.continual.diffusion_data import (
     unpack_trajectories,
     validate_stage_trajectory_group,
 )
-from src.envs import EPISODE_HORIZON
+from continual_manipulation.environments import EPISODE_HORIZON
 from torch.utils.data import TensorDataset
 
 
 @dataclass
 class TrajectoryGroupPreparation:
-    """Deterministic split and BC diagnostic for one task trajectory group."""
+    """Deterministic split for one task trajectory group."""
 
     train_ids: list[int]
     validation_ids: list[int]
-    bc_target_clip_fraction: float
 
 
 @dataclass
@@ -62,53 +61,6 @@ def validate_stage_group(
         source=source,
     )
     return group_count
-
-
-def prepare_stage_group_split(
-    values: torch.Tensor,
-    *,
-    count: int,
-    split_seed: int,
-    action_low: torch.Tensor,
-    action_high: torch.Tensor,
-    clamp_epsilon: float,
-    training_only: bool,
-) -> TrajectoryGroupPreparation:
-    """Create one deterministic split and optional training-only override."""
-    prepared = prepare_trajectory_group(
-        values,
-        count=count,
-        seed=split_seed,
-        action_low=action_low,
-        action_high=action_high,
-        clamp_epsilon=clamp_epsilon,
-    )
-    if training_only:
-        prepared.train_ids = list(range(count))
-        prepared.validation_ids = []
-    return prepared
-
-
-def finalize_stage_groups(
-    groups: Mapping[int, torch.Tensor],
-    preparations: Mapping[int, TrajectoryGroupPreparation],
-    task_names: list[str] | tuple[str, ...],
-    *,
-    horizon: int,
-) -> tuple[PreparedGroupedTrajectoryDataset, dict[str, dict[str, object]]]:
-    """Concatenate ordered groups and construct their established split metadata."""
-    splits: dict[str, dict[str, object]] = {}
-    for index, values in groups.items():
-        prepared = preparations[index]
-        name = task_names[index]
-        splits[name] = {
-            "train_ids": prepared.train_ids,
-            "validation_ids": prepared.validation_ids,
-            "trajectories": len(values),
-            "train_samples": len(prepared.train_ids) * horizon,
-            "validation_samples": len(prepared.validation_ids) * horizon,
-        }
-    return concatenate_trajectory_groups(groups, preparations), splits
 
 
 def split_indices(count: int, seed: int) -> tuple[list[int], list[int]]:
@@ -152,23 +104,14 @@ def prepare_trajectory_group(
     *,
     count: int,
     seed: int,
-    action_low: torch.Tensor,
-    action_high: torch.Tensor,
-    clamp_epsilon: float,
 ) -> TrajectoryGroupPreparation:
-    """Return the original whole-episode split and BC clipping diagnostic."""
-    actions = bc_dataset(values).tensors[1]
-    scaled = 2 * (actions - action_low) / (action_high - action_low) - 1
-    clip_fraction = float(
-        ((scaled < -1 + clamp_epsilon) | (scaled > 1 - clamp_epsilon)).float().mean()
-    )
+    """Return the original whole-episode split."""
     # A fixed total replay budget can assign one historical episode to a task.
     # Keep it in training; the current-task group still provides validation.
     train_ids, validation_ids = ([0], []) if count == 1 else split_indices(count, seed)
     return TrajectoryGroupPreparation(
         train_ids=train_ids,
         validation_ids=validation_ids,
-        bc_target_clip_fraction=clip_fraction,
     )
 
 
@@ -204,9 +147,6 @@ def prepare_stage_groups(
     stage: int,
     horizon: int,
     runtime_seed: int,
-    action_low: torch.Tensor,
-    action_high: torch.Tensor,
-    clamp_epsilon: float,
     historical_replay_training_only: bool,
 ) -> PreparedStageGroups:
     """Validate and split ordered physical groups without I/O or mutation."""
@@ -220,20 +160,28 @@ def prepare_stage_groups(
             task=name,
             horizon=horizon,
         )
-        preparations[index] = prepare_stage_group_split(
+        prepared = prepare_trajectory_group(
             values,
             count=group_count,
-            split_seed=runtime_seed + stage * 1000 + index,
-            action_low=action_low,
-            action_high=action_high,
-            clamp_epsilon=clamp_epsilon,
-            training_only=historical_replay_training_only and index < stage,
+            seed=runtime_seed + stage * 1000 + index,
         )
-    dataset, splits = finalize_stage_groups(
-        groups, preparations, task_names, horizon=horizon
-    )
+        if historical_replay_training_only and index < stage:
+            prepared.train_ids = list(range(group_count))
+            prepared.validation_ids = []
+        preparations[index] = prepared
+
+    splits: dict[str, dict[str, object]] = {}
+    for index, values in groups.items():
+        prepared = preparations[index]
+        splits[task_names[index]] = {
+            "train_ids": prepared.train_ids,
+            "validation_ids": prepared.validation_ids,
+            "trajectories": len(values),
+            "train_samples": len(prepared.train_ids) * horizon,
+            "validation_samples": len(prepared.validation_ids) * horizon,
+        }
     return PreparedStageGroups(
-        dataset=dataset,
+        dataset=concatenate_trajectory_groups(groups, preparations),
         preparations=preparations,
         splits=splits,
     )

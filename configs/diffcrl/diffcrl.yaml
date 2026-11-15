@@ -1,4 +1,4 @@
-# Canonical five-task diffusion-replay experiment.
+# Recommended five-task deterministic-BC diffusion-replay experiment.
 experiment: diffcrl
 environment:
   reward_function_version: v2
@@ -6,7 +6,7 @@ bc:
   epochs: 100
   batch_size: 256
   learning_rate: 0.001
-  loss: post-tanh-mse
+  loss: deterministic_mse
 diffusion:
   epochs: 300
   batch_size: 8
@@ -31,6 +31,8 @@ continual:
     window-close-v3: runs/experts/metaworld-v3/window-close-v3/policy.zip
   trajectories_per_task: 200
   replay_mode: diffusion
+  collection_mode: all
+  expert_action_mode: deterministic
 evaluation:
   episodes: 50
   seed: 10000

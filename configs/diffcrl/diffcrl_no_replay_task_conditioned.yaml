@@ -6,7 +6,7 @@ bc:
   epochs: 100
   batch_size: 256
   learning_rate: 0.001
-  loss: post-tanh-mse
+  loss: squashed-gaussian-nll
   task_conditioning: one_hot
 continual:
   tasks: [button-press-v3, faucet-close-v3, hammer-v3, handle-press-side-v3, window-close-v3]

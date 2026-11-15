@@ -1,7 +1,7 @@
 """Focused Phase 4 trainer integration tests for Flow Matching replay."""
 
-from dataclasses import replace
 import json
+from dataclasses import replace
 from pathlib import Path
 from types import SimpleNamespace
 from unittest.mock import Mock, patch
@@ -17,21 +17,19 @@ from src.continual.diffcrl import (
     CurrentTaskData,
     DiffCRLTrainer,
     DiffusionTrainingResult,
-    PolicyTrainingResult,
-    StageArtifacts,
     StageContext,
     StageData,
     StageRawData,
 )
-from src.continual.evaluation import EvaluationMatrix
-from src.continual.resume import write_stage_boundary
-from src.continual.task_sequence import TaskSequence
+from src.continual.diffcrl_artifacts import save_stage_checkpoints, write_stage_marker
+from continual_manipulation.evaluation import EvaluationMatrix
+from continual_manipulation.sequences import TaskSequence
 from src.continual.trajectory_diffusion import (
     FeatureNormalizer,
     TrajectoryDiffusion,
 )
+from src.continual.trajectory_flow_matching import FlowMatchingConfig
 from src.support.reproducibility import state_hash
-
 
 TASKS = ["reach-v3", "push-v3"]
 
@@ -73,21 +71,27 @@ def trainer_config(tmp_path, mode):
     )
 
 
-def initialize(tmp_path, mode, *, resume_from=None):
-    identity = SimpleNamespace(to_dict=lambda: {"checkpoint_sha256": "expert"})
+def initialize(tmp_path, mode):
+    identity = SimpleNamespace(
+        checkpoint_sha256="expert",
+        to_dict=lambda: {"checkpoint_sha256": "expert"},
+    )
     with patch("src.continual.diffcrl.validate_expert_checkpoint", return_value=identity), patch(
         "src.continual.diffcrl.file_hash", return_value="expert-hash"
     ), patch("src.continual.diffcrl.create_run_manifest"), patch(
         "src.continual.diffcrl.write_json"
     ):
-        return DiffCRLTrainer(
-            trainer_config(tmp_path, mode), progress=False, resume_from=resume_from
-        )
+        return DiffCRLTrainer(trainer_config(tmp_path, mode), progress=False)
 
 
 @pytest.mark.parametrize(
     "mode,has_diffusion,has_flow",
-    [("diffusion", True, False), ("flow-matching", False, True), ("none", False, False)],
+    [
+        ("diffusion", True, False),
+        ("flow-matching", False, True),
+        ("expert-recollection", False, False),
+        ("none", False, False),
+    ],
 )
 def test_generator_initialization_is_mutually_exclusive(
     tmp_path, mode, has_diffusion, has_flow
@@ -96,6 +100,7 @@ def test_generator_initialization_is_mutually_exclusive(
     assert (trainer.diffusion is not None) is has_diffusion
     assert (trainer.flow_matching is not None) is has_flow
     if has_flow:
+        assert trainer.flow_matching.config.backbone == "temporal_cnn"
         assert trainer.flow_matching.config.horizon == trainer.horizon
         assert trainer.flow_matching.config.num_tasks == len(TASKS)
         assert trainer.flow_matching.config.integration_steps == 2
@@ -110,6 +115,9 @@ def bare_flow_trainer(tmp_path):
     trainer.progress = False
     trainer.diffusion = None
     trainer.flow_matching = nn.Linear(1, 1)
+    trainer.flow_matching.config = FlowMatchingConfig(
+        horizon=200, width=4, num_tasks=2
+    )
     trainer.previous_diffusion = None
     trainer.previous_flow_matching = tmp_path / "previous-flow.pt"
     trainer.output = tmp_path
@@ -150,6 +158,7 @@ def test_replay_dispatches_only_to_flow_adapter(tmp_path):
     request = flow_replay.call_args.args[0]
     assert request.checkpoint == trainer.previous_flow_matching
     assert request.expected_state_hash == "flow-state"
+    assert request.expected_config == trainer.flow_matching.config
     assert request.trajectory_counts == {0: 200}
     assert request.integration_steps == 2
     assert result.groups is generated.groups
@@ -168,7 +177,6 @@ def physical_stage_data():
         validation_labels=torch.tensor([0, 1]),
         sources={},
         splits={},
-        real_encode_clip_fraction=0.0,
     )
 
 
@@ -180,8 +188,8 @@ def test_flow_training_reuses_normalized_stage_data_and_persistent_weights(tmp_p
 
     def fit(model, train, validation, train_goals, validation_goals, **kwargs):
         seen_models.append(model)
-        assert train.shape == (2, 200, 22)
-        assert validation.shape == (2, 200, 22)
+        assert train.shape == (2, 200, 43)
+        assert validation.shape == (2, 200, 43)
         assert train_goals.shape == (2, 3)
         assert kwargs["seed"] in (0, 1)
         with torch.no_grad():
@@ -200,7 +208,7 @@ def test_flow_training_reuses_normalized_stage_data_and_persistent_weights(tmp_p
         trainer.flow_matching.weight, weight_after_first + 1, rtol=0, atol=0
     )
     assert first.losses == second.losses == {"best_epoch": 1}
-    assert first.normalizer.mean.shape == (22,)
+    assert first.normalizer.mean.shape == (43,)
 
 
 @pytest.mark.parametrize("mode", ["diffusion", "flow-matching"])
@@ -210,12 +218,12 @@ def test_generator_normalization_remains_inside_measured_interval(tmp_path, mode
     trainer.policy = nn.Linear(1, 1)
     trainer.diffusion = nn.Linear(1, 1) if mode == "diffusion" else None
     trainer.flow_matching = nn.Linear(1, 1) if mode == "flow-matching" else None
-    normalizer = FeatureNormalizer(torch.zeros(22), torch.ones(22))
+    normalizer = FeatureNormalizer(torch.zeros(43), torch.ones(43))
     goal = FeatureNormalizer(torch.zeros(3), torch.ones(3))
     prepared = SimpleNamespace(normalizer=normalizer, goal_normalizer=goal)
     normalized = SimpleNamespace(
-        train=torch.zeros(1, 200, 22),
-        validation=torch.zeros(1, 200, 22),
+        train=torch.zeros(1, 200, 43),
+        validation=torch.zeros(1, 200, 43),
         train_goals=torch.zeros(1, 3),
         validation_goals=torch.zeros(1, 3),
     )
@@ -255,7 +263,7 @@ def test_generator_normalization_remains_inside_measured_interval(tmp_path, mode
     assert result.training_seconds == 5.0
 
 
-@pytest.mark.parametrize("mode", ["real", "none"])
+@pytest.mark.parametrize("mode", ["expert-recollection", "none"])
 def test_generator_free_modes_report_zero_training_seconds(tmp_path, mode):
     trainer = bare_flow_trainer(tmp_path)
     trainer.config = trainer_config(tmp_path, mode)
@@ -284,12 +292,12 @@ def test_flow_checkpoint_filename_metadata_and_artifact_key(tmp_path):
     trainer.flow_matching.state_dict.return_value = {"weight": torch.ones(1)}
     trainer.flow_matching.save.side_effect = save_flow
     trainer.policy.save.side_effect = lambda path, **_: Path(path).write_bytes(b"policy")
-    normalizer = FeatureNormalizer(torch.zeros(22), torch.ones(22))
+    normalizer = FeatureNormalizer(torch.zeros(43), torch.ones(43))
     goal = FeatureNormalizer(torch.zeros(3), torch.ones(3))
     training = DiffusionTrainingResult(normalizer, goal, {"best_epoch": 1})
-    policy = PolicyTrainingResult({"best_epoch": 1})
+    policy = {"best_epoch": 1}
 
-    artifacts = trainer._save_stage_checkpoints(context(tmp_path), training, policy)
+    artifacts = save_stage_checkpoints(trainer, context(tmp_path), training, policy)
 
     assert artifacts.diffusion_path is None
     assert artifacts.flow_matching_path.name.startswith("flow_matching_after_task_1_")
@@ -309,7 +317,9 @@ def test_flow_checkpoint_filename_metadata_and_artifact_key(tmp_path):
 def test_ddpm_and_policy_checkpoint_metadata_optimizer_and_load_compatibility(tmp_path):
     trainer = initialize(tmp_path, "diffusion")
     trainer.output = tmp_path
-    trainer.policy = GeneralPolicy(-np.ones(4), np.ones(4))
+    trainer.policy = GeneralPolicy(
+        -np.ones(4), np.ones(4), objective=trainer.config.bc.loss
+    )
     trainer.policy_optimizer = torch.optim.Adam(trainer.policy.parameters(), lr=1e-3)
     loss = trainer.policy(torch.zeros(2, 39)).square().sum()
     loss.backward()
@@ -318,11 +328,12 @@ def test_ddpm_and_policy_checkpoint_metadata_optimizer_and_load_compatibility(tm
     trainer.train_configurations = {
         "reach-v3": {"indices": [0], "source_trajectory_ids": [0]}
     }
-    dynamic = FeatureNormalizer(torch.arange(22.0), torch.arange(1.0, 23.0))
+    dynamic = FeatureNormalizer(torch.arange(43.0), torch.arange(1.0, 44.0))
     goal = FeatureNormalizer(torch.tensor([1.0, 2.0, 3.0]), torch.ones(3))
-    policy_training = PolicyTrainingResult({"best_epoch": 1})
+    policy_training = {"best_epoch": 1}
 
-    artifacts = trainer._save_stage_checkpoints(
+    artifacts = save_stage_checkpoints(
+        trainer,
         context(tmp_path),
         DiffusionTrainingResult(dynamic, goal, {"best_epoch": 1}),
         policy_training,
@@ -371,6 +382,8 @@ def test_ddpm_and_policy_checkpoint_metadata_optimizer_and_load_compatibility(tm
         "seed": trainer.config.runtime.seed,
         "best_epoch": 1,
         "bc_loss": trainer.config.bc.loss,
+        "bc_objective": trainer.policy.objective,
+        "bc_initial_log_std": trainer.config.bc.initial_log_std,
         "bc_clamp_epsilon": 1e-4,
         "bc_normalization_mode": "layer-norm",
         "bc_use_layer_norm": True,
@@ -381,7 +394,7 @@ def test_ddpm_and_policy_checkpoint_metadata_optimizer_and_load_compatibility(tm
     }
 
 
-def test_stage_boundary_uses_distinct_flow_artifact_key(tmp_path):
+def test_stage_marker_uses_distinct_flow_artifact_key(tmp_path):
     stage_dir = tmp_path / "stage"
     stage_dir.mkdir()
     paths = {
@@ -392,13 +405,11 @@ def test_stage_boundary_uses_distinct_flow_artifact_key(tmp_path):
     }
     for path in paths.values():
         path.write_bytes(b"artifact")
-    marker_path = write_stage_boundary(
+    marker_path = write_stage_marker(
         tmp_path,
         stage=0,
         task="reach-v3",
         diffusion_path=None,
-        training_banks={},
-        train_configurations={},
         **paths,
     )
     marker = json.loads(marker_path.read_text())
@@ -418,16 +429,14 @@ def test_train_task_keeps_collection_bc_and_evaluation_shared(tmp_path):
         group=torch.zeros(2, 200, 43),
         source={"kind": "real_expert"},
         collected_configurations=[],
-        real_encode_clip_fraction=0.0,
     )
     prepared = physical_stage_data()
     generator_training = DiffusionTrainingResult(
-        FeatureNormalizer(torch.zeros(22), torch.ones(22)),
+        FeatureNormalizer(torch.zeros(43), torch.ones(43)),
         FeatureNormalizer(torch.zeros(3), torch.ones(3)),
         {"best_epoch": 1},
     )
-    policy_training = PolicyTrainingResult({"best_epoch": 1})
-    artifacts = StageArtifacts(None, tmp_path / "policy.pt", tmp_path / "flow.pt")
+    policy_training = {"best_epoch": 1}
     events = []
 
     def step(name, value=None):
@@ -452,11 +461,9 @@ def test_train_task_keeps_collection_bc_and_evaluation_shared(tmp_path):
     ) as fit_generator, patch.object(
         trainer, "_fit_stage_policy", side_effect=step("bc", policy_training)
     ) as fit_policy, patch.object(
-        trainer, "_save_stage_checkpoints", side_effect=step("checkpoints", artifacts)
-    ), patch.object(
         trainer, "_evaluate_stage", side_effect=step("evaluate")
     ) as evaluate, patch.object(
-        trainer, "_finish_stage", side_effect=step("finalize", {"stage": 0})
+        trainer, "_commit_stage", side_effect=step("commit", {"stage": 0})
     ):
         report = trainer.train_task(0)
 
@@ -472,8 +479,7 @@ def test_train_task_keeps_collection_bc_and_evaluation_shared(tmp_path):
         "prepare",
         "generator",
         "bc",
-        "checkpoints",
         "evaluate",
-        "finalize",
+        "commit",
     ]
     assert report == {"stage": 0}

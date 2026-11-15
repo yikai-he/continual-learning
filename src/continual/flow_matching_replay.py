@@ -8,25 +8,21 @@ from dataclasses import dataclass
 from pathlib import Path
 
 import torch
-from src.envs import CURRENT_STATE_SLICE, GOAL_SLICE, PREVIOUS_STATE_SLICE
 from src.support.reproducibility import file_hash, state_hash
-from tqdm.auto import tqdm
 
 from .diffusion_data import (
-    DIFFUSION_FEATURES,
+    GENERATOR_FEATURES,
     PHYSICAL_ACTION_SLICE,
     PHYSICAL_TRAJECTORY_FEATURES,
-    validate_stage_trajectory_group,
 )
 from .replay_common import (
-    decode_generated_replay,
-    normalize_replay_goals,
-    prepare_replay_task,
+    ReplayResult,
+    ReplayTaskContext,
+    generate_replay_groups,
     training_configuration_hashes,
     valid_replay_counts,
 )
-from .task_bank import reconstruct_goals, sample_training_configurations
-from .trajectory_flow_matching import CHECKPOINT_KIND, TrajectoryFlowMatching
+from .trajectory_flow_matching import TrajectoryFlowMatching
 
 ReplaySource = dict[str, object]
 ProgressMessage = Callable[..., None]
@@ -40,6 +36,7 @@ class FlowMatchingReplayRequest:
     trajectory_counts: dict[int, int]
     checkpoint: Path
     expected_state_hash: str | None
+    expected_config: object | None
     task_names: tuple[str, ...]
     backend: str
     horizon: int
@@ -55,14 +52,6 @@ class FlowMatchingReplayRequest:
     solver: str = "euler"
     rtol: float = 1e-5
     atol: float = 1e-5
-
-
-@dataclass
-class FlowMatchingReplayResult:
-    """Generated physical trajectory groups and provenance by previous task."""
-
-    groups: dict[int, torch.Tensor]
-    sources: dict[str, ReplaySource]
 
 
 def _validate_request(request: FlowMatchingReplayRequest) -> None:
@@ -93,7 +82,10 @@ def _validate_request(request: FlowMatchingReplayRequest) -> None:
 
 def _validate_checkpoint_metadata(metadata, request: FlowMatchingReplayRequest) -> None:
     if not isinstance(metadata, dict):
-        raise ValueError("Flow Matching checkpoint metadata must be a mapping.")
+        # Invalid serialized checkpoint contents use the established ValueError API.
+        raise ValueError(  # noqa: TRY004
+            "Flow Matching checkpoint metadata must be a mapping."
+        )
     required = {
         "task_order",
         "training_banks",
@@ -105,7 +97,7 @@ def _validate_checkpoint_metadata(metadata, request: FlowMatchingReplayRequest) 
     missing = required - set(metadata)
     if missing:
         raise ValueError(
-            f"Flow Matching checkpoint metadata is incomplete: {sorted(missing)[0]}."
+            f"Flow Matching checkpoint metadata is incomplete: {min(missing)}."
         )
     if (
         metadata["task_order"] != list(request.task_names)
@@ -139,16 +131,17 @@ def generate_previous_task_flow_matching_replay(
     request: FlowMatchingReplayRequest,
     *,
     progress_message: ProgressMessage | None = None,
-) -> FlowMatchingReplayResult:
-    """Generate, denormalize, decode, project, and validate old-task replay."""
+) -> ReplayResult:
+    """Generate, denormalize, project actions, and validate old-task replay."""
     _validate_request(request)
     old, old_norm, old_goal_norm, old_meta = TrajectoryFlowMatching.load(
-        request.checkpoint
+        request.checkpoint,
+        expected_config=request.expected_config,
     )
     _validate_checkpoint_metadata(old_meta, request)
     if (
         old.config.horizon != request.horizon
-        or old.config.features != DIFFUSION_FEATURES
+        or old.config.features != GENERATOR_FEATURES
     ):
         raise ValueError(
             "Flow Matching checkpoint trajectory shape differs from replay request."
@@ -158,104 +151,54 @@ def generate_previous_task_flow_matching_replay(
         raise RuntimeError(
             "Previous checkpoint differs from current Flow Matching memory."
         )
+    checkpoint_sha256 = file_hash(request.checkpoint)
 
-    groups: dict[int, torch.Tensor] = {}
-    sources: dict[str, ReplaySource] = {}
-    for old_index in range(request.stage):
-        trajectory_count = request.trajectory_counts[old_index]
-        if trajectory_count == 0:
-            continue
-        name = request.task_names[old_index]
-        if progress_message is not None:
-            progress_message(
-                "Generating Flow Matching replay",
-                Task=name,
-                Trajectories=trajectory_count,
-            )
-        task = prepare_replay_task(
-            request,
-            old_meta,
-            old_index,
-            trajectory_count,
-            sample_configurations=sample_training_configurations,
-            reconstruct=reconstruct_goals,
+    def sample_normalized(task: ReplayTaskContext, normalized_goals: torch.Tensor):
+        generation_started = time.perf_counter()
+        normalized = old.sample(
+            task.trajectory_count,
+            seed=task.seed,
+            task_ids=task.labels,
+            goals=normalized_goals,
+            integration_steps=request.integration_steps,
+            solver=request.solver,
+            rtol=request.rtol,
+            atol=request.atol,
         )
-        normalized_goals = normalize_replay_goals(task, old_goal_norm)
-        with tqdm(
-            total=trajectory_count,
-            desc=f"Flow replay: {name}",
-            unit="trajectory",
-            disable=not request.progress,
-        ) as replay_progress:
-            generation_started = time.perf_counter()
-            normalized = old.sample(
-                trajectory_count,
-                seed=task.seed,
-                task_ids=task.labels,
-                goals=normalized_goals,
-                integration_steps=request.integration_steps,
-                solver=request.solver,
-                rtol=request.rtol,
-                atol=request.atol,
-            )
-            generation_seconds = time.perf_counter() - generation_started
-            if normalized.shape != (
-                trajectory_count,
-                request.horizon,
-                DIFFUSION_FEATURES,
-            ):
-                raise ValueError("Flow Matching generated an invalid trajectory shape.")
-            sampled = old_norm.denormalize(normalized)
-            replay_progress.update(trajectory_count)
+        generation_seconds = time.perf_counter() - generation_started
+        if normalized.shape != (
+            task.trajectory_count,
+            request.horizon,
+            GENERATOR_FEATURES,
+        ):
+            raise ValueError("Flow Matching generated an invalid trajectory shape.")
+        return normalized, generation_seconds
 
-        replay = decode_generated_replay(
-            sampled,
-            task.goals,
-            action_space=request.action_space,
-            action_projection=request.action_projection,
-            bc_clamp_epsilon=request.bc_clamp_epsilon,
-        )
-        projected = replay.projected
+    def validate_projected(projected: torch.Tensor, trajectory_count: int) -> None:
         if projected.shape != (
             trajectory_count,
             request.horizon,
             PHYSICAL_TRAJECTORY_FEATURES,
         ):
-            raise ValueError("Decoded Flow Matching replay has an invalid shape.")
-        if not torch.equal(
-            projected[..., PREVIOUS_STATE_SLICE],
-            torch.cat(
-                (
-                    projected[:, :1, CURRENT_STATE_SLICE],
-                    projected[:, :-1, CURRENT_STATE_SLICE],
-                ),
-                dim=1,
-            ),
-        ):
-            raise ValueError(
-                "Decoded Flow Matching replay violates previous-state alignment."
-            )
-        if not torch.equal(
-            projected[..., GOAL_SLICE],
-            task.goals[:, None].expand(-1, request.horizon, -1),
-        ):
-            raise ValueError(
-                "Decoded Flow Matching replay violates constant-goal alignment."
-            )
+            raise ValueError("Flow Matching replay has an invalid physical shape.")
         if request.action_space == "pre-tanh" and torch.any(
             projected[..., PHYSICAL_ACTION_SLICE].abs() > 1
         ):
-            raise ValueError("Decoded pre-tanh Flow Matching actions exceed bounds.")
+            raise ValueError("Flow Matching pre-tanh replay actions exceed bounds.")
 
-        source: ReplaySource = {
+    def build_source(
+        task: ReplayTaskContext,
+        generation_seconds: float,
+    ) -> ReplaySource:
+        return {
             "kind": "generated",
             "generator": "flow_matching",
-            "checkpoint_kind": CHECKPOINT_KIND,
+            "checkpoint_kind": old.checkpoint_kind,
             "checkpoint": str(request.checkpoint),
-            "checkpoint_sha256": file_hash(request.checkpoint),
+            "checkpoint_sha256": checkpoint_sha256,
             "sampling_seed": task.seed,
-            "condition": old_index,
-            "trajectory_count": trajectory_count,
+            "condition": task.index,
+            "trajectory_count": task.trajectory_count,
             "integration_steps": (
                 old.config.integration_steps
                 if request.integration_steps is None
@@ -268,15 +211,21 @@ def generate_previous_task_flow_matching_replay(
             "generation_seconds": generation_seconds,
             "success": None,
             "return": None,
-            "generated_latent_abs_gt_bc_cap_fraction": replay.latent_cap_fraction,
             "training_configuration_indices": task.selected_configuration_indices,
             "training_configuration_hashes": training_configuration_hashes(task),
-            **replay.action_diagnostics,
         }
-        validate_stage_trajectory_group(
-            projected, stage=request.stage, task=name, source=source
-        )
-        groups[old_index] = projected
-        sources[name] = source
-    del old
-    return FlowMatchingReplayResult(groups=groups, sources=sources)
+
+    result = generate_replay_groups(
+        request,
+        counts=request.trajectory_counts,
+        metadata=old_meta,
+        dynamic_normalizer=old_norm,
+        goal_normalizer=old_goal_norm,
+        sample_normalized=sample_normalized,
+        build_source=build_source,
+        validate_projected=validate_projected,
+        progress_message=progress_message,
+        progress_heading="Generating Flow Matching replay",
+        progress_description=lambda name: f"Flow replay: {name}",
+    )
+    return result

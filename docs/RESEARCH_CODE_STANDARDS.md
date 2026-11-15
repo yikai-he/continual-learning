@@ -8,7 +8,7 @@ applies_to: continual-learning
 
 ## Purpose and scope
 
-These project-specific standards guide work on the thesis implementation of SAC, sequential SAC, DiffCRL, behavior cloning, DDPM replay, Flow Matching replay, and continual robotic manipulation. The goal is trustworthy thesis evidence from a small, understandable codebase. The repository is not intended to provide a general reinforcement-learning framework or anticipate unrelated future projects.
+These project-specific standards guide work on the thesis implementation of SAC, DiffCRL, behavior cloning, DDPM replay, Flow Matching replay, and continual robotic manipulation. The goal is trustworthy thesis evidence from a small, understandable codebase. The repository is not intended to provide a general reinforcement-learning framework or anticipate unrelated future projects.
 
 The policy draws on established research-software-engineering ideas, including traceable computational results, explicit dependencies, versioned inputs, reviewable code, and proportionate testing. Relevant references include [Good Enough Practices in Scientific Computing](https://doi.org/10.1371/journal.pcbi.1005510), the [FAIR Principles for Research Software](https://doi.org/10.15497/RDA00068), and guidance from the [Software Sustainability Institute](https://www.software.ac.uk/). These sources inform this repository; the rules below are local engineering choices, not universal standards.
 

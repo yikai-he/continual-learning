@@ -1,0 +1,35 @@
+experiment: diffcrl
+environment:
+  backend: kuka-v3
+  reward_function_version: v2
+bc:
+  epochs: 1
+  batch_size: 256
+  learning_rate: 0.001
+  loss: post-tanh-mse
+diffusion:
+  epochs: 100
+  batch_size: 8
+  learning_rate: 0.001
+  steps: 100
+  width: 64
+  action_space: raw
+  action_clamp_epsilon: 0.0001
+  generated_action_projection: none
+  trajectory_representation: structured_22d
+continual:
+  tasks: [kuka-hammer-v3]
+  experts:
+    kuka-hammer-v3: runs/experts/kuka-v3/hammer-v3/policy.zip
+  trajectories_per_task: 100
+  replay_mode: diffusion
+evaluation:
+  episodes: 1
+  seed: 10000
+  mode: fixed-tasks
+  task_set_seed: 10000
+runtime:
+  seed: 0
+  device: cpu
+  output: runs/representation_ablation/single_hammer_ddpm
+  run_name: structured_22d_seed0

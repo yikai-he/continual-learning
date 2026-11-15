@@ -13,9 +13,9 @@ if str(REPOSITORY_ROOT) not in sys.path:
 
 from stable_baselines3 import SAC
 
-from src.continual.evaluation import evaluate_task
+from continual_manipulation.evaluation import evaluate_task
 from src.continual.policy_adapter import SB3SACPolicy
-from src.continual.task_sequence import TaskSpec
+from continual_manipulation.sequences import TaskSpec
 from src.support.expert_manifest import qualification_record
 from src.support.reproducibility import file_hash
 

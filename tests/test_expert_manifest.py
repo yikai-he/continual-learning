@@ -93,7 +93,12 @@ def test_writer_records_horizon_and_reward_version_metadata(tmp_path):
         action_shape=(4,),
         horizon=200,
         qualification=None,
+        policy_architecture="legacy-continual-diff-pytorch-4x256-v1",
     )
 
     manifest = json.loads(path.read_text(encoding="utf-8"))
     assert manifest["horizon"] == 200
+    assert (
+        manifest["policy_architecture"]
+        == "legacy-continual-diff-pytorch-4x256-v1"
+    )

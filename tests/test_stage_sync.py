@@ -8,7 +8,7 @@ import numpy as np
 import pytest
 import torch
 
-from src.continual.resume import marker_path
+from src.continual.diffcrl_artifacts import marker_path, write_stage_marker
 from src.support.reproducibility import file_hash
 from src.support.stage_sync import (
     backup_status,
@@ -16,11 +16,41 @@ from src.support.stage_sync import (
     sync_all_completed,
     sync_completed_stage,
 )
-from tests.test_diffcrl_resume import TASKS, add_boundary, make_run
+
+TASKS = ["reach-v3", "push-v3", "hammer-v3"]
+
+
+def make_run(tmp_path):
+    run = tmp_path / "run"
+    run.mkdir()
+    (run / "config.yaml").write_text("experiment: diffcrl\n", encoding="utf-8")
+    (run / "run_manifest.json").write_text("{}\n", encoding="utf-8")
+    return run
+
+
+def add_boundary(run, stage):
+    task = TASKS[stage]
+    directory = run / f"stage_{stage}_{task}"
+    directory.mkdir()
+    policy = run / f"general_policy_after_task_{stage}_{task}.pt"
+    policy.write_bytes(f"policy {stage}".encode())
+    report = directory / "report.json"
+    report.write_text("{}\n", encoding="utf-8")
+    matrix = directory / "evaluation_matrix.json"
+    matrix.write_text("{}\n", encoding="utf-8")
+    return write_stage_marker(
+        run,
+        stage=stage,
+        task=task,
+        policy_path=policy,
+        diffusion_path=None,
+        report_path=report,
+        matrix_path=matrix,
+    )
 
 
 def _complete_source(tmp_path, count=1):
-    run, _, _ = make_run(tmp_path)
+    run = make_run(tmp_path)
     (run / "config.json").write_text("{}\n", encoding="utf-8")
     (run / "RUNNING").write_text("running\n", encoding="utf-8")
     for stage in range(count):
@@ -59,7 +89,7 @@ def test_marker_is_published_last(tmp_path):
 def test_missing_or_corrupt_source_is_rejected_without_remote_marker(tmp_path):
     source = _complete_source(tmp_path)
     backup = tmp_path / "drive"
-    (source / "policy_0.pt").write_bytes(b"corrupt")
+    (source / "general_policy_after_task_0_reach-v3.pt").write_bytes(b"corrupt")
     with pytest.raises(ValueError, match="corrupted"):
         sync_completed_stage(source, backup, TASKS, 0)
     assert not marker_path(backup, 0).exists()
@@ -107,7 +137,7 @@ def test_corrupt_remote_and_missing_marker_are_not_valid(tmp_path):
     marker_path(backup, 0).unlink()
     assert backup_status(backup, TASKS)["completed_stages"] == []
     sync_completed_stage(source, backup, TASKS, 0)
-    (backup / "policy_0.pt").write_bytes(b"broken")
+    (backup / "general_policy_after_task_0_reach-v3.pt").write_bytes(b"broken")
     with pytest.raises(ValueError, match="corrupted"):
         backup_status(backup, TASKS)
 
@@ -153,11 +183,11 @@ def test_sync_does_not_consume_rng(tmp_path):
     torch.testing.assert_close(torch.get_rng_state(), torch_state, rtol=0, atol=0)
 
 
-def test_retry_from_completed_local_run_stays_resumable(tmp_path):
+def test_completed_local_run_preserves_completion_lifecycle(tmp_path):
     source = _complete_source(tmp_path)
     (source / "RUNNING").rename(source / "RUN_COMPLETE")
     backup = tmp_path / "drive"
     sync_completed_stage(source, backup, TASKS, 0)
-    assert (backup / "RUNNING").is_file()
-    assert not (backup / "RUN_COMPLETE").exists()
+    assert (backup / "RUN_COMPLETE").is_file()
+    assert not (backup / "RUNNING").exists()
     assert restore_backup(backup, tmp_path / "restored", TASKS) == 0

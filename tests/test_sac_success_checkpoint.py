@@ -29,7 +29,6 @@ class FixedSeedEvalCallbackTests(unittest.TestCase):
             n_eval_episodes=1,
             seed=0,
             log_path=Path("evaluations"),
-            best_model_save_path=Path("best"),
             best_success_model_save_path=Path("best-success"),
             early_stopping=EarlyStoppingConfig(**settings),
         )
@@ -134,7 +133,7 @@ class FixedSeedEvalCallbackTests(unittest.TestCase):
             "train_sac.fixed_mt1_tasks", side_effect=bank
         ), patch("train_sac.disable_task_sampling"):
             root = Path(tmp)
-            for name in ("evaluations", "best_model", "best_success_model"):
+            for name in ("evaluations", "best_success_model"):
                 (root / name).mkdir()
             env = Env()
             callback = FixedSeedEvalCallback(
@@ -146,7 +145,6 @@ class FixedSeedEvalCallbackTests(unittest.TestCase):
                 task_set_seed=10_000,
                 evaluation_mode="fixed-tasks",
                 log_path=root / "evaluations",
-                best_model_save_path=root / "best_model",
                 best_success_model_save_path=root / "best_success_model",
             )
             callback.model = MagicMock()
@@ -175,7 +173,6 @@ class FixedSeedEvalCallbackTests(unittest.TestCase):
                 task_set_seed=10_001,
                 evaluation_mode="fixed-tasks",
                 log_path=root / "evaluations",
-                best_model_save_path=root / "best_model",
                 best_success_model_save_path=root / "best_success_model",
             )
             self.assertNotEqual(callback.task_hashes, other.task_hashes)
@@ -183,7 +180,7 @@ class FixedSeedEvalCallbackTests(unittest.TestCase):
     def test_success_is_primary_and_return_breaks_ties(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
-            for name in ("evaluations", "best_model", "best_success_model"):
+            for name in ("evaluations", "best_success_model"):
                 (root / name).mkdir()
             callback = FixedSeedEvalCallback(
                 MagicMock(),
@@ -191,7 +188,6 @@ class FixedSeedEvalCallbackTests(unittest.TestCase):
                 n_eval_episodes=2,
                 seed=10_000,
                 log_path=root / "evaluations",
-                best_model_save_path=root / "best_model",
                 best_success_model_save_path=root / "best_success_model",
             )
             callback.model = MagicMock()
@@ -214,12 +210,9 @@ class FixedSeedEvalCallbackTests(unittest.TestCase):
             self.assertEqual(
                 paths,
                 [
-                    root / "best_model/best_model",
-                    root / "best_success_model/best_success_model",
-                    root / "best_model/best_model",
                     root / "best_success_model/best_success_model",
                     root / "best_success_model/best_success_model",
-                    root / "best_model/best_model",
+                    root / "best_success_model/best_success_model",
                 ],
             )
             archive = np.load(root / "evaluations/evaluations.npz")

@@ -11,12 +11,9 @@ from src.continual.flow_matching_replay import (
     FlowMatchingReplayRequest,
     generate_previous_task_flow_matching_replay,
 )
-from src.continual.trajectory_flow_matching import (
-    FlowMatchingConfig,
-    TrajectoryFlowMatching,
-)
-from src.continual.trajectory_diffusion import FeatureNormalizer
 from src.continual.stage_dataset import bc_dataset
+from src.continual.trajectory_diffusion import FeatureNormalizer
+from src.continual.trajectory_flow_matching import FlowMatchingConfig
 
 
 class RecordingFlow:
@@ -25,6 +22,7 @@ class RecordingFlow:
             horizon=horizon, width=4, num_tasks=3, integration_steps=7
         )
         self.velocity_model = Mock()
+        self.checkpoint_kind = "trajectory_flow_matching_43_v3"
         self.calls = []
         self.last_sample_nfe = 0
 
@@ -53,7 +51,7 @@ class RecordingFlow:
             }
         )
         generator = torch.Generator().manual_seed(seed)
-        result = torch.randn((count, self.config.horizon, 22), generator=generator)
+        result = torch.randn((count, self.config.horizon, 43), generator=generator)
         result[..., :18] += task_ids[:, None, None]
         result[..., 18:] = 2.0
         self.last_sample_nfe = self.config.integration_steps if integration_steps is None else integration_steps
@@ -86,6 +84,7 @@ def request(**overrides):
         "trajectory_counts": {0: 3, 1: 3},
         "checkpoint": Path("/tmp/flow-checkpoint.pt"),
         "expected_state_hash": "expected-state",
+        "expected_config": None,
         "task_names": ("reach-v3", "push-v3", "hammer-v3"),
         "backend": "metaworld-v3",
         "horizon": 200,
@@ -111,13 +110,13 @@ def reconstructed_goals(bank, selected, **kwargs):
 
 def run_adapter(model=None, dynamic=None, goal=None, **request_overrides):
     model = RecordingFlow() if model is None else model
-    dynamic = FeatureNormalizer(torch.zeros(22), torch.ones(22)) if dynamic is None else dynamic
+    dynamic = FeatureNormalizer(torch.zeros(43), torch.ones(43)) if dynamic is None else dynamic
     goal = FeatureNormalizer(torch.zeros(3), torch.ones(3)) if goal is None else goal
     with patch(
         "src.continual.flow_matching_replay.TrajectoryFlowMatching.load",
         return_value=(model, dynamic, goal, metadata()),
     ), patch(
-        "src.continual.flow_matching_replay.reconstruct_goals",
+        "src.continual.replay_common.reconstruct_goals",
         side_effect=reconstructed_goals,
     ), patch(
         "src.continual.flow_matching_replay.file_hash", return_value="checkpoint-sha"
@@ -131,7 +130,7 @@ def run_adapter(model=None, dynamic=None, goal=None, **request_overrides):
     return model, result
 
 
-def test_shapes_conditions_group_counts_alignment_and_bc_compatibility():
+def test_shapes_conditions_direct_generated_values_and_bc_compatibility():
     model, result = run_adapter()
 
     assert list(result.groups) == [0, 1]
@@ -150,25 +149,19 @@ def test_shapes_conditions_group_counts_alignment_and_bc_compatibility():
             call["task_ids"], torch.full((3,), old_index, dtype=torch.long)
         )
         assert call["goals"].shape == (3, 3)
-        current = group[..., :18]
-        previous = group[..., 18:36]
-        torch.testing.assert_close(previous[:, 0], current[:, 0], rtol=0, atol=0)
-        torch.testing.assert_close(previous[:, 1:], current[:, :-1], rtol=0, atol=0)
-        torch.testing.assert_close(
-            group[..., 36:39], group[:, :1, 36:39].expand(-1, 200, -1), rtol=0, atol=0
-        )
+        torch.testing.assert_close(group[..., 18:39], torch.full_like(group[..., 18:39], 2.0))
         assert bc_dataset(group).tensors[0].shape == (600, 39)
         assert bc_dataset(group).tensors[1].shape == (600, 4)
         source = result.sources[name]
         assert source["condition"] == old_index
-        assert source["checkpoint_kind"] == "trajectory_flow_matching_22_v1"
+        assert source["checkpoint_kind"] == "trajectory_flow_matching_43_v3"
         assert source["neural_function_evaluations"] == 7
         assert source["generation_seconds"] >= 0
         assert len(source["training_configuration_indices"]) == 3
 
 
 def test_solver_and_tolerances_are_forwarded():
-    model, _ = run_adapter(
+    model, result = run_adapter(
         stage=1,
         trajectory_counts={0: 3},
         solver="rk4",
@@ -178,10 +171,35 @@ def test_solver_and_tolerances_are_forwarded():
     assert model.calls[0]["solver"] == "rk4"
     assert model.calls[0]["rtol"] == 2e-5
     assert model.calls[0]["atol"] == 3e-5
+    source = result.sources["reach-v3"]
+    assert source["integration_steps"] == model.config.integration_steps
+    assert source["neural_function_evaluations"] == model.last_sample_nfe
+
+
+@pytest.mark.integration
+@pytest.mark.skipif(not torch.cuda.is_available(), reason="CUDA is unavailable")
+def test_replay_provider_moves_loaded_model_to_cuda_before_sampling():
+    class DeviceRecordingFlow(RecordingFlow):
+        def __init__(self):
+            super().__init__()
+            self.velocity_model = torch.nn.Linear(1, 1)
+
+        def sample(self, *args, **kwargs):
+            assert next(self.velocity_model.parameters()).device.type == "cuda"
+            return super().sample(*args, **kwargs)
+
+    model, result = run_adapter(
+        model=DeviceRecordingFlow(),
+        stage=1,
+        trajectory_counts={0: 1},
+        device="cuda",
+    )
+    assert next(model.velocity_model.parameters()).device.type == "cuda"
+    assert result.groups[0].device.type == "cpu"
 
 
 def test_goal_normalization_and_dynamic_denormalization_are_used():
-    dynamic = FeatureNormalizer(torch.ones(22), torch.full((22,), 2.0))
+    dynamic = FeatureNormalizer(torch.ones(43), torch.full((43,), 2.0))
     goal = FeatureNormalizer(
         torch.tensor([1.0, 0.0, -1.0]), torch.tensor([2.0, 4.0, 2.0])
     )
@@ -200,7 +218,7 @@ def test_goal_normalization_and_dynamic_denormalization_are_used():
     expected_normalized = goal.normalize(physical_goals[:, None, :])[:, 0]
     torch.testing.assert_close(first_call["goals"], expected_normalized)
     expected_first_current = 2 * torch.randn(
-        (3, 200, 22), generator=torch.Generator().manual_seed(first_call["seed"])
+        (3, 200, 43), generator=torch.Generator().manual_seed(first_call["seed"])
     )[..., :18] + 1
     torch.testing.assert_close(result.groups[0][..., :18], expected_first_current)
 
@@ -231,18 +249,16 @@ def test_zero_allocations_are_not_generated():
 def test_raw_actions_are_only_clipped_when_explicitly_requested():
     _, clipped = run_adapter(action_projection="clip")
     assert torch.all(clipped.groups[0][..., PHYSICAL_ACTION_SLICE] == 1)
-    assert clipped.sources["reach-v3"]["pre_projection_oob_component_fraction"] == 1.0
-    assert clipped.sources["reach-v3"]["post_projection_oob_component_fraction"] == 0.0
 
     unprojected_metadata = metadata()
     unprojected_metadata["generated_action_projection"] = "none"
     model = RecordingFlow()
-    identity = FeatureNormalizer(torch.zeros(22), torch.ones(22))
+    identity = FeatureNormalizer(torch.zeros(43), torch.ones(43))
     with patch(
         "src.continual.flow_matching_replay.TrajectoryFlowMatching.load",
         return_value=(model, identity, FeatureNormalizer(torch.zeros(3), torch.ones(3)), unprojected_metadata),
     ), patch(
-        "src.continual.flow_matching_replay.reconstruct_goals",
+        "src.continual.replay_common.reconstruct_goals",
         side_effect=reconstructed_goals,
     ), patch(
         "src.continual.flow_matching_replay.file_hash", return_value="sha"
@@ -253,19 +269,18 @@ def test_raw_actions_are_only_clipped_when_explicitly_requested():
             request(action_projection="none")
         )
     assert torch.all(unprojected.groups[0][..., PHYSICAL_ACTION_SLICE] == 2)
-    assert unprojected.sources["reach-v3"]["post_projection_oob_component_fraction"] == 1.0
 
 
 def test_pre_tanh_actions_decode_without_silent_projection():
     pre_tanh_metadata = metadata()
     pre_tanh_metadata.update(action_space="pre-tanh", generated_action_projection="none")
     model = RecordingFlow()
-    identity = FeatureNormalizer(torch.zeros(22), torch.ones(22))
+    identity = FeatureNormalizer(torch.zeros(43), torch.ones(43))
     with patch(
         "src.continual.flow_matching_replay.TrajectoryFlowMatching.load",
         return_value=(model, identity, FeatureNormalizer(torch.zeros(3), torch.ones(3)), pre_tanh_metadata),
     ), patch(
-        "src.continual.flow_matching_replay.reconstruct_goals",
+        "src.continual.replay_common.reconstruct_goals",
         side_effect=reconstructed_goals,
     ), patch(
         "src.continual.flow_matching_replay.file_hash", return_value="sha"
@@ -285,15 +300,15 @@ def test_pre_tanh_actions_decode_without_silent_projection():
 def test_checkpoint_kind_validation_propagates():
     with patch(
         "src.continual.flow_matching_replay.TrajectoryFlowMatching.load",
-        side_effect=ValueError("Checkpoint is not trajectory_flow_matching_22_v1."),
-    ), pytest.raises(ValueError, match="trajectory_flow_matching_22_v1"):
+        side_effect=ValueError("Checkpoint is not trajectory_flow_matching_43_v2."),
+    ), pytest.raises(ValueError, match="trajectory_flow_matching_43_v2"):
         generate_previous_task_flow_matching_replay(request())
 
 
 def test_real_incompatible_checkpoint_kind_is_rejected(tmp_path):
     path = tmp_path / "diffusion.pt"
     torch.save({"kind": "trajectory_diffusion_22_v1"}, path)
-    with pytest.raises(ValueError, match="trajectory_flow_matching_22_v1"):
+    with pytest.raises(ValueError, match="trajectory_flow_matching_43_v2"):
         generate_previous_task_flow_matching_replay(request(checkpoint=path))
 
 
@@ -301,7 +316,7 @@ def test_checkpoint_metadata_mismatch_is_rejected_before_sampling():
     bad = metadata()
     bad["task_order"] = ["wrong-v3"]
     model = RecordingFlow()
-    normalizer = FeatureNormalizer(torch.zeros(22), torch.ones(22))
+    normalizer = FeatureNormalizer(torch.zeros(43), torch.ones(43))
     goal = FeatureNormalizer(torch.zeros(3), torch.ones(3))
     with patch(
         "src.continual.flow_matching_replay.TrajectoryFlowMatching.load",

@@ -7,24 +7,14 @@ this module.
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Protocol
+from typing import TYPE_CHECKING
 
 import numpy as np
+from continual_manipulation.environments import ACTION_SHAPE, OBSERVATION_SHAPE
 from numpy.typing import NDArray
-from src.envs import ACTION_SHAPE, OBSERVATION_SHAPE
 
 if TYPE_CHECKING:
     from stable_baselines3 import SAC
-
-
-class Policy(Protocol):
-    """Minimal interface for policies that act on one unbatched observation."""
-
-    def act(
-        self, observation: NDArray[np.float32], deterministic: bool = True
-    ) -> NDArray[np.floating]:
-        """Return one environment action; no recurrent-state tuple."""
-        ...
 
 
 class SB3SACPolicy:

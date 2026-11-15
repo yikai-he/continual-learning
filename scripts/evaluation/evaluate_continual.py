@@ -15,12 +15,12 @@ if str(REPOSITORY_ROOT) not in sys.path:
 
 import torch
 
-from src.continual.evaluation import (
+from continual_manipulation.evaluation import (
     EvaluationMatrix,
     evaluate_stage,
     evaluate_task,
 )
-from src.continual.task_sequence import PILOT_SEQUENCE, TaskSequence
+from continual_manipulation.sequences import PILOT_SEQUENCE, TaskSequence
 from src.support.io import write_json
 from src.support.reproducibility import file_hash
 

@@ -6,9 +6,9 @@ import torch
 from torch.utils.data import TensorDataset
 
 from src.continual.bc_policy import GeneralPolicy, fit_bc
-from src.continual.evaluation import EvaluationMatrix, evaluate_stage
+from continual_manipulation.evaluation import EvaluationMatrix, evaluate_stage
 from src.continual.stage_dataset import bc_dataset
-from src.continual.task_sequence import TaskSequence
+from continual_manipulation.sequences import TaskSequence
 
 
 TASKS = ("button-press-v3", "hammer-v3", "window-close-v3")
@@ -24,7 +24,7 @@ def test_policy_input_one_hot_shape_bounds_and_validation():
     model = policy()
     observations = torch.zeros(2, 39)
     inputs = model.policy_input(observations, torch.tensor([0, 2]))
-    assert model.network[0].in_features == 42
+    assert model.shared_network[0].in_features == 42
     assert torch.equal(inputs[:, 39:], torch.tensor([[1, 0, 0], [0, 0, 1]]).float())
     actions = model(observations, torch.tensor([0, 2]))
     assert actions.shape == (2, 4)
@@ -47,9 +47,9 @@ def test_task_conditioned_training_and_checkpoint_contract(tmp_path):
     actions = torch.tanh(torch.randn(12, 4))
     labels = torch.arange(12) % len(TASKS)
     dataset = TensorDataset(observations, actions, labels)
-    before = model.network[0].weight.detach().clone()
+    before = model.shared_network[0].weight.detach().clone()
     fit_bc(model, dataset, dataset, epochs=1, batch_size=4)
-    assert not torch.equal(before, model.network[0].weight)
+    assert not torch.equal(before, model.shared_network[0].weight)
 
     checkpoint = tmp_path / "conditioned.pt"
     model.save(checkpoint)
@@ -67,7 +67,7 @@ def test_task_conditioned_training_and_checkpoint_contract(tmp_path):
 
 def test_task_agnostic_architecture_is_unchanged():
     model = GeneralPolicy(-np.ones(4), np.ones(4))
-    assert model.network[0].in_features == 39
+    assert model.shared_network[0].in_features == 39
     assert model(torch.zeros(2, 39)).shape == (2, 4)
 
 
@@ -84,7 +84,9 @@ def test_stage_evaluation_provides_configured_task_indices(monkeypatch):
             "evaluation_mode": "sampled",
         }
 
-    monkeypatch.setattr("src.continual.evaluation.evaluate_task", fake_evaluate_task)
+    monkeypatch.setattr(
+        "continual_manipulation.evaluation.protocols.evaluate_task", fake_evaluate_task
+    )
     sequence = TaskSequence.from_names(TASKS)
     matrix = EvaluationMatrix(sequence)
     evaluate_stage(object(), matrix, 2)

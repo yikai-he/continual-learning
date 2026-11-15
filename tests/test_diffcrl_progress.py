@@ -14,10 +14,10 @@ from src.continual import (
     bc_policy,
     collector,
     diffcrl,
-    diffcrl_replay,
-    evaluation,
+    replay_common,
     trajectory_diffusion,
 )
+from continual_manipulation.evaluation import protocols as evaluation
 
 
 class DiffCRLProgressTests(unittest.TestCase):
@@ -32,7 +32,7 @@ class DiffCRLProgressTests(unittest.TestCase):
         self.assertEqual(
             inspect.getsource(diffcrl).count("disable=not self.progress"), 0
         )
-        self.assertIn("disable=not request.progress", inspect.getsource(diffcrl_replay))
+        self.assertIn("disable=not request.progress", inspect.getsource(replay_common))
         for module in (bc_policy, collector, trajectory_diffusion, evaluation):
             source = inspect.getsource(module)
             self.assertIn("disable=not progress", source)

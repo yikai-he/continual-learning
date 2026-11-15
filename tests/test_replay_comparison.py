@@ -18,7 +18,7 @@ def test_comparison_arms_are_matched_and_isolated(tmp_path):
     )
     configs = comparison_configs(base, tmp_path)
 
-    assert set(configs) == {"no_replay", "real_replay", "ddpm_replay"}
+    assert set(configs) == {"no_replay", "expert_recollection", "ddpm_replay"}
     assert len({cfg.runtime.run_name for cfg in configs.values()}) == 3
     shared = configs["ddpm_replay"]
     for cfg in configs.values():
@@ -26,11 +26,11 @@ def test_comparison_arms_are_matched_and_isolated(tmp_path):
         assert cfg.evaluation == shared.evaluation
         assert cfg.continual.tasks == shared.continual.tasks
         assert cfg.continual.trajectories_per_task == 200
-    assert configs["real_replay"].continual.replay_mode == "real"
-    assert configs["real_replay"].continual.replay_budget == 50
+    assert configs["expert_recollection"].continual.replay_mode == "expert-recollection"
+    assert configs["expert_recollection"].continual.replay_budget == 50
     assert configs["ddpm_replay"].continual.replay_budget == 50
-    assert configs["ddpm_replay"].continual.historical_replay_training_only
-    assert configs["real_replay"].continual.historical_replay_training_only
+    assert not configs["ddpm_replay"].continual.historical_replay_training_only
+    assert not configs["expert_recollection"].continual.historical_replay_training_only
     assert not configs["no_replay"].continual.historical_replay_training_only
 
 
@@ -49,6 +49,6 @@ def test_comparison_arms_inherit_base_replay_budget(tmp_path):
 
     configs = comparison_configs(base, tmp_path)
 
-    assert configs["real_replay"].continual.replay_budget == 25
+    assert configs["expert_recollection"].continual.replay_budget == 25
     assert configs["ddpm_replay"].continual.replay_budget == 25
     assert configs["no_replay"].continual.replay_mode == "none"

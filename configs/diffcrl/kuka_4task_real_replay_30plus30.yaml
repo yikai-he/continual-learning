@@ -1,4 +1,4 @@
-# Controlled KUKA-v3 stored-real replay baseline.
+# ARCHIVAL: retired stored-trajectory Real Replay; active loading rejects this mode.
 experiment: diffcrl
 environment:
   backend: kuka-v3
@@ -7,7 +7,7 @@ bc:
   epochs: 100
   batch_size: 256
   learning_rate: 0.001
-  loss: post-tanh-mse
+  loss: squashed-gaussian-nll
 diffusion:
   epochs: 300
   batch_size: 8

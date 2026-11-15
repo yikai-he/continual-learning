@@ -1,0 +1,15 @@
+experiment: fixed_dataset_bc
+source_run: runs/replay_budget_ablation/kuka_4task_ddpm_mse_100real_100replay_stochastic_expert_seed0
+bc:
+  loss: squashed_gaussian_nll
+  checkpoint_selection: validation_physical_mse
+  epochs: 100
+  batch_size: 256
+  learning_rate: 0.001
+  initial_log_std: -3.0
+  activation: relu
+  hidden_dim: 256
+runtime:
+  seed: 0
+  device: cpu
+  output: runs/replay_budget_ablation/kuka_4task_fixed_stochastic_data_nll_best_mse_seed0

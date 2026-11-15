@@ -7,12 +7,13 @@ sac:
   learning_rate: 0.001
   buffer_size: 5000
   learning_starts: 50
+  random_exploration_steps: 50
+  target_output_std: 0.089
   batch_size: 128
   gamma: 0.99
   tau: 0.005
   train_freq: 1
   gradient_steps: 1
-  checkpoint_freq: 250
 continual:
   tasks:
   - reach-v3

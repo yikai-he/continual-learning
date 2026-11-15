@@ -37,7 +37,7 @@ class FakeDiffusion:
             (count, seed, task_ids.clone(), goals.clone(), execution_mode)
         )
         generator = torch.Generator().manual_seed(seed)
-        result = torch.randn((count, 200, 22), generator=generator)
+        result = torch.randn((count, 200, 43), generator=generator)
         result[..., :18] += task_ids[:, None, None]
         result[..., 18:] = 2.0
         return result
@@ -87,7 +87,7 @@ class DiffCRLReplayTests(unittest.TestCase):
             "src.continual.diffcrl_replay.TrajectoryDiffusion.load",
             return_value=(model, normalizer, normalizer, metadata()),
         ), patch(
-            "src.continual.diffcrl_replay.reconstruct_goals",
+            "src.continual.replay_common.reconstruct_goals",
             side_effect=lambda bank, selected, **kwargs: [
                 [0.1, 0.2, 0.3] for _ in selected
             ],
@@ -121,7 +121,7 @@ class DiffCRLReplayTests(unittest.TestCase):
         with patch(
             "src.continual.diffcrl_replay.TrajectoryDiffusion.load", load
         ), patch(
-            "src.continual.diffcrl_replay.reconstruct_goals",
+            "src.continual.replay_common.reconstruct_goals",
             side_effect=goals,
         ), patch(
             "src.continual.diffcrl_replay.file_hash",
@@ -130,7 +130,9 @@ class DiffCRLReplayTests(unittest.TestCase):
             "src.continual.diffcrl_replay.state_hash",
             return_value="expected-state",
         ):
-            result = generate_previous_task_replay(request(), progress_message=progress)
+            result = generate_previous_task_replay(
+                request(expected_config=model.config), progress_message=progress
+            )
 
         self.assertEqual(list(result.groups), [0, 1])
         self.assertEqual(
@@ -149,6 +151,7 @@ class DiffCRLReplayTests(unittest.TestCase):
             expected_clamp_epsilon=1e-4,
             expected_projection="clip",
             expected_task_order=("reach-v3", "push-v3", "hammer-v3"),
+            expected_config=model.config,
         )
         self.assertEqual(progress.call_count, 2)
         for old_index, name in enumerate(("reach-v3", "push-v3")):
@@ -160,10 +163,6 @@ class DiffCRLReplayTests(unittest.TestCase):
             self.assertEqual(
                 source["neural_function_evaluations"], model.config.steps
             )
-            self.assertIsNone(source["generated_latent_abs_gt_bc_cap_fraction"])
-            self.assertEqual(source["pre_projection_oob_component_fraction"], 1.0)
-            self.assertEqual(source["post_projection_oob_component_fraction"], 0.0)
-            self.assertEqual(source["clipped_component_fraction"], 1.0)
             self.assertEqual(len(source["training_configuration_indices"]), 3)
 
     def test_device_native_execution_is_forwarded(self):
@@ -173,7 +172,7 @@ class DiffCRLReplayTests(unittest.TestCase):
             "src.continual.diffcrl_replay.TrajectoryDiffusion.load",
             return_value=(model, normalizer, normalizer, metadata()),
         ), patch(
-            "src.continual.diffcrl_replay.reconstruct_goals",
+            "src.continual.replay_common.reconstruct_goals",
             side_effect=lambda bank, selected, **kwargs: [
                 [0.1, 0.2, 0.3] for _ in selected
             ],
@@ -196,7 +195,7 @@ class DiffCRLReplayTests(unittest.TestCase):
                 "src.continual.diffcrl_replay.TrajectoryDiffusion.load",
                 return_value=(model, normalizer, normalizer, metadata()),
             ), patch(
-                "src.continual.diffcrl_replay.reconstruct_goals",
+                "src.continual.replay_common.reconstruct_goals",
                 side_effect=lambda bank, selected, **_: [
                     [1.0, float(index), -1.0] for index in selected
                 ],

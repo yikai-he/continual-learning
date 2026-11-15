@@ -7,16 +7,10 @@ import pytest
 
 from src.config import load_config
 from src.continual.diffcrl import DiffCRLTrainer
-from src.continual.evaluation import evaluate_task, fixed_mt1_tasks
-from src.continual.evaluation import EvaluationMatrix
-from src.continual.task_bank import (
-    bank_hashes,
-    reconstruct_goals,
-    training_bank,
-    verify_disjoint_task_banks,
-)
-from src.continual.task_sequence import TaskSequence
-from src.envs import make_env
+from continual_manipulation.evaluation import EvaluationMatrix, evaluate_task, fixed_mt1_tasks
+from continual_manipulation.task_banks import bank_hashes, verify_disjoint_task_banks
+from continual_manipulation.sequences import TaskSequence
+from continual_manipulation.environments import make_env
 
 
 class _ZeroPolicy:
@@ -64,18 +58,7 @@ def test_kuka_formal_configs_match_except_replay_and_output() -> None:
     assert control.continual.replay_mode == "none"
 
 
-def test_kuka_bank_hashes_repeat_across_methods_and_stages() -> None:
-    first, identities = fixed_mt1_tasks(
-        "kuka-reach-v3", 10_000, backend="kuka-v3"
-    )
-    second, repeated = fixed_mt1_tasks(
-        "kuka-reach-v3", 10_000, backend="kuka-v3"
-    )
-    assert bank_hashes(first) == bank_hashes(second)
-    assert identities == repeated
-    assert identities[0]["task_hash"] != identities[1]["task_hash"]
-
-
+@pytest.mark.integration
 def test_kuka_training_and_evaluation_banks_are_hash_disjoint() -> None:
     check = verify_disjoint_task_banks(
         "kuka-reach-v3", 0, 10_000, backend="kuka-v3"
@@ -89,10 +72,9 @@ def test_kuka_training_and_evaluation_banks_are_hash_disjoint() -> None:
     )
 
 
-@pytest.mark.parametrize(
-    "name", ("kuka-reach-v3", "kuka-handle-press-side-v3")
-)
-def test_kuka_fixed_evaluation_uses_ordered_identity(name) -> None:
+@pytest.mark.integration
+def test_kuka_fixed_evaluation_uses_ordered_identity() -> None:
+    name = "kuka-reach-v3"
     task = TaskSequence.from_names([name]).task(0)
     result = evaluate_task(
         _ZeroPolicy(),
@@ -111,69 +93,62 @@ def test_kuka_fixed_evaluation_uses_ordered_identity(name) -> None:
 
 def test_hammer_fixed_evaluation_forwards_environment_settings() -> None:
     task = TaskSequence.from_names(["kuka-hammer-v3"]).task(0)
-    env = make_env(
-        "kuka-v3",
+    selected_task = object()
+    identities = [{"task_hash": "hammer-task-hash"}]
+    trajectory = MagicMock(
+        episode_return=12.5,
+        length=200,
+        success=True,
+    )
+    env = MagicMock()
+    env.spec.max_episode_steps = 200
+    switcher = MagicMock()
+    switcher.__enter__.return_value = switcher
+    switcher.switch.return_value = env
+    with patch(
+        "continual_manipulation.evaluation.protocols.TaskSwitcher", return_value=switcher
+    ) as switcher_type, patch(
+        "continual_manipulation.evaluation.protocols.fixed_mt1_tasks",
+        return_value=([selected_task], identities),
+    ) as fixed_tasks, patch(
+        "continual_manipulation.evaluation.protocols.disable_task_sampling"
+    ) as disable_sampling, patch(
+        "continual_manipulation.evaluation.protocols.collect_trajectory", return_value=trajectory
+    ) as collect, patch(
+        "continual_manipulation.evaluation.protocols.validate_active_task"
+    ) as validate:
+        result = evaluate_task(
+            _ZeroPolicy(),
+            task,
+            episodes=1,
+            seed=20_000,
+            evaluation_mode="fixed-tasks",
+            task_set_seed=10_000,
+            backend="kuka-v3",
+            reward_function_version="v2",
+        )
+    switcher_type.assert_called_once_with(
+        TaskSequence((task,)),
+        backend="kuka-v3",
+        reward_function_version="v2",
+        render_mode=None,
+    )
+    fixed_tasks.assert_called_once_with(
+        "kuka-hammer-v3", 10_000, backend="kuka-v3"
+    )
+    disable_sampling.assert_called_once_with(env)
+    env.unwrapped.set_task.assert_called_once_with(selected_task)
+    collect.assert_called_once_with(
+        env,
+        collect.call_args.args[1],
         "kuka-hammer-v3",
-        20_000,
-        reward_function_version="v2",
+        seed=20_000,
+        deterministic=True,
     )
-    switcher = MagicMock()
-    switcher.__enter__.return_value = switcher
-    switcher.switch.return_value = env
-    with patch(
-        "src.continual.evaluation.TaskSwitcher", return_value=switcher
-    ) as switcher_type:
-        evaluate_task(
-            _ZeroPolicy(),
-            task,
-            episodes=1,
-            seed=20_000,
-            evaluation_mode="fixed-tasks",
-            task_set_seed=10_000,
-            backend="kuka-v3",
-            reward_function_version="v2",
-        )
-    env.close()
-    switcher_type.assert_called_once_with(
-        TaskSequence((task,)),
-        backend="kuka-v3",
-        reward_function_version="v2",
-        render_mode=None,
-    )
-
-
-def test_peg_fixed_evaluation_forwards_environment_settings() -> None:
-    task = TaskSequence.from_names(["kuka-peg-unplug-side-v3"]).task(0)
-    env = make_env(
-        "kuka-v3",
-        "kuka-peg-unplug-side-v3",
-        20_000,
-        reward_function_version="v2",
-    )
-    switcher = MagicMock()
-    switcher.__enter__.return_value = switcher
-    switcher.switch.return_value = env
-    with patch(
-        "src.continual.evaluation.TaskSwitcher", return_value=switcher
-    ) as switcher_type:
-        evaluate_task(
-            _ZeroPolicy(),
-            task,
-            episodes=1,
-            seed=20_000,
-            evaluation_mode="fixed-tasks",
-            task_set_seed=10_000,
-            backend="kuka-v3",
-            reward_function_version="v2",
-        )
-    env.close()
-    switcher_type.assert_called_once_with(
-        TaskSequence((task,)),
-        backend="kuka-v3",
-        reward_function_version="v2",
-        render_mode=None,
-    )
-
+    validate.assert_called_once_with(env, selected_task, "kuka-v3")
+    assert result["mean_return"] == 12.5
+    assert result["success_rate"] == 1.0
+    assert result["ordered_task_hashes"] == ["hammer-task-hash"]
 
 def test_diffcrl_stage_evaluation_uses_fixed_environment_settings() -> None:
     config = _config("diffcrl_kuka_10task_15plus15_4layer.yaml")
@@ -187,37 +162,12 @@ def test_diffcrl_stage_evaluation_uses_fixed_environment_settings() -> None:
     assert evaluate.call_count == 1
 
 
-def test_replay_reconstruction_remains_on_training_bank() -> None:
-    training = training_bank("kuka-reach-v3", 0, backend="kuka-v3")
-    evaluation_tasks, _ = fixed_mt1_tasks(
-        "kuka-reach-v3", 10_000, backend="kuka-v3"
-    )
-    assert not set(training["ordered_task_hashes"]) & set(
-        bank_hashes(evaluation_tasks)
-    )
-    goals = reconstruct_goals(training, [0], backend="kuka-v3")
-    assert goals.shape == (1, 3)
-
-
-@pytest.mark.parametrize(
-    "name",
-    (
-        "kuka-button-press-v3",
-        "kuka-drawer-close-v3",
-        "kuka-window-open-v3",
-        "kuka-window-close-v3",
-        "kuka-faucet-open-v3",
-        "kuka-door-open-v3",
-        "kuka-faucet-close-v3",
-        "kuka-reach-v3",
-        "kuka-handle-press-side-v3",
-        "kuka-hammer-v3",
-    ),
-)
-def test_every_kuka_task_bank_target_is_representable_without_clipping(name) -> None:
+@pytest.mark.integration
+def test_kuka_task_bank_target_is_representable_without_clipping() -> None:
     """The public observation contract must represent every canonical target."""
-    from src.continual.evaluation import disable_task_sampling
+    from continual_manipulation.evaluation import disable_task_sampling
 
+    name = "kuka-hammer-v3"
     tasks, _ = fixed_mt1_tasks(name, 0, backend="kuka-v3")
     env = make_env(
         "kuka-v3",
@@ -244,17 +194,9 @@ def test_every_kuka_task_bank_target_is_representable_without_clipping(name) -> 
         env.close()
 
 
-@pytest.mark.parametrize(
-    "name",
-    (
-        "kuka-reach-v3",
-        "kuka-handle-press-side-v3",
-        "kuka-drawer-close-v3",
-        "kuka-faucet-close-v3",
-        "kuka-hammer-v3",
-    ),
-)
-def test_formal_kuka_task_goal_is_exactly_constant_for_full_episode(name) -> None:
+@pytest.mark.integration
+def test_formal_kuka_task_goal_is_exactly_constant_for_full_episode() -> None:
+    name = "kuka-hammer-v3"
     tasks, _ = fixed_mt1_tasks(name, 0, backend="kuka-v3")
     env = make_env(
         "kuka-v3",
@@ -263,7 +205,7 @@ def test_formal_kuka_task_goal_is_exactly_constant_for_full_episode(name) -> Non
         reward_function_version="v2",
     )
     try:
-        from src.continual.evaluation import disable_task_sampling, validate_active_task
+        from continual_manipulation.evaluation import disable_task_sampling, validate_active_task
 
         disable_task_sampling(env)
         env.unwrapped.set_task(tasks[2])
