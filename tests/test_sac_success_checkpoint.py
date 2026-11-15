@@ -202,9 +202,17 @@ class FixedSeedEvalCallbackTests(unittest.TestCase):
                 ]
             )
 
-            for step in (5_000, 10_000, 15_000, 20_000):
-                callback.num_timesteps = step
-                self.assertTrue(callback._on_step())
+            with patch("builtins.print") as progress:
+                for step in (5_000, 10_000, 15_000, 20_000):
+                    callback.num_timesteps = step
+                    self.assertTrue(callback._on_step())
+
+            self.assertEqual(progress.call_count, 4)
+            self.assertEqual(
+                progress.call_args_list[-1].args[0],
+                "SAC progress step=20000 success_rate=0.500 mean_return=100.000",
+            )
+            self.assertTrue(progress.call_args_list[-1].kwargs["flush"])
 
             paths = [call.args[0] for call in callback.model.save.call_args_list]
             self.assertEqual(

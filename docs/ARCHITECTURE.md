@@ -183,8 +183,12 @@ same core to the concatenated 39D observation and 4D action, followed by a
 scalar linear head. This reproduces the Legacy neural-network layout, not its
 SAC implementation: a localized schedule gate reproduces its separate 10,000-
 step random-action period and 50-updates-per-50-steps cadence, while SB3
-continues to own distributions, losses, entropy tuning, replay, optimizers, and
-target updates. The original Legacy single-task
+continues to own Gaussian sampling, losses, entropy tuning, replay, optimizers,
+and target updates. The actor's tanh log-Jacobian uses the Legacy algebraically
+stable pre-tanh expression instead of SB3's action-space epsilon expression;
+this changes neither the actor parameters nor deterministic inference and
+prevents saturated float32 actions from losing the correction gradient. The
+original Legacy single-task
 wrapper's 12D observation truncation and multi-head selection are intentionally
 absent.
 

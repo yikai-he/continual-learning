@@ -30,6 +30,38 @@ from src.support.expert_manifest import validate_expert_checkpoint
 
 
 class TrainingConfigTests(unittest.TestCase):
+    def test_six_cw10_expert_configs_share_the_formal_sac_protocol(self):
+        expected = (
+            ("push_wall_v3.yaml", "push-wall-v3"),
+            ("handle_press_side_v3.yaml", "handle-press-side-v3"),
+            ("push_v3.yaml", "push-v3"),
+            ("shelf_place_v3.yaml", "shelf-place-v3"),
+            ("window_close_v3.yaml", "window-close-v3"),
+            ("peg_unplug_side_v3.yaml", "peg-unplug-side-v3"),
+        )
+        for filename, task in expected:
+            config = load_config(
+                Path("configs/sac/cw10") / filename,
+                expected_experiment="sac",
+            )
+            self.assertEqual(config.continual.tasks, [task])
+            self.assertEqual(config.environment.backend, "metaworld-v3")
+            self.assertEqual(config.environment.reward_function_version, "v2")
+            self.assertEqual(config.sac.steps, 1_000_000)
+            self.assertEqual(config.sac.learning_rate, 1e-3)
+            self.assertEqual(config.sac.batch_size, 128)
+            self.assertEqual(config.sac.buffer_size, 1_000_000)
+            self.assertEqual(config.sac.learning_starts, 1_000)
+            self.assertEqual(config.sac.random_exploration_steps, 10_000)
+            self.assertEqual(config.sac.train_freq, 50)
+            self.assertEqual(config.sac.gradient_steps, 50)
+            self.assertEqual(config.evaluation.frequency, 40_000)
+            self.assertEqual(config.evaluation.mode, "fixed-tasks")
+            self.assertEqual(config.runtime.seed, 0)
+            self.assertEqual(
+                config.runtime.output, "runs/cw10_experts/stable_tanh_v2"
+            )
+
     def test_sac_defaults_to_low_disk_with_separate_final_banks(self):
         config = default_config("sac")
         self.assertEqual(config.evaluation.task_set_seed, 10_000)
@@ -192,7 +224,7 @@ class TrainingConfigTests(unittest.TestCase):
                 self.assertEqual(
                     sac.return_value.learn.call_args.kwargs["total_timesteps"], 7
                 )
-                self.assertTrue(sac.return_value.learn.call_args.kwargs["progress_bar"])
+                self.assertFalse(sac.return_value.learn.call_args.kwargs["progress_bar"])
                 self.assertEqual(
                     [call.args[2] for call in env.call_args_list], [3, 126]
                 )

@@ -236,6 +236,11 @@ class FixedSeedEvalCallback(BaseCallback):
         self.logger.record("eval/mean_reward", mean_return)
         self.logger.record("eval/std_reward", return_stddev)
         self.logger.record("eval/success_rate", success_rate)
+        print(
+            f"SAC progress step={self.num_timesteps} "
+            f"success_rate={success_rate:.3f} mean_return={mean_return:.3f}",
+            flush=True,
+        )
         score = success_score(success_rate, mean_return)
         if score > self.best_success_score:
             self.best_success_score = score
@@ -497,7 +502,7 @@ def main(argv=None) -> None:
             total_timesteps=config.sac.steps,
             callback=evaluation_callback,
             tb_log_name="SAC",
-            progress_bar=True,
+            progress_bar=False,
         )
         best_path = run_dir / "best_model.zip"
         print(f"Best model saved to: {best_path}")

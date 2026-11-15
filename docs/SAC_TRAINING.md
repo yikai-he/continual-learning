@@ -20,6 +20,15 @@ validation runs every 40,000 steps. Smoke configurations deliberately retain
 short warmups and one-step updates so they remain inexpensive infrastructure
 checks.
 
+The actor uses SB3's squashed diagonal Gaussian, but evaluates the tanh
+Jacobian from the cached pre-tanh action with the algebraically stable Legacy
+formula. This avoids the zero-gradient branch that can occur when float32
+`tanh` rounds a large latent action to exactly `-1` or `1`. Sampling,
+deterministic actions, distribution parameters, losses, and checkpoint tensor
+keys are otherwise unchanged. New expert manifests identify this implementation
+as `legacy-continual-diff-pytorch-4x256-stable-tanh-v2`; older expert weights
+remain loadable through the same `LegacySACPolicy` class.
+
 ## Checkpoint semantics
 
 Standalone SAC retains one selected expert:
@@ -105,3 +114,52 @@ below `logs/cw5_experts/legacy_sac/`. Monitor a task with, for example,
 outputs, verify that every task directory contains `RUN_COMPLETE`,
 `best_model.zip`, and `best_model.zip.manifest.json`. Identical seeds preserve the
 protocol but do not guarantee bitwise-identical results across hardware.
+
+## Six stable-tanh CW10 experts
+
+The second CW10 task and tasks 6--10 are prepared as six independent experts in
+this exact order:
+
+```text
+push-wall-v3
+handle-press-side-v3
+push-v3
+shelf-place-v3
+window-close-v3
+peg-unplug-side-v3
+```
+
+This ordering follows the Legacy `continualworld/tasks.py` CW10 definition after
+updating its `-v2` environment names to MetaWorld v3. Every YAML below
+`configs/sac/cw10/` creates a fresh model and replay buffer with seed 0, one
+million environment steps, reward v2, and the fixed-task evaluation protocol
+described above. No weights or optimizer state pass between tasks.
+
+Run all six sequentially in a persistent tmux session:
+
+```bash
+conda activate metaworld
+cd /path/to/continual-learning
+tmux new -s cw10-experts
+PYTHON_BIN=python ./scripts/experiments/train_cw10_six_sequential.sh
+```
+
+Detach with `Ctrl-b d` and reattach with `tmux attach -t cw10-experts`. Results
+are written to
+`runs/cw10_experts/stable_tanh_v2/reward_v2/<task>/seed_0/`; task logs are
+written to `logs/cw10_experts/stable_tanh_v2/<task>_seed0.log`. The launcher
+preflights every configuration and refuses any existing target run or log
+before starting the first task. It prints timestamped task boundaries and one
+unbuffered progress line at each 40,000-step evaluation, including success rate
+and mean return. Monitor the durable output with, for example:
+
+```bash
+tail -f logs/cw10_experts/stable_tanh_v2/push-wall-v3_seed0.log
+```
+
+The earlier Rich progress bar was connected to a pipe by the launcher's `tee`,
+so it could not reliably render as an interactive terminal display. SAC now
+uses the evaluation progress lines instead; they render consistently both in
+tmux and redirected logs. If a task fails or is interrupted, the launcher
+prints `FAILED`, preserves Python's exit status, and stops without retrying or
+starting the next task.

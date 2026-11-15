@@ -2,15 +2,45 @@
 
 from __future__ import annotations
 
+import math
+
+import torch
+import torch.nn.functional as F
 from torch import nn
 
+from stable_baselines3.common.distributions import (
+    SquashedDiagGaussianDistribution,
+    TanhBijector,
+    sum_independent_dims,
+)
 from stable_baselines3.common.policies import ContinuousCritic
 from stable_baselines3.sac.policies import Actor, SACPolicy
 
 
-SAC_POLICY_ARCHITECTURE = "legacy-continual-diff-pytorch-4x256-v1"
+SAC_POLICY_ARCHITECTURE = "legacy-continual-diff-pytorch-4x256-stable-tanh-v2"
 SAC_HIDDEN_SIZES = (256, 256, 256, 256)
 LEAKY_RELU_NEGATIVE_SLOPE = 0.01
+
+
+class LegacySquashedDiagGaussianDistribution(SquashedDiagGaussianDistribution):
+    """Squashed Gaussian with the Legacy stable pre-tanh Jacobian."""
+
+    def log_prob(
+        self,
+        actions: torch.Tensor,
+        gaussian_actions: torch.Tensor | None = None,
+    ) -> torch.Tensor:
+        if gaussian_actions is None:
+            gaussian_actions = TanhBijector.inverse(actions)
+        gaussian_log_prob = sum_independent_dims(
+            self.distribution.log_prob(gaussian_actions)
+        )
+        log_tanh_jacobian = 2.0 * (
+            math.log(2.0)
+            - gaussian_actions
+            - F.softplus(-2.0 * gaussian_actions)
+        )
+        return gaussian_log_prob - log_tanh_jacobian.sum(dim=1)
 
 
 def _legacy_network(input_dim: int, output_dim: int | None = None) -> nn.Sequential:
@@ -37,6 +67,10 @@ class LegacySACActor(Actor):
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
         self.latent_pi = _legacy_network(self.features_dim)
+        if not self.use_sde:
+            self.action_dist = LegacySquashedDiagGaussianDistribution(
+                int(self.action_space.shape[0])
+            )
 
 
 class LegacySACCritic(ContinuousCritic):

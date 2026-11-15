@@ -12,9 +12,11 @@ from torch import nn
 from src.continual.policy_adapter import SB3SACPolicy
 from src.sac_policy import (
     LEAKY_RELU_NEGATIVE_SLOPE,
+    LegacySquashedDiagGaussianDistribution,
     LegacySACPolicy,
     SAC_HIDDEN_SIZES,
 )
+from stable_baselines3.common.distributions import SquashedDiagGaussianDistribution
 from stable_baselines3 import SAC
 from train_sac import LegacyScheduleSAC, target_entropy_from_output_std
 
@@ -71,6 +73,7 @@ def _assert_legacy_core(modules, input_dim: int, *, output_dim=None) -> None:
 def test_actor_and_twin_critics_match_legacy_architecture() -> None:
     model = _model()
     actor = model.policy.actor
+    assert isinstance(actor.action_dist, LegacySquashedDiagGaussianDistribution)
     _assert_legacy_core(list(actor.latent_pi), 39)
     assert actor.mu.in_features == actor.log_std.in_features == 256
     assert actor.mu.out_features == actor.log_std.out_features == 4
@@ -114,8 +117,18 @@ def test_sb3_actions_gradients_adapter_and_checkpoint_round_trip(tmp_path: Path)
     model.save(checkpoint)
     loaded = SAC.load(checkpoint, env=_SACFixtureEnv(), device="cpu")
     assert isinstance(loaded.policy, LegacySACPolicy)
+    assert isinstance(loaded.actor.action_dist, LegacySquashedDiagGaussianDistribution)
     reloaded, _ = loaded.predict(observation, deterministic=True)
     np.testing.assert_allclose(reloaded, deterministic, rtol=0, atol=1e-7)
+
+
+def test_stable_distribution_does_not_change_deterministic_predictions() -> None:
+    model = _model()
+    observation = np.linspace(-1.0, 1.0, 39, dtype=np.float32)
+    corrected, _ = model.predict(observation, deterministic=True)
+    model.actor.action_dist = SquashedDiagGaussianDistribution(4)
+    sb3, _ = model.predict(observation, deterministic=True)
+    np.testing.assert_allclose(corrected, sb3, rtol=0, atol=0)
 
 
 def test_standard_sb3_checkpoint_keeps_its_original_policy(tmp_path: Path) -> None:
@@ -132,6 +145,69 @@ def test_standard_sb3_checkpoint_keeps_its_original_policy(tmp_path: Path) -> No
     loaded = SAC.load(checkpoint, env=_SACFixtureEnv(), device="cpu")
     assert type(loaded.policy).__name__ == "SACPolicy"
     assert not isinstance(loaded.policy, LegacySACPolicy)
+    assert isinstance(loaded.actor.action_dist, SquashedDiagGaussianDistribution)
+    assert not isinstance(loaded.actor.action_dist, LegacySquashedDiagGaussianDistribution)
+
+
+def _distribution_log_prob_and_gradients(distribution_type, pre_tanh, log_std):
+    mean = torch.tensor(pre_tanh, dtype=torch.float32, requires_grad=True)
+    log_std_tensor = torch.full_like(mean, log_std, requires_grad=True)
+    distribution = distribution_type(mean.shape[1])
+    distribution.proba_distribution(mean, log_std_tensor)
+    gaussian_actions = mean + log_std_tensor.exp() * 0.25
+    actions = torch.tanh(gaussian_actions)
+    log_prob = distribution.log_prob(actions, gaussian_actions)
+    mean_gradient, log_std_gradient = torch.autograd.grad(
+        log_prob.sum(), (mean, log_std_tensor)
+    )
+    return log_prob.detach(), mean_gradient.detach(), log_std_gradient.detach(), actions
+
+
+def test_stable_tanh_log_probability_values_and_gradients() -> None:
+    points = [[value] for value in (0.0, 1.0, -1.0, 5.0, -5.0, 10.0, -10.0, 20.0, -20.0)]
+    stable = _distribution_log_prob_and_gradients(
+        LegacySquashedDiagGaussianDistribution, points, -2.0
+    )
+    sb3 = _distribution_log_prob_and_gradients(
+        SquashedDiagGaussianDistribution, points, -2.0
+    )
+    stable_log_prob, stable_mean_gradient, stable_log_std_gradient, actions = stable
+    sb3_log_prob, sb3_mean_gradient, _, _ = sb3
+
+    assert torch.isfinite(stable_log_prob).all()
+    assert torch.isfinite(stable_mean_gradient).all()
+    assert torch.isfinite(stable_log_std_gradient).all()
+    assert torch.allclose(
+        stable_log_prob[:3], sb3_log_prob[:3], atol=2e-5, rtol=2e-5
+    )
+    assert torch.allclose(
+        stable_mean_gradient[:3], sb3_mean_gradient[:3], atol=2e-3, rtol=2e-3
+    )
+    saturated = actions[:, 0].abs() == 1
+    assert saturated[5:].all()
+    assert torch.all(stable_mean_gradient[5::2, 0] > 1.9)
+    assert torch.all(stable_mean_gradient[6::2, 0] < -1.9)
+    assert torch.all(sb3_mean_gradient[saturated].abs() < 1e-8)
+    assert not torch.allclose(stable_log_prob[5:], sb3_log_prob[5:])
+
+
+def test_stable_tanh_log_probability_handles_small_std_and_uncached_actions() -> None:
+    mean = torch.tensor([[0.0, 1.0, -5.0, 10.0]], dtype=torch.float64)
+    log_std = torch.full_like(mean, -20.0)
+    distribution = LegacySquashedDiagGaussianDistribution(4)
+    distribution.proba_distribution(mean, log_std)
+    actions = torch.tanh(mean)
+    cached = distribution.log_prob(actions, mean)
+    assert torch.isfinite(cached).all()
+
+    mean = torch.tensor([[0.0, 1.0, -1.0, 2.0]], dtype=torch.float64)
+    log_std = torch.full_like(mean, -2.0)
+    distribution.proba_distribution(mean, log_std)
+    actions = torch.tanh(mean)
+    cached = distribution.log_prob(actions, mean)
+    uncached = distribution.log_prob(actions)
+    assert torch.isfinite(uncached).all()
+    assert torch.allclose(cached, uncached, atol=1e-6, rtol=1e-6)
 
 
 def _scheduled_model() -> LegacyScheduleSAC:

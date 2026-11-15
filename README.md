@@ -33,9 +33,11 @@ New experts use the Legacy `continual_diff_pytorch`
 four-layer 256-unit actor/critic core: the first linear layer is followed by
 LayerNorm and Tanh, and the remaining layers use LeakyReLU (`0.01`). Stable-
 Baselines3 still owns squashed-Gaussian sampling, twin/target critics, entropy
-tuning, replay, and optimization. Existing standard-SB3 checkpoints retain
-their original serialized policy class; new and old weights are not
-interchangeable.
+tuning, replay, and optimization; the actor evaluates the tanh correction with
+the Legacy stable pre-tanh formula to retain finite saturation gradients.
+Existing standard-SB3 checkpoints retain their original serialized policy
+class; historical `LegacySACPolicy` weights remain loadable with the corrected
+distribution.
 
 ```bash
 python train_sac.py --config configs/sac/sac.yaml --seed 0 --device cpu
