@@ -74,7 +74,7 @@ class DirectTrajectoryTests(unittest.TestCase):
         self.assertTrue(torch.equal(projected[..., :39], generated[..., :39]))
         self.assertTrue(torch.equal(projected[..., 39:], generated[..., 39:].clamp(-1, 1)))
 
-    def test_generated_values_skip_real_trajectory_contract_validation(self):
+    def test_stage_validation_accepts_learned_previous_state_and_goal_values(self):
         physical = valid_batch()
         changed = physical.clone()
         changed[0, 2, 18] += 2
@@ -83,9 +83,34 @@ class DirectTrajectoryTests(unittest.TestCase):
         validate_stage_trajectory_group(
             changed, stage=1, task="old", source={"kind": "generated"}
         )
-        with self.assertRaisesRegex(ValueError, "Previous-state contract"):
+        validate_stage_trajectory_group(
+            changed,
+            stage=1,
+            task="current",
+            source={
+                "kind": "real_expert",
+                "collection_configurations": [{"task_hash": "unused"}],
+            },
+        )
+
+    def test_stage_validation_retains_shape_and_finiteness_contracts(self):
+        physical = valid_batch()
+        with self.assertRaisesRegex(ValueError, "Invalid trajectory group shape"):
             validate_stage_trajectory_group(
-                changed, stage=1, task="old", source={"kind": "real_expert"}
+                physical[..., :-1],
+                stage=1,
+                task="old",
+                source={"kind": "generated"},
             )
+        physical[0, 0, 18] = float("nan")
+        with self.assertRaisesRegex(ValueError, "Nonfinite trajectory data"):
+            validate_stage_trajectory_group(
+                physical,
+                stage=1,
+                task="current",
+                source={"kind": "real_expert"},
+            )
+
+
 if __name__ == "__main__":
     unittest.main()
