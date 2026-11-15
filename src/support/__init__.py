@@ -1,1 +1,1 @@
-"""Utilities for the MetaWorld SAC baseline."""
+"""Shared experiment infrastructure and reproducibility utilities."""

@@ -7,6 +7,7 @@ import warnings
 from dataclasses import dataclass
 from pathlib import Path
 
+from src.support.io import atomic_write_json
 from src.support.reproducibility import file_hash
 
 
@@ -231,7 +232,5 @@ def write_expert_manifest(
     }
     if policy_architecture is not None:
         value["policy_architecture"] = policy_architecture
-    with path.open("x", encoding="utf-8") as stream:
-        json.dump(value, stream, indent=2, allow_nan=False)
-        stream.write("\n")
+    atomic_write_json(path, value)
     return path

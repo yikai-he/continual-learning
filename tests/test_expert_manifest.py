@@ -102,3 +102,39 @@ def test_writer_records_horizon_and_reward_version_metadata(tmp_path):
         manifest["policy_architecture"]
         == "legacy-continual-diff-pytorch-4x256-v1"
     )
+
+
+def test_writer_is_exclusive_and_cleans_up_nonfinite_failures(tmp_path):
+    checkpoint = tmp_path / "expert.zip"
+    checkpoint.write_bytes(b"checkpoint")
+    arguments = {
+        "task_name": "reach-v3",
+        "backend": "metaworld-v3",
+        "reward_function_version": "v2",
+        "training_seed": 0,
+        "training_config_reference": "config.yaml",
+        "training_config_sha256": "1" * 64,
+        "observation_shape": (39,),
+        "action_shape": (4,),
+        "horizon": 200,
+        "qualification": None,
+    }
+    path = write_expert_manifest(checkpoint, **arguments)
+    original = path.read_bytes()
+    with pytest.raises(FileExistsError):
+        write_expert_manifest(checkpoint, **arguments)
+    assert path.read_bytes() == original
+
+    invalid_checkpoint = tmp_path / "invalid.zip"
+    invalid_checkpoint.write_bytes(b"checkpoint")
+    invalid_path = invalid_checkpoint.with_suffix(".zip.manifest.json")
+    with pytest.raises(ValueError, match="Out of range float values"):
+        write_expert_manifest(
+            invalid_checkpoint,
+            **{
+                **arguments,
+                "qualification": {"success_rate": float("nan")},
+            },
+        )
+    assert not invalid_path.exists()
+    assert not list(tmp_path.glob(f".{invalid_path.name}.*.tmp"))

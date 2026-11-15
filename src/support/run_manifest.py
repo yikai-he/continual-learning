@@ -12,6 +12,7 @@ from pathlib import Path
 
 import torch
 
+from src.support.io import atomic_replace_json, atomic_write_json
 from src.support.reproducibility import file_hash, git_output
 
 
@@ -107,9 +108,7 @@ def create_run_manifest(
         "experts": experts or {},
         "task_banks": task_banks or {},
     }
-    with (run_dir / "run_manifest.json").open("x", encoding="utf-8") as stream:
-        json.dump(manifest, stream, indent=2, allow_nan=False)
-        stream.write("\n")
+    atomic_write_json(run_dir / "run_manifest.json", manifest)
     (run_dir / "RUNNING").write_text(
         manifest["run_started_at"] + "\n", encoding="utf-8"
     )
@@ -129,9 +128,5 @@ def complete_run(run_dir: str | Path) -> None:
     manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
     manifest["status"] = "complete"
     manifest["run_completed_at"] = _now()
-    temporary = run_dir / ".run_manifest.json.tmp"
-    temporary.write_text(
-        json.dumps(manifest, indent=2, allow_nan=False) + "\n", encoding="utf-8"
-    )
-    temporary.replace(manifest_path)
+    atomic_replace_json(manifest_path, manifest, allow_nan=False)
     running.replace(complete)
