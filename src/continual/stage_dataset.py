@@ -10,7 +10,6 @@ import torch
 from src.continual.diffusion_data import (
     PHYSICAL_TRAJECTORY_FEATURES,
     unpack_trajectories,
-    validate_stage_trajectory_group,
 )
 from continual_manipulation.environments import EPISODE_HORIZON
 from torch.utils.data import TensorDataset
@@ -53,13 +52,10 @@ def validate_stage_group(
 ) -> int:
     """Validate one ordered physical group and return its episode count."""
     group_count = len(values)
-    validate_trajectory_group(values, count=group_count, horizon=horizon)
-    validate_stage_trajectory_group(
-        values,
-        stage=stage,
-        task=task,
-        source=source,
-    )
+    try:
+        validate_trajectory_group(values, count=group_count, horizon=horizon)
+    except ValueError as error:
+        raise ValueError(f"{error} stage={stage}, task={task}.") from error
     return group_count
 
 

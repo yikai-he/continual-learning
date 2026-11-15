@@ -363,13 +363,16 @@ def test_run_finalization_replaces_existing_cumulative_best_mse_matrix(tmp_path)
         tmp_path / "evaluation_matrix_best_mse.json",
         {"kind": "stale-cumulative-matrix"},
     )
-    with patch.object(trainer, "train_task") as train_task, patch(
+    with patch.object(trainer, "train_task") as train_task, patch.object(
+        trainer, "finalize_run", wraps=trainer.finalize_run
+    ) as finalize_run, patch(
         "src.continual.diffcrl.print_final_report"
     ), patch("src.continual.diffcrl.complete_run"):
         returned = trainer.run()
 
     assert returned is trainer.matrix
     assert train_task.call_count == 3
+    finalize_run.assert_called_once()
     final_alternative = EvaluationMatrix.load(
         tmp_path / "evaluation_matrix_best_mse.json"
     )

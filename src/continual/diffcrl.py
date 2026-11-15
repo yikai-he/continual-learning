@@ -399,7 +399,6 @@ class DiffCRLTrainer:
             "action_space": cfg.diffusion.action_space,
             "action_clamp_epsilon": cfg.diffusion.action_clamp_epsilon,
             "action_projection": cfg.diffusion.generated_action_projection,
-            "bc_clamp_epsilon": BC_CLAMP_EPSILON,
             "progress": self.progress,
         }
         allocation = replay_counts(
@@ -980,13 +979,12 @@ class DiffCRLTrainer:
             timing,
         )
 
-    def run(self):
-        """Train all configured tasks sequentially and return the final matrix."""
+    def finalize_run(self, *, process_started=None):
+        """Publish final run artifacts after every configured stage is complete."""
         timing_device = self.config.runtime.device
-        _synchronize_timing_device(timing_device)
-        process_started = time.perf_counter()
-        for stage in range(self.sequence.num_tasks):
-            self.train_task(stage)
+        if process_started is None:
+            _synchronize_timing_device(timing_device)
+            process_started = time.perf_counter()
         final_matrix = self.output / "evaluation_matrix.json"
         write_json(final_matrix, self.matrix.to_dict())
         if self.best_mse_matrix is not None:
@@ -1034,3 +1032,11 @@ class DiffCRLTrainer:
         print_final_report(self.matrix)
         complete_run(self.output)
         return self.matrix
+
+    def run(self):
+        """Train all configured tasks sequentially and return the final matrix."""
+        _synchronize_timing_device(self.config.runtime.device)
+        process_started = time.perf_counter()
+        for stage in range(self.sequence.num_tasks):
+            self.train_task(stage)
+        return self.finalize_run(process_started=process_started)

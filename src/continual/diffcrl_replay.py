@@ -44,7 +44,6 @@ class ReplayRequest:
     action_space: str
     action_clamp_epsilon: float
     action_projection: str
-    bc_clamp_epsilon: float
     progress: bool
     expected_config: object | None = None
     trajectory_counts: dict[int, int] | None = None

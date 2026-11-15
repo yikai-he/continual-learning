@@ -58,7 +58,6 @@ def request(**overrides):
         "action_space": "raw",
         "action_clamp_epsilon": 1e-4,
         "action_projection": "clip",
-        "bc_clamp_epsilon": 1e-4,
         "progress": False,
     }
     values.update(overrides)

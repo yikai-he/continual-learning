@@ -46,7 +46,6 @@ class FlowMatchingReplayRequest:
     action_space: str
     action_clamp_epsilon: float
     action_projection: str
-    bc_clamp_epsilon: float
     progress: bool
     integration_steps: int | None = None
     solver: str = "euler"
@@ -66,7 +65,6 @@ def _validate_request(request: FlowMatchingReplayRequest) -> None:
         or request.action_space not in ("raw", "pre-tanh")
         or request.action_projection not in ("none", "clip")
         or not 0 < request.action_clamp_epsilon < 1
-        or not 0 < request.bc_clamp_epsilon < 1
         or request.solver not in ("euler", "midpoint", "heun2", "rk4", "dopri5")
         or not 0 < request.rtol < float("inf")
         or not 0 < request.atol < float("inf")

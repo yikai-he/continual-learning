@@ -8,8 +8,6 @@ from .evaluation import (
     format_evaluation_result,
     format_final_report,
     format_stage_report,
-    format_final_report,
-    format_stage_report,
 )
 from .interfaces import Policy
 from .metrics import average_performance, forgetting, forward_transfer
@@ -30,8 +28,6 @@ __all__ = [
     "evaluate_task",
     "forgetting",
     "format_evaluation_result",
-    "format_final_report",
-    "format_stage_report",
     "format_final_report",
     "format_stage_report",
     "forward_transfer",

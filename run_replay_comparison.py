@@ -6,6 +6,7 @@ import argparse
 from dataclasses import replace
 import json
 from pathlib import Path
+import time
 
 from src.config import load_config
 from src.continual.bc_policy import GeneralPolicy
@@ -62,6 +63,7 @@ def _stage_report(trainer, stage):
 
 def run_comparison(base, output_root: Path, *, progress=True):
     """Execute arms stage-by-stage and enforce the matched-data contracts."""
+    process_started = time.perf_counter()
     configs = comparison_configs(base, output_root)
     trainers = {
         name: DiffCRLTrainer(config, progress=progress)
@@ -124,7 +126,7 @@ def run_comparison(base, output_root: Path, *, progress=True):
                 trainer.policy = policy.to(trainer.config.runtime.device)
                 trainer.policy_optimizer = optimizer
     for trainer in trainers.values():
-        trainer.run()
+        trainer.finalize_run(process_started=process_started)
     summary = {
         "kind": "policy_replay_comparison_v1",
         "seed": base.runtime.seed,
