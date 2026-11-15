@@ -1,6 +1,6 @@
 ---
 status: current
-last_verified: 2026-11-11
+last_verified: 2026-11-15
 applies_to: continual-learning direct-43d migration and verification
 ---
 
@@ -62,9 +62,10 @@ error. Sampling begins with standard normal `(N,T,43)` noise and applies every
 ancestral posterior step in reverse order. The temporal network uses position,
 discrete time, task, and projected normalized-goal conditions.
 
-The checkpoint kind is `trajectory_diffusion_43_v2`. Loading validates the
-43-feature model configuration, schedule buffers, model state, task/action
-contracts, and 43D dynamic plus 3D goal normalization statistics.
+New checkpoints use kind `trajectory_diffusion_43_v3`. Loading validates the
+43-feature model configuration, schedule buffers, model state, task/action and
+backbone contracts, and 43D dynamic plus 3D goal normalization statistics.
+Known v2 direct-43D checkpoints remain loadable as the original Temporal CNN.
 
 ### Flow Matching
 
@@ -79,14 +80,19 @@ adaptive `dopri5`. `integration_steps` controls fixed-step size; `rtol` and
 `atol` control integration tolerances. The temporal network receives position,
 continuous time, task, and projected normalized-goal conditions.
 
-The checkpoint kind is `trajectory_flow_matching_43_v2`. It stores the 43D
-model configuration and normalizer, 3D goal normalizer, state, and replay
-provenance.
+New checkpoints use kind `trajectory_flow_matching_43_v3`. It stores the 43D
+model configuration and normalizer, 3D goal normalizer, state, backbone
+identity, and replay provenance. Known v2 direct-43D checkpoints remain
+loadable as the original Temporal CNN.
 
 Neither loader accepts legacy reduced-representation checkpoints. There is no
 automatic conversion. Historical configurations, checkpoints, and experiment
 reports remain evidence for the software that produced them, but legacy
 generator configurations are incompatible with the current strict schema.
+
+The action representation and generated-action projection are shared by DDPM
+and Flow Matching. Their fields remain under `diffusion:` for historical YAML,
+checkpoint, and report compatibility.
 
 ## Consistency and interpretation
 
@@ -107,10 +113,10 @@ the environment. Downstream performance asks whether replay helps the BC policy
 learn and retain tasks. These are separate measurements; success in one does
 not establish either of the others.
 
-Real expert trajectories retain strict collection validation: reset previous
-state equals reset current state, later previous states align with preceding
-current states, goals are exactly constant within an episode, and all values
-are finite.
+Real expert and generated trajectories share the stage acceptance contract:
+the physical shape and all values must be finite. Previous-state alignment and
+within-episode goal consistency remain descriptive diagnostics and do not reject
+either source.
 
 ## Completed verification
 

@@ -51,9 +51,11 @@ continually distils those trajectories into one persistent behavior-cloning
 policy. Diffusion or Flow Matching models provide old-task replay.
 
 The recommended pipeline collects every requested expert episode with the
-deterministic action from each frozen SAC expert, combines current data with No,
-Real, DDPM, or Flow Matching replay, trains the persistent `GeneralPolicy` with
-physical-action MSE, and evaluates it deterministically on fixed task banks.
+deterministic action from each frozen SAC expert, combines current data with No
+Replay, Expert Recollection, DDPM, or Flow Matching replay, trains the persistent
+`GeneralPolicy` with physical-action MSE, and evaluates it deterministically on
+fixed task banks. Expert Recollection performs fresh rollouts from frozen
+historical experts; it is distinct from the retired stored real-trajectory mode.
 The canonical `configs/diffcrl/diffcrl.yaml` makes the key choices explicit:
 
 ```yaml
@@ -229,9 +231,11 @@ task list, so named and equivalent explicit curricula have the same scientific
 identity. Expert paths remain explicit for every selected DiffCRL task.
 
 Use `configs/diffcrl/diffcrl_no_replay.yaml` for the no-replay ablation. Flow
-Matching, Real Replay, KUKA, fixed-budget, and pilot configurations are kept in
-the same directory and are labelled by filename and comments. Inspect a YAML
-before running it; not every configuration is a maintained formal protocol.
+Matching, Expert Recollection, KUKA, fixed-budget, and pilot configurations are
+kept in the same directory and are labelled by filename and comments. Historical
+YAML using `real` is provenance only and is rejected by current validation.
+Inspect a YAML before running it; not every configuration is a maintained formal
+protocol.
 
 Flow Matching sampling uses `torchdiffeq.odeint`. Configure `ode_solver` as
 `euler`, `midpoint`, `heun2`, `rk4`, or `dopri5`; `integration_steps` determines

@@ -1,6 +1,6 @@
 ---
 status: current
-last_verified: 2026-11-11
+last_verified: 2026-11-15
 applies_to: continual-learning
 ---
 
@@ -41,6 +41,17 @@ flow_matching:
   integration_steps: 100
 ```
 
+The shared generator action-representation settings remain under `diffusion:`
+for historical configuration and artifact compatibility, including when Flow
+Matching is selected:
+
+```yaml
+diffusion:
+  action_space: raw
+  action_clamp_epsilon: 0.0001
+  generated_action_projection: none
+```
+
 `trajectories_per_task` is the current expert collection count.
 `replay_budget` is the total number of historical synthetic trajectories at
 each nonzero stage. Current expert trajectories are excluded. Uniform
@@ -60,7 +71,10 @@ The 43 generated coordinates are current state (18), previous state (18), goal
 training split. Sampling denormalizes all 43 features directly. Raw or
 pre-`tanh` action representation and optional action projection affect only the
 last four coordinates; previous states and goals are never reconstructed or
-overwritten. The checkpoint kind is `trajectory_flow_matching_43_v2`.
+overwritten. New checkpoints use kind `trajectory_flow_matching_43_v3`.
+Known `trajectory_flow_matching_43_v2` direct-43D checkpoints remain loadable
+as the original Temporal CNN only. Reduced representations and weights between
+backbones are not converted.
 
 `allocate_replay` is independent of environments, models, generation, and
 training. A future prioritization method can extend its strategy input once a

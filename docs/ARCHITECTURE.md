@@ -1,6 +1,6 @@
 ---
 status: current
-last_verified: 2026-11-14
+last_verified: 2026-11-15
 applies_to: continual-learning
 ---
 
@@ -29,6 +29,7 @@ continual-learning/
 ├── run_replay_comparison.py     # comparison-run orchestration
 ├── configs/
 │   ├── sac/                     # single-task expert presets
+│   │   └── cw10/                # stable-tanh CW10 task 2 and tasks 6--10
 │   ├── diffcrl/                 # DiffCRL and replay variants
 │   ├── local/                   # machine/local experiment presets
 │   └── archive/                 # historical reproducibility presets
@@ -187,10 +188,42 @@ continues to own Gaussian sampling, losses, entropy tuning, replay, optimizers,
 and target updates. The actor's tanh log-Jacobian uses the Legacy algebraically
 stable pre-tanh expression instead of SB3's action-space epsilon expression;
 this changes neither the actor parameters nor deterministic inference and
-prevents saturated float32 actions from losing the correction gradient. The
-original Legacy single-task
-wrapper's 12D observation truncation and multi-head selection are intentionally
-absent.
+prevents saturated float32 actions from losing the correction gradient. New
+manifests record this distribution and network combination as
+`legacy-continual-diff-pytorch-4x256-stable-tanh-v2`. Historical
+`LegacySACPolicy` state dictionaries remain loadable because the distribution
+adds no parameters. The original Legacy single-task wrapper's 12D observation
+truncation and multi-head selection are intentionally absent.
+
+The formal stable-tanh expert batch under `configs/sac/cw10/` contains six
+independent single-task experiments in this order:
+
+```text
+push-wall-v3 -> handle-press-side-v3 -> push-v3 -> shelf-place-v3
+             -> window-close-v3 -> peg-unplug-side-v3
+```
+
+This is Legacy CW10 task 2 followed by tasks 6--10, with environment names
+updated from v2 to v3. The ordering belongs only to launch orchestration: every
+configuration creates a new SAC model, optimizer, and replay buffer with seed
+0. There is no policy, optimizer, replay-buffer, or entropy-state transfer
+between tasks. Each run uses one million environment steps, reward v2, fixed
+validation banks, and evaluation every 40,000 steps. Outputs are isolated under
+`runs/cw10_experts/stable_tanh_v2/reward_v2/<task>/seed_0/`.
+
+`scripts/experiments/train_cw10_six_sequential.sh` is a thin sequential
+launcher over those six YAML files. It validates every configuration and target
+path before starting, saves one console log per task, and stops on the first
+nonzero Python exit status. Because piping through `tee` removes the TTY needed
+for SB3's Rich progress rendering, `train_sac.py` disables that interactive bar
+and emits an unbuffered progress record from the existing evaluation callback:
+step, validation success rate, and mean return. This changes display behavior
+only; evaluation cadence and training mathematics are unchanged.
+
+Standalone SAC retains only the atomically replaced `best_model.zip`, selected
+lexicographically by validation success rate and then mean episode return.
+Exact ties retain the earlier checkpoint. Periodic/final checkpoints, replay
+buffer persistence, and resume state are intentionally absent.
 
 `SB3SACPolicy` adapts an already loaded SAC model to the common
 `Policy.act(observation, deterministic=True) -> action` boundary. The collector
@@ -277,11 +310,13 @@ Task-ID and normalized 3D reference-goal conditioning remain external inputs,
 while the goal is also one of the generated features. There is no trajectory
 decoder: generated previous states and goals pass through unchanged. Actions
 may be modeled raw or in pre-`tanh` coordinates; optional replay projection
-clips only the four generated action coordinates.
+clips only the four generated action coordinates. For historical configuration
+and artifact compatibility, these shared generator action settings remain in
+the `diffusion` section even when Flow Matching is selected.
 
-Real collected trajectories remain subject to exact previous-state and
-constant-goal validation. Generated replay requires the physical shape and
-finite values but is not rejected for learned previous-state or goal drift.
+Real collected trajectories and generated replay share the stage acceptance
+contract: physical `(N,T,43)` shape and finite values. Neither source is
+rejected for previous-state misalignment or within-episode goal variation.
 
 Generated replay provenance stores read-only goal deviation/variation,
 previous-state alignment and reset error, action-bound violations, and NaN/Inf
@@ -557,10 +592,9 @@ metric.
 | BC dataset | observations `(N*T,39)`, actions `(N*T,4)`, plus optional task IDs `(N*T,)` | `bc_dataset` | `fit_bc` |
 | Evaluation cell | returns, success rate, lengths, seeds and provenance | `evaluate_task` | `EvaluationMatrix.record` |
 
-Real physical episodes require previous state at reset to equal current state,
-subsequent previous states to equal preceding current states, and an exactly
-constant goal. Generated episodes retain the same shape and finiteness contract,
-but these learned relationships are diagnostics rather than acceptance rules.
+Real and generated physical episodes require the expected shape and finite
+values. Previous-state alignment and within-episode goal consistency are
+diagnostics rather than acceptance rules for both sources.
 
 ## 8. Configuration and reproducibility
 

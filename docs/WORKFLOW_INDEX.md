@@ -1,6 +1,6 @@
 ---
 status: current
-last_verified: 2026-11-11
+last_verified: 2026-11-15
 applies_to: continual-learning
 ---
 
@@ -18,7 +18,7 @@ Use [Development status](DEVELOPMENT_STATUS.md) for capability maturity and
 | Workflow | Entry point | Primary configurations |
 |---|---|---|
 | Single-task SAC experts | `train_sac.py` | `configs/sac/sac.yaml`, formal task presets, and matching smoke presets |
-| DiffCRL (`diffusion`, `flow-matching`, `real`, or `none`) | `train_diffcrl.py` | `configs/diffcrl/` |
+| DiffCRL (`diffusion`, `flow-matching`, `expert-recollection`, or `none`) | `train_diffcrl.py` | `configs/diffcrl/` |
 | Matched replay comparison | `run_replay_comparison.py` | `configs/diffcrl/policy_replay_comparison_*.yaml` |
 | Expert trajectory collection | `scripts/collection/collect_expert_trajectories.py` | A dedicated `experiment: trajectory_collection` YAML passed by the caller |
 | Policy evaluation | `scripts/evaluation/evaluate_sac.py`, `scripts/evaluation/evaluate_continual.py` | Resolved run configuration and checkpoint |
@@ -50,6 +50,7 @@ an explicitly documented experimental preset.
 
 Historical trajectory-representation experiments may contain removed 22D/40D
 configuration fields. They remain provenance artifacts and must not be passed
-to the current strict 43D-only loader. Current generator checkpoints accept
-only `trajectory_diffusion_43_v2` or `trajectory_flow_matching_43_v2` as
-appropriate; legacy checkpoints are not converted.
+to the current strict 43D-only loader. Current checkpoints use
+`trajectory_diffusion_43_v3` and `trajectory_flow_matching_43_v3`. Known v2
+direct-43D checkpoints remain load-compatible only as their original Temporal
+CNN architectures; reduced-representation checkpoints are not converted.
