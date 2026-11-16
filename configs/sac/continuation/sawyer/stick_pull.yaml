@@ -1,0 +1,32 @@
+experiment: sac
+environment: {backend: metaworld-v3, reward_function_version: v2}
+sac:
+  steps: 500000
+  learning_rate: 0.001
+  buffer_size: 1000000
+  learning_starts: 1000
+  random_exploration_steps: 10000
+  target_output_std: 0.089
+  batch_size: 128
+  gamma: 0.99
+  tau: 0.005
+  train_freq: 50
+  gradient_steps: 50
+  early_stopping: {enabled: true, min_steps: 50000, success_threshold: 1.0, patience: 3, plateau_patience: null, min_delta: 0.01}
+actor_init: {mode: scratch, checkpoint: null}
+resume:
+  enabled: true
+  checkpoint: experts/sawyer/stick-pull-v3/seed_0/best_model.zip
+  replay_buffer: null
+  refill_steps: 10000
+continual: {tasks: [stick-pull-v3]}
+evaluation:
+  episodes: 50
+  final_episodes: 100
+  frequency: 20000
+  seed_offset: 10000
+  mode: fixed-tasks
+  task_set_seed: 10000
+  final_task_set_seeds: [20000]
+  final_reset_seed: 30000
+runtime: {seed: 0, device: auto, output: runs/sac_continuation/sawyer/stick-pull-v3, run_name: seed_0}

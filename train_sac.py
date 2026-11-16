@@ -18,6 +18,7 @@ from src.config import (
     save_resolved_config,
 )
 from src.sac_policy import LegacySACPolicy, SAC_POLICY_ARCHITECTURE
+from src.sac_actor_init import initialize_sac_actor
 from continual_manipulation.evaluation import (
     disable_task_sampling,
     evaluate_task,
@@ -30,6 +31,7 @@ from continual_manipulation.environments import (
     ACTION_SHAPE, OBSERVATION_SHAPE, horizon_for_backend, make_env,
 )
 from src.support.expert_manifest import qualification_record, write_expert_manifest
+from src.support.expert_manifest import validate_expert_checkpoint, load_expert_manifest
 from src.support.reproducibility import file_hash
 from src.support.run_manifest import complete_run, create_run_manifest
 from stable_baselines3 import SAC
@@ -132,6 +134,10 @@ class FixedSeedEvalCallback(BaseCallback):
         self.best_success_model_name = best_success_model_name
         self.atomic_model_replacement = atomic_model_replacement
         self.consecutive_successful_evaluations = 0
+        self.training_start_timestep: int | None = None
+        self.best_plateau_success = -np.inf
+        self.plateau_evaluations = 0
+        self.stopping_reason: str | None = None
         self.early_stopped = False
         self.stop_timestep: int | None = None
         self.trigger_success_rate: float | None = None
@@ -257,19 +263,39 @@ class FixedSeedEvalCallback(BaseCallback):
             self.consecutive_successful_evaluations += 1
         else:
             self.consecutive_successful_evaluations = 0
+        if success_rate > self.best_plateau_success + self.early_stopping.min_delta:
+            self.best_plateau_success = success_rate
+            self.plateau_evaluations = 0
+        else:
+            self.plateau_evaluations += 1
+        start = self.training_start_timestep or 0
+        additional_steps = self.num_timesteps - start
         if (
-            self.num_timesteps >= self.early_stopping.min_steps
+            additional_steps >= self.early_stopping.min_steps
             and self.consecutive_successful_evaluations >= self.early_stopping.patience
         ):
             self.early_stopped = True
             self.stop_timestep = self.num_timesteps
             self.trigger_success_rate = success_rate
+            self.stopping_reason = "target-success"
+            return False
+        if (
+            additional_steps >= self.early_stopping.min_steps
+            and self.early_stopping.plateau_patience is not None
+            and self.plateau_evaluations >= self.early_stopping.plateau_patience
+        ):
+            self.early_stopped = True
+            self.stop_timestep = self.num_timesteps
+            self.trigger_success_rate = success_rate
+            self.stopping_reason = "validation-plateau"
             return False
         return True
 
     def _on_training_start(self) -> None:
         """Initialize the global schedule and optionally evaluate a fresh policy."""
         current = self.model.num_timesteps
+        if self.training_start_timestep is None:
+            self.training_start_timestep = current
         self._next_evaluation_timestep = next_global_boundary(current, self.eval_freq)
         if self.evaluate_on_training_start:
             self.num_timesteps = current
@@ -346,13 +372,14 @@ def final_test(config: ExperimentConfig, model) -> list[dict]:
     task = config.continual.tasks[0]
     policy = SB3SACPolicy(model)
     fixed = config.environment.backend in ("metaworld-v3", "kuka-v3")
+    episodes = config.evaluation.final_episodes or config.evaluation.episodes
     return [
         evaluate_task(
             policy,
             TaskSpec(task, task),
-            episodes=config.evaluation.episodes,
+            episodes=episodes,
             seed=(
-                config.evaluation.final_reset_seed + index * config.evaluation.episodes
+                config.evaluation.final_reset_seed + index * episodes
                 if fixed
                 else bank_seed
             ),
@@ -380,6 +407,8 @@ def early_stopping_metadata(
         "min_steps": config.min_steps,
         "success_threshold": config.success_threshold,
         "patience": config.patience,
+        "plateau_patience": config.plateau_patience,
+        "min_delta": config.min_delta,
         "triggered": observed.early_stopped if observed is not None else False,
         "stop_timestep": observed.stop_timestep if observed is not None else None,
         "trigger_success_rate": (
@@ -388,6 +417,171 @@ def early_stopping_metadata(
         "consecutive_success_count": (
             observed.consecutive_successful_evaluations if observed is not None else 0
         ),
+        "stopping_reason": observed.stopping_reason if observed is not None else None,
+        "additional_steps_at_stop": (
+            observed.stop_timestep - (observed.training_start_timestep or 0)
+            if observed is not None and observed.stop_timestep is not None
+            else None
+        ),
+    }
+
+
+def initialize_sac_training(config, train_env, run_dir: Path):
+    """Create scratch SAC or restore the serialized model state for continuation."""
+    if not config.resume.enabled:
+        target_entropy = target_entropy_from_output_std(
+            config.sac.target_output_std, int(np.prod(train_env.action_space.shape))
+        )
+        model = LegacyScheduleSAC(
+            LegacySACPolicy,
+            train_env,
+            learning_rate=config.sac.learning_rate,
+            buffer_size=config.sac.buffer_size,
+            learning_starts=config.sac.learning_starts,
+            random_exploration_steps=config.sac.random_exploration_steps,
+            batch_size=config.sac.batch_size,
+            gamma=config.sac.gamma,
+            tau=config.sac.tau,
+            update_interval=config.sac.train_freq,
+            gradient_steps=config.sac.gradient_steps,
+            ent_coef=SAC_ENT_COEF,
+            target_entropy=target_entropy,
+            tensorboard_log=str(run_dir / "tensorboard"),
+            seed=config.runtime.seed,
+            device=config.runtime.device,
+            verbose=0,
+        )
+        actor = initialize_sac_actor(
+            model, config.actor_init, base_dir=Path(__file__).resolve().parent
+        )
+        return model, actor, {
+            "enabled": False,
+            "mode": "scratch",
+            "restored": [],
+            "reset": ["all SAC training state"],
+            "source_checkpoint": None,
+        }
+
+    source = Path(config.resume.checkpoint).expanduser().resolve()
+    manifest_path = source.parent / "manifest.json"
+    if not manifest_path.is_file():
+        manifest_path = source.with_suffix(source.suffix + ".manifest.json")
+    if not manifest_path.is_file():
+        raise FileNotFoundError("Resume requires a checkpoint-specific expert manifest.")
+    manifest = load_expert_manifest(manifest_path)
+    reward_configuration = manifest.get("reward_configuration")
+    if reward_configuration not in (None, "v2 original hammer reward; nail progress weight 0.0"):
+        raise ValueError(
+            "Resume source uses a reward configuration that the SAC training factory "
+            "cannot reconstruct safely."
+        )
+    validate_expert_checkpoint(
+        source,
+        expected_task=config.continual.tasks[0],
+        expected_backend=config.environment.backend,
+        expected_reward_function_version=config.environment.reward_function_version,
+        expected_observation_shape=OBSERVATION_SHAPE,
+        expected_action_shape=ACTION_SHAPE,
+        expected_horizon=horizon_for_backend(config.environment.backend),
+        manifest_path=manifest_path,
+        allow_legacy=False,
+    )
+    model = LegacyScheduleSAC.load(
+        source,
+        env=train_env,
+        device=config.runtime.device,
+        tensorboard_log=str(run_dir / "tensorboard"),
+    )
+    source_timestep = int(model.num_timesteps)
+    model.set_random_seed(config.runtime.seed)
+    replay = config.resume.replay_buffer
+    if replay is not None:
+        replay_path = Path(replay).expanduser().resolve()
+        if not replay_path.is_file():
+            raise FileNotFoundError(f"Resume replay buffer not found: {replay_path}")
+        model.load_replay_buffer(replay_path)
+        replay_record = str(replay_path)
+        replay_restored = True
+    else:
+        replay_record = None
+        replay_restored = False
+    actor = {"schema_version": 1, "mode": "scratch", "reason": "full SAC resume"}
+    provenance = {
+        "enabled": True,
+        "mode": "full-model-with-replay" if replay_restored else "model-state-only",
+        "source_checkpoint": str(source),
+        "source_checkpoint_sha256": file_hash(source),
+        "source_manifest": str(manifest_path.resolve()),
+        "source_policy_architecture": manifest.get("policy_architecture"),
+        "source_timestep": source_timestep,
+        "source_gradient_updates": int(getattr(model, "_n_updates", 0)),
+        "replay_buffer": replay_record,
+        "restored": [
+            "actor parameters", "critic parameters", "target critic parameters",
+            "optimizer states", "entropy coefficient and optimizer", "timestep counters",
+        ] + (["replay buffer"] if replay_restored else []),
+        "reset": (
+            [] if replay_restored else ["replay buffer"]
+        ) + ["random-number-generator state (reseeded for continuation)"],
+        "effective_loaded_hyperparameters": {
+            "learning_rate": model.learning_rate,
+            "buffer_size": model.buffer_size,
+            "learning_starts": model.learning_starts,
+            "batch_size": model.batch_size,
+            "gamma": model.gamma,
+            "tau": model.tau,
+            "gradient_steps": model.gradient_steps,
+            "random_exploration_steps": getattr(model, "random_exploration_steps", None),
+            "update_interval": getattr(model, "update_interval", None),
+        },
+    }
+    return model, actor, provenance
+
+
+def refill_resume_replay_buffer(model, steps: int, *, additional_budget: int) -> dict:
+    """Collect stochastic transitions without invoking SAC optimization."""
+    if steps < 0 or steps >= additional_budget:
+        raise ValueError("Refill steps must be nonnegative and smaller than the budget.")
+    before_steps = int(model.num_timesteps)
+    before_updates = int(getattr(model, "_n_updates", 0))
+    before_size = int(model.replay_buffer.size())
+    if steps == 0:
+        return {
+            "requested_steps": 0,
+            "collected_steps": 0,
+            "buffer_size_before": before_size,
+            "buffer_size_after": before_size,
+            "completed": True,
+        }
+    env = model.get_env()
+    if env is None or env.num_envs != 1:
+        raise ValueError("Replay refill requires one attached vectorized environment.")
+    model._last_obs = env.reset()
+    for _ in range(steps):
+        actions, buffer_actions = model._sample_action(
+            learning_starts=0, action_noise=None, n_envs=env.num_envs
+        )
+        new_obs, rewards, dones, infos = env.step(actions)
+        model.num_timesteps += env.num_envs
+        model._store_transition(
+            model.replay_buffer,
+            buffer_actions,
+            new_obs,
+            rewards,
+            dones,
+            infos,
+        )
+    if int(getattr(model, "_n_updates", 0)) != before_updates:
+        raise RuntimeError("SAC optimizer updates occurred during replay refill.")
+    collected = int(model.num_timesteps) - before_steps
+    if collected != steps:
+        raise RuntimeError("Replay refill timestep accounting mismatch.")
+    return {
+        "requested_steps": steps,
+        "collected_steps": collected,
+        "buffer_size_before": before_size,
+        "buffer_size_after": int(model.replay_buffer.size()),
+        "completed": True,
     }
 
 
@@ -474,36 +668,55 @@ def main(argv=None) -> None:
         best_success_model_name="best_model",
         atomic_model_replacement=True,
     )
-    target_entropy = target_entropy_from_output_std(
-        config.sac.target_output_std, int(np.prod(train_env.action_space.shape))
+    model, actor_initialization, resume_provenance = initialize_sac_training(
+        config, train_env, run_dir
     )
-    model = LegacyScheduleSAC(
-        LegacySACPolicy,
-        train_env,
-        learning_rate=config.sac.learning_rate,
-        buffer_size=config.sac.buffer_size,
-        learning_starts=config.sac.learning_starts,
-        random_exploration_steps=config.sac.random_exploration_steps,
-        batch_size=config.sac.batch_size,
-        gamma=config.sac.gamma,
-        tau=config.sac.tau,
-        update_interval=config.sac.train_freq,
-        gradient_steps=config.sac.gradient_steps,
-        ent_coef=SAC_ENT_COEF,
-        target_entropy=target_entropy,
-        tensorboard_log=str(run_dir / "tensorboard"),
-        seed=config.runtime.seed,
-        device=config.runtime.device,
-        verbose=0,
+    source_timestep = int(model.num_timesteps)
+    refill = (
+        refill_resume_replay_buffer(
+            model,
+            config.resume.refill_steps,
+            additional_budget=config.sac.steps,
+        )
+        if config.resume.enabled and config.resume.replay_buffer is None
+        else {
+            "requested_steps": 0,
+            "collected_steps": 0,
+            "buffer_size_before": int(model.replay_buffer.size()),
+            "buffer_size_after": int(model.replay_buffer.size()),
+            "completed": True,
+        }
     )
+    resume_provenance["refill"] = refill
+    evaluation_callback.training_start_timestep = source_timestep
+    with (run_dir / "actor_initialization.json").open("x", encoding="utf-8") as stream:
+        json.dump(actor_initialization, stream, indent=2, allow_nan=False)
+        stream.write("\n")
+    print(f"Actor initialization: {config.actor_init.mode}")
 
     try:
-        model.learn(
-            total_timesteps=config.sac.steps,
+        learn_kwargs = dict(
+            total_timesteps=config.sac.steps - refill["collected_steps"],
             callback=evaluation_callback,
             tb_log_name="SAC",
             progress_bar=False,
         )
+        if config.resume.enabled:
+            learn_kwargs["reset_num_timesteps"] = False
+        model.learn(**learn_kwargs)
+        if config.resume.enabled:
+            final_returns, final_lengths, final_successes = evaluation_callback._evaluate()
+        else:
+            final_returns = evaluation_callback.results[-1]
+            final_lengths = evaluation_callback.ep_lengths[-1]
+            final_successes = evaluation_callback.successes[-1]
+        final_policy_validation = {
+            "success_rate": float(np.mean(final_successes)),
+            "success_count": int(np.sum(final_successes)),
+            "mean_return": float(np.mean(final_returns)),
+            "std_return": float(np.std(final_returns)),
+            "mean_episode_length": float(np.mean(final_lengths)),
+        }
         best_path = run_dir / "best_model.zip"
         print(f"Best model saved to: {best_path}")
         if (
@@ -530,6 +743,9 @@ def main(argv=None) -> None:
                 task_hashes=list(evaluation_callback.task_hashes),
             )
             config_path = run_dir / "config.yaml"
+            architecture = resume_provenance.get("source_policy_architecture")
+            if isinstance(architecture, dict):
+                architecture = architecture.get("identity") or architecture.get("policy_class")
             write_expert_manifest(
                 best_path,
                 task_name=config.continual.tasks[0],
@@ -542,7 +758,7 @@ def main(argv=None) -> None:
                 action_shape=ACTION_SHAPE,
                 horizon=horizon_for_backend(config.environment.backend),
                 qualification=selected_qualification,
-                policy_architecture=SAC_POLICY_ARCHITECTURE,
+                policy_architecture=architecture or SAC_POLICY_ARCHITECTURE,
             )
         else:
             raise RuntimeError("SAC evaluation produced no checkpoint-selection data.")
@@ -550,8 +766,26 @@ def main(argv=None) -> None:
         selected = SAC.load(best_path, device=config.runtime.device)
         results = {
             "schema_version": 1,
+            "actor_initialization": actor_initialization,
+            "resume": resume_provenance,
+            "source_policy_validation": (
+                {
+                    "success_rate": float(np.mean(evaluation_callback.successes[0])),
+                    "mean_return": float(np.mean(evaluation_callback.results[0])),
+                    "timestep": int(resume_provenance["source_timestep"]),
+                }
+                if config.resume.enabled else None
+            ),
+            "final_policy_validation": final_policy_validation,
             "actual_final_timestep": model.num_timesteps,
-            "target_timestep": config.sac.steps,
+            "additional_training_steps": model.num_timesteps - resume_provenance.get("source_timestep", 0),
+            "total_effective_environment_steps": model.num_timesteps,
+            "additional_gradient_updates": int(getattr(model, "_n_updates", 0))
+            - int(resume_provenance.get("source_gradient_updates", 0)),
+            "target_additional_timesteps": config.sac.steps,
+            "target_timestep": (
+                resume_provenance.get("source_timestep", 0) + config.sac.steps
+            ),
             "early_stopping": early_stopping_metadata(
                 config.sac.early_stopping, evaluation_callback
             ),

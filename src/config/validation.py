@@ -97,11 +97,43 @@ def _validate_sac(config: SACExperimentConfig) -> None:
     _validate_environment(config.environment)
     _validate_sac_values(config.sac)
     _positive(config.sac, ("steps",), "sac")
+    actor_init = config.actor_init
+    if actor_init.mode not in ("scratch", "sac_actor", "general_actor"):
+        raise ValueError(
+            "actor_init.mode must be scratch, sac_actor, or general_actor."
+        )
+    if actor_init.mode == "scratch" and actor_init.checkpoint is not None:
+        raise ValueError("actor_init.checkpoint must be null in scratch mode.")
+    if actor_init.mode != "scratch" and (
+        actor_init.checkpoint is None or not actor_init.checkpoint.strip()
+    ):
+        raise ValueError(
+            f"actor_init.checkpoint is required in {actor_init.mode} mode."
+        )
+    resume = config.resume
+    if resume.enabled and actor_init.mode != "scratch":
+        raise ValueError("resume and Actor Warm-Start are mutually exclusive.")
+    if resume.enabled and (resume.checkpoint is None or not resume.checkpoint.strip()):
+        raise ValueError("resume.checkpoint is required when resume.enabled is true.")
+    if not resume.enabled and (resume.checkpoint is not None or resume.replay_buffer is not None):
+        raise ValueError("resume paths must be null when resume.enabled is false.")
+    if resume.refill_steps < 0:
+        raise ValueError("resume.refill_steps must be nonnegative.")
+    if not resume.enabled and resume.refill_steps != 0:
+        raise ValueError("resume.refill_steps must be zero when resume is disabled.")
+    if resume.replay_buffer is not None and resume.refill_steps != 0:
+        raise ValueError("resume.refill_steps must be zero when a replay buffer is restored.")
+    if resume.enabled and resume.replay_buffer is None and resume.refill_steps >= config.sac.steps:
+        raise ValueError("resume.refill_steps must be smaller than the additional SAC step budget.")
     stop = config.sac.early_stopping
     if stop.min_steps < 0:
         raise ValueError("sac.early_stopping.min_steps must be nonnegative.")
     if stop.patience <= 0:
         raise ValueError("sac.early_stopping.patience must be positive.")
+    if stop.plateau_patience is not None and stop.plateau_patience <= 0:
+        raise ValueError("sac.early_stopping.plateau_patience must be positive or null.")
+    if not math.isfinite(stop.min_delta) or stop.min_delta < 0:
+        raise ValueError("sac.early_stopping.min_delta must be nonnegative.")
     if not 0 <= stop.success_threshold <= 1:
         raise ValueError("sac.early_stopping.success_threshold must be in [0, 1].")
     _validate_tasks(config.continual.tasks, config.environment.backend)
@@ -109,6 +141,8 @@ def _validate_sac(config: SACExperimentConfig) -> None:
         raise ValueError("continual.tasks must contain exactly one task for sac.")
     evaluation = config.evaluation
     _positive(evaluation, ("episodes", "frequency"), "evaluation")
+    if evaluation.final_episodes is not None and evaluation.final_episodes <= 0:
+        raise ValueError("evaluation.final_episodes must be positive or null.")
     if evaluation.seed_offset < 0:
         raise ValueError("evaluation.seed_offset must be nonnegative.")
     if evaluation.mode not in ("fixed-tasks", "sampled"):

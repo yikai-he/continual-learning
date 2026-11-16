@@ -40,6 +40,8 @@ class EarlyStoppingConfig:
     min_steps: int = 100_000
     success_threshold: float = 0.95
     patience: int = 3
+    plateau_patience: int | None = None
+    min_delta: float = 0.01
 
 
 @dataclass(frozen=True)
@@ -56,6 +58,24 @@ class SACConfig:
     train_freq: int = 50
     gradient_steps: int = 50
     early_stopping: EarlyStoppingConfig = field(default_factory=EarlyStoppingConfig)
+
+
+@dataclass(frozen=True)
+class ActorInitConfig:
+    """Optional actor-only initialization for a standalone SAC run."""
+
+    mode: str = "scratch"
+    checkpoint: str | None = None
+
+
+@dataclass(frozen=True)
+class SACResumeConfig:
+    """Optional full-model continuation, distinct from actor initialization."""
+
+    enabled: bool = False
+    checkpoint: str | None = None
+    replay_buffer: str | None = None
+    refill_steps: int = 0
 
 
 @dataclass(frozen=True)
@@ -158,6 +178,7 @@ class ContinualEvaluationConfig:
 @dataclass(frozen=True)
 class SACEvaluationConfig:
     episodes: int = 5
+    final_episodes: int | None = None
     frequency: int = 5_000
     seed_offset: int = 10_000
     mode: str = "sampled"
@@ -171,6 +192,8 @@ class SACExperimentConfig:
     experiment: str = "sac"
     environment: EnvironmentConfig = field(default_factory=EnvironmentConfig)
     sac: SACConfig = field(default_factory=SACConfig)
+    actor_init: ActorInitConfig = field(default_factory=ActorInitConfig)
+    resume: SACResumeConfig = field(default_factory=SACResumeConfig)
     continual: SACTaskConfig = field(default_factory=SACTaskConfig)
     evaluation: SACEvaluationConfig = field(default_factory=SACEvaluationConfig)
     runtime: RuntimeConfig = field(

@@ -21,6 +21,7 @@ from .schema import (
     REPLAY_PRIORITY_STRATEGY,
     SAC_ENT_COEF,
     SAC_NET_ARCH,
+    ActorInitConfig,
     BCConfig,
     ContinualEvaluationConfig,
     DiffCRLExperimentConfig,
@@ -33,6 +34,7 @@ from .schema import (
     RuntimeConfig,
     SACConfig,
     SACExperimentConfig,
+    SACResumeConfig,
     default_config,
 )
 from .validation import validate_config

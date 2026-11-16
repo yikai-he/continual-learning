@@ -1,0 +1,77 @@
+{
+  "schema_version": 1,
+  "registry_status": "verified",
+  "checkpoint_identifier": "best_model.zip",
+  "checkpoint_sha256": "fef45ed74cae6774bdedeee4fa5af3bd90916c0732fcfa7f857e59fd495282de",
+  "task_name": "stick-pull-v3",
+  "robot": "sawyer",
+  "backend": "metaworld-v3",
+  "algorithm": "SAC",
+  "reward_function_version": "v2",
+  "training_seed": 0,
+  "policy_architecture": {
+    "identity": "legacy-continual-diff-pytorch-4x256-v1",
+    "policy_class": "src.sac_policy.LegacySACPolicy",
+    "actor_class": "src.sac_policy.LegacySACActor",
+    "net_arch": [
+      256,
+      256,
+      256,
+      256
+    ],
+    "identity_source": "source_manifest"
+  },
+  "observation_shape": [
+    39
+  ],
+  "action_shape": [
+    4
+  ],
+  "action_bounds": {
+    "low": [
+      -1.0,
+      -1.0,
+      -1.0,
+      -1.0
+    ],
+    "high": [
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ]
+  },
+  "horizon": 200,
+  "qualification_status": "qualified",
+  "qualification": {
+    "protocol": "fixed-mt1-task-bank-v1",
+    "episodes": 10,
+    "success_rate": 0.6,
+    "mean_return": 1157.191393647197,
+    "return_std": 406.61768738685794,
+    "task_set_seed": 10000,
+    "evaluation_seed": 10000,
+    "deterministic": true,
+    "ordered_task_data_sha256": [
+      "7087f1149c7913f5e6a27fcd7c94d840fe293603b3395ad23d4353db136cd6e5",
+      "3c4f704706d576a405aa5ba516f5238629d1e06b4ae821691e58afa20b935cf6",
+      "fa7d86adb66c7abb6a2e1e103c5bf8c9bf8190fc2a3dcb27bb9b842931bfe94a",
+      "df79077dc1b431201ea8118b22c89b0b877b42cdea332c18a2187bc7a4e5477a",
+      "5409a028bbbc310d9c2c8351c55a209e5e2edbfb68e71520cd7443592f38e3bf",
+      "7578545ba1e8c9527633082b4cf93708d73bcdda6241fafd65297a36d0bf6edb",
+      "faaf67084ad5d8bd34e2664f70dda8083cabe9b8eae9c9b5f9bca06d9bc66a53",
+      "2242b463be3331d02001a83dcba074a6682d803036ba2190f493fb6911493148",
+      "76e68d7a19ec66d069d57c5facf87bff4e0b224a1d30aa2e69b770f5da6063ba",
+      "93e869a0023b57debf9f01510a291d67c5d54bbed7a7c8510bb86dc02adb1a0c"
+    ],
+    "selection_key": [
+      0.6,
+      1157.191393647197
+    ],
+    "selection_rule": "maximum success_rate; mean_return breaks ties"
+  },
+  "training_config_reference": "/home/yikai/Documents/Code/Thesis/continual-learning/runs/cw5_experts/legacy_sac/reward_v2/stick-pull-v3/seed_0/config.yaml",
+  "training_config_sha256": "b39705dfd82c165eeb968911d686d2485791911e98bf07963385c9dd2c3e3a43",
+  "source_checkpoint": "runs/cw5_experts/legacy_sac/reward_v2/stick-pull-v3/seed_0/best_model.zip",
+  "source_manifest": "runs/cw5_experts/legacy_sac/reward_v2/stick-pull-v3/seed_0/best_model.zip.manifest.json"
+}

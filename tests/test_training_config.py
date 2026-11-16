@@ -75,6 +75,7 @@ class TrainingConfigTests(unittest.TestCase):
             evaluation=replace(
                 config.evaluation,
                 episodes=2,
+                final_episodes=3,
                 final_task_set_seeds=[20_000, 20_001],
                 final_reset_seed=30_000,
             ),
@@ -95,7 +96,11 @@ class TrainingConfigTests(unittest.TestCase):
         )
         self.assertEqual(
             [call.kwargs["seed"] for call in evaluate.call_args_list],
-            [30_000, 30_002],
+            [30_000, 30_003],
+        )
+        self.assertEqual(
+            [call.kwargs["episodes"] for call in evaluate.call_args_list],
+            [3, 3],
         )
         self.assertTrue(
             all(
@@ -177,6 +182,10 @@ class TrainingConfigTests(unittest.TestCase):
                 train_sac, "Monitor", side_effect=lambda e: e
             ), patch.object(train_sac, "FixedSeedEvalCallback") as evaluation, patch.object(
                 train_sac, "final_test", return_value=[{"success_rate": 1.0}]
+            ), patch.object(
+                train_sac,
+                "initialize_sac_actor",
+                return_value={"schema_version": 1, "mode": "scratch"},
             ):
                 sac.return_value.num_timesteps = 7
                 load.return_value = sac.return_value

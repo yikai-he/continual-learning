@@ -42,6 +42,7 @@ def manifest_candidates(checkpoint: str | Path) -> tuple[Path, ...]:
     return (
         checkpoint.with_suffix(checkpoint.suffix + ".manifest.json"),
         checkpoint.with_suffix(".manifest.json"),
+        checkpoint.parent / "manifest.json",
         checkpoint.parent / "expert_manifest.json",
     )
 

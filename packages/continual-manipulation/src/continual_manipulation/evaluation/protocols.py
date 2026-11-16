@@ -61,6 +61,19 @@ def format_evaluation_result(task_name: str, result: dict) -> str:
     )
 
 
+def validate_policy_spaces(model, env):
+    """Validate inference contracts without trusting stale observation bounds."""
+    if (
+        model.observation_space.shape != env.observation_space.shape
+        or model.observation_space.dtype != env.observation_space.dtype
+        or model.action_space.shape != env.action_space.shape
+        or model.action_space.dtype != env.action_space.dtype
+        or not np.array_equal(model.action_space.low, env.action_space.low)
+        or not np.array_equal(model.action_space.high, env.action_space.high)
+    ):
+        raise ValueError("SAC model/environment spaces differ.")
+
+
 def evaluate_task(
     policy,
     task,
@@ -87,10 +100,8 @@ def evaluate_task(
     )
     if episodes is None:
         episodes = len(selected) if selected is not None else 100
-    if episodes < 1 or selected is not None and episodes > len(selected):
-        raise ValueError(
-            "Episode count must be positive and cannot exceed the fixed task bank."
-        )
+    if episodes < 1:
+        raise ValueError("Episode count must be positive.")
     sequence = TaskSequence((task,))
     returns = []
     lengths = []
@@ -104,11 +115,8 @@ def evaluate_task(
     ) as switcher:
         env = switcher.switch(0, seed=seed)
         model = getattr(policy, "model", None)
-        if model is not None and (
-            model.observation_space != env.observation_space
-            or model.action_space != env.action_space
-        ):
-            raise ValueError("SAC model/environment spaces differ.")
+        if model is not None:
+            validate_policy_spaces(model, env)
         horizon = env.spec.max_episode_steps
         if selected is not None:
             disable_task_sampling(env)
@@ -120,7 +128,8 @@ def evaluate_task(
         ) as evaluation_progress:
             for i in evaluation_progress:
                 if selected is not None:
-                    env.unwrapped.set_task(selected[i])
+                    task_index = i % len(selected)
+                    env.unwrapped.set_task(selected[task_index])
                 rollout_policy = policy
                 if getattr(policy, "task_conditioning", "none") == "one_hot":
                     if policy_task_id is None:
@@ -139,7 +148,7 @@ def evaluate_task(
                     env, rollout_policy, task.task_id, seed=seed + i, deterministic=True
                 )
                 if selected is not None:
-                    validate_active_task(env, selected[i], backend)
+                    validate_active_task(env, selected[task_index], backend)
                 returns.append(trajectory.episode_return)
                 lengths.append(trajectory.length)
                 successes.append(trajectory.success)
@@ -155,7 +164,8 @@ def evaluate_task(
                 if selected is not None:
                     episode_provenance.append(
                         {
-                            **identities[i],
+                            **identities[task_index],
+                            "task_bank_index": task_index,
                             "reset_seed": seed + i,
                             "episode_return": trajectory.episode_return,
                             "success": bool(trajectory.success),
@@ -178,6 +188,9 @@ def evaluate_task(
         "environment_backend": backend,
         "task_set_seed": task_set_seed if selected is not None else None,
         "task_bank_size": len(selected) if selected is not None else None,
+        "task_bank_repetitions": (
+            int(np.ceil(episodes / len(selected))) if selected is not None else None
+        ),
         "ordered_task_hashes": (
             [identity["task_hash"] for identity in identities]
             if selected is not None
