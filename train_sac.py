@@ -291,6 +291,20 @@ class FixedSeedEvalCallback(BaseCallback):
             return False
         return True
 
+    def record_maximum_budget_completion(self, maximum_additional_steps: int) -> None:
+        """Persist normal completion at the configured additional-step ceiling."""
+        if self.stopping_reason is not None:
+            return
+        start = self.training_start_timestep or 0
+        additional_steps = self.num_timesteps - start
+        if additional_steps < maximum_additional_steps:
+            raise RuntimeError(
+                "SAC training ended before its maximum budget without an Early "
+                "Stopping reason."
+            )
+        self.stop_timestep = self.num_timesteps
+        self.stopping_reason = "maximum-training-steps"
+
     def _on_training_start(self) -> None:
         """Initialize the global schedule and optionally evaluate a fresh policy."""
         current = self.model.num_timesteps
@@ -704,6 +718,8 @@ def main(argv=None) -> None:
         if config.resume.enabled:
             learn_kwargs["reset_num_timesteps"] = False
         model.learn(**learn_kwargs)
+        evaluation_callback.num_timesteps = int(model.num_timesteps)
+        evaluation_callback.record_maximum_budget_completion(config.sac.steps)
         if config.resume.enabled:
             final_returns, final_lengths, final_successes = evaluation_callback._evaluate()
         else:

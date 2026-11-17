@@ -29,7 +29,17 @@ from src.config import (
     save_resolved_config,
     validate_config,
 )
-from continual_manipulation.sequences import CM1, CM3, CM5, CM10, NAMED_SEQUENCES
+from continual_manipulation.sequences import (
+    CM1,
+    CM3,
+    CM5,
+    CM10,
+    KUKA_CM4,
+    KUKA_CM5,
+    KUKA_CM5_LEGACY,
+    KUKA_CM10,
+    NAMED_SEQUENCES,
+)
 from src.continual.trajectory_flow_matching import (
     FlowMatchingConfig as FlowMatchingModelConfig,
 )
@@ -108,21 +118,50 @@ class ConfigTests(unittest.TestCase):
         self.assertEqual(
             CM10,
             (
-                "reach-v3",
-                "push-v3",
                 "hammer-v3",
+                "push-wall-v3",
+                "faucet-close-v3",
+                "push-back-v3",
+                "stick-pull-v3",
                 "handle-press-side-v3",
-                "button-press-topdown-v3",
-                "faucet-open-v3",
-                "drawer-close-v3",
+                "push-v3",
+                "shelf-place-v3",
                 "window-close-v3",
-                "door-open-v3",
                 "peg-unplug-side-v3",
             ),
         )
         self.assertEqual(
+            KUKA_CM4,
+            (
+                "kuka-drawer-close-v3",
+                "kuka-window-close-v3",
+                "kuka-door-open-v3",
+                "kuka-peg-unplug-side-v3",
+            ),
+        )
+        self.assertEqual(
+            KUKA_CM10,
+            (
+                "kuka-reach-v3",
+                "kuka-push-cube-v3",
+                "kuka-hammer-v3",
+                "kuka-handle-press-side-v3",
+                "kuka-button-press-topdown-v3",
+                "kuka-faucet-open-v3",
+                "kuka-drawer-close-v3",
+                "kuka-window-close-v3",
+                "kuka-door-open-v3",
+                "kuka-peg-unplug-side-v3",
+            ),
+        )
+        self.assertEqual(KUKA_CM5, KUKA_CM10[:5])
+        self.assertEqual(KUKA_CM5_LEGACY, KUKA_CM4 + ("kuka-reach-v3",))
+        self.assertEqual(
             tuple(NAMED_SEQUENCES),
-            ("cm1", "cm3", "cm5", "cm10", "kuka_cw10_inspired_5"),
+            (
+                "cm1", "cm3", "cm5", "cm10", "kuka_cm4", "kuka_cm5",
+                "kuka_cm10", "kuka_cm5_legacy", "kuka_cw10_inspired_5",
+            ),
         )
         for sequence in NAMED_SEQUENCES.values():
             self.assertEqual(len(sequence), len(set(sequence)))
@@ -139,6 +178,23 @@ class ConfigTests(unittest.TestCase):
         self.assertEqual(config_to_dict(named), config_to_dict(explicit))
         self.assertNotIn("sequence", config_to_dict(named)["continual"])
 
+    def test_named_kuka_sequences_resolve_and_serialize_explicitly(self):
+        for name, tasks in (
+            ("kuka_cm5", KUKA_CM5),
+            ("kuka_cm10", KUKA_CM10),
+            ("kuka_cm5_legacy", KUKA_CM5_LEGACY),
+        ):
+            config = self.config(
+                environment={"backend": "kuka-v3"},
+                continual={
+                    "sequence": name,
+                    "experts": {task: f"/tmp/{task}.zip" for task in tasks},
+                },
+            )
+            serialized = config_to_dict(config)
+            self.assertEqual(serialized["continual"]["tasks"], list(tasks))
+            self.assertNotIn("sequence", serialized["continual"])
+
     def test_named_sequence_validation_is_strict(self):
         with self.assertRaisesRegex(ValueError, "mutually exclusive"):
             self.config(
@@ -152,15 +208,38 @@ class ConfigTests(unittest.TestCase):
     def test_named_sequence_rejects_unsupported_backend_without_substitution(self):
         with self.assertRaisesRegex(
             ValueError,
-            "kuka-v3.*Unsupported tasks: reach-v3",
+            "kuka-v3.*Unsupported tasks: hammer-v3",
         ):
             self.config(
                 environment={"backend": "kuka-v3"},
                 continual={
                     "sequence": "cm1",
-                    "experts": {"reach-v3": "/tmp/reach.zip"},
+                    "experts": {"hammer-v3": "/tmp/hammer.zip"},
                 },
             )
+
+    def test_named_kuka_sequence_rejects_metaworld_backend(self):
+        with self.assertRaisesRegex(
+            ValueError,
+            "metaworld-v3.*Unsupported tasks: kuka-reach-v3",
+        ):
+            self.config(
+                continual={
+                    "sequence": "kuka_cm5",
+                    "experts": {task: f"/tmp/{task}.zip" for task in KUKA_CM5},
+                },
+            )
+
+    def test_explicit_kuka_sequence_preserves_custom_order(self):
+        tasks = ["kuka-reach-v3", "kuka-hammer-v3", "kuka-handle-press-side-v3"]
+        config = self.config(
+            environment={"backend": "kuka-v3"},
+            continual={
+                "tasks": tasks,
+                "experts": {task: f"/tmp/{task}.zip" for task in tasks},
+            },
+        )
+        self.assertEqual(config.continual.tasks, tasks)
 
     def test_all_maintained_presets_load_and_smokes_are_small(self):
         paths = {

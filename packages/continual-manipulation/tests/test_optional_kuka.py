@@ -20,6 +20,6 @@ def test_metaworld_package_import_does_not_require_kuka(monkeypatch) -> None:
             monkeypatch.delitem(sys.modules, name, raising=False)
     import continual_manipulation
 
-    assert continual_manipulation.resolve_named_sequence("cm1") == ("reach-v3",)
+    assert continual_manipulation.resolve_named_sequence("cm1") == ("hammer-v3",)
     with pytest.raises(ModuleNotFoundError, match="optional KUKA-v3 backend"):
         continual_manipulation.make_env("kuka-v3", "kuka-reach-v3", 0)

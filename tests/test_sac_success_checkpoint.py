@@ -104,6 +104,16 @@ class FixedSeedEvalCallbackTests(unittest.TestCase):
         self.assertEqual(metadata["stop_timestep"], 320_000)
         self.assertEqual(metadata["trigger_success_rate"], 1.0)
 
+    def test_maximum_budget_completion_is_recorded_without_early_stop(self):
+        callback = self._early_stopping_callback(min_steps=100_000)
+        callback.training_start_timestep = 1_540_000
+        callback.num_timesteps = 2_540_000
+        callback.record_maximum_budget_completion(1_000_000)
+        metadata = early_stopping_metadata(callback.early_stopping, callback)
+        self.assertFalse(metadata["triggered"])
+        self.assertEqual(metadata["stopping_reason"], "maximum-training-steps")
+        self.assertEqual(metadata["additional_steps_at_stop"], 1_000_000)
+
     def test_fixed_bank_is_reused_and_task_set_seed_controls_identity(self) -> None:
         class Env:
             def __init__(self):

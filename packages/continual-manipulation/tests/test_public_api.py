@@ -15,7 +15,7 @@ def test_public_api_and_distribution_version() -> None:
 
 def test_named_sequence_identity() -> None:
     assert cm.resolve_named_sequence("cm3") == (
-        "reach-v3", "push-v3", "hammer-v3"
+        "hammer-v3", "push-wall-v3", "faucet-close-v3"
     )
     sequence = cm.TaskSequence.from_names(cm.resolve_named_sequence("cm3"))
     assert tuple(sequence.task_names) == tuple(task.task_id for task in sequence.tasks)

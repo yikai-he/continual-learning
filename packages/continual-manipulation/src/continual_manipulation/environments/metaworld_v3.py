@@ -13,6 +13,13 @@ from .contracts import ACTION_SHAPE, GOAL_SLICE, OBSERVATION_SHAPE, EpisodeSucce
 METAWORLD_V3_HORIZON = 200
 
 
+def metaworld_v3_task_names() -> tuple[str, ...]:
+    """Return the installed MetaWorld-v3 registry without constructing an env."""
+    from metaworld import ALL_V3_ENVIRONMENTS
+
+    return tuple(ALL_V3_ENVIRONMENTS)
+
+
 class MetaWorldObservationWrapper(gym.ObservationWrapper):
     """Expose the physical 39D MetaWorld-v3 observation contract."""
 

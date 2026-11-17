@@ -158,18 +158,33 @@ def test_incompatible_general_actor_is_rejected(tmp_path: Path, kwargs, error):
         )
 
 
-def test_missing_checkpoint_and_nonlegacy_sac_are_rejected(tmp_path: Path):
+def test_missing_checkpoint_and_incompatible_standard_sac_are_rejected(tmp_path: Path):
     with pytest.raises(ValueError, match="does not exist"):
         initialize_sac_actor(
             _model(), ActorInitConfig("sac_actor", str(tmp_path / "missing.zip"))
         )
-    standard = SAC("MlpPolicy", _Env(), device="cpu")
+    standard = SAC("MlpPolicy", _Env(), policy_kwargs={"net_arch": [64, 64]}, device="cpu")
     checkpoint = tmp_path / "standard.zip"
     standard.save(checkpoint)
-    with pytest.raises(ValueError, match="exact LegacySACPolicy"):
+    with pytest.raises(ValueError, match="architecture is incompatible"):
         initialize_sac_actor(
             _model(), ActorInitConfig("sac_actor", str(checkpoint))
         )
+
+
+def test_standard_four_layer_sac_maps_all_learned_actor_parameters(tmp_path: Path):
+    source = SAC("MlpPolicy", _Env(), policy_kwargs={"net_arch": [256] * 4}, device="cpu")
+    checkpoint = tmp_path / "standard-four-layer.zip"
+    source.save(checkpoint)
+    target = _model()
+    record = initialize_sac_actor(
+        target, ActorInitConfig("sac_actor", str(checkpoint))
+    )
+    assert record["source_architecture"]["policy_class"].endswith("SACPolicy")
+    assert record["source_architecture"]["fresh_target_modules"] == ["layer_norm"]
+    assert set(record["fresh_actor_parameters"]) == {
+        "latent_pi.1.weight", "latent_pi.1.bias"
+    }
 
 
 def test_general_actor_action_bounds_mismatch_is_rejected(tmp_path: Path):

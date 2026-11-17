@@ -32,6 +32,16 @@ _GENERAL_TO_SAC = {
     "log_std_head.bias": "log_std.bias",
 }
 
+_STANDARD_SAC_TO_LEGACY = {
+    **{
+        f"latent_pi.{source}.{suffix}": f"latent_pi.{target}.{suffix}"
+        for source, target in ((0, 0), (2, 3), (4, 5), (6, 7))
+        for suffix in ("weight", "bias")
+    },
+    **{f"{head}.{suffix}": f"{head}.{suffix}"
+       for head in ("mu", "log_std") for suffix in ("weight", "bias")},
+}
+
 
 def _checkpoint_path(checkpoint: str, base_dir: Path) -> Path:
     path = Path(checkpoint).expanduser()
@@ -126,24 +136,47 @@ def initialize_sac_actor(
             )
         except Exception as error:
             raise ValueError(f"Could not load SAC actor checkpoint {source_path}: {error}") from error
-        if type(source.policy) is not LegacySACPolicy:
-            raise ValueError(
-                "SAC actor checkpoint does not use the exact LegacySACPolicy class."
-            )
         if source.observation_space != model.observation_space:
             raise ValueError("SAC source and target observation spaces are incompatible.")
         if tuple(source.action_space.shape or ()) != (4,):
             raise ValueError("SAC source action shape must be (4,).")
         _require_equal_bounds(source.action_space, model.action_space)
         source_state = source.actor.state_dict()
-        _strict_actor_state(target_state, source_state)
-        model.actor.load_state_dict(source_state, strict=True)
-        transferred = list(source_state)
-        source_architecture = {
-            "kind": "stable_baselines3_sac",
-            "policy": SAC_POLICY_ARCHITECTURE,
-            "hidden_sizes": list(SAC_HIDDEN_SIZES),
-        }
+        if type(source.policy) is LegacySACPolicy:
+            _strict_actor_state(target_state, source_state)
+            model.actor.load_state_dict(source_state, strict=True)
+            transferred = list(source_state)
+            source_architecture = {
+                "kind": "legacy_sac",
+                "policy": SAC_POLICY_ARCHITECTURE,
+                "hidden_sizes": list(SAC_HIDDEN_SIZES),
+            }
+        else:
+            # Historical Sawyer experts use SB3 SACPolicy with the same four
+            # linear layers but no LayerNorm modules. Map every learned source
+            # tensor explicitly and leave only the target LayerNorm identities
+            # fresh; no unmatched source parameter is ignored.
+            if type(source.policy).__module__ != "stable_baselines3.sac.policies" or type(source.policy).__name__ != "SACPolicy":
+                raise ValueError("Unsupported SAC actor policy class for warm-start.")
+            expected = set(_STANDARD_SAC_TO_LEGACY)
+            if set(source_state) != expected:
+                raise ValueError("Standard SAC actor architecture is incompatible with the Legacy target.")
+            mapped = dict(target_state)
+            for source_name, target_name in _STANDARD_SAC_TO_LEGACY.items():
+                if source_state[source_name].shape != target_state[target_name].shape:
+                    raise ValueError(
+                        f"Actor parameter shape mismatch: {source_name} -> {target_name}."
+                    )
+                mapped[target_name] = source_state[source_name]
+                transferred.append(target_name)
+            model.actor.load_state_dict(mapped, strict=True)
+            source_architecture = {
+                "kind": "stable_baselines3_sac",
+                "policy_class": "stable_baselines3.sac.policies.SACPolicy",
+                "hidden_sizes": list(SAC_HIDDEN_SIZES),
+                "parameter_mapping": dict(_STANDARD_SAC_TO_LEGACY),
+                "fresh_target_modules": ["layer_norm"],
+            }
     elif config.mode == "general_actor":
         if not config.checkpoint:
             raise ValueError("general_actor initialization requires a checkpoint.")

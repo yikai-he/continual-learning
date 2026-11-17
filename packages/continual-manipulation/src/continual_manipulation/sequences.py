@@ -6,15 +6,15 @@ from dataclasses import dataclass
 from types import MappingProxyType
 
 CM10 = (
-    "reach-v3",
-    "push-v3",
     "hammer-v3",
+    "push-wall-v3",
+    "faucet-close-v3",
+    "push-back-v3",
+    "stick-pull-v3",
     "handle-press-side-v3",
-    "button-press-topdown-v3",
-    "faucet-open-v3",
-    "drawer-close-v3",
+    "push-v3",
+    "shelf-place-v3",
     "window-close-v3",
-    "door-open-v3",
     "peg-unplug-side-v3",
 )
 CM1 = CM10[:1]
@@ -31,6 +31,28 @@ KUKA_CW10_INSPIRED_5 = (
     "kuka-peg-unplug-side-v3",
 )
 
+KUKA_CM4 = (
+    "kuka-drawer-close-v3",
+    "kuka-window-close-v3",
+    "kuka-door-open-v3",
+    "kuka-peg-unplug-side-v3",
+)
+KUKA_CM5_LEGACY = KUKA_CM4 + ("kuka-reach-v3",)
+
+KUKA_CM10 = (
+    "kuka-reach-v3",
+    "kuka-push-cube-v3",
+    "kuka-hammer-v3",
+    "kuka-handle-press-side-v3",
+    "kuka-button-press-topdown-v3",
+    "kuka-faucet-open-v3",
+    "kuka-drawer-close-v3",
+    "kuka-window-close-v3",
+    "kuka-door-open-v3",
+    "kuka-peg-unplug-side-v3",
+)
+KUKA_CM5 = KUKA_CM10[:5]
+
 # Named curricula are immutable aliases for exact task orders, not backend-specific
 # templates. Backends validate these unchanged names before a run is created.
 NAMED_SEQUENCES = MappingProxyType(
@@ -39,6 +61,10 @@ NAMED_SEQUENCES = MappingProxyType(
         "cm3": CM3,
         "cm5": CM5,
         "cm10": CM10,
+        "kuka_cm4": KUKA_CM4,
+        "kuka_cm5": KUKA_CM5,
+        "kuka_cm10": KUKA_CM10,
+        "kuka_cm5_legacy": KUKA_CM5_LEGACY,
         "kuka_cw10_inspired_5": KUKA_CW10_INSPIRED_5,
     }
 )

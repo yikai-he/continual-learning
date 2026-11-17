@@ -47,17 +47,24 @@ def _validate_environment(environment: EnvironmentConfig) -> None:
 def _validate_tasks(tasks: list[str], backend: str) -> None:
     if not tasks or len(set(tasks)) != len(tasks):
         raise ValueError("continual.tasks must be a nonempty list of unique task names.")
-    if backend == "metaworld-v3" and any(not task.endswith("-v3") for task in tasks):
-        raise ValueError("continual.tasks must contain MetaWorld v3 task names.")
-    if backend == "kuka-v3":
+    if backend == "metaworld-v3":
+        from continual_manipulation.environments.metaworld_v3 import (
+            metaworld_v3_task_names,
+        )
+
+        supported = set(metaworld_v3_task_names())
+    elif backend == "kuka-v3":
         from continual_manipulation.environments.kuka_v3 import KUKA_V3_TASKS
 
-        unsupported = [task for task in tasks if task not in KUKA_V3_TASKS]
-        if unsupported:
-            raise ValueError(
-                "The kuka-v3 backend supports only registered KUKA task names. "
-                f"Unsupported tasks: {', '.join(unsupported)}."
-            )
+        supported = set(KUKA_V3_TASKS)
+    else:
+        return
+    unsupported = [task for task in tasks if task not in supported]
+    if unsupported:
+        raise ValueError(
+            f"The {backend} backend supports only registered task names. "
+            f"Unsupported tasks: {', '.join(unsupported)}."
+        )
 
 
 def _validate_continual_evaluation(evaluation: ContinualEvaluationConfig) -> None:

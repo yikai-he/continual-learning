@@ -1,6 +1,6 @@
 ---
 status: current
-last_verified: 2026-11-13
+last_verified: 2026-11-17
 applies_to: continual-learning
 ---
 
@@ -19,8 +19,10 @@ checkpoint maximizing `(success_rate, mean_return)` lexicographically. Exact
 ties retain the existing best checkpoint. The trainer does not create a second
 return-best or periodic inference-only checkpoint.
 
-Standalone SAC does not save replay buffers or support training continuation.
-Historical SAC artifacts remain untouched but are not current workflow inputs.
+Standalone SAC does not save replay buffers by default. It supports explicit
+model-state continuation from a validated checkpoint and actor-only warm starts;
+exact replay-backed continuation requires a separately saved replay buffer.
+Historical SAC artifacts remain untouched.
 
 Optimization uses the `runtime.seed` bank, validation defaults to bank `10000`,
 and post-selection final tests default to banks `20000` and `20001`. Serialized
@@ -42,6 +44,27 @@ distribution.
 ```bash
 python train_sac.py --config configs/sac/sac.yaml --seed 0 --device cpu
 ```
+
+Three Sawyer Early Stopping runs are prepared as isolated configurations:
+Push Back receives only compatible Faucet Close actor tensors into otherwise
+fresh SAC state; Stick Pull and Push restore same-task SB3 model state but reset
+and refill replay because no replay-buffer artifact exists. All validate on 100
+fixed tasks from bank 10000 every 40,000 steps, require three consecutive checks
+at 100% success, and reserve banks 20000 and 20001 for post-selection testing.
+Plateau patience/minimum new steps are respectively 8/200k, 6/120k, and 10/400k.
+
+```bash
+# Validate configs, manifests, hashes, and output isolation; do not train:
+PYTHON_BIN=python ./tools/experiments/train_sawyer_early_stop_three.sh --preflight-only
+
+# Run Push Back, Stick Pull, then Push sequentially:
+PYTHON_BIN=python ./tools/experiments/train_sawyer_early_stop_three.sh --run
+```
+
+The individual configs are
+`sawyer_push_back_from_faucet_close_early_stop.yaml`,
+`sawyer_stick_pull_continuation_early_stop.yaml`, and
+`sawyer_push_continuation_early_stop.yaml` under `configs/sac/`.
 
 The main pipeline, DiffCRL, is inspired by DISTR (Diffusion-based Trajectory
 Replay), but it is **not an exact reproduction**. DISTR trains an Immediate
@@ -222,13 +245,21 @@ python -u train_diffcrl.py \
   --run-name diffusion-seed0
 ```
 
-New MetaWorld curricula may use `continual.sequence: cm1`, `cm3`, `cm5`, or
-`cm10` instead of an explicit `continual.tasks` list. The names select exact
-prefixes of the project-defined, Continual World-inspired CM10 order documented in
-[Architecture](docs/ARCHITECTURE.md#61-named-task-sequences). A configuration
-must not set both fields. Resolved run configurations always store the explicit
-task list, so named and equivalent explicit curricula have the same scientific
-identity. Expert paths remain explicit for every selected DiffCRL task.
+Named curricula may use `continual.sequence`. Sawyer / MetaWorld-v3 supports
+`cm1`, `cm3`, `cm5`, and `cm10`; CM10 follows the original Continual World CW10
+task ordering with MetaWorld-v3 identifiers. KUKA / MetaWorld-KUKA-v3 supports
+the custom `kuka_cm4`, `kuka_cm5`, and `kuka_cm10` curricula. The former KUKA
+CM5 ordering remains available as `kuka_cm5_legacy`; the project also retains
+the backward-compatible `kuka_cw10_inspired_5` alias. The complete definitions
+and protocol caveats are documented in the
+[benchmark README](packages/continual-manipulation/README.md#named-task-sequences).
+
+A configuration must not set both `continual.sequence` and `continual.tasks`.
+Resolved run configurations store the explicit ordered task list, so historical
+snapshots and explicit configurations keep their original scientific identity
+when an alias definition changes. Expert paths remain explicit for every
+selected DiffCRL task. `cm20` is not exposed because the current unique-task
+identity and evaluation contracts cannot safely represent a repeated curriculum.
 
 Use `configs/diffcrl/diffcrl_no_replay.yaml` for the no-replay ablation. Flow
 Matching, Expert Recollection, KUKA, fixed-budget, and pilot configurations are
