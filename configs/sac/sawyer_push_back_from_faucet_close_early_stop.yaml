@@ -19,7 +19,7 @@ actor_init:
 resume: {enabled: false, checkpoint: null, replay_buffer: null, refill_steps: 0}
 continual: {tasks: [push-back-v3]}
 evaluation:
-  episodes: 100
+  episodes: 50
   final_episodes: 100
   frequency: 40000
   seed_offset: 10000

@@ -23,6 +23,7 @@ from continual_manipulation.evaluation import (
     disable_task_sampling,
     evaluate_task,
     fixed_mt1_tasks,
+    validate_active_task,
 )
 from src.continual.policy_adapter import SB3SACPolicy
 from continual_manipulation.task_banks import backend_tasks, bank_hashes
@@ -99,6 +100,76 @@ def best_success_index(success_rates, mean_returns) -> int:
     )
 
 
+def fixed_evaluation_schedule(tasks, identities, episodes: int, first_seed: int) -> dict:
+    """Build a deterministic episode schedule that may repeat one fixed bank."""
+    if episodes <= 0:
+        raise ValueError("Fixed evaluation episode count must be positive.")
+    if not tasks:
+        raise ValueError("Fixed evaluation task bank is empty.")
+    if len(tasks) != len(identities):
+        raise ValueError("Fixed evaluation tasks and identities are misaligned.")
+    hashes = []
+    for identity in identities:
+        digest = identity.get("task_data_sha256")
+        if not isinstance(digest, str) or not digest:
+            raise ValueError("Fixed evaluation task identity has no SHA-256 digest.")
+        hashes.append(digest)
+    indices = tuple(index % len(tasks) for index in range(episodes))
+    return {
+        "task_bank_size": len(tasks),
+        "task_bank_repetitions": int(math.ceil(episodes / len(tasks))),
+        "task_bank_indices": indices,
+        "reset_seeds": tuple(range(first_seed, first_seed + episodes)),
+        "unique_task_hashes": tuple(hashes),
+        "episode_task_hashes": tuple(hashes[index] for index in indices),
+    }
+
+
+def validate_fixed_evaluation_preflight(
+    eval_env,
+    *,
+    task_name: str,
+    task_set_seed: int,
+    episodes: int,
+    first_reset_seed: int,
+    backend: str = "metaworld-v3",
+) -> dict:
+    """Validate repeated fixed-bank selection and deterministic reset behavior."""
+    tasks, identities = fixed_mt1_tasks(task_name, task_set_seed, backend=backend)
+    schedule = fixed_evaluation_schedule(tasks, identities, episodes, first_reset_seed)
+    disable_task_sampling(eval_env)
+    first_index = schedule["task_bank_indices"][0]
+    first_task = tasks[first_index]
+    eval_env.unwrapped.set_task(first_task)
+    first_observation, _ = eval_env.reset(seed=first_reset_seed)
+    validate_active_task(eval_env, first_task, backend)
+    eval_env.unwrapped.set_task(first_task)
+    repeated_observation, _ = eval_env.reset(seed=first_reset_seed)
+    validate_active_task(eval_env, first_task, backend)
+    if not np.array_equal(first_observation, repeated_observation):
+        raise ValueError(
+            "Fixed evaluation reset is not reproducible for an identical "
+            "task-configuration/reset-seed pair."
+        )
+    second_pass_seed_effective = None
+    if episodes > len(tasks):
+        repeated_index = len(tasks)
+        repeated_task = tasks[schedule["task_bank_indices"][repeated_index]]
+        eval_env.unwrapped.set_task(repeated_task)
+        second_observation, _ = eval_env.reset(
+            seed=schedule["reset_seeds"][repeated_index]
+        )
+        validate_active_task(eval_env, repeated_task, backend)
+        second_pass_seed_effective = not np.array_equal(
+            first_observation, second_observation
+        )
+    return {
+        **schedule,
+        "same_pair_reset_reproducible": True,
+        "second_pass_reset_seed_changed_observation": second_pass_seed_effective,
+    }
+
+
 class FixedSeedEvalCallback(BaseCallback):
     """Evaluate on one fixed seed bank and retain the success-best expert."""
 
@@ -160,15 +231,22 @@ class FixedSeedEvalCallback(BaseCallback):
                 ]
             else:
                 self.fixed_tasks, identities = fixed_mt1_tasks(task_name, task_set_seed)
-            if n_eval_episodes > len(self.fixed_tasks):
-                raise ValueError("Evaluation episodes exceed the fixed MT1 task bank.")
-            self.task_hashes = tuple(
-                item["task_data_sha256"] for item in identities[:n_eval_episodes]
+            schedule = fixed_evaluation_schedule(
+                self.fixed_tasks, identities, n_eval_episodes, seed
             )
+            self.task_bank_size = schedule["task_bank_size"]
+            self.task_bank_repetitions = schedule["task_bank_repetitions"]
+            self.task_bank_indices = schedule["task_bank_indices"]
+            self.unique_task_hashes = schedule["unique_task_hashes"]
+            self.task_hashes = schedule["episode_task_hashes"]
             disable_task_sampling(eval_env)
         elif evaluation_mode == "sampled":
             self.fixed_tasks = None
             self.task_hashes = ()
+            self.unique_task_hashes = ()
+            self.task_bank_size = None
+            self.task_bank_repetitions = None
+            self.task_bank_indices = ()
         else:
             raise ValueError("Unknown SAC evaluation mode.")
         self.best_success_score = (-np.inf, -np.inf)
@@ -191,8 +269,16 @@ class FixedSeedEvalCallback(BaseCallback):
         returns, lengths, successes = [], [], []
         for index, seed in enumerate(self.seeds):
             if self.fixed_tasks is not None:
-                self.eval_env.unwrapped.set_task(self.fixed_tasks[index])
+                task_index = self.task_bank_indices[index]
+                selected_task = self.fixed_tasks[task_index]
+                self.eval_env.unwrapped.set_task(selected_task)
             observation, _ = self.eval_env.reset(seed=seed)
+            if self.fixed_tasks is not None:
+                validate_active_task(
+                    self.eval_env,
+                    selected_task,
+                    "kuka-v3" if self.task_name.startswith("kuka-") else "metaworld-v3",
+                )
             episode_return = 0.0
             episode_length = 0
             episode_success = False
@@ -226,6 +312,14 @@ class FixedSeedEvalCallback(BaseCallback):
                 -1 if self.task_set_seed is None else self.task_set_seed
             ),
             ordered_task_data_sha256=np.asarray(self.task_hashes),
+            unique_task_data_sha256=np.asarray(self.unique_task_hashes),
+            task_bank_size=np.asarray(
+                -1 if self.task_bank_size is None else self.task_bank_size
+            ),
+            task_bank_repetitions=np.asarray(
+                -1 if self.task_bank_repetitions is None else self.task_bank_repetitions
+            ),
+            task_bank_indices=np.asarray(self.task_bank_indices, dtype=np.int64),
         )
 
     def _record_evaluation(self, *, allow_early_stop: bool = True) -> bool:

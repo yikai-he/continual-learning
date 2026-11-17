@@ -48,10 +48,17 @@ python train_sac.py --config configs/sac/sac.yaml --seed 0 --device cpu
 Three Sawyer Early Stopping runs are prepared as isolated configurations:
 Push Back receives only compatible Faucet Close actor tensors into otherwise
 fresh SAC state; Stick Pull and Push restore same-task SB3 model state but reset
-and refill replay because no replay-buffer artifact exists. All validate on 100
-fixed tasks from bank 10000 every 40,000 steps, require three consecutive checks
-at 100% success, and reserve banks 20000 and 20001 for post-selection testing.
-Plateau patience/minimum new steps are respectively 8/200k, 6/120k, and 10/400k.
+and refill replay because no replay-buffer artifact exists. Each validation uses
+50 deterministic episodes: one ordered pass over all 50 unique MetaWorld MT1
+configurations from bank 10000. Checks run every 40,000 steps and require three
+consecutive 50/50-success results; 49/50 resets the target counter. Banks 20000
+and 20001 remain reserved for post-selection testing. Plateau patience/minimum
+new steps are respectively 8/200k, 6/120k, and 10/400k.
+
+The general fixed-task evaluator still supports episode counts above the bank
+size by deterministic cycling, recording repeated indices, hashes, reset seeds,
+and pass counts. These three experiments intentionally use one pass so no task
+configuration repeats within a validation check.
 
 ```bash
 # Validate configs, manifests, hashes, and output isolation; do not train:

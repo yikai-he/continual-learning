@@ -10,6 +10,7 @@ import numpy as np
 from train_sac import (
     FixedSeedEvalCallback,
     early_stopping_metadata,
+    fixed_evaluation_schedule,
 )
 from src.config import EarlyStoppingConfig
 
@@ -141,7 +142,9 @@ class FixedSeedEvalCallbackTests(unittest.TestCase):
 
         with tempfile.TemporaryDirectory() as tmp, patch(
             "train_sac.fixed_mt1_tasks", side_effect=bank
-        ), patch("train_sac.disable_task_sampling"):
+        ), patch("train_sac.disable_task_sampling"), patch(
+            "train_sac.validate_active_task"
+        ):
             root = Path(tmp)
             for name in ("evaluations", "best_success_model"):
                 (root / name).mkdir()
@@ -186,6 +189,115 @@ class FixedSeedEvalCallbackTests(unittest.TestCase):
                 best_success_model_save_path=root / "best_success_model",
             )
             self.assertNotEqual(callback.task_hashes, other.task_hashes)
+
+    def test_fixed_schedule_exact_bank_and_two_deterministic_passes(self):
+        tasks = [f"task-{index}" for index in range(50)]
+        identities = [
+            {"task_data_sha256": f"hash-{index}"} for index in range(50)
+        ]
+        fifty = fixed_evaluation_schedule(tasks, identities, 50, 20_000)
+        self.assertEqual(fifty["task_bank_indices"], tuple(range(50)))
+        self.assertEqual(fifty["task_bank_repetitions"], 1)
+        hundred = fixed_evaluation_schedule(tasks, identities, 100, 20_000)
+        self.assertEqual(hundred["task_bank_indices"], tuple(range(50)) * 2)
+        self.assertEqual(hundred["reset_seeds"], tuple(range(20_000, 20_100)))
+        self.assertEqual(hundred["task_bank_repetitions"], 2)
+        expected_hashes = tuple(item["task_data_sha256"] for item in identities)
+        self.assertEqual(hundred["episode_task_hashes"][:50], expected_hashes)
+        self.assertEqual(hundred["episode_task_hashes"][50:], expected_hashes)
+
+    def test_repeated_callback_evaluations_reuse_identical_pairs(self):
+        class Env:
+            def __init__(self):
+                self.unwrapped = self
+                self.current = None
+                self.seen = []
+
+            def set_task(self, task):
+                self.current = task
+
+            def reset(self, seed=None):
+                self.seen.append((self.current, seed))
+                return np.zeros(39, dtype=np.float32), {}
+
+            def step(self, _action):
+                return np.zeros(39), 0.0, True, False, {"success": True}
+
+        tasks = ["task-a", "task-b"]
+        identities = [
+            {"task_data_sha256": "hash-a"},
+            {"task_data_sha256": "hash-b"},
+        ]
+        with patch("train_sac.fixed_mt1_tasks", return_value=(tasks, identities)), patch(
+            "train_sac.disable_task_sampling"
+        ), patch("train_sac.validate_active_task"):
+            env = Env()
+            callback = FixedSeedEvalCallback(
+                env,
+                eval_freq=1,
+                n_eval_episodes=4,
+                seed=30_000,
+                task_name="push-v3",
+                task_set_seed=10_000,
+                evaluation_mode="fixed-tasks",
+                log_path=Path("evaluations"),
+                best_success_model_save_path=Path("best"),
+            )
+            callback.model = MagicMock()
+            callback.model.predict.return_value = (np.zeros(4), None)
+            callback._evaluate()
+            first = list(env.seen)
+            callback._evaluate()
+            self.assertEqual(first, env.seen[4:])
+            self.assertEqual(
+                first,
+                [("task-a", 30_000), ("task-b", 30_001),
+                 ("task-a", 30_002), ("task-b", 30_003)],
+            )
+
+    def test_fixed_schedule_rejects_invalid_inputs(self):
+        with self.assertRaisesRegex(ValueError, "positive"):
+            fixed_evaluation_schedule([object()], [{"task_data_sha256": "a"}], 0, 0)
+        with self.assertRaisesRegex(ValueError, "empty"):
+            fixed_evaluation_schedule([], [], 1, 0)
+        with self.assertRaisesRegex(ValueError, "misaligned"):
+            fixed_evaluation_schedule([object()], [], 1, 0)
+        with self.assertRaisesRegex(ValueError, "SHA-256"):
+            fixed_evaluation_schedule([object()], [{}], 1, 0)
+
+    def test_evaluation_artifact_records_reused_configuration_indices(self):
+        tasks = ["task-a", "task-b"]
+        identities = [
+            {"task_data_sha256": "hash-a"},
+            {"task_data_sha256": "hash-b"},
+        ]
+        with tempfile.TemporaryDirectory() as tmp, patch(
+            "train_sac.fixed_mt1_tasks", return_value=(tasks, identities)
+        ), patch("train_sac.disable_task_sampling"):
+            root = Path(tmp)
+            callback = FixedSeedEvalCallback(
+                MagicMock(),
+                eval_freq=1,
+                n_eval_episodes=4,
+                seed=30_000,
+                task_name="push-v3",
+                task_set_seed=10_000,
+                evaluation_mode="fixed-tasks",
+                log_path=root,
+                best_success_model_save_path=root,
+            )
+            callback._save_evaluations()
+            archive = np.load(root / "evaluations.npz")
+            np.testing.assert_array_equal(archive["task_bank_indices"], [0, 1, 0, 1])
+            np.testing.assert_array_equal(
+                archive["ordered_task_data_sha256"],
+                ["hash-a", "hash-b", "hash-a", "hash-b"],
+            )
+            np.testing.assert_array_equal(
+                archive["unique_task_data_sha256"], ["hash-a", "hash-b"]
+            )
+            self.assertEqual(int(archive["task_bank_size"]), 2)
+            self.assertEqual(int(archive["task_bank_repetitions"]), 2)
 
     def test_success_is_primary_and_return_breaks_ties(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:

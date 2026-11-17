@@ -39,9 +39,12 @@ for index in "${!configs[@]}"; do
   "$python_bin" - "$config" "$task" "$output" <<'PY'
 import sys
 from pathlib import Path
+from stable_baselines3.common.monitor import Monitor
+from continual_manipulation.environments import make_env
 from src.config import load_config, output_directory
 from src.support.expert_manifest import load_expert_manifest, validate_expert_checkpoint
 from src.support.reproducibility import file_hash
+from train_sac import validate_fixed_evaluation_preflight
 
 config_path, task, expected_output = sys.argv[1], sys.argv[2], Path(sys.argv[3]).resolve()
 cfg = load_config(config_path, expected_experiment="sac")
@@ -51,11 +54,42 @@ assert cfg.environment.reward_function_version == "v2"
 assert cfg.runtime.seed == 0
 assert cfg.sac.early_stopping.enabled
 assert cfg.evaluation.mode == "fixed-tasks"
-assert cfg.evaluation.episodes == 100
+assert cfg.evaluation.episodes == 50
 assert cfg.evaluation.frequency == 40_000
 assert cfg.evaluation.task_set_seed == 10_000
 assert cfg.evaluation.final_task_set_seeds == [20_000, 20_001]
 assert output_directory(cfg) == expected_output
+
+eval_env = Monitor(make_env(
+    cfg.environment.backend,
+    task,
+    cfg.evaluation.task_set_seed,
+    reward_function_version=cfg.environment.reward_function_version,
+))
+try:
+    evaluation_check = validate_fixed_evaluation_preflight(
+        eval_env,
+        task_name=task,
+        task_set_seed=cfg.evaluation.task_set_seed,
+        episodes=cfg.evaluation.episodes,
+        first_reset_seed=cfg.runtime.seed + cfg.evaluation.seed_offset,
+        backend=cfg.environment.backend,
+    )
+finally:
+    eval_env.close()
+assert evaluation_check["task_bank_size"] == 50
+assert evaluation_check["task_bank_repetitions"] == 1
+assert evaluation_check["task_bank_indices"] == tuple(range(50))
+assert evaluation_check["same_pair_reset_reproducible"] is True
+print(
+    "evaluation_preflight "
+    f"task={task} bank_size={evaluation_check['task_bank_size']} "
+    f"episodes={cfg.evaluation.episodes} "
+    f"passes={evaluation_check['task_bank_repetitions']} "
+    "explicit_selection=true "
+    f"second_pass_seed_changed_observation="
+    f"{evaluation_check['second_pass_reset_seed_changed_observation']}"
+)
 
 source_name = cfg.resume.checkpoint if cfg.resume.enabled else cfg.actor_init.checkpoint
 source = Path(source_name).resolve()
