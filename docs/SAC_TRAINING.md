@@ -44,6 +44,21 @@ a temporary path and atomically replaced; replay buffers are not saved.
 No periodic models, replay buffers, final model, or resume checkpoint are
 written. Interrupted runs must be restarted in a fresh collision-safe directory.
 
+The three prepared Sawyer target-success-only experiments explicitly set
+`plateau_patience: null`. They run Stick Pull, Push, then Push Back, prioritizing
+the stronger existing same-task experts before the less certain Faucet Close →
+Push Back actor transfer. Their fresh destinations are under
+`runs/sac_target_success_only_20261117/`; the launcher refuses collisions and
+does not alter historical `runs/sac_early_stop_20261117/` artifacts. Stick Pull
+and Push restore compatible model and optimizer state, refill an empty replay
+buffer for 10,000 interactions, and count those interactions against the new
+budget. Push Back transfers compatible actor tensors only and starts fresh
+critics, targets, optimizers, entropy state, replay, and counters. Normal
+termination is either sustained target success after the configured minimum or
+the maximum additional-step budget; long zero-success periods do not stop a
+run. The best validation checkpoint remains success-first, mean-return-second,
+and is selected before independent testing on banks 20000 and 20001.
+
 ## Evaluation separation
 
 - Optimization: `runtime.seed`

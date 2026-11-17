@@ -52,8 +52,10 @@ and refill replay because no replay-buffer artifact exists. Each validation uses
 50 deterministic episodes: one ordered pass over all 50 unique MetaWorld MT1
 configurations from bank 10000. Checks run every 40,000 steps and require three
 consecutive 50/50-success results; 49/50 resets the target counter. Banks 20000
-and 20001 remain reserved for post-selection testing. Plateau patience/minimum
-new steps are respectively 8/200k, 6/120k, and 10/400k.
+and 20001 remain reserved for post-selection testing. Plateau stopping is
+disabled because SAC may improve after long validation plateaus. The minimum
+new-step requirements for target-success stopping are 120k, 400k, and 200k for
+Stick Pull, Push, and Push Back; maximum budgets remain 500k, 1M, and 1M.
 
 The general fixed-task evaluator still supports episode counts above the bank
 size by deterministic cycling, recording repeated indices, hashes, reset seeds,
@@ -64,9 +66,17 @@ configuration repeats within a validation check.
 # Validate configs, manifests, hashes, and output isolation; do not train:
 PYTHON_BIN=python ./tools/experiments/train_sawyer_early_stop_three.sh --preflight-only
 
-# Run Push Back, Stick Pull, then Push sequentially:
+# Run Stick Pull, Push, then Push Back sequentially:
 PYTHON_BIN=python ./tools/experiments/train_sawyer_early_stop_three.sh --run
 ```
+
+Both modes refuse any existing destination under
+`runs/sac_target_success_only_20261117/`; historical Plateau-enabled runs under
+`runs/sac_early_stop_20261117/` remain separate. Normal completion is either
+three sustained perfect validations after the task's minimum new steps or the
+maximum additional-step budget. Inspect `results.json` → `early_stopping` for
+the recorded reason (`target-success` or `maximum-training-steps`); do not infer
+it from TensorBoard. Reaching perfect validation is not guaranteed.
 
 The individual configs are
 `sawyer_push_back_from_faucet_close_early_stop.yaml`,
