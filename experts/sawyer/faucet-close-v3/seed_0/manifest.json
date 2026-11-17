@@ -1,0 +1,117 @@
+{
+  "schema_version": 1,
+  "registry_status": "verified",
+  "checkpoint_identifier": "best_model.zip",
+  "checkpoint_sha256": "7adf6b40f7f658dc862abafc7aa3e3a85a30f3304a7fb97829f98d9727d80ab6",
+  "task_name": "faucet-close-v3",
+  "robot": "sawyer",
+  "backend": "metaworld-v3",
+  "algorithm": "SAC",
+  "reward_function_version": "v2",
+  "training_seed": 0,
+  "policy_architecture": {
+    "identity": null,
+    "policy_class": "stable_baselines3.sac.policies.SACPolicy",
+    "actor_class": "stable_baselines3.sac.policies.Actor",
+    "net_arch": [
+      256,
+      256,
+      256,
+      256
+    ],
+    "identity_source": "checkpoint_deserialization"
+  },
+  "observation_shape": [
+    39
+  ],
+  "action_shape": [
+    4
+  ],
+  "action_bounds": {
+    "low": [
+      -1.0,
+      -1.0,
+      -1.0,
+      -1.0
+    ],
+    "high": [
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ]
+  },
+  "horizon": 200,
+  "qualification_status": "qualified",
+  "qualification": {
+    "protocol": "fixed-mt1-task-bank-v1",
+    "episodes": 50,
+    "success_rate": 1.0,
+    "mean_return": 1766.1819787376119,
+    "return_std": 12.979281103411063,
+    "task_set_seed": 10000,
+    "evaluation_seed": 10000,
+    "deterministic": true,
+    "ordered_task_data_sha256": [
+      "13f5f2ce30750cd20099a61dd177656cff533483be7c79a919fa9bd88aaf8d7e",
+      "843d7c9e761fe5554c8b545b23789d4219d48632449bc6562d5e89d04f3a7f15",
+      "81cac5c18869a11ea4dc5ff5f2037c6eaf74b8864b37f64e4cb5489c2a7793d8",
+      "f34c86cf84397cd5b37e6222c0792dd82e59789b7f8bd2c119cbc72144f362fa",
+      "93e98f06b6b2a7845a1a99ccbbb416f8cbbb034f342b1f891152ffd30a8476be",
+      "39ac5d7ac2639d70e70b6271550019d8202432898756dc9d8cc64adb2c2af952",
+      "54b5361ee9daad7198ddbefee959bd1560434def3da6df7115db3d484a87929b",
+      "a50e98acc1272a7a6a883ba0c83d0ec0a30c722482756f2e3b64daffbd2a4346",
+      "7c84e64884414ee63f353c1335466bf702056959b47fe312a00e6972722a8c8a",
+      "54d86cc56f569adc0d3ca47de3000cf02ec6fac75057afdf8012daa051c90e51",
+      "37025bb7d33f3d191dea3d1479a57464de8f0169369d38eb4693bdfb9237c466",
+      "6da3a7643d46d522814f4a1d14f14adae6eacca7807bd5e4cdfea65eadc85063",
+      "92af8675f0d5533c2c6299d81923f1f8184b157fa7207293f6f2e9a5b66b5101",
+      "1659c54034ba508183ce180803179385c9eb1aaf0ef937d7f1a0288108b8024e",
+      "63653469c28b4013290be203f76387a6b259c78ffab26d449213545d3dba9d89",
+      "e19603078d4e109cbc212187aea41179f9e5d08e2a9240311e1ddea47a95a335",
+      "7b6edc3843b9d1285faee506aa3fdcdb5344ff06276d572cba1320af55250ac1",
+      "d0caaae670fcf39dbd85d4cc29fdba3f4ae54afab44538214daa4d85cd443086",
+      "3e9b06b2ec14f91a864c1362cedc3dfb5dac0ad3e8d46e651a7a0be5116b3735",
+      "96e6a3686b65e725cf53144ea2d50e261001f9afc5397d604ea944a4f1fc35b8",
+      "465a77cb8ac447e732419be73ca1826c56c65d7a51897e7ad86aed6c67192b11",
+      "c5db8a7dda8c2a761897e9e1c7c1161d950ad75a727e5492e4792852c683a8c9",
+      "3ba4aaa6bd8b0790056659e23742560b50f22eecc65ddd6d75c1839355291f4a",
+      "1ab34bee786474ff4d2e0ec0596dec356ba10e799351e9abc034a106c99e46bf",
+      "6e624625bff89729827e7e520e1abbc86a96c62c91520f98f0b1a34e695a45bb",
+      "7eddcea25158f51923f7b95566a58800ffdbc1605671113ca2c7f5e89e0ee3ed",
+      "de4c193166ef2162f63be535437d6b56e6404d2e113a8e017efbdfdfa53ad42e",
+      "3e02acee117b0c288a7f60c86285c4337e4cf53169c6aac6e497b283427ef332",
+      "34d042b1ac2222d22f0352279b81050eaf2ed7835c1fd68625279f952dfa636c",
+      "0f1cdafab78b66b0a02ba3bed60fac4847adf21ccf7e65e803b3406773e3ab8d",
+      "2807cbe7fae4236c6b61a7f774502fc4107d8b824dc97a21de9235781209a9db",
+      "ee58b878ac85e69789e32b7a0591212fd53b426458431ec2d24825218e7da0f7",
+      "0503b5fa601c733db4cfa77bd0616c99c4f9c3986b86fd128b5d4aa3d0437275",
+      "7bb8dd43f8d69a32f43cd93e8b7627de14846c9dad94b1bfc9780a87f71e408d",
+      "b110b3fe6cd7dd4cb1edfa05f9ed0737d50dba091b3fa83a50c977d01ad3618b",
+      "140cc23fa5174d34aaac7bb69732bfad628b84af0a3e936122260b245e705294",
+      "b1d4be03a02d4670c5e8f2fd92b25218c6312c435f42b406198f1d5f2b6986f2",
+      "e96872f4367560529296e0059869578d23a800594fb8bc24615dd2329564ff27",
+      "be2fd69b95fe43b6f76319d11bd9562a72950c5e30982af3a37a577fd723429a",
+      "dcf05275d4d59f2400390e957bccf4da6e0fd407216c190dc1c425a3f6fcb4e0",
+      "86f58ef154e8755998006240c60342fa9ec59db3f6ba3cab09d557bfb0adc5d3",
+      "3722cff6a982ffced3aa7c207ea0e4d790b965488b8d98a62316ab7d55aef8ae",
+      "2cf91a9887b34d8b3af7f716fc63f9d62e41072deaa2056d17627d0cc90d5607",
+      "daf67b9a96e657d3c4be33c4e2e7ca5e553ae197ff0545537c75f313ced15dba",
+      "6ee949c77582214e92416f0c4b7337958eeaf90f61a786a77ae77f4840727ee9",
+      "b544c9e27df14c6e3793423c31cb89eb2a7ca5483743433fccc6eae2e73d0865",
+      "914864ff0350bee90f22ca9434b6b963f58dbaead46aa2a876b1278041187346",
+      "17e8a98f6987ecdcd43c9fb22490a926cdfb56e3728d9823b06f636c741aac7d",
+      "8a76be9f81de3a47e881ce76f5bc10a20119289490c9011652d5d63cb9902eb8",
+      "36a508da10375d966e6e9bce5e3e26318e1c5ad3d4da062b380df8107720cb5f"
+    ],
+    "selection_key": [
+      1.0,
+      1766.1819787376119
+    ],
+    "selection_rule": "maximum success_rate; mean_return breaks ties"
+  },
+  "training_config_reference": "runs/experts/metaworld-v3/faucet-close-v3/config.json",
+  "training_config_sha256": "2907b0cc48dcbe5e9d05ad1c179b8b54eb76468672931895145fd122eda45eef",
+  "source_checkpoint": "runs/experts/metaworld-v3/faucet-close-v3/policy.zip",
+  "source_manifest": "runs/experts/metaworld-v3/faucet-close-v3/policy.zip.manifest.json"
+}
