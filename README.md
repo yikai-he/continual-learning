@@ -13,16 +13,13 @@ policy learns a sequence of simulated tasks.
 
 ## SAC training
 
-`train_sac.py` is the preferred entry point for new single-task SAC experts. It
-uses a low-disk workflow: `best_model.zip` is the validation
-checkpoint maximizing `(success_rate, mean_return)` lexicographically. Exact
-ties retain the existing best checkpoint. The trainer does not create a second
-return-best or periodic inference-only checkpoint.
-
-Standalone SAC does not save replay buffers by default. It supports explicit
-model-state continuation from a validated checkpoint and actor-only warm starts;
-exact replay-backed continuation requires a separately saved replay buffer.
-Historical SAC artifacts remain untouched.
+`train_sac.py` is the preferred entry point for new single-task SAC experts.
+`best_model.zip` remains the compatible inference path, while new runs retain
+synchronized Best and Final model/replay snapshots for same-task continuation.
+Selection maximizes `(success_rate, mean_return)` lexicographically; exact ties
+keep the earlier Best. Actor-only warm-start and historical model-state-only
+continuation remain supported. Replay buffers stay in training runs and are not
+registered as experts. See [SAC training](docs/SAC_TRAINING.md) for details.
 
 Optimization uses the `runtime.seed` bank, validation defaults to bank `10000`,
 and post-selection final tests default to banks `20000` and `20001`. Serialized

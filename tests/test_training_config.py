@@ -183,6 +183,10 @@ class TrainingConfigTests(unittest.TestCase):
             ), patch.object(train_sac, "FixedSeedEvalCallback") as evaluation, patch.object(
                 train_sac, "final_test", return_value=[{"success_rate": 1.0}]
             ), patch.object(
+                train_sac, "save_sac_checkpoint"
+            ) as save_checkpoint, patch.object(
+                train_sac, "atomic_replace_json"
+            ), patch.object(
                 train_sac,
                 "initialize_sac_actor",
                 return_value={"schema_version": 1, "mode": "scratch"},
@@ -194,6 +198,16 @@ class TrainingConfigTests(unittest.TestCase):
                 evaluation.return_value.successes = [[True, False]]
                 evaluation.return_value.return_stddevs = [0.5]
                 evaluation.return_value.task_hashes = ("a", "b")
+                evaluation.return_value.timesteps = []
+                evaluation.return_value._evaluate.return_value = (
+                    [1.0, 2.0], [200, 200], [True, False]
+                )
+                evaluation.return_value.best_checkpoint = {"name": "best"}
+                def save_final(_model, run_dir, name, _context, **_kwargs):
+                    (Path(run_dir) / f"{name}_model.zip").write_bytes(b"final")
+                    return {"name": name, "status": "pending-validation"}
+
+                save_checkpoint.side_effect = save_final
 
                 def learn(**_kwargs):
                     selected = (
@@ -296,8 +310,8 @@ class TrainingConfigTests(unittest.TestCase):
                 "EXPERIMENT_SUMMARY.md",
             ):
                 self.assertFalse((Path(tmp) / "trial" / removed).exists())
-            self.assertFalse((Path(tmp) / "trial/final_model.zip.manifest.json").exists())
-            self.assertFalse((Path(tmp) / "trial/final_model.zip").exists())
+            self.assertTrue((Path(tmp) / "trial/final_model.zip.manifest.json").exists())
+            save_checkpoint.assert_called_once()
             self.assertFalse((Path(tmp) / "trial/checkpoints").exists())
 
     def test_sac_directory_collision_preserved(self):

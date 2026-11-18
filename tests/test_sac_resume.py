@@ -95,12 +95,14 @@ def test_resume_restores_model_state_and_reports_missing_replay_buffer(tmp_path:
             config, MagicMock(), tmp_path / "new-run"
         )
     assert restored is model
-    assert actor["reason"] == "full SAC resume"
+    assert "continuation" in actor["reason"]
     assert provenance["mode"] == "model-state-only"
     assert provenance["source_timestep"] == 840_000
     assert provenance["reset"] == [
         "replay buffer",
         "random-number-generator state (reseeded for continuation)",
+        "environment state",
+        "evaluation and checkpoint-selection callback state",
     ]
     assert "optimizer states" in provenance["restored"]
     validate.assert_called_once()
@@ -111,8 +113,8 @@ def test_resume_restores_model_state_and_reports_missing_replay_buffer(tmp_path:
 def test_resume_loads_explicit_replay_buffer(tmp_path: Path):
     checkpoint = tmp_path / "best_model.zip"
     checkpoint.write_bytes(b"source")
-    replay = tmp_path / "replay.pkl"
-    replay.write_bytes(b"buffer")
+    metadata = tmp_path / "best_checkpoint.json"
+    metadata.write_text("{}")
     (tmp_path / "manifest.json").write_text("{}")
     config = default_config("sac")
     config = replace(
@@ -121,7 +123,7 @@ def test_resume_loads_explicit_replay_buffer(tmp_path: Path):
             config.resume,
             enabled=True,
             checkpoint=str(checkpoint),
-            replay_buffer=str(replay),
+            replay_buffer=str(tmp_path / "best_replay_buffer.pkl"),
         ),
     )
     model = MagicMock(num_timesteps=10)
@@ -132,16 +134,22 @@ def test_resume_loads_explicit_replay_buffer(tmp_path: Path):
     model.gamma = 0.99
     model.tau = 0.005
     model.gradient_steps = 1
+    paired_replay = tmp_path / "best_replay_buffer.pkl"
+    paired_replay.write_bytes(b"buffer")
     with patch("train_sac.load_expert_manifest", return_value={}), patch(
         "train_sac.validate_expert_checkpoint"
-    ), patch.object(train_sac.LegacyScheduleSAC, "load", return_value=model):
+    ), patch.object(train_sac.LegacyScheduleSAC, "load", return_value=model), patch(
+        "train_sac.validate_replay_checkpoint_pair", return_value={"name": "best"}
+    ) as validate_pair:
         _, _, provenance = train_sac.initialize_sac_training(
             config, MagicMock(), tmp_path / "new-run"
         )
-    model.load_replay_buffer.assert_called_once_with(replay.resolve())
-    assert provenance["mode"] == "full-model-with-replay"
+    validate_pair.assert_called_once()
+    assert provenance["mode"] == "model-and-replay"
     assert provenance["reset"] == [
-        "random-number-generator state (reseeded for continuation)"
+        "random-number-generator state (reseeded for continuation)",
+        "environment state",
+        "evaluation and checkpoint-selection callback state",
     ]
 
 

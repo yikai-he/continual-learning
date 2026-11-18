@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 import math
 import os
+import zipfile
 from datetime import datetime
 from pathlib import Path
 
@@ -35,6 +36,7 @@ from src.support.expert_manifest import qualification_record, write_expert_manif
 from src.support.expert_manifest import validate_expert_checkpoint, load_expert_manifest
 from src.support.reproducibility import file_hash
 from src.support.run_manifest import complete_run, create_run_manifest
+from src.support.io import atomic_replace_json
 from stable_baselines3 import SAC
 from stable_baselines3.common.callbacks import BaseCallback
 from stable_baselines3.common.monitor import Monitor
@@ -189,6 +191,7 @@ class FixedSeedEvalCallback(BaseCallback):
         early_stopping: EarlyStoppingConfig | None = None,
         best_success_model_name: str = "best_success_model",
         atomic_model_replacement: bool = False,
+        checkpoint_context: dict | None = None,
     ) -> None:
         super().__init__()
         self.eval_env = eval_env
@@ -204,6 +207,8 @@ class FixedSeedEvalCallback(BaseCallback):
         self.early_stopping = early_stopping or EarlyStoppingConfig()
         self.best_success_model_name = best_success_model_name
         self.atomic_model_replacement = atomic_model_replacement
+        self.checkpoint_context = checkpoint_context
+        self.best_checkpoint: dict | None = None
         self.consecutive_successful_evaluations = 0
         self.training_start_timestep: int | None = None
         self.best_plateau_success = -np.inf
@@ -259,6 +264,14 @@ class FixedSeedEvalCallback(BaseCallback):
     def _save_model(self, path: Path) -> None:
         """Save directly by default, or atomically replace one named archive."""
         path = Path(path)
+        if self.checkpoint_context is not None:
+            self.best_checkpoint = save_sac_checkpoint(
+                self.model,
+                path.parent,
+                "best",
+                self.checkpoint_context,
+            )
+            return
         if not self.atomic_model_replacement:
             self.model.save(path)
             return
@@ -443,6 +456,157 @@ def atomic_replace_model(model, path: Path) -> None:
         temporary.unlink(missing_ok=True)
 
 
+def _checkpoint_paths(run_dir: Path, name: str) -> tuple[Path, Path, Path]:
+    """Return the stable model, replay, and metadata paths for one SAC snapshot."""
+    return (
+        run_dir / f"{name}_model.zip",
+        run_dir / f"{name}_replay_buffer.pkl",
+        run_dir / f"{name}_checkpoint.json",
+    )
+
+
+def _replay_buffer_metadata(model) -> dict:
+    buffer = model.replay_buffer
+    return {
+        "class": f"{type(buffer).__module__}.{type(buffer).__name__}",
+        "capacity": int(buffer.buffer_size),
+        "stored_transitions": int(buffer.size()),
+    }
+
+
+def save_sac_checkpoint(
+    model,
+    run_dir: Path,
+    name: str,
+    context: dict,
+    *,
+    status: str = "complete",
+) -> dict:
+    """Atomically replace one synchronized model/replay/metadata checkpoint.
+
+    Temporary files are fully serialized and hashed before publication. If a
+    replacement fails, the previous complete trio is restored.
+    """
+    if name not in ("best", "final"):
+        raise ValueError("SAC checkpoint name must be best or final.")
+    run_dir = Path(run_dir)
+    model_path, replay_path, metadata_path = _checkpoint_paths(run_dir, name)
+    token = f"{os.getpid()}.{name}"
+    staged_model = run_dir / f".{token}.model.tmp.zip"
+    staged_replay = run_dir / f".{token}.replay.tmp.pkl"
+    staged_metadata = run_dir / f".{token}.checkpoint.tmp.json"
+    targets = (model_path, replay_path, metadata_path)
+    staged = (staged_model, staged_replay, staged_metadata)
+    backups = tuple(path.with_name(f".{path.name}.{token}.backup") for path in targets)
+    try:
+        model.save(staged_model)
+        model.save_replay_buffer(staged_replay)
+        if not zipfile.is_zipfile(staged_model):
+            raise RuntimeError("SAC model checkpoint is not a valid ZIP archive.")
+        if not staged_replay.is_file() or staged_replay.stat().st_size == 0:
+            raise RuntimeError("SAC replay-buffer serialization produced no data.")
+        metadata = {
+            "schema_version": 1,
+            "kind": "sac_model_replay_checkpoint_v1",
+            "name": name,
+            "status": status,
+            "checkpoint_timestep": int(model.num_timesteps),
+            "gradient_updates": int(getattr(model, "_n_updates", 0)),
+            "task_name": context["task_name"],
+            "backend": context["backend"],
+            "reward_function_version": context["reward_function_version"],
+            "observation_shape": list(model.observation_space.shape),
+            "action_shape": list(model.action_space.shape),
+            "replay_buffer": _replay_buffer_metadata(model),
+            "model": {"path": model_path.name, "sha256": file_hash(staged_model)},
+            "replay": {"path": replay_path.name, "sha256": file_hash(staged_replay)},
+            "training_config_sha256": context["training_config_sha256"],
+        }
+        with staged_metadata.open("x", encoding="utf-8") as stream:
+            json.dump(metadata, stream, indent=2, allow_nan=False)
+            stream.write("\n")
+
+        backed_up = []
+        published = []
+        try:
+            for target, backup in zip(targets, backups):
+                if target.exists():
+                    os.replace(target, backup)
+                    backed_up.append((target, backup))
+            for source, target in zip(staged, targets):
+                os.replace(source, target)
+                published.append(target)
+        except Exception:
+            for target in published:
+                target.unlink(missing_ok=True)
+            for target, backup in reversed(backed_up):
+                if backup.exists():
+                    os.replace(backup, target)
+            raise
+        for backup in backups:
+            backup.unlink(missing_ok=True)
+        return metadata
+    finally:
+        for path in staged:
+            path.unlink(missing_ok=True)
+
+
+def validate_replay_checkpoint_pair(
+    model_path: Path,
+    replay_path: Path,
+    metadata_path: Path,
+    config,
+    model,
+) -> dict:
+    """Verify and load a formal same-task model/replay checkpoint pair."""
+    if not metadata_path.is_file():
+        raise FileNotFoundError(
+            f"Replay-backed continuation requires checkpoint metadata: {metadata_path}"
+        )
+    metadata = json.loads(metadata_path.read_text(encoding="utf-8"))
+    checks = (
+        (metadata.get("kind") == "sac_model_replay_checkpoint_v1", "checkpoint kind"),
+        (metadata.get("status") == "complete", "checkpoint status"),
+        (metadata.get("task_name") == config.continual.tasks[0], "task identity"),
+        (metadata.get("backend") == config.environment.backend, "backend"),
+        (
+            metadata.get("reward_function_version")
+            == config.environment.reward_function_version,
+            "reward version",
+        ),
+        (tuple(metadata.get("observation_shape", ())) == OBSERVATION_SHAPE, "observation shape"),
+        (tuple(metadata.get("action_shape", ())) == ACTION_SHAPE, "action shape"),
+        (metadata.get("model", {}).get("path") == model_path.name, "model path"),
+        (metadata.get("replay", {}).get("path") == replay_path.name, "replay path"),
+        (metadata.get("model", {}).get("sha256") == file_hash(model_path), "model SHA-256"),
+        (metadata.get("replay", {}).get("sha256") == file_hash(replay_path), "replay SHA-256"),
+        (metadata.get("checkpoint_timestep") == int(model.num_timesteps), "checkpoint timestep"),
+    )
+    for valid, label in checks:
+        if not valid:
+            raise ValueError(f"SAC model/replay checkpoint {label} mismatch.")
+    source_config = model_path.parent / "config.yaml"
+    if source_config.is_file() and metadata.get("training_config_sha256") != file_hash(source_config):
+        raise ValueError("SAC model/replay checkpoint training configuration mismatch.")
+    model.load_replay_buffer(replay_path)
+    replay = metadata.get("replay_buffer", {})
+    buffer = model.replay_buffer
+    loaded_checks = (
+        (
+            f"{type(buffer).__module__}.{type(buffer).__name__}" == replay.get("class"),
+            "class",
+        ),
+        (int(buffer.buffer_size) == replay.get("capacity"), "capacity"),
+        (int(buffer.size()) == replay.get("stored_transitions"), "stored transition count"),
+        (tuple(buffer.observation_space.shape) == OBSERVATION_SHAPE, "buffer observation shape"),
+        (tuple(buffer.action_space.shape) == ACTION_SHAPE, "buffer action shape"),
+    )
+    for valid, label in loaded_checks:
+        if not valid:
+            raise ValueError(f"Loaded SAC replay buffer {label} mismatch.")
+    return metadata
+
+
 def task_bank_provenance(
     task: str,
     training_seed: int,
@@ -603,20 +767,36 @@ def initialize_sac_training(config, train_env, run_dir: Path):
     source_timestep = int(model.num_timesteps)
     model.set_random_seed(config.runtime.seed)
     replay = config.resume.replay_buffer
+    replay_metadata = None
     if replay is not None:
         replay_path = Path(replay).expanduser().resolve()
         if not replay_path.is_file():
             raise FileNotFoundError(f"Resume replay buffer not found: {replay_path}")
-        model.load_replay_buffer(replay_path)
+        if replay_path.parent != source.parent:
+            raise ValueError("Formal model-and-replay continuation requires colocated files.")
+        expected = {
+            "best_model.zip": ("best_replay_buffer.pkl", "best_checkpoint.json"),
+            "final_model.zip": ("final_replay_buffer.pkl", "final_checkpoint.json"),
+        }.get(source.name)
+        if expected is None or replay_path.name != expected[0]:
+            raise ValueError("Resume model and replay-buffer filenames do not form a matched pair.")
+        metadata_path = source.parent / expected[1]
+        replay_metadata = validate_replay_checkpoint_pair(
+            source, replay_path, metadata_path, config, model
+        )
         replay_record = str(replay_path)
         replay_restored = True
     else:
         replay_record = None
         replay_restored = False
-    actor = {"schema_version": 1, "mode": "scratch", "reason": "full SAC resume"}
+    actor = {
+        "schema_version": 1,
+        "mode": "scratch",
+        "reason": "same-task SAC continuation; actor initialization is not used",
+    }
     provenance = {
         "enabled": True,
-        "mode": "full-model-with-replay" if replay_restored else "model-state-only",
+        "mode": "model-and-replay" if replay_restored else "model-state-only",
         "source_checkpoint": str(source),
         "source_checkpoint_sha256": file_hash(source),
         "source_manifest": str(manifest_path.resolve()),
@@ -624,13 +804,19 @@ def initialize_sac_training(config, train_env, run_dir: Path):
         "source_timestep": source_timestep,
         "source_gradient_updates": int(getattr(model, "_n_updates", 0)),
         "replay_buffer": replay_record,
+        "replay_checkpoint_metadata": replay_metadata,
         "restored": [
             "actor parameters", "critic parameters", "target critic parameters",
             "optimizer states", "entropy coefficient and optimizer", "timestep counters",
         ] + (["replay buffer"] if replay_restored else []),
         "reset": (
             [] if replay_restored else ["replay buffer"]
-        ) + ["random-number-generator state (reseeded for continuation)"],
+        ) + [
+            "random-number-generator state (reseeded for continuation)",
+            "environment state",
+            "evaluation and checkpoint-selection callback state",
+        ],
+        "exact_process_resume": False,
         "effective_loaded_hyperparameters": {
             "learning_rate": model.learning_rate,
             "buffer_size": model.buffer_size,
@@ -741,6 +927,12 @@ def main(argv=None) -> None:
     run_dir = create_run_directory(config)
     save_resolved_config(config, run_dir)
     create_run_manifest(run_dir, config, task_banks=task_bank_checks)
+    checkpoint_context = {
+        "task_name": config.continual.tasks[0],
+        "backend": config.environment.backend,
+        "reward_function_version": config.environment.reward_function_version,
+        "training_config_sha256": file_hash(run_dir / "config.yaml"),
+    }
     for directory in ("tensorboard", "evaluations"):
         (run_dir / directory).mkdir()
 
@@ -775,6 +967,7 @@ def main(argv=None) -> None:
         early_stopping=config.sac.early_stopping,
         best_success_model_name="best_model",
         atomic_model_replacement=True,
+        checkpoint_context=checkpoint_context,
     )
     model, actor_initialization, resume_provenance = initialize_sac_training(
         config, train_env, run_dir
@@ -814,12 +1007,22 @@ def main(argv=None) -> None:
         model.learn(**learn_kwargs)
         evaluation_callback.num_timesteps = int(model.num_timesteps)
         evaluation_callback.record_maximum_budget_completion(config.sac.steps)
-        if config.resume.enabled:
-            final_returns, final_lengths, final_successes = evaluation_callback._evaluate()
-        else:
+        final_checkpoint = save_sac_checkpoint(
+            model,
+            run_dir,
+            "final",
+            checkpoint_context,
+            status="pending-validation",
+        )
+        if (
+            evaluation_callback.timesteps
+            and evaluation_callback.timesteps[-1] == int(model.num_timesteps)
+        ):
             final_returns = evaluation_callback.results[-1]
             final_lengths = evaluation_callback.ep_lengths[-1]
             final_successes = evaluation_callback.successes[-1]
+        else:
+            final_returns, final_lengths, final_successes = evaluation_callback._evaluate()
         final_policy_validation = {
             "success_rate": float(np.mean(final_successes)),
             "success_count": int(np.sum(final_successes)),
@@ -827,6 +1030,24 @@ def main(argv=None) -> None:
             "std_return": float(np.std(final_returns)),
             "mean_episode_length": float(np.mean(final_lengths)),
         }
+        architecture = resume_provenance.get("source_policy_architecture")
+        if isinstance(architecture, dict):
+            architecture = architecture.get("identity") or architecture.get("policy_class")
+        config_path = run_dir / "config.yaml"
+        write_expert_manifest(
+            run_dir / "final_model.zip",
+            task_name=config.continual.tasks[0],
+            backend=config.environment.backend,
+            reward_function_version=config.environment.reward_function_version,
+            training_seed=config.runtime.seed,
+            training_config_reference=str(config_path),
+            training_config_sha256=file_hash(config_path),
+            observation_shape=OBSERVATION_SHAPE,
+            action_shape=ACTION_SHAPE,
+            horizon=horizon_for_backend(config.environment.backend),
+            qualification=None,
+            policy_architecture=architecture or SAC_POLICY_ARCHITECTURE,
+        )
         best_path = run_dir / "best_model.zip"
         print(f"Best model saved to: {best_path}")
         if (
@@ -852,10 +1073,6 @@ def main(argv=None) -> None:
                 deterministic=True,
                 task_hashes=list(evaluation_callback.task_hashes),
             )
-            config_path = run_dir / "config.yaml"
-            architecture = resume_provenance.get("source_policy_architecture")
-            if isinstance(architecture, dict):
-                architecture = architecture.get("identity") or architecture.get("policy_class")
             write_expert_manifest(
                 best_path,
                 task_name=config.continual.tasks[0],
@@ -903,11 +1120,17 @@ def main(argv=None) -> None:
                 "path": str(best_path.relative_to(run_dir)),
                 "sha256": file_hash(best_path),
             },
+            "best_checkpoint": evaluation_callback.best_checkpoint,
+            "final_checkpoint": {**final_checkpoint, "status": "complete"},
             "final_evaluation": final_test(config, selected),
         }
         with (run_dir / "results.json").open("x", encoding="utf-8") as stream:
             json.dump(results, stream, indent=2, allow_nan=False)
             stream.write("\n")
+        final_checkpoint["status"] = "complete"
+        atomic_replace_json(
+            run_dir / "final_checkpoint.json", final_checkpoint, allow_nan=False
+        )
         complete_run(run_dir)
         print(f"Run directory: {run_dir}")
     finally:

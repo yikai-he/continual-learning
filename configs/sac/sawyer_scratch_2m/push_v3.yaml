@@ -1,0 +1,38 @@
+experiment: sac
+environment: {backend: metaworld-v3, reward_function_version: v2}
+sac:
+  steps: 2000000
+  learning_rate: 0.001
+  buffer_size: 1000000
+  learning_starts: 1000
+  random_exploration_steps: 10000
+  target_output_std: 0.089
+  batch_size: 128
+  gamma: 0.99
+  tau: 0.005
+  train_freq: 50
+  gradient_steps: 50
+  early_stopping:
+    enabled: true
+    min_steps: 0
+    success_threshold: 1.0
+    patience: 3
+    plateau_patience: null
+    min_delta: 0.01
+actor_init: {mode: scratch, checkpoint: null}
+resume: {enabled: false, checkpoint: null, replay_buffer: null, refill_steps: 0}
+continual: {tasks: [push-v3]}
+evaluation:
+  episodes: 50
+  final_episodes: 50
+  frequency: 40000
+  seed_offset: 10000
+  mode: fixed-tasks
+  task_set_seed: 10000
+  final_task_set_seeds: [20000, 20001]
+  final_reset_seed: 30000
+runtime:
+  seed: 0
+  device: auto
+  output: runs/sac_sawyer_scratch_2m/push-v3
+  run_name: seed_0

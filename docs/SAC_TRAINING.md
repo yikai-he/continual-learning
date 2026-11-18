@@ -31,18 +31,111 @@ remain loadable through the same `LegacySACPolicy` class.
 
 ## Checkpoint semantics
 
-Standalone SAC retains one selected expert:
+New standalone SAC runs retain synchronized Best and Final training snapshots:
 
 ```text
-best_model.zip    # highest validation (success_rate, mean_return)
+best_model.zip              # selected inference checkpoint (compatible path)
+best_replay_buffer.pkl      # replay state at the same validation step
+best_checkpoint.json        # hashes, step, task, spaces, and buffer metadata
+final_model.zip             # actual policy at normal termination
+final_replay_buffer.pkl     # replay state at the final step
+final_checkpoint.json       # synchronized Final metadata
+final_model.zip.manifest.json # identity sidecar for same-task continuation
 ```
 
 Success rate is primary. Mean return breaks equal-success ties, and exact ties
-keep the earlier checkpoint. Metrics must be finite. The file is serialized to
-a temporary path and atomically replaced; replay buffers are not saved.
+keep the earlier checkpoint. Metrics must be finite. Model and replay files are
+serialized and hashed before metadata is published; a failed Best replacement
+restores the previous complete trio. Final is saved for normal maximum-budget
+and Early Stopping termination and is not promoted automatically to the Expert
+Registry. No periodic recovery snapshots are created.
 
-No periodic models, replay buffers, final model, or resume checkpoint are
-written. Interrupted runs must be restarted in a fresh collision-safe directory.
+## Scratch, actor initialization, and continuation
+
+The three initialization modes are deliberately separate:
+
+- Scratch training creates a new SAC model and all training state. This remains
+  the default.
+- Actor Warm-Start copies only compatible actor weights; critics, targets,
+  optimizers, entropy state, counters, and replay are fresh.
+- Same-task continuation loads the serialized SAC model into a new
+  collision-safe run.
+  Actor, critics, target critics, optimizer states, entropy state, and timestep
+  counters stored by SB3 are restored. Warm-start and resume are mutually
+  exclusive.
+
+```yaml
+actor_init: {mode: scratch, checkpoint: null}
+resume:
+  enabled: true
+  checkpoint: experts/sawyer/peg-unplug-side-v3/seed_0/best_model.zip
+  replay_buffer: null
+sac:
+  steps: 200000  # hard maximum of additional environment steps
+  early_stopping:
+    enabled: true
+    min_steps: 20000
+    success_threshold: 1.0
+    patience: 3
+    plateau_patience: null
+    min_delta: 0.01
+```
+
+SB3 model archives do not contain replay buffers. With `replay_buffer: null`,
+the run is labeled `model-state-only`, starts with an empty buffer, and uses the
+explicit refill described below. New matched continuation points use either
+the `best_*` model/replay/metadata trio or the corresponding `final_*` trio.
+Hashes, step, task, backend, reward, spaces, capacity, stored transition count,
+and source configuration are verified before optimization. A Best model cannot
+be paired with a Final buffer. Neither mode is exact process-level resume: RNG
+streams, environment state, callback state, and TensorBoard state are not
+restored.
+
+For a matched continuation, point both paths at the same completed training run:
+
+```yaml
+resume:
+  enabled: true
+  checkpoint: runs/source/best_model.zip       # or final_model.zip
+  replay_buffer: runs/source/best_replay_buffer.pkl
+  refill_steps: 0
+```
+
+The adjacent `best_checkpoint.json` (or `final_checkpoint.json`) is mandatory.
+Source checkpoint steps remain the TensorBoard/global-step origin; refill and
+new training interactions count toward the additional `sac.steps` budget, while
+evaluation interactions do not.
+
+The serialized source hyperparameters remain effective during continuation and
+are recorded in the result provenance; the new `sac.steps` is the additional
+budget rather than a request to rebuild the optimizer. SB3 archives do not
+preserve a live random-number-generator stream, so continuation reseeds the
+model and environment from `runtime.seed` and records that RNG state as reset.
+
+For model-state-only continuation, `resume.refill_steps` collects transitions
+with the restored SAC policy's ordinary stochastic action sampling before
+optimization resumes. Actor, critics, optimizers, and entropy state are not
+updated during refill. The interactions advance the global counter, consume the
+additional-step budget, and count toward early-stopping `min_steps`. This avoids
+the Legacy 50-update boundary repeatedly sampling a nearly empty buffer. Refill
+must be zero when an explicit replay buffer is restored.
+
+At termination, `final_policy_validation` evaluates the actual in-memory Final
+policy on the validation bank unless that exact timestep was already evaluated.
+This is separate from Best validation and independent final-bank testing of
+Best. Validation and final testing may use different episode counts through
+`evaluation.episodes` and optional `evaluation.final_episodes`; null preserves
+the historical behavior of using the validation count for final banks.
+
+Resume requires a hash-valid manifest matching task, backend, reward version,
+horizon, and observation/action contracts. Unsupported custom reward variants
+are rejected. The source policy is evaluated before the first update and
+participates in success-first, return-second selection. `min_steps` counts
+additional steps. `patience` counts consecutive held-out evaluations meeting
+`success_threshold`; optional `plateau_patience` counts evaluations without a
+success-rate improvement greater than `min_delta` and is disabled by default.
+`results.json` records source, final-policy, and independent final-test metrics,
+restored/reset state, additional/total steps, and the stopping reason.
 
 The three prepared Sawyer target-success-only experiments explicitly set
 `plateau_patience: null`. They run Stick Pull, Push, then Push Back, prioritizing
@@ -72,8 +165,9 @@ tests run only after selection and cannot change checkpoint ranking.
 
 The smoke configuration exercises environment creation, training, four periodic
 validation events, atomic best-expert replacement, independent final testing,
-and result serialization. It is an infrastructure check, not a performance
-benchmark, and does not require the policy to solve the task.
+result serialization, and synchronized Best/Final replay persistence. It is an
+infrastructure check, not a performance benchmark, and does not require the
+policy to solve the task.
 
 From the repository root, with the `metaworld` Conda environment active, run:
 
@@ -85,17 +179,54 @@ python train_sac.py \
 
 Replace the timestamp placeholder so the run has a new path under
 `runs/smoke/sac_low_disk/`. The trainer also refuses to overwrite an existing
-run directory. A successful run contains `best_model.zip`, its expert manifest,
-`config.yaml`, `run_manifest.json`, `results.json`, and evaluation records.
-`results.json` contains the early-stopping outcome, selected-expert hash, and
-post-selection final evaluations. No replay-buffer file or periodic checkpoint
-directory is expected. CSV, Markdown, and duplicate JSON summaries are not
+run directory. A successful run contains synchronized Best and Final
+model/replay trios, the Best expert manifest, `config.yaml`,
+`run_manifest.json`, `results.json`, and evaluation records. Replay buffers
+remain training artifacts and are never copied into `experts/`. A
+one-million-entry buffer is typically several hundred MB, so Best and Final are
+the only retained snapshots. CSV, Markdown, and duplicate JSON summaries are not
 written automatically; `evaluations/evaluations.npz` is the validation-history
 authority.
 
 Stop safely with `Ctrl-C`. An interrupted run is intentionally not marked
-complete; use a fresh run name for the next attempt because low-disk checkpoints
-are inference-only and cannot provide exact training resumption.
+complete; use a fresh run name for the next attempt. This workflow does not
+provide crash recovery or exact process-level resume.
+
+## Sawyer Push Back and Push scratch runs (2M maximum)
+
+Two independent seed-0 scratch experiments are defined in
+`configs/sac/sawyer_scratch_2m/`. Push Back runs first because it blocks CM5;
+Push follows as a separate CM10 candidate. Both use MetaWorld v3 reward v2,
+`LegacySACPolicy`, a maximum of 2,000,000 training interactions, and a fresh
+actor, critics, optimizers, entropy state, timestep counter, and replay buffer.
+They do not load the historical Push continuation or Faucet Close actor.
+
+Validation is deterministic on all 50 fixed MT1 configurations once every
+40,000 training interactions. Training stops normally after three consecutive
+50/50 validations or at the maximum budget; `plateau_patience: null` means long
+periods without improvement cannot stop it. The initial step-0 evaluation is
+eligible for Best selection but not Early Stopping. Selected-Best final tests
+use distinct task banks 20000 and 20001 for 100 total episodes and never affect
+selection.
+
+Each run writes synchronized `best_*` and `final_*` model, replay-buffer, and
+checkpoint-metadata trios under
+`runs/sac_sawyer_scratch_2m/<task>/seed_0/`, plus the resolved configuration,
+actor initialization, run manifest, evaluation history, results, TensorBoard
+events, and console log. Historical experts and transfer/continuation runs stay
+separate and are never promoted automatically.
+
+```bash
+# Validate both tasks without creating run directories.
+./tools/experiments/train_sawyer_scratch_2m.sh --preflight-only
+
+# Run either task independently.
+python -u train_sac.py --config configs/sac/sawyer_scratch_2m/push_back_v3.yaml
+python -u train_sac.py --config configs/sac/sawyer_scratch_2m/push_v3.yaml
+
+# Run Push Back then Push, stopping on the first unexpected failure.
+./tools/experiments/train_sawyer_scratch_2m.sh --run
+```
 
 ## Five Sawyer experts on three machines
 
